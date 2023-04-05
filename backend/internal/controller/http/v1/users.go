@@ -19,12 +19,19 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase) {
 
 	h := handler.Group("/users")
 	{
-		h.GET("/history", r.detail)
+		h.POST("/create", r.createUser)
+		h.POST("/login", r.autentication)
+
+		secured := h.Group("/").Use(Auth())
+		{
+			secured.GET("/detail", r.detail)
+		}
 	}
 }
 
 type userResponse struct {
-	User entity.User `json:"user"`
+	User  entity.User `json:"user"`
+	Token string
 }
 
 // @Summary     Show history
@@ -45,5 +52,68 @@ func (r *usersRoutes) detail(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, userResponse{user})
+	c.JSON(http.StatusOK, userResponse{User: user})
+}
+
+// @Summary     Create user
+// @Description Create user
+// @ID          create
+// @Tags  	    user
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} userResponse
+// @Failure     500 {object} response
+// @Router      /user/create [post]
+func (r *usersRoutes) createUser(c *gin.Context) {
+	var user entity.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		// r.l.Error(err, "http - v1 - create")
+		// errorResponse(c, http.StatusBadRequest, "invalid request body")
+		fmt.Println(err)
+		return
+	}
+
+	if err := r.t.CreateUser(user); err != nil {
+		// r.l.Error(err, "http - v1 - create")
+		// errorResponse(c, http.StatusInternalServerError, "database problems")
+		fmt.Println(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, userResponse{User: user})
+}
+
+// @Summary Autentication User
+// @Description Autentication User
+// @ID autentication
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200 {object} userResponse
+// @Failure 500 {object} response
+// @Router /user/login [post]
+func (r *usersRoutes) autentication(c *gin.Context) {
+	var user entity.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		// r.l.Error(err, "http - v1 - create")
+		// errorResponse(c, http.StatusBadRequest, "invalid request body")
+		fmt.Println(err)
+		return
+	}
+	// check if user exists and password is correct
+	user, err := r.t.Autentication(user.Name, user.Password)
+	if err != nil {
+		// r.l.Error(err, "http - v1 - create")
+		// errorResponse(c, http.StatusInternalServerError, "database problems")
+		fmt.Println(err)
+		return
+	}
+	tokenString, err := GenerateJWT(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
+
+	c.JSON(http.StatusOK, userResponse{User: user, Token: tokenString})
 }

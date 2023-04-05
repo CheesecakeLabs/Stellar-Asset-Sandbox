@@ -16,7 +16,7 @@ func New(pg *postgres.Postgres) UserRepo {
 }
 
 func (r UserRepo) GetUser(name string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT * FROM User WHERE name='%s'`, name)
+	stmt := fmt.Sprintf(`SELECT * FROM "User" WHERE name='%s'`, name)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
@@ -28,7 +28,7 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	for rows.Next() {
 		var user entity.User
 
-		err = rows.Scan(&user.Name)
+		err = rows.Scan(&user.Name, &user.Password)
 		if err != nil {
 			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
 		}
@@ -37,4 +37,16 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	}
 
 	return entity.User{}, nil
+}
+
+func (r UserRepo) CreateUser(user entity.User) error {
+	stmt := `INSERT INTO public."User" (name, password) VALUES ($1, $2)`
+	fmt.Println(user)
+	_, err := r.Db.Exec(stmt, user.Name, user.Password)
+	if err != nil {
+		panic(err)
+		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+	}
+	fmt.Println("User created successfully")
+	return nil
 }
