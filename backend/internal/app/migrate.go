@@ -18,7 +18,7 @@ const (
 	_defaultTimeout  = time.Second
 )
 
-func init_sa() {
+func init() {
 	cfg, e := config.NewConfig()
 	if e != nil {
 		log.Fatalf("Config error: %s", e)
