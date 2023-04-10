@@ -1,0 +1,4 @@
+CREATE TABLE Wallet (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL
+);
