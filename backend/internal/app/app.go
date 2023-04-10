@@ -19,11 +19,11 @@ import (
 
 // Run creates objects via constructors.
 func Run(cfg *config.Config, pg *postgres.Postgres) {
-	//l := logger.New(cfg.Log.Level)
+	// l := logger.New(cfg.Log.Level)
 
 	// Use case
 	usecase := usecase.New(
-		repo.New(pg),
+		repo.New(pg), cfg.JWT.SecretKey,
 	)
 
 	// HTTP Server

@@ -22,7 +22,7 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase) {
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
 
-		secured := h.Group("/").Use(Auth())
+		secured := h.Group("/").Use(Auth(t.GetJWTSecretKey()))
 		{
 			secured.GET("/detail", r.detail)
 		}
@@ -108,7 +108,8 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	tokenString, err := GenerateJWT(user)
+	tokenString, err := GenerateJWT(user, r.t.GetJWTSecretKey())
+	fmt.Println(" Error", err)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		c.Abort()

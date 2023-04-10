@@ -10,13 +10,15 @@ import (
 
 // TranslationUseCase -.
 type UserUseCase struct {
-	repo repo.UserRepo
+	repo         repo.UserRepo
+	jwtSecretKey string
 }
 
 // New -.
-func New(r repo.UserRepo) *UserUseCase {
+func New(r repo.UserRepo, k string) *UserUseCase {
 	return &UserUseCase{
-		repo: r,
+		repo:         r,
+		jwtSecretKey: k,
 	}
 }
 
@@ -67,4 +69,8 @@ func (uc *UserUseCase) checkPassword(user entity.User, providedPassword string) 
 		return err
 	}
 	return nil
+}
+
+func (uc *UserUseCase) GetJWTSecretKey() string {
+	return uc.jwtSecretKey
 }

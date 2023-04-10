@@ -6,9 +6,8 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
-
-var jwtKey = []byte("supersecretkey") // Todo: move to env
 
 type JWTClaim struct {
 	ID   string `json:"username"` // TODO
@@ -16,12 +15,12 @@ type JWTClaim struct {
 	jwt.StandardClaims
 }
 
-func ValidateToken(signedToken string) (err error) {
+func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&JWTClaim{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtKey), nil
+			return []byte(jwtSecretKey), nil
 		},
 	)
 	if err != nil {
@@ -39,7 +38,7 @@ func ValidateToken(signedToken string) (err error) {
 	return
 }
 
-func GenerateJWT(user entity.User) (tokenString string, err error) {
+func GenerateJWT(user entity.User, jwtSecretKey string) (tokenString string, err error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &JWTClaim{
 		ID:   user.ID, // TODO
@@ -49,6 +48,24 @@ func GenerateJWT(user entity.User) (tokenString string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString(jwtKey)
+	tokenString, err = token.SignedString([]byte(jwtSecretKey))
 	return
+}
+
+func Auth(jwtSecretKey string) gin.HandlerFunc {
+	return func(context *gin.Context) {
+		tokenString := context.GetHeader("Authorization")
+		if tokenString == "" {
+			context.JSON(401, gin.H{"error": "request does not contain an access token"})
+			context.Abort()
+			return
+		}
+		err := ValidateToken(tokenString, jwtSecretKey)
+		if err != nil {
+			context.JSON(401, gin.H{"error": err.Error()})
+			context.Abort()
+			return
+		}
+		context.Next()
+	}
 }
