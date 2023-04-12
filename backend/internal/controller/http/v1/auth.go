@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -10,8 +11,8 @@ import (
 )
 
 type JWTClaim struct {
-	ID   string `json:"username"` // TODO
-	Name string `json:"email"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 	jwt.StandardClaims
 }
 
@@ -24,22 +25,20 @@ func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 		},
 	)
 	if err != nil {
+		fmt.Println("OPAAAA")
 		return
 	}
-	claims, ok := token.Claims.(*JWTClaim)
+	_, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
 		return
 	}
-	if claims.ExpiresAt < time.Now().Local().Unix() {
-		err = errors.New("token expired")
-		return
-	}
+
 	return
 }
 
 func GenerateJWT(user entity.User, jwtSecretKey string) (tokenString string, err error) {
-	expirationTime := time.Now().Add(1 * time.Hour)
+	expirationTime := time.Now().Add(15 * time.Minute)
 	claims := &JWTClaim{
 		ID:   user.ID, // TODO
 		Name: user.Name,

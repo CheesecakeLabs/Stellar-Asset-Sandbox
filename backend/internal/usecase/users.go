@@ -8,16 +8,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// TranslationUseCase -.
+// User Use Case -.
 type UserUseCase struct {
 	repo         repo.UserRepo
 	jwtSecretKey string
 }
 
 // New -.
-func New(r repo.UserRepo, k string) *UserUseCase {
+func New(r *repo.UserRepo, k string) *UserUseCase {
 	return &UserUseCase{
-		repo:         r,
+		repo:         *r,
 		jwtSecretKey: k,
 	}
 }
@@ -53,6 +53,10 @@ func (uc *UserUseCase) Autentication(name string, password string) (user entity.
 		return
 	}
 	return
+}
+
+func (uc *UserUseCase) Logout(name string) error {
+	return nil
 }
 
 func (uc *UserUseCase) hashPassword(password string) (string, error) {

@@ -21,7 +21,6 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase) {
 	{
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
-
 		secured := h.Group("/").Use(Auth(t.GetJWTSecretKey()))
 		{
 			secured.GET("/detail", r.detail)
