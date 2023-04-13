@@ -55,10 +55,6 @@ func (uc *UserUseCase) Autentication(name string, password string) (user entity.
 	return
 }
 
-func (uc *UserUseCase) Logout(name string) error {
-	return nil
-}
-
 func (uc *UserUseCase) hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {

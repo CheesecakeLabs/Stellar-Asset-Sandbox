@@ -63,7 +63,6 @@ func Auth(jwtSecretKey string) gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-
 		context.Next()
 	}
 }

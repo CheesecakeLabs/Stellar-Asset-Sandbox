@@ -24,14 +24,10 @@ func (uc *AuthUseCase) UpdateToken(id string, token string) error {
 	return nil
 }
 
-func (uc *AuthUseCase) ValidateToken(id string, token string) error {
-	err := uc.repo.ValidateToken(id, token)
+func (uc *AuthUseCase) ValidateToken() string {
+	err := uc.repo.ValidateToken(uc.jwtSecretKey)
 	if err != nil {
-		return err
+		return ""
 	}
-	return nil
-}
-
-func (uc *AuthUseCase) GetJWTSecretKey() string {
 	return uc.jwtSecretKey
 }

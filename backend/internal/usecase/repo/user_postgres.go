@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -62,26 +63,20 @@ func (r UserRepo) UpdateToken(id string, token string) error {
 	return nil
 }
 
-func (r UserRepo) ValidateToken(id string, token string) error {
-	stmt := fmt.Sprintf(`SELECT * FROM "UserAccount" WHERE id='%s' AND token='%s'`, id, token)
+func (r UserRepo) ValidateToken(token string) error {
+	stmt := `SELECT * FROM "UserAccount" WHERE token=$1`
 
-	rows, err := r.Db.Query(stmt)
+	rows, err := r.Db.Query(stmt, token)
 	if err != nil {
-		return fmt.Errorf("UserRepo - GetUser - db.Query: %w", err)
+		return fmt.Errorf("UserRepo - ValidateToken - db.Query: %w", err)
 	}
 
 	defer rows.Close()
 
-	for rows.Next() {
-		var user entity.User
-
-		err = rows.Scan(&user.Name, &user.Password)
-		if err != nil {
-			return fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
-		}
-
-		return nil
+	// Check if any row was returned
+	if !rows.Next() {
+		return errors.New("UserRepo - ValidateToken - no user found for token")
 	}
 
-	return fmt.Errorf("UserRepo - GetUser - db.Query: %w", err)
+	return nil
 }
