@@ -2,7 +2,6 @@ package v1
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -25,7 +24,6 @@ func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 		},
 	)
 	if err != nil {
-		fmt.Println("OPAAAA")
 		return
 	}
 	_, ok := token.Claims.(*JWTClaim)
@@ -65,6 +63,7 @@ func Auth(jwtSecretKey string) gin.HandlerFunc {
 			context.Abort()
 			return
 		}
+
 		context.Next()
 	}
 }

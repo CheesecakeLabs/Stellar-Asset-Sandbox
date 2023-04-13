@@ -22,13 +22,17 @@ func Run(cfg *config.Config, pg *postgres.Postgres) {
 	// l := logger.New(cfg.Log.Level)
 
 	// Use case
-	usecase := usecase.New(
+	userUseCase := usecase.NewUserUseCase(
+		repo.New(pg), cfg.JWT.SecretKey,
+	)
+
+	authUseCase := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
 	)
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, *usecase)
+	v1.NewRouter(handler, *userUseCase, *authUseCase)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal

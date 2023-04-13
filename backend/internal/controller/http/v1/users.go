@@ -11,17 +11,18 @@ import (
 
 type usersRoutes struct {
 	t usecase.UserUseCase
+	a usecase.AuthUseCase
 	// l logger.Interface
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase) {
-	r := &usersRoutes{t}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase) {
+	r := &usersRoutes{t, a}
 
 	h := handler.Group("/users")
 	{
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
-		secured := h.Group("/").Use(Auth(t.GetJWTSecretKey()))
+		secured := h.Group("/").Use(Auth(a.GetJWTSecretKey()))
 		{
 			secured.GET("/detail", r.detail)
 		}
@@ -107,13 +108,17 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	tokenString, err := GenerateJWT(user, r.t.GetJWTSecretKey())
-	fmt.Println(" Error", err)
+	tokenString, err := GenerateJWT(user, r.a.GetJWTSecretKey())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		c.Abort()
 		return
 	}
-
+	err = r.a.UpdateToken(user.Name, tokenString)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
 	c.JSON(http.StatusOK, userResponse{User: user, Token: tokenString})
 }

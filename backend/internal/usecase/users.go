@@ -15,9 +15,9 @@ type UserUseCase struct {
 }
 
 // New -.
-func New(r *repo.UserRepo, k string) *UserUseCase {
+func NewUserUseCase(r repo.UserRepo, k string) *UserUseCase {
 	return &UserUseCase{
-		repo:         *r,
+		repo:         r,
 		jwtSecretKey: k,
 	}
 }
@@ -73,8 +73,4 @@ func (uc *UserUseCase) checkPassword(user entity.User, providedPassword string) 
 		return err
 	}
 	return nil
-}
-
-func (uc *UserUseCase) GetJWTSecretKey() string {
-	return uc.jwtSecretKey
 }
