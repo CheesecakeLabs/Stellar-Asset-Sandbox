@@ -57,6 +57,7 @@ require (
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/bitly/go-notify v0.0.0-20130217044602-0a148b8111d6
+	github.com/golang/mock v1.6.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )

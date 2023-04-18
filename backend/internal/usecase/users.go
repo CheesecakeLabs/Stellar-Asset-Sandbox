@@ -4,18 +4,17 @@ import (
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
-	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // User Use Case -.
 type UserUseCase struct {
-	repo         repo.UserRepo
+	repo         UserRepo
 	jwtSecretKey string
 }
 
 // New -.
-func NewUserUseCase(r repo.UserRepo, k string) *UserUseCase {
+func NewUserUseCase(r UserRepo, k string) *UserUseCase {
 	return &UserUseCase{
 		repo:         r,
 		jwtSecretKey: k,
