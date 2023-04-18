@@ -34,7 +34,10 @@ func (uc *UserUseCase) Detail(name string) (entity.User, error) {
 // CreateUser - creating user.
 func (uc *UserUseCase) CreateUser(user entity.User) error {
 	var err error
-	user.Password, err = uc.hashPassword(user.Password)
+	if user.Password == "" {
+		return fmt.Errorf("password is empty")
+	}
+	user.Password, err = uc.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
@@ -47,14 +50,14 @@ func (uc *UserUseCase) Autentication(name string, password string) (user entity.
 	if err != nil {
 		return user, err
 	}
-	err = uc.checkPassword(user, password)
+	err = uc.CheckPassword(user, password)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (uc *UserUseCase) hashPassword(password string) (string, error) {
+func (uc *UserUseCase) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		return "", err
@@ -62,7 +65,7 @@ func (uc *UserUseCase) hashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
-func (uc *UserUseCase) checkPassword(user entity.User, providedPassword string) error {
+func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
 	if err != nil {
 		return err

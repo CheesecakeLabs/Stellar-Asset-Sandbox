@@ -1,8 +1,8 @@
 package usecase_test
 
 import (
-	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -41,46 +41,93 @@ func TestUserUseCase_GetUser(t *testing.T) {
 			name: "empty result",
 			mock: func() {
 				repo.EXPECT().
-					GetUser("context.Background(").
-					Return(entity.User{
-						ID:   "test",
-						Name: "test",
-					}, nil)
+					GetUser("empty result").
+					Return(entity.User{}, nil)
 			},
-			res: entity.User{
-				ID:   "test",
-				Name: "test",
-			},
+			res: entity.User{},
 			err: nil,
 		},
 		{
 			name: "result with error",
 			mock: func() {
 				repo.EXPECT().
-					GetUser(context.Background()).
-					Return(entity.User{
-						ID:   "test",
-						Name: "test",
-					}, errInternalServErr)
+					GetUser("result with error").
+					Return(entity.User{}, errInternalServErr)
 			},
-			res: entity.User{
-				ID:   "test",
-				Name: "test",
-			},
+			res: entity.User{},
 			err: errInternalServErr,
 		},
+		{
+			name: "result without error",
+			mock: func() {
+				repo.EXPECT().
+					GetUser("result without error").
+					Return(entity.User{
+						Name:     "test",
+						Password: "test",
+					}, nil)
+			},
+			res: entity.User{
+				Name:     "test",
+				Password: "test",
+			},
+		},
 	}
-
 	for _, tc := range tests {
 		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, err := userCase.Detail("test")
+			res, err := userCase.Detail(tc.name)
 
 			require.Equal(t, res, tc.res)
 			require.ErrorIs(t, err, tc.err)
+		})
+	}
+}
+
+func TestUserUseCase_CreateUser(t *testing.T) {
+	userCase, repo := user(t)
+
+	users := []entity.User{
+		{
+			Name: "user_invalid",
+		},
+		// {
+		// 	Name:     "user_valid",
+		// 	Password: "password",
+		// },
+	}
+
+	tests := []test{
+		{
+			name: "result with error",
+			mock: func() {
+				repo.EXPECT().
+					CreateUser(users[0]).
+					Return(fmt.Errorf("password is empty"))
+			},
+			err: fmt.Errorf("password is empty"),
+		},
+		// {
+		// 	name: "result without error",
+		// 	mock: func() {
+		// 		repo.EXPECT().
+		// 			CreateUser(users[0]).
+		// 			Return(nil)
+		// 	},
+		// 	err: nil,
+		// },
+	}
+
+	for i, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			err := userCase.CreateUser(users[i])
+
+			require.Equal(t, err, tc.err)
 		})
 	}
 }
