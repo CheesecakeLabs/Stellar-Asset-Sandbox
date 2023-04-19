@@ -16,7 +16,7 @@ func New(pg *postgres.Postgres) UserRepo {
 }
 
 func (r UserRepo) GetUser(name string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT * FROM User WHERE name='%s'`, name)
+	stmt := fmt.Sprintf(`SELECT * FROM UserAccount WHERE name='%s'`, name)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
