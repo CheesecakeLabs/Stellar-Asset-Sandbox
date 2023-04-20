@@ -11,6 +11,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	v1 "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/v1"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
@@ -18,7 +19,7 @@ import (
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres) {
+func Run(cfg *config.Config, pg *postgres.Postgres, p entity.ProducerInterface) {
 	//l := logger.New(cfg.Log.Level)
 
 	// Use case
@@ -32,7 +33,7 @@ func Run(cfg *config.Config, pg *postgres.Postgres) {
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, *userUc, *walletUc)
+	v1.NewRouter(handler, p, *userUc, *walletUc)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal

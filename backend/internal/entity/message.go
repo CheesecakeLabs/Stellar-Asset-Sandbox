@@ -1,10 +1,21 @@
 package entity
 
-type ParserInput struct {
-}
+type (
+	NotifyData struct {
+		Key      string
+		Message  interface{}
+		Producer ProducerInterface
+	}
 
-type NotifyData struct {
-	Key         string
-	ParserInput ParserInput
-	Producer    ProducerInterface
-}
+	Request struct {
+		CreateKeypair CreateKeypairRequest
+	}
+
+	CreateKeypairRequest struct {
+		Amount int `json:"amount"`
+	}
+
+	CreateKeypairResponse struct {
+		PublicKeys []string `json:"publicKeys"`
+	}
+)

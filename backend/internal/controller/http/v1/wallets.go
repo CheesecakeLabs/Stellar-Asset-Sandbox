@@ -11,11 +11,12 @@ import (
 
 type walletsRoutes struct {
 	t usecase.WalletUseCase
+	m HTTPControllerMessenger
 	// l logger.Interface
 }
 
-func newWalletsRoutes(handler *gin.RouterGroup, t usecase.WalletUseCase) {
-	r := &walletsRoutes{t}
+func newWalletsRoutes(handler *gin.RouterGroup, t usecase.WalletUseCase, m HTTPControllerMessenger) {
+	r := &walletsRoutes{t, m}
 
 	h := handler.Group("/wallets")
 	{
@@ -29,15 +30,6 @@ type walletResponse struct {
 	Wallet  entity.Wallet   `json:"wallet"`
 }
 
-// @Summary     Show history
-// @Description Show all translation history
-// @ID          history
-// @Tags  	    translation
-// @Accept      json
-// @Produce     json
-// @Success     200 {object} userResponse
-// @Failure     500 {object} response
-// @Router      /translation/history [get]
 func (r *walletsRoutes) list(c *gin.Context) {
 	walletType := c.Query("type")
 
@@ -53,9 +45,23 @@ func (r *walletsRoutes) list(c *gin.Context) {
 }
 
 func (r *walletsRoutes) create(c *gin.Context) {
-	// create keypair in kms
-	// send to starlabs
-	wallet, err := r.t.Create(entity.Wallet{Type: entity.SponsorType})
+	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 1})
+	if err != nil {
+		// r.l.Error(err, "http - v1 - history")
+		// errorResponse(c, http.StatusInternalServerError, "database problems")
+		fmt.Println(err)
+		return
+	}
+
+	kpRes := res.Message.(entity.CreateKeypairResponse)
+	pk := kpRes.PublicKeys[0]
+
+	wallet, err := r.t.Create(entity.Wallet{
+		Type: entity.SponsorType, Key: entity.Key{
+			PublicKey: pk,
+			Weight:    1,
+		},
+	})
 	if err != nil {
 		// r.l.Error(err, "http - v1 - history")
 		// errorResponse(c, http.StatusInternalServerError, "database problems")

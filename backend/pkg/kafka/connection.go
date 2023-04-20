@@ -27,10 +27,13 @@ func New(cfg config.KafkaConfig) *Connection {
 			Topics: cfg.ConsumerTopics,
 		},
 		Producer: &Producer{
-			Topic: cfg.ProducerTopic,
+			HorizonTopic:  cfg.HorProducerTopic,
+			KeypairTopic:  cfg.KpProducerTopic,
+			EnvelopeTopic: cfg.EnvProducerTopic,
 		},
 		Deserializer: &Deserializer{
-			URL: cfg.SchemaRegistry,
+			URL:           cfg.SchemaRegistry,
+			schemaEnabled: false,
 		},
 		Connection: &kafka.ConfigMap{
 			"bootstrap.servers": cfg.ClientBrokers,
@@ -88,15 +91,20 @@ func (c *Connection) AttemptConnect() error {
 }
 
 // This function will run the Kafka Consumer and send the message to the notify channel
-func (c Connection) Run(cfg *config.Config) {
+func (c Connection) Run(cfg *config.Config, chanName string) {
 	for {
 		msg, error := c.Consumer.Consumer()
 		if error != nil {
 			fmt.Println(error)
 		}
 		if msg != nil {
-			data := c.Deserializer.deserializeMessage(msg)
-			notify.Post("StellarEvents", &entity.NotifyData{Key: string(msg.Key), ParserInput: data, Producer: c.Producer})
+			data, err := c.Deserializer.DeserializeMessage(msg, chanName)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			notify.Post(string(msg.Key), &entity.NotifyData{Key: string(msg.Key), Message: data})
 		}
 	}
 }

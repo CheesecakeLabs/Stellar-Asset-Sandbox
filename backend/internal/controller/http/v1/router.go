@@ -3,6 +3,7 @@ package v1
 import (
 	"net/http"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -16,7 +17,7 @@ import (
 // @version     1.0
 // @host        localhost:8080
 // @BasePath    /v1
-func NewRouter(handler *gin.Engine, t usecase.UserUseCase, w usecase.WalletUseCase) {
+func NewRouter(handler *gin.Engine, p entity.ProducerInterface, t usecase.UserUseCase, w usecase.WalletUseCase) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -30,8 +31,9 @@ func NewRouter(handler *gin.Engine, t usecase.UserUseCase, w usecase.WalletUseCa
 
 	// Routers
 	h := handler.Group("/v1")
+	m := newHTTPControllerMessenger(p)
 	{
 		newUserRoutes(h, t)
-		newWalletsRoutes(h, w)
+		newWalletsRoutes(h, w, m)
 	}
 }
