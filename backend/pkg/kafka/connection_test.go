@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
@@ -25,7 +26,7 @@ func TestAttemptConnect(t *testing.T) {
 			ConsumerTopics: []string{
 				"Stellar",
 			},
-			ProducerTopic: "Reply",
+			KpProducerTopic: "Reply",
 		},
 	}
 
@@ -41,7 +42,7 @@ func TestAttemptConnect(t *testing.T) {
 		os.Exit(1)
 	}
 
-	go conn.Run(cfg)
+	go conn.Run(cfg, entity.CreateKeypairChannel)
 
 	deliveryChan := make(chan kafka.Event)
 	topic := "Stellar"
