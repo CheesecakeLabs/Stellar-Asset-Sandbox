@@ -1,0 +1,97 @@
+definitions:
+  entity.Key:
+    properties:
+      id:
+        example: 1
+        type: integer
+      publicKey:
+        example: GCK...
+        type: string
+      walletId:
+        example: 1
+        type: integer
+      weight:
+        example: 3
+        type: integer
+    type: object
+  entity.Wallet:
+    properties:
+      id:
+        example: 1
+        type: integer
+      key:
+        $ref: '#/definitions/entity.Key'
+      type:
+        example: sponsor
+        type: string
+    type: object
+  v1.CreateWalletRequest:
+    properties:
+      type:
+        example: sponsor
+        type: string
+    required:
+    - type
+    type: object
+  v1.response:
+    properties:
+      error:
+        example: message
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /wallets:
+    get:
+      consumes:
+      - application/json
+      description: List wallets by type
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Wallet'
+            type: array
+      summary: List
+      tags:
+      - Wallets
+    post:
+      consumes:
+      - application/json
+      description: Create a new wallet
+      parameters:
+      - description: Set up wallet
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create
+      tags:
+      - Wallets
+swagger: "2.0"
