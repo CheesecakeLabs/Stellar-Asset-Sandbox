@@ -1,37 +1,36 @@
 package v1
 
-// import (
-// 	"fmt"
-// 	"testing"
+import (
+	"testing"
 
-// 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
-// 	"github.com/bitly/go-notify"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/require"
-// )
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+	"github.com/bitly/go-notify"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
-// type mockProducer struct{}
+var mockResponse *entity.NotifyData = &entity.NotifyData{Message: "test message"}
 
-// func newMockProducer() *mockProducer {
-// 	return &mockProducer{}
-// }
+type mockProducer struct{}
 
-// func (p *mockProducer) Produce(chanType string, key string, value interface{}) error {
-// 	fmt.Println("oi")
-// 	notify.Post(key, value)
-// 	return nil
-// }
+func newMockProducer() *mockProducer {
+	return &mockProducer{}
+}
 
-// func TestSendMessage(t *testing.T) {
-// 	mockProducer := newMockProducer()
-// 	messenger := newHTTPControllerMessenger(mockProducer)
+func (p *mockProducer) Produce(chanType string, key string, value interface{}) error {
+	go func() {
+		notify.Post(key, mockResponse)
+	}()
+	return nil
+}
 
-// 	expectedData := &entity.NotifyData{Message: "test message"}
-// 	actualData, err := messenger.SendMessage("test", expectedData)
-// 	assert.NoError(t, err)
+func TestSendMessage(t *testing.T) {
+	mockProducer := newMockProducer()
+	messenger := newHTTPControllerMessenger(mockProducer)
 
-// 	// Verify that the producer received the correct message
+	reqData := &entity.CreateKeypairRequest{Amount: 1}
+	actualData, err := messenger.SendMessage("test", reqData)
+	assert.NoError(t, err)
 
-// 	// Verify that the messenger returned the correct data
-// 	require.EqualValues(t, expectedData, actualData)
-// }
+	require.EqualValues(t, mockResponse, actualData)
+}
