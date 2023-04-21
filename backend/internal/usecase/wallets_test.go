@@ -1,0 +1,183 @@
+package usecase_test
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/mocks"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+)
+
+type test struct {
+	name string
+	mock func()
+	req  interface{}
+	res  interface{}
+	err  error
+}
+
+var dbError = errors.New("database error")
+var walletDbError = errors.New("wallet database error")
+var keyDbError = errors.New("key database error")
+
+func wallet(t *testing.T) (*usecase.WalletUseCase, *mocks.MockWalletRepoInterface) {
+	t.Helper()
+
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+
+	r := mocks.NewMockWalletRepoInterface(mockCtl)
+	u := usecase.NewWalletUseCase(r)
+
+	return u, r
+}
+
+func TestWalletUseCaseList(t *testing.T) {
+	u, r := wallet(t)
+
+	wallet1 := entity.Wallet{
+		Id:   1,
+		Type: entity.SponsorType,
+	}
+	wallet2 := entity.Wallet{
+		Id:   1,
+		Type: entity.IssuerType,
+		Key: entity.Key{
+			Id: 3,
+		},
+	}
+	tests := []test{
+		{
+			name: "list - two wallets",
+			req:  entity.SponsorType,
+			mock: func() {
+				r.EXPECT().GetWallets(entity.SponsorType).Return([]entity.Wallet{wallet1, wallet2}, nil)
+			},
+			res: []entity.Wallet{wallet1, wallet2},
+			err: nil,
+		},
+		{
+			name: "list - empty",
+			req:  entity.SponsorType,
+			mock: func() {
+				r.EXPECT().GetWallets(entity.SponsorType).Return([]entity.Wallet{}, nil)
+			},
+			res: []entity.Wallet{},
+			err: nil,
+		},
+		{
+			name: "list - database error",
+			req:  entity.SponsorType,
+			mock: func() {
+				r.EXPECT().GetWallets(entity.SponsorType).Return(nil, dbError)
+			},
+			res: []entity.Wallet(nil),
+			err: dbError,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			res, err := u.List(tc.req.(string))
+
+			require.EqualValues(t, tc.res, res)
+			if tc.err == nil {
+				require.EqualValues(t, err, tc.err)
+			} else {
+				require.ErrorContains(t, err, dbError.Error())
+			}
+		})
+	}
+
+}
+
+func TestWalletUseCaseCreate(t *testing.T) {
+	u, r := wallet(t)
+
+	req := entity.Wallet{
+		Type: entity.IssuerType,
+		Key: entity.Key{
+			PublicKey: "key",
+			Weight:    1,
+		},
+	}
+	tests := []test{
+		{
+			name: "create - success",
+			req:  req,
+			mock: func() {
+				r.EXPECT().CreateWallet(req).Return(entity.Wallet{
+					Id:   12,
+					Type: entity.IssuerType,
+					Key: entity.Key{
+						PublicKey: "key",
+						Weight:    1,
+					},
+				}, nil)
+				r.EXPECT().CreateKey(entity.Key{
+					PublicKey: "key",
+					Weight:    1,
+					WalletId:  12,
+				}).Return(entity.Key{
+					Id:        25,
+					PublicKey: "key",
+					Weight:    1,
+					WalletId:  12,
+				}, nil)
+			},
+			res: entity.Wallet{
+				Id:   12,
+				Type: entity.IssuerType,
+				Key: entity.Key{
+					Id:        25,
+					PublicKey: "key",
+					Weight:    1,
+					WalletId:  12,
+				},
+			},
+			err: nil,
+		},
+		{
+			name: "create - wallet database error",
+			req:  req,
+			mock: func() {
+				r.EXPECT().CreateWallet(req).Return(entity.Wallet{}, walletDbError)
+			},
+			res: entity.Wallet{},
+			err: walletDbError,
+		},
+		{
+			name: "create - key database error",
+			req:  req,
+			mock: func() {
+				r.EXPECT().CreateWallet(req).Return(req, nil)
+				r.EXPECT().CreateKey(req.Key).Return(entity.Key{}, keyDbError)
+			},
+			res: entity.Wallet{},
+			err: keyDbError,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			res, err := u.Create(tc.req.(entity.Wallet))
+
+			require.EqualValues(t, tc.res, res)
+			if tc.err == nil {
+				require.EqualValues(t, err, tc.err)
+			} else {
+				require.ErrorContains(t, err, dbError.Error())
+			}
+		})
+	}
+
+}

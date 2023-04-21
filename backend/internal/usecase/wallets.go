@@ -4,14 +4,13 @@ import (
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
-	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 )
 
 type WalletUseCase struct {
-	repo repo.WalletRepo
+	repo WalletRepoInterface
 }
 
-func NewWalletUseCase(r repo.WalletRepo) *WalletUseCase {
+func NewWalletUseCase(r WalletRepoInterface) *WalletUseCase {
 	return &WalletUseCase{
 		repo: r,
 	}

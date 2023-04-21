@@ -18,21 +18,21 @@ func newHTTPControllerMessenger(p entity.ProducerInterface) HTTPControllerMessen
 }
 
 func (m *HTTPControllerMessenger) SendMessage(chanType string, value interface{}) (*entity.NotifyData, error) {
-	chanName, err := m.generateHash()
+	msgKey, err := m.generateHash()
 	if err != nil {
 		return &entity.NotifyData{}, fmt.Errorf("sendMessage - generateHash: %v", err)
 	}
 
 	channel := make(chan interface{})
-	notify.Start(chanName, channel)
+	notify.Start(msgKey, channel)
 
-	err = m.p.Produce(chanType, chanName, value)
+	err = m.p.Produce(chanType, msgKey, value)
 	if err != nil {
 		return &entity.NotifyData{}, fmt.Errorf("sendMessage - p.Produce: %v", err)
 	}
 
 	res := <-channel
-	notify.Stop(chanName, channel)
+	notify.Stop(msgKey, channel)
 
 	return res.(*entity.NotifyData), nil
 }

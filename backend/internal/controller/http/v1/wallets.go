@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -12,12 +11,10 @@ import (
 type walletsRoutes struct {
 	t usecase.WalletUseCase
 	m HTTPControllerMessenger
-	// l logger.Interface
 }
 
 func newWalletsRoutes(handler *gin.RouterGroup, t usecase.WalletUseCase, m HTTPControllerMessenger) {
 	r := &walletsRoutes{t, m}
-
 	h := handler.Group("/wallets")
 	{
 		h.GET("", r.list)
@@ -25,32 +22,21 @@ func newWalletsRoutes(handler *gin.RouterGroup, t usecase.WalletUseCase, m HTTPC
 	}
 }
 
-type walletResponse struct {
-	Wallets []entity.Wallet `json:"wallets"`
-	Wallet  entity.Wallet   `json:"wallet"`
-}
-
 func (r *walletsRoutes) list(c *gin.Context) {
 	walletType := c.Query("type")
 
 	wallets, err := r.t.List(walletType)
 	if err != nil {
-		// r.l.Error(err, "http - v1 - history")
-		// errorResponse(c, http.StatusInternalServerError, "database problems")
-		fmt.Println(err)
-		return
+		errorResponse(c, http.StatusInternalServerError, "database problems")
 	}
 
-	c.JSON(http.StatusOK, walletResponse{Wallets: wallets})
+	c.JSON(http.StatusOK, wallets)
 }
 
 func (r *walletsRoutes) create(c *gin.Context) {
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 1})
 	if err != nil {
-		// r.l.Error(err, "http - v1 - history")
-		// errorResponse(c, http.StatusInternalServerError, "database problems")
-		fmt.Println(err)
-		return
+		errorResponse(c, http.StatusInternalServerError, "messaging problems")
 	}
 
 	kpRes := res.Message.(entity.CreateKeypairResponse)
@@ -63,11 +49,8 @@ func (r *walletsRoutes) create(c *gin.Context) {
 		},
 	})
 	if err != nil {
-		// r.l.Error(err, "http - v1 - history")
-		// errorResponse(c, http.StatusInternalServerError, "database problems")
-		fmt.Println(err)
-		return
+		errorResponse(c, http.StatusInternalServerError, "database problems")
 	}
 
-	c.JSON(http.StatusOK, walletResponse{Wallet: wallet})
+	c.JSON(http.StatusOK, wallet)
 }
