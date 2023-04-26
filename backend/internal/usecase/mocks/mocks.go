@@ -64,6 +64,36 @@ func (mr *MockWalletRepoInterfaceMockRecorder) CreateWallet(arg0 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).CreateWallet), arg0)
 }
 
+// GetKey mocks base method.
+func (m *MockWalletRepoInterface) GetKey(arg0 int) (entity.Key, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKey", arg0)
+	ret0, _ := ret[0].(entity.Key)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKey indicates an expected call of GetKey.
+func (mr *MockWalletRepoInterfaceMockRecorder) GetKey(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKey", reflect.TypeOf((*MockWalletRepoInterface)(nil).GetKey), arg0)
+}
+
+// GetWallet mocks base method.
+func (m *MockWalletRepoInterface) GetWallet(arg0 int) (entity.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWallet", arg0)
+	ret0, _ := ret[0].(entity.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWallet indicates an expected call of GetWallet.
+func (mr *MockWalletRepoInterfaceMockRecorder) GetWallet(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).GetWallet), arg0)
+}
+
 // GetWallets mocks base method.
 func (m *MockWalletRepoInterface) GetWallets(arg0 string) ([]entity.Wallet, error) {
 	m.ctrl.T.Helper()
