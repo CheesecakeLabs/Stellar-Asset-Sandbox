@@ -2,7 +2,7 @@ package usecase
 
 import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 
-// mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks_test.go -package=mocks
+// mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks.go -package=mocks
 
 type (
 	// UserRepo -.

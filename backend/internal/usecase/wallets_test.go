@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type test struct {
+type testWallet struct {
 	name string
 	mock func()
 	req  interface{}
@@ -49,7 +49,7 @@ func TestWalletUseCaseList(t *testing.T) {
 			Id: 3,
 		},
 	}
-	tests := []test{
+	tests := []testWallet{
 		{
 			name: "list - two wallets",
 			req:  entity.SponsorType,
@@ -107,7 +107,7 @@ func TestWalletUseCaseCreate(t *testing.T) {
 			Weight:    1,
 		},
 	}
-	tests := []test{
+	tests := []testWallet{
 		{
 			name: "create - success",
 			req:  req,
