@@ -15,13 +15,21 @@ type (
 	}
 
 	KafkaConfig struct {
-		ClientGroupId    string   `env:"KAFKA_CLIENT_GROUP_ID"`
-		ClientBrokers    string   `env:"KAFKA_CLIENT_BROKERS"`
-		SchemaRegistry   string   `env:"KAFKA_SCHEMA_REGISTRY_URL"`
-		ConsumerTopics   []string `env:"KAFKA_CONSUMER_TOPICS"`
-		HorProducerTopic string   `env:"KAFKA_HORIZON_PRODUCER_TOPIC"`
-		EnvProducerTopic string   `env:"KAFKA_ENVELOPE_PRODUCER_TOPIC"`
-		KpProducerTopic  string   `env:"KAFKA_KEYPAIR_PRODUCER_TOPIC"`
+		ClientGroupId  string `env:"KAFKA_CLIENT_GROUP_ID"`
+		ClientBrokers  string `env:"KAFKA_CLIENT_BROKERS"`
+		SchemaRegistry string `env:"KAFKA_SCHEMA_REGISTRY_URL"`
+		CreateKpCfg    struct {
+			ConsumerTopics []string `env:"KAFKA_CREATE_KP_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_CREATE_KP_PRODUCER_TOPIC"`
+		}
+		EnvelopeCfg struct {
+			ConsumerTopics []string `env:"KAFKA_ENVELOPE_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_ENVELOPE_PRODUCER_TOPIC"`
+		}
+		HorizonCfg struct {
+			ConsumerTopics []string `env:"KAFKA_HORIZON_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_HORIZON_PRODUCER_TOPIC"`
+		}
 	}
 
 	PGConfig struct {

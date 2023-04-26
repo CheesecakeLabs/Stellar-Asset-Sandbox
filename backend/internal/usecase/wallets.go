@@ -16,12 +16,25 @@ func NewWalletUseCase(r WalletRepoInterface) *WalletUseCase {
 	}
 }
 
+func (uc *WalletUseCase) Get(id int) (entity.Wallet, error) {
+	wallet, err := uc.repo.GetWallet(id)
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetWallet: %w", err)
+	}
+
+	wallet.Key, err = uc.repo.GetKey(wallet.Id)
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
+	}
+
+	return wallet, nil
+}
+
 func (uc *WalletUseCase) List(wType string) ([]entity.Wallet, error) {
 	wallets, err := uc.repo.GetWallets(wType)
 	if err != nil {
 		return nil, fmt.Errorf("WalletUseCase - List - uc.repo.GetWallets: %w", err)
 	}
-
 	return wallets, nil
 }
 

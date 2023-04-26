@@ -18,4 +18,15 @@ type (
 	CreateKeypairResponse struct {
 		PublicKeys []string `json:"publicKeys"`
 	}
+
+	HorizonRequest struct {
+		Id      int    `json:"id"`
+		Type    string `json:"type"`
+		Account string `json:"account"`
+	}
+
+	HorizonResponse struct {
+		Id         int `json:"id"`
+		StatusCode int `json:"statusCode"`
+	}
 )

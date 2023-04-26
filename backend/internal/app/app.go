@@ -19,7 +19,7 @@ import (
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, p entity.ProducerInterface) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
 	//l := logger.New(cfg.Log.Level)
 
 	// Use case
@@ -33,7 +33,7 @@ func Run(cfg *config.Config, pg *postgres.Postgres, p entity.ProducerInterface) 
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, p, *userUc, *walletUc)
+	v1.NewRouter(handler, pKp, pHor, pEnv, *userUc, *walletUc)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal
