@@ -23,7 +23,7 @@ func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
 	row := r.Db.QueryRow(stmt, id)
 
 	var wallet entity.Wallet
-	err := row.Scan(&wallet.Id, &wallet.Type)
+	err := row.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -50,7 +50,7 @@ func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
 	for rows.Next() {
 		var wallet entity.Wallet
 
-		err = rows.Scan(&wallet.Id, &wallet.Type)
+		err = rows.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
 		if err != nil {
 			return nil, fmt.Errorf("WalletRepo - GetWallets - rows.Scan: %w", err)
 		}
@@ -71,6 +71,26 @@ func (r WalletRepo) CreateWallet(data entity.Wallet) (entity.Wallet, error) {
 	}
 
 	return res, nil
+}
+
+func (r WalletRepo) UpdateWallet(data entity.Wallet) (entity.Wallet, error) {
+	stmt := `UPDATE Wallet SET funded=($1) WHERE id=($2);`
+	result, err := r.Db.Exec(stmt, data.Funded, data.Id)
+
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - db.Exec: %v", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - result.RowsAffected: %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - no rows updated")
+	}
+
+	return data, nil
 }
 
 func (r WalletRepo) GetKey(walletId int) (entity.Key, error) {

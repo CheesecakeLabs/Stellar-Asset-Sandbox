@@ -51,3 +51,11 @@ func (uc *WalletUseCase) Create(data entity.Wallet) (entity.Wallet, error) {
 	}
 	return wallet, nil
 }
+
+func (uc *WalletUseCase) Update(data entity.Wallet) (entity.Wallet, error) {
+	wallet, err := uc.repo.UpdateWallet(data)
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Update - uc.repo.UpdateWallet: %w", err)
+	}
+	return wallet, nil
+}

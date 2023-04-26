@@ -118,6 +118,11 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 		return
 	}
 
+	if wallet.Funded {
+		errorResponse(c, http.StatusBadRequest, "wallet is already funded")
+		return
+	}
+
 	res, err := r.m.SendMessage(entity.HorizonChannel, entity.HorizonRequest{
 		Id:      wallet.Id,
 		Type:    "fundWithFriendbot",
@@ -131,6 +136,14 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 
 	if fundRes.StatusCode != 200 {
 		errorResponse(c, http.StatusInternalServerError, "friendbot error")
+		return
+	}
+
+	wallet.Funded = true
+	wallet, err = r.w.Update(wallet)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse(c, http.StatusInternalServerError, "database problems")
 		return
 	}
 

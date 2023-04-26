@@ -19,7 +19,6 @@ const (
 )
 
 func init() {
-	return
 	cfg, e := config.NewConfig()
 	if e != nil {
 		log.Fatalf("Config error: %s", e)
