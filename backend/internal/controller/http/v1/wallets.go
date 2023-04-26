@@ -98,12 +98,12 @@ type FundWalletRequest struct {
 // @Tags  	    Wallets
 // @Accept      json
 // @Produce     json
-// @Param       request body FundWalletRequest true "Wallet id
+// @Param       request body FundWalletRequest true "Wallet id"
 // @Success     200 {object} entity.Wallet
 // @Failure     400 {object} response
 // @Failure     404 {object} response
 // @Failure     500 {object} response
-// @Router      /wallets [post]
+// @Router      /wallets/fund/ [post]
 func (r *walletsRoutes) fundWallet(c *gin.Context) {
 	var request FundWalletRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
