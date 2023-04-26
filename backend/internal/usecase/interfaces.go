@@ -2,9 +2,25 @@ package usecase
 
 import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 
-// mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks_test.go -package=mocks
+// mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks.go -package=mocks
 
 type (
+	// UserRepo -.
+	UserRepo interface {
+		GetUser(name string) (entity.User, error)
+		CreateUser(user entity.User) error
+		UpdateToken(id string, token string) error
+		ValidateToken(token string) error
+	}
+
+	// User -.
+	User interface {
+		Detail(name string) (entity.User, error)
+		CreateUser(user entity.User) error
+		Autentication(name string, password string) (User, error)
+	}
+
+	// Wallet -.
 	WalletRepoInterface interface {
 		GetWallet(int) (entity.Wallet, error)
 		GetWallets(string) ([]entity.Wallet, error)

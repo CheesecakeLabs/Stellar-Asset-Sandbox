@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -28,7 +29,7 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	for rows.Next() {
 		var user entity.User
 
-		err = rows.Scan(&user.Name)
+		err = rows.Scan(&user.Name, &user.Password)
 		if err != nil {
 			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
 		}
@@ -37,4 +38,45 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	}
 
 	return entity.User{}, nil
+}
+
+func (r UserRepo) CreateUser(user entity.User) error {
+	stmt := `INSERT INTO public."UserAccount" (name, password) VALUES ($1, $2)`
+	fmt.Println(user)
+	_, err := r.Db.Exec(stmt, user.Name, user.Password)
+	if err != nil {
+		panic(err)
+		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+	}
+	fmt.Println("User created successfully")
+	return nil
+}
+
+func (r UserRepo) UpdateToken(id string, token string) error {
+	// insert into if not exists if exist replace
+	stmt := `INSERT INTO public."UserAccount" (id, token) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET token = $2`
+	_, err := r.Db.Exec(stmt, id, token)
+	if err != nil {
+		// panic(err)
+		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+	}
+	return nil
+}
+
+func (r UserRepo) ValidateToken(token string) error {
+	stmt := `SELECT * FROM "UserAccount" WHERE token=$1`
+
+	rows, err := r.Db.Query(stmt, token)
+	if err != nil {
+		return fmt.Errorf("UserRepo - ValidateToken - db.Query: %w", err)
+	}
+
+	defer rows.Close()
+
+	// Check if any row was returned
+	if !rows.Next() {
+		return errors.New("UserRepo - ValidateToken - no user found for token")
+	}
+
+	return nil
 }

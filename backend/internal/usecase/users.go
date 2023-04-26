@@ -4,18 +4,20 @@ import (
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
-	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// TranslationUseCase -.
+// User Use Case -.
 type UserUseCase struct {
-	repo repo.UserRepo
+	repo         UserRepo
+	jwtSecretKey string
 }
 
 // New -.
-func New(r repo.UserRepo) *UserUseCase {
+func NewUserUseCase(r UserRepo, k string) *UserUseCase {
 	return &UserUseCase{
-		repo: r,
+		repo:         r,
+		jwtSecretKey: k,
 	}
 }
 
@@ -27,4 +29,46 @@ func (uc *UserUseCase) Detail(name string) (entity.User, error) {
 	}
 
 	return user, nil
+}
+
+// CreateUser - creating user.
+func (uc *UserUseCase) CreateUser(user entity.User) error {
+	var err error
+	if user.Password == "" {
+		return fmt.Errorf("password is empty")
+	}
+	user.Password, err = uc.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	uc.repo.CreateUser(user)
+	return nil
+}
+
+func (uc *UserUseCase) Autentication(name string, password string) (user entity.User, err error) {
+	user, err = uc.repo.GetUser(name)
+	if err != nil {
+		return user, err
+	}
+	err = uc.CheckPassword(user, password)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (uc *UserUseCase) HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
+func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
+	if err != nil {
+		return err
+	}
+	return nil
 }
