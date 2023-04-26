@@ -26,7 +26,7 @@ type (
 		GetWallets(string) ([]entity.Wallet, error)
 		CreateWallet(entity.Wallet) (entity.Wallet, error)
 		UpdateWallet(entity.Wallet) (entity.Wallet, error)
-		GetKey(int) (entity.Key, error)
+		GetKeyByWallet(int) (entity.Key, error)
 		CreateKey(entity.Key) (entity.Key, error)
 	}
 )

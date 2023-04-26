@@ -97,6 +97,67 @@ func TestWalletUseCaseList(t *testing.T) {
 
 }
 
+func TestWalletUseCasGet(t *testing.T) {
+	u, r := wallet(t)
+
+	wallet := entity.Wallet{
+		Id:   12,
+		Type: entity.IssuerType,
+		Key: entity.Key{
+			Id:        3,
+			PublicKey: "key",
+		},
+	}
+	tests := []testWallet{
+		{
+			name: "get - success",
+			req:  12,
+			mock: func() {
+				r.EXPECT().GetWallet(12).Return(wallet, nil)
+				r.EXPECT().GetKeyByWallet(12).Return(wallet.Key, nil)
+			},
+			res: wallet,
+			err: nil,
+		},
+		{
+			name: "get - wallet database error",
+			req:  12,
+			mock: func() {
+				r.EXPECT().GetWallet(12).Return(entity.Wallet{}, walletDbError)
+			},
+			res: entity.Wallet{},
+			err: walletDbError,
+		},
+		{
+			name: "get - key database error",
+			req:  12,
+			mock: func() {
+				r.EXPECT().GetWallet(12).Return(wallet, nil)
+				r.EXPECT().GetKeyByWallet(12).Return(entity.Key{}, keyDbError)
+			},
+			res: entity.Wallet{},
+			err: keyDbError,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			res, err := u.Get(tc.req.(int))
+
+			require.EqualValues(t, tc.res, res)
+			if tc.err == nil {
+				require.EqualValues(t, err, tc.err)
+			} else {
+				require.ErrorContains(t, err, dbError.Error())
+			}
+		})
+	}
+
+}
+
 func TestWalletUseCaseCreate(t *testing.T) {
 	u, r := wallet(t)
 
@@ -170,6 +231,61 @@ func TestWalletUseCaseCreate(t *testing.T) {
 			tc.mock()
 
 			res, err := u.Create(tc.req.(entity.Wallet))
+
+			require.EqualValues(t, tc.res, res)
+			if tc.err == nil {
+				require.EqualValues(t, err, tc.err)
+			} else {
+				require.ErrorContains(t, err, dbError.Error())
+			}
+		})
+	}
+
+}
+
+func TestWalletUseCaseUpdate(t *testing.T) {
+	u, r := wallet(t)
+
+	req := entity.Wallet{
+		Id:     2,
+		Type:   entity.IssuerType,
+		Funded: true,
+	}
+	tests := []testWallet{
+		{
+			name: "update - success",
+			req:  req,
+			mock: func() {
+				r.EXPECT().UpdateWallet(req).Return(entity.Wallet{
+					Id:     2,
+					Type:   entity.IssuerType,
+					Funded: true,
+				}, nil)
+			},
+			res: entity.Wallet{
+				Id:     2,
+				Type:   entity.IssuerType,
+				Funded: true,
+			},
+			err: nil,
+		},
+		{
+			name: "update - database error",
+			req:  req,
+			mock: func() {
+				r.EXPECT().UpdateWallet(req).Return(entity.Wallet{}, walletDbError)
+			},
+			res: entity.Wallet{},
+			err: walletDbError,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			res, err := u.Update(tc.req.(entity.Wallet))
 
 			require.EqualValues(t, tc.res, res)
 			if tc.err == nil {

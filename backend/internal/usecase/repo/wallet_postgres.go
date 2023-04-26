@@ -93,7 +93,7 @@ func (r WalletRepo) UpdateWallet(data entity.Wallet) (entity.Wallet, error) {
 	return data, nil
 }
 
-func (r WalletRepo) GetKey(walletId int) (entity.Key, error) {
+func (r WalletRepo) GetKeyByWallet(walletId int) (entity.Key, error) {
 	stmt := `SELECT * FROM key WHERE wallet_id=$1`
 	row := r.Db.QueryRow(stmt, walletId)
 
@@ -102,9 +102,9 @@ func (r WalletRepo) GetKey(walletId int) (entity.Key, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return entity.Key{}, fmt.Errorf("WalletRepo - GetKey - key not found")
+			return entity.Key{}, fmt.Errorf("WalletRepo - GetKeyByWallet - key not found")
 		}
-		return entity.Key{}, fmt.Errorf("WalletRepo - GetKey - row.Scan: %w", err)
+		return entity.Key{}, fmt.Errorf("WalletRepo - GetKeyByWallet - row.Scan: %w", err)
 	}
 
 	return key, nil

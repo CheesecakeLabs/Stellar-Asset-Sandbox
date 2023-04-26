@@ -22,7 +22,7 @@ func (uc *WalletUseCase) Get(id int) (entity.Wallet, error) {
 		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetWallet: %w", err)
 	}
 
-	wallet.Key, err = uc.repo.GetKey(wallet.Id)
+	wallet.Key, err = uc.repo.GetKeyByWallet(wallet.Id)
 	if err != nil {
 		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
 	}
