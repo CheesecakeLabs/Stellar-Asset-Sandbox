@@ -12,6 +12,7 @@ type (
 		Kafka KafkaConfig
 		PG    PGConfig
 		HTTP  HTTP
+		JWT   JWT
 	}
 
 	KafkaConfig struct {
@@ -34,6 +35,10 @@ type (
 
 	HTTP struct {
 		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+	}
+
+	JWT struct {
+		SecretKey string `env-required:"true" env:"JWT_SECRET_KEY"`
 	}
 )
 

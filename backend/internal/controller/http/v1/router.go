@@ -16,7 +16,7 @@ import (
 // @title       Token Factory API
 // @version     1.0
 // @BasePath    /v1
-func NewRouter(handler *gin.Engine, p entity.ProducerInterface, t usecase.UserUseCase, w usecase.WalletUseCase) {
+func NewRouter(handler *gin.Engine, p entity.ProducerInterface, a usecase.AuthUseCase, t usecase.UserUseCase, w usecase.WalletUseCase) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -32,7 +32,7 @@ func NewRouter(handler *gin.Engine, p entity.ProducerInterface, t usecase.UserUs
 	h := handler.Group("/v1")
 	m := newHTTPControllerMessenger(p)
 	{
-		newUserRoutes(h, t)
+		newUserRoutes(h, t, a)
 		newWalletsRoutes(h, w, m)
 	}
 }
