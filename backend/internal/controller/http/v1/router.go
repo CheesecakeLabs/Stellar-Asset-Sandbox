@@ -34,5 +34,6 @@ func NewRouter(handler *gin.Engine, pKp, pHor, pEnv entity.ProducerInterface, a 
 	{
 		newUserRoutes(h, u, a)
 		newWalletsRoutes(h, w, m)
+		newAssetsRoutes(h, w, m)
 	}
 }
