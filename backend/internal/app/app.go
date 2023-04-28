@@ -32,10 +32,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	walletUc := usecase.NewWalletUseCase(
 		repo.NewWalletRepo(pg),
 	)
+	assetUc := usecase.NewAssetUseCase(
+		repo.NewAssetRepo(pg),
+		repo.NewWalletRepo(pg),
+	)
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc)
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal
