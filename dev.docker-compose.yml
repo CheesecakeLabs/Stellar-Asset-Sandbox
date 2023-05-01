@@ -3,6 +3,7 @@ version: '3.7'
 services:
   postgres:
     container_name: postgres
+    profiles: ["tests"]
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -14,7 +15,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - common_network
+      - stellar-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
@@ -24,13 +25,14 @@ services:
   
   backend:
     platform: linux/amd64
+    profiles: ["all", "starlabs" , "tests"]
     container_name: token-factory-v2
     build:
       context: ./backend
       dockerfile: dev.Dockerfile
     image: mullberry-backend
     networks:
-      - common_network
+      - stellar-network
     ports:
       - "8080:8080"
     volumes:
@@ -39,10 +41,38 @@ services:
       postgres:
         condition: service_healthy
 
+  stellar-kms:
+    platform: linux/amd64
+    profiles: ["all", "starlabs" , "tests"]
+    container_name: kms
+    networks:
+      - stellar-network
+    build:
+      context: ./stellar-kms
+      dockerfile: dev.Dockerfile
+    volumes:
+      - '.:/workspace'
+    environment:
+      KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
+      KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-broker:9092}
+      KAFKA_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-consumer_topic}
+      KAFKA_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-producer_topic}
+      KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema_registry:8085}
+      PG_HOST: ${PG_HOST:-postgres}
+      PG_PORT: ${PG_PORT:-5432}
+      PG_USER: ${PG_USER:-postgres}
+      PG_PASSWORD: ${PG_PASSWORD:-password}
+      PG_DB_NAME: ${PG_DATABASE:-postgres}
+      MASTER_KEY: ${MASTER_KEY:-da52f130e6fd477256b0c554aba89503}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   integration:
+    profiles: ["tests" ]
     platform: linux/amd64
     networks:
-      - common_network
+      - stellar-network
     build:
       context: ./backend
       dockerfile: integration-test/Dockerfile
@@ -55,4 +85,4 @@ volumes:
     postgres:
 
 networks:
-  common_network:
+  stellar-network:
