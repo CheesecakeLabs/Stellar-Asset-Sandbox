@@ -28,7 +28,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 type CreateAssetRequest struct {
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
-	Limit     int    `json:"limit"         example:"1000"`
+	Limit     *int   `json:"limit"         example:"1000"`
 }
 
 // @Summary     Create a new asset
@@ -41,7 +41,7 @@ type CreateAssetRequest struct {
 // @Failure     400 {object} response
 // @Failure     404 {object} response
 // @Failure     500 {object} response
-// @Router      /wallets/fund/ [post]
+// @Router      /assets [post]
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -51,7 +51,6 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
 	}
@@ -89,7 +88,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 					Code:   request.Code,
 					Issuer: issuerPk,
 				},
-				TrustLimit: &request.Limit,
+				TrustLimit: request.Limit,
 				Origin:     distPk,
 			},
 		},
@@ -123,7 +122,6 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "database problems")
 		return
 	}
-	fmt.Println("oi")
-	fmt.Println(asset)
+
 	c.JSON(http.StatusOK, asset)
 }
