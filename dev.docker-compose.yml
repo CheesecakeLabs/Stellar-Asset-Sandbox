@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - common_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  
+  backend:
+    platform: linux/amd64
+    container_name: token-factory-v2
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    image: mullberry-backend
+    networks:
+      - common_network
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/go/src/CheesecakeLabs/token-factory-v2/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  integration:
+    platform: linux/amd64
+    networks:
+      - common_network
+    build:
+      context: ./backend
+      dockerfile: integration-test/Dockerfile
+    container_name: integration
+    image: integration
+    depends_on:
+      - backend
+
+volumes:
+    postgres:
+
+networks:
+  common_network:
