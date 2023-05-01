@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  api:
+    platform: linux/amd64
+    container_name: token-factory-v2
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: mullberry-backend
+    networks:
+      - database_app_common_network
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/go/src/CheesecakeLabs/token-factory-v2/backend
+
+
+  # integration:
+  #   build:
+  #     context: .
+  #     dockerfile: integration-test/Dockerfile
+  #   container_name: integration
+  #   image: integration
+  #   depends_on:
+  #     - app
+
+networks:
+  database_app_common_network:
+     external: true

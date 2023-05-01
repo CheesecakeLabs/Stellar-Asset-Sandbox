@@ -1,37 +1,27 @@
 version: '3.9'
 services:
-  postgres:
-    container_name: postgres
-    image: postgres
-    volumes:
-      - pg-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: 'user'
-      POSTGRES_PASSWORD: 'pass'
-      POSTGRES_DB: 'postgres'
-    ports:
-      - 5432:5432
-
   app:
-    build: .
+    platform: linux/amd64
+    build:
+      context: .
+      target: local
+    volumes:
+      - '.:/workspace'
     container_name: app
     image: app
     environment:
-      PG_URL: 'postgres://user:pass@postgres:5432/postgres'
-      RMQ_URL: 'amqp://guest:guest@rabbitmq:5672/'
+      PG_HOST: ${PG_HOST:-postgres}
+      PG_PORT: ${PG_PORT:-5432}
+      PG_USER: ${PG_USER:-postgres}
+      PG_PASSWORD: ${PG_PASSWORD:-password}
+      PG_DB_NAME: ${PG_DB_NAME:-tokenfactory}
+      KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
+      KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-broker:9092}
+      KAFKA_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-consumer_topic}
+      KAFKA_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-prodEucer_topic}
+      KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema_registry:8085}
     ports:
       - 8080:8080
-    depends_on:
-      - postgres
-
-  integration:
-    build:
-      context: .
-      dockerfile: integration-test/Dockerfile
-    container_name: integration
-    image: integration
-    depends_on:
-      - app
 
 volumes:
   pg-data:
