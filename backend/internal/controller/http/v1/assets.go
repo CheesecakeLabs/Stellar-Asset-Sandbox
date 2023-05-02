@@ -45,7 +45,7 @@ type CreateAssetRequest struct {
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid request body: %x")
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
 
@@ -61,40 +61,51 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
-	kpRes := res.Message.(entity.CreateKeypairResponse)
+	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
+	if !ok || len(kpRes.PublicKeys) != 2 {
+		errorResponse(c, http.StatusInternalServerError, "unexpected kms response")
+		return
+	}
 	issuerPk := kpRes.PublicKeys[0]
 	distPk := kpRes.PublicKeys[1]
 
+	ops := []entity.Operation{
+		{
+			Type:   entity.CreateAccountOp,
+			Target: issuerPk,
+			Amount: _startingBalance,
+			Origin: sponsor.Key.PublicKey,
+		},
+		{
+			Type:   entity.CreateAccountOp,
+			Target: distPk,
+			Amount: _startingBalance,
+			Origin: sponsor.Key.PublicKey,
+		},
+		{
+			Type:    entity.ChangeTrustOp,
+			Sponsor: sponsor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   request.Code,
+				Issuer: issuerPk,
+			},
+			TrustLimit: request.Limit,
+			Origin:     distPk,
+		},
+	}
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
-		Operations: []entity.Operation{
-			{
-				Type:   "createAccount",
-				Target: issuerPk,
-				Amount: _startingBalance,
-				Origin: sponsor.Key.PublicKey,
-			},
-			{
-				Type:   "createAccount",
-				Target: distPk,
-				Amount: _startingBalance,
-				Origin: sponsor.Key.PublicKey,
-			},
-			{
-				Type:    "changeTrust",
-				Sponsor: sponsor.Key.PublicKey,
-				Asset: entity.OpAsset{
-					Code:   request.Code,
-					Issuer: issuerPk,
-				},
-				TrustLimit: request.Limit,
-				Origin:     distPk,
-			},
-		},
+		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+	_, ok = res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
 	}
 
 	asset := entity.Asset{
@@ -118,7 +129,6 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 	asset, err = r.as.Create(asset)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse(c, http.StatusNotFound, "database problems")
 		return
 	}
