@@ -1,5 +1,5 @@
 package entity
 
 type ProducerInterface interface {
-	Produce(string, string)
+	Produce(string, string, interface{}) error
 }

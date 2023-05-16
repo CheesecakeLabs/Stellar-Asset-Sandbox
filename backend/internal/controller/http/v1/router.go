@@ -3,34 +3,36 @@ package v1
 import (
 	"net/http"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	docs "github.com/CheesecakeLabs/token-factory-v2/backend/docs"
 )
 
-// NewRouter -.
 // Swagger spec:
-// @title       Go Clean Template API
-// @description Using a translation service as an example
+// @title       Token Factory API
 // @version     1.0
-// @host        localhost:8080
 // @BasePath    /v1
-func NewRouter(handler *gin.Engine, t usecase.UserUseCase, a usecase.AuthUseCase) {
+func NewRouter(handler *gin.Engine, p entity.ProducerInterface, a usecase.AuthUseCase, t usecase.UserUseCase, w usecase.WalletUseCase) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
 
 	// Swagger
-	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")
-	handler.GET("/swagger/*any", swaggerHandler)
+	docs.SwaggerInfo.BasePath = "/v1"
+	handler.GET("v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	// Routers
 	h := handler.Group("/v1")
+	m := newHTTPControllerMessenger(p)
 	{
 		newUserRoutes(h, t, a)
+		newWalletsRoutes(h, w, m)
 	}
 }

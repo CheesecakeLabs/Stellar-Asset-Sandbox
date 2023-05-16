@@ -35,15 +35,6 @@ type userResponse struct {
 	Token string
 }
 
-// @Summary     Show history
-// @Description Show all translation history
-// @ID          history
-// @Tags  	    translation
-// @Accept      json
-// @Produce     json
-// @Success     200 {object} userResponse
-// @Failure     500 {object} response
-// @Router      /translation/history [get]
 func (r *usersRoutes) detail(c *gin.Context) {
 	user, err := r.t.Detail("name")
 	if err != nil {

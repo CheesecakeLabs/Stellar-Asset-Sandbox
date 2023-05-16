@@ -7,26 +7,27 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
 var errInternalServErr = errors.New("internal server error")
 
-type test struct {
+type userTest struct {
 	name string
 	mock func()
 	res  interface{}
 	err  error
 }
 
-func user(t *testing.T) (*usecase.UserUseCase, *MockUserRepo) {
+func user(t *testing.T) (*usecase.UserUseCase, *mocks.MockUserRepo) {
 	t.Helper()
 
 	mockCtl := gomock.NewController(t)
 	defer mockCtl.Finish()
 
-	repo := NewMockUserRepo(mockCtl)
+	repo := mocks.NewMockUserRepo(mockCtl)
 
 	useCase := usecase.NewUserUseCase(repo, "test")
 
@@ -36,7 +37,7 @@ func user(t *testing.T) (*usecase.UserUseCase, *MockUserRepo) {
 func TestUserUseCase_GetUser(t *testing.T) {
 	userCase, repo := user(t)
 
-	tests := []test{
+	tests := []userTest{
 		{
 			name: "empty result",
 			mock: func() {
@@ -99,7 +100,7 @@ func TestUserUseCase_CreateUser(t *testing.T) {
 		// },
 	}
 
-	tests := []test{
+	tests := []userTest{
 		{
 			name: "result with error",
 			mock: func() {

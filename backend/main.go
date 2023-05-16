@@ -7,6 +7,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/app"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/kafka"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
 )
@@ -25,17 +26,15 @@ func main() {
 	}
 	defer pg.Close()
 
-	// If Kafka is enabled, attempt to connect to it
-	if cfg.Kafka.ClientBrokers != "" {
-		conn := kafka.New(cfg.Kafka)
-		err := conn.AttemptConnect()
-		if err != nil {
-			fmt.Printf("Failed to connect to Kafka: %s\n", err)
-			os.Exit(1)
-		}
-
-		go conn.Run(cfg)
+	// Kafka
+	conn := kafka.New(cfg.Kafka)
+	err = conn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka: %s\n", err)
+		os.Exit(1)
 	}
 
-	app.Run(cfg, pg)
+	go conn.Run(cfg, entity.CreateKeypairChannel)
+
+	app.Run(cfg, pg, conn.Producer)
 }
