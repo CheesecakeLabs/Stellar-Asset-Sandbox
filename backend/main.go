@@ -26,15 +26,32 @@ func main() {
 	}
 	defer pg.Close()
 
-	// Kafka
-	conn := kafka.New(cfg.Kafka)
-	err = conn.AttemptConnect()
+	// Kafka create keypair connection
+	kpConn := kafka.New(cfg.Kafka, cfg.Kafka.CreateKpCfg.ConsumerTopics, cfg.Kafka.CreateKpCfg.ProducerTopic)
+	err = kpConn.AttemptConnect()
 	if err != nil {
-		fmt.Printf("Failed to connect to Kafka: %s\n", err)
+		fmt.Printf("Failed to connect to Kafka create keypair topics %s\n", err)
 		os.Exit(1)
 	}
+	go kpConn.Run(cfg, entity.CreateKeypairChannel)
 
-	go conn.Run(cfg, entity.CreateKeypairChannel)
+	// Kafka horizon connection
+	horConn := kafka.New(cfg.Kafka, cfg.Kafka.HorizonCfg.ConsumerTopics, cfg.Kafka.HorizonCfg.ProducerTopic)
+	err = horConn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka horizon topics %s\n", err)
+		os.Exit(1)
+	}
+	go horConn.Run(cfg, entity.HorizonChannel)
 
-	app.Run(cfg, pg, conn.Producer)
+	// Kafka envelope connection
+	envConn := kafka.New(cfg.Kafka, cfg.Kafka.EnvelopeCfg.ConsumerTopics, cfg.Kafka.EnvelopeCfg.ProducerTopic)
+	err = envConn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka envelopee topics %s\n", err)
+		os.Exit(1)
+	}
+	go envConn.Run(cfg, entity.EnvelopeChannel)
+
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer)
 }

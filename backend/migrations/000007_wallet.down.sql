@@ -1,0 +1,1 @@
+ALTER TABLE Wallet DROP COLUMN funded;

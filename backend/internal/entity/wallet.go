@@ -7,9 +7,10 @@ const (
 )
 
 type Wallet struct {
-	Id   int    `json:"id" example:"1"`
-	Type string `json:"type" example:"sponsor"`
-	Key  Key    `json:"key"`
+	Id     int    `json:"id" example:"1"`
+	Type   string `json:"type" example:"sponsor"`
+	Key    Key    `json:"key"`
+	Funded bool   `json:"funded"`
 }
 
 type Key struct {

@@ -33,6 +33,14 @@ definitions:
     required:
     - type
     type: object
+  v1.FundWalletRequest:
+    properties:
+      id:
+        example: 1
+        type: integer
+    required:
+    - id
+    type: object
   v1.response:
     properties:
       error:
@@ -92,6 +100,40 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Create
+      tags:
+      - Wallets
+  /wallets/fund/:
+    post:
+      consumes:
+      - application/json
+      description: Fund a wallet with Friendbot
+      parameters:
+      - description: Wallet id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.FundWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Fund Wallet
       tags:
       - Wallets
 swagger: "2.0"

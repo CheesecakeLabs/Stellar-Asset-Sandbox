@@ -212,6 +212,36 @@ func (mr *MockWalletRepoInterfaceMockRecorder) CreateWallet(arg0 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).CreateWallet), arg0)
 }
 
+// GetKeyByWallet mocks base method.
+func (m *MockWalletRepoInterface) GetKeyByWallet(arg0 int) (entity.Key, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKeyByWallet", arg0)
+	ret0, _ := ret[0].(entity.Key)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKeyByWallet indicates an expected call of GetKeyByWallet.
+func (mr *MockWalletRepoInterfaceMockRecorder) GetKeyByWallet(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeyByWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).GetKeyByWallet), arg0)
+}
+
+// GetWallet mocks base method.
+func (m *MockWalletRepoInterface) GetWallet(arg0 int) (entity.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWallet", arg0)
+	ret0, _ := ret[0].(entity.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWallet indicates an expected call of GetWallet.
+func (mr *MockWalletRepoInterfaceMockRecorder) GetWallet(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).GetWallet), arg0)
+}
+
 // GetWallets mocks base method.
 func (m *MockWalletRepoInterface) GetWallets(arg0 string) ([]entity.Wallet, error) {
 	m.ctrl.T.Helper()
@@ -225,4 +255,19 @@ func (m *MockWalletRepoInterface) GetWallets(arg0 string) ([]entity.Wallet, erro
 func (mr *MockWalletRepoInterfaceMockRecorder) GetWallets(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWallets", reflect.TypeOf((*MockWalletRepoInterface)(nil).GetWallets), arg0)
+}
+
+// UpdateWallet mocks base method.
+func (m *MockWalletRepoInterface) UpdateWallet(arg0 entity.Wallet) (entity.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateWallet", arg0)
+	ret0, _ := ret[0].(entity.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateWallet indicates an expected call of UpdateWallet.
+func (mr *MockWalletRepoInterfaceMockRecorder) UpdateWallet(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).UpdateWallet), arg0)
 }

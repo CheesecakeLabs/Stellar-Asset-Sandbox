@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -15,6 +16,23 @@ type WalletRepo struct {
 
 func NewWalletRepo(pg *postgres.Postgres) WalletRepo {
 	return WalletRepo{pg}
+}
+
+func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
+	stmt := `SELECT * FROM wallet WHERE id=$1`
+	row := r.Db.QueryRow(stmt, id)
+
+	var wallet entity.Wallet
+	err := row.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Wallet{}, fmt.Errorf("WalletRepo - GetWallet - wallet not found")
+		}
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - GetWallet - row.Scan: %w", err)
+	}
+
+	return wallet, nil
 }
 
 func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
@@ -32,7 +50,7 @@ func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
 	for rows.Next() {
 		var wallet entity.Wallet
 
-		err = rows.Scan(&wallet.Id, &wallet.Type)
+		err = rows.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
 		if err != nil {
 			return nil, fmt.Errorf("WalletRepo - GetWallets - rows.Scan: %w", err)
 		}
@@ -53,6 +71,43 @@ func (r WalletRepo) CreateWallet(data entity.Wallet) (entity.Wallet, error) {
 	}
 
 	return res, nil
+}
+
+func (r WalletRepo) UpdateWallet(data entity.Wallet) (entity.Wallet, error) {
+	stmt := `UPDATE Wallet SET funded=($1) WHERE id=($2);`
+	result, err := r.Db.Exec(stmt, data.Funded, data.Id)
+
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - db.Exec: %v", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - result.RowsAffected: %v", err)
+	}
+
+	if rowsAffected == 0 {
+		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - no rows updated")
+	}
+
+	return data, nil
+}
+
+func (r WalletRepo) GetKeyByWallet(walletId int) (entity.Key, error) {
+	stmt := `SELECT * FROM key WHERE wallet_id=$1`
+	row := r.Db.QueryRow(stmt, walletId)
+
+	var key entity.Key
+	err := row.Scan(&key.Id, &key.PublicKey, &key.Weight, &key.WalletId)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Key{}, fmt.Errorf("WalletRepo - GetKeyByWallet - key not found")
+		}
+		return entity.Key{}, fmt.Errorf("WalletRepo - GetKeyByWallet - row.Scan: %w", err)
+	}
+
+	return key, nil
 }
 
 func (r WalletRepo) CreateKey(data entity.Key) (entity.Key, error) {

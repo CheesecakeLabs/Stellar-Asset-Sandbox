@@ -22,8 +22,11 @@ type (
 
 	// Wallet -.
 	WalletRepoInterface interface {
+		GetWallet(int) (entity.Wallet, error)
 		GetWallets(string) ([]entity.Wallet, error)
 		CreateWallet(entity.Wallet) (entity.Wallet, error)
+		UpdateWallet(entity.Wallet) (entity.Wallet, error)
+		GetKeyByWallet(int) (entity.Key, error)
 		CreateKey(entity.Key) (entity.Key, error)
 	}
 )

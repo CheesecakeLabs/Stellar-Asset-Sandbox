@@ -17,7 +17,7 @@ func newMockProducer() *mockProducer {
 	return &mockProducer{}
 }
 
-func (p *mockProducer) Produce(chanType string, key string, value interface{}) error {
+func (p *mockProducer) Produce(key string, value interface{}) error {
 	go func() {
 		notify.Post(key, mockResponse)
 	}()
@@ -26,10 +26,10 @@ func (p *mockProducer) Produce(chanType string, key string, value interface{}) e
 
 func TestSendMessage(t *testing.T) {
 	mockProducer := newMockProducer()
-	messenger := newHTTPControllerMessenger(mockProducer)
+	messenger := newHTTPControllerMessenger(mockProducer, mockProducer, mockProducer)
 
 	reqData := &entity.CreateKeypairRequest{Amount: 1}
-	actualData, err := messenger.SendMessage("test", reqData)
+	actualData, err := messenger.SendMessage(entity.EnvelopeChannel, reqData)
 	assert.NoError(t, err)
 
 	require.EqualValues(t, mockResponse, actualData)

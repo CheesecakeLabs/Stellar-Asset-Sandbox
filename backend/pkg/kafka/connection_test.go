@@ -23,14 +23,13 @@ func TestAttemptConnect(t *testing.T) {
 		Kafka: config.KafkaConfig{
 			ClientBrokers: broker,
 			ClientGroupId: "test",
-			ConsumerTopics: []string{
-				"Stellar",
-			},
-			KpProducerTopic: "Reply",
 		},
 	}
 
-	conn := New(cfg.Kafka)
+	cfg.Kafka.CreateKpCfg.ConsumerTopics = []string{"consumer"}
+	cfg.Kafka.CreateKpCfg.ProducerTopic = "producer"
+
+	conn := New(cfg.Kafka, cfg.Kafka.CreateKpCfg.ConsumerTopics, cfg.Kafka.CreateKpCfg.ProducerTopic)
 	err = conn.AttemptConnect()
 	if err != nil {
 		t.Errorf("Failed to connect to Kafka: %s\n", err)

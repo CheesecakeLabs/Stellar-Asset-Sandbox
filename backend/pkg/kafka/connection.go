@@ -21,15 +21,13 @@ type Connection struct {
 }
 
 // New Kafka Connection Struct
-func New(cfg config.KafkaConfig) *Connection {
+func New(cfg config.KafkaConfig, consumerTopics []string, producerTopic string) *Connection {
 	return &Connection{
 		Consumer: &Consumer{
-			Topics: cfg.ConsumerTopics,
+			Topics: consumerTopics,
 		},
 		Producer: &Producer{
-			HorizonTopic:  cfg.HorProducerTopic,
-			KeypairTopic:  cfg.KpProducerTopic,
-			EnvelopeTopic: cfg.EnvProducerTopic,
+			Topic: producerTopic,
 		},
 		Deserializer: &Deserializer{
 			URL:           cfg.SchemaRegistry,
@@ -103,7 +101,6 @@ func (c Connection) Run(cfg *config.Config, chanName string) {
 				fmt.Println(err)
 				continue
 			}
-
 			notify.Post(string(msg.Key), &entity.NotifyData{Key: string(msg.Key), Message: data})
 		}
 	}
