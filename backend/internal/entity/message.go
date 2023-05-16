@@ -29,4 +29,49 @@ type (
 		Id         int `json:"id"`
 		StatusCode int `json:"statusCode"`
 	}
+
+	EnvelopeRequest struct {
+		Id         int
+		MainSource string
+		PublicKeys []string
+		Operations []Operation
+		FeeBump    string
+	}
+
+	EnvelopeResponse struct {
+		Id         int    `json:"id"`
+		Hash       string `json:"hash"`
+		StatusCode int    `json:"statusCode"`
+	}
+
+	Operation struct {
+		Type                 string
+		Origin               string
+		Target               string
+		Sponsor              string
+		Amount               string
+		Asset                OpAsset
+		Order                int
+		InflationDestination *string
+		SetFlags             []string
+		ClearFlags           []string
+		MasterWeight         *uint8
+		LowThreshold         *uint8
+		MediumThreshold      *uint8
+		HighThreshold        *uint8
+		HomeDomain           *string
+		Signer               *Signer
+		TrustLimit           *int
+		Trustor              string
+	}
+
+	OpAsset struct {
+		Code   string `json:"code"`
+		Issuer string `json:"issuer"`
+	}
+
+	Signer struct {
+		Account string
+		Weight  uint8
+	}
 )

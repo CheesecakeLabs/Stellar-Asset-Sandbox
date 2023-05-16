@@ -173,23 +173,16 @@ func TestWalletUseCaseCreate(t *testing.T) {
 			name: "create - success",
 			req:  req,
 			mock: func() {
-				r.EXPECT().CreateWallet(req).Return(entity.Wallet{
+				r.EXPECT().CreateWalletWithKey(req).Return(entity.Wallet{
 					Id:   12,
 					Type: entity.IssuerType,
 					Key: entity.Key{
 						PublicKey: "key",
-						Weight:    1,
+						Id:        25,
+
+						Weight:   1,
+						WalletId: 12,
 					},
-				}, nil)
-				r.EXPECT().CreateKey(entity.Key{
-					PublicKey: "key",
-					Weight:    1,
-					WalletId:  12,
-				}).Return(entity.Key{
-					Id:        25,
-					PublicKey: "key",
-					Weight:    1,
-					WalletId:  12,
 				}, nil)
 			},
 			res: entity.Wallet{
@@ -205,23 +198,13 @@ func TestWalletUseCaseCreate(t *testing.T) {
 			err: nil,
 		},
 		{
-			name: "create - wallet database error",
+			name: "create - database error",
 			req:  req,
 			mock: func() {
-				r.EXPECT().CreateWallet(req).Return(entity.Wallet{}, walletDbError)
+				r.EXPECT().CreateWalletWithKey(req).Return(entity.Wallet{}, dbError)
 			},
 			res: entity.Wallet{},
-			err: walletDbError,
-		},
-		{
-			name: "create - key database error",
-			req:  req,
-			mock: func() {
-				r.EXPECT().CreateWallet(req).Return(req, nil)
-				r.EXPECT().CreateKey(req.Key).Return(entity.Key{}, keyDbError)
-			},
-			res: entity.Wallet{},
-			err: keyDbError,
+			err: dbError,
 		},
 	}
 

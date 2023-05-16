@@ -21,6 +21,8 @@ func (d *Deserializer) DeserializeMessage(msg *kafka.Message, chanName string) (
 		return d.deserializeCreateKpMessage(msg)
 	case entity.HorizonChannel:
 		return d.deserializeHorizonMessage(msg)
+	case entity.EnvelopeChannel:
+		return d.deserializeEnvelopeMessage(msg)
 	default:
 		return nil, fmt.Errorf("invalid channel name: %s", chanName)
 	}
@@ -30,7 +32,7 @@ func (d *Deserializer) deserializeCreateKpMessage(msg *kafka.Message) (entity.Cr
 	data := entity.CreateKeypairResponse{}
 	err := d.unmarshalMessage(msg, &data)
 	if err != nil {
-		return data, fmt.Errorf("failed to deserialize create keypair request: %w", err)
+		return data, fmt.Errorf("failed to deserialize create keypair response: %w", err)
 	}
 	return data, nil
 }
@@ -39,7 +41,16 @@ func (d *Deserializer) deserializeHorizonMessage(msg *kafka.Message) (entity.Hor
 	data := entity.HorizonResponse{}
 	err := d.unmarshalMessage(msg, &data)
 	if err != nil {
-		return data, fmt.Errorf("failed to deserialize horizon request: %w", err)
+		return data, fmt.Errorf("failed to deserialize horizon response: %w", err)
+	}
+	return data, nil
+}
+
+func (d *Deserializer) deserializeEnvelopeMessage(msg *kafka.Message) (entity.EnvelopeResponse, error) {
+	data := entity.EnvelopeResponse{}
+	err := d.unmarshalMessage(msg, &data)
+	if err != nil {
+		return data, fmt.Errorf("failed to deserialize envelope response: %w", err)
 	}
 	return data, nil
 }

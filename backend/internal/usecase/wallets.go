@@ -39,15 +39,9 @@ func (uc *WalletUseCase) List(wType string) ([]entity.Wallet, error) {
 }
 
 func (uc *WalletUseCase) Create(data entity.Wallet) (entity.Wallet, error) {
-	wallet, err := uc.repo.CreateWallet(data)
+	wallet, err := uc.repo.CreateWalletWithKey(data)
 	if err != nil {
-		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Create - uc.repo.CreateWallet: %w", err)
-	}
-
-	wallet.Key.WalletId = wallet.Id
-	wallet.Key, err = uc.repo.CreateKey(wallet.Key)
-	if err != nil {
-		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Create - uc.repo.CreateKey: %w", err)
+		return entity.Wallet{}, fmt.Errorf("WalletUseCase - Create - uc.repo.CreateWalletWithKey: %w", err)
 	}
 	return wallet, nil
 }

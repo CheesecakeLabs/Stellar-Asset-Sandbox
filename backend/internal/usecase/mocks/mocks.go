@@ -212,6 +212,21 @@ func (mr *MockWalletRepoInterfaceMockRecorder) CreateWallet(arg0 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).CreateWallet), arg0)
 }
 
+// CreateWalletWithKey mocks base method.
+func (m *MockWalletRepoInterface) CreateWalletWithKey(arg0 entity.Wallet) (entity.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateWalletWithKey", arg0)
+	ret0, _ := ret[0].(entity.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateWalletWithKey indicates an expected call of CreateWalletWithKey.
+func (mr *MockWalletRepoInterfaceMockRecorder) CreateWalletWithKey(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWalletWithKey", reflect.TypeOf((*MockWalletRepoInterface)(nil).CreateWalletWithKey), arg0)
+}
+
 // GetKeyByWallet mocks base method.
 func (m *MockWalletRepoInterface) GetKeyByWallet(arg0 int) (entity.Key, error) {
 	m.ctrl.T.Helper()
@@ -270,4 +285,72 @@ func (m *MockWalletRepoInterface) UpdateWallet(arg0 entity.Wallet) (entity.Walle
 func (mr *MockWalletRepoInterfaceMockRecorder) UpdateWallet(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWallet", reflect.TypeOf((*MockWalletRepoInterface)(nil).UpdateWallet), arg0)
+}
+
+// MockAssetRepoInterface is a mock of AssetRepoInterface interface.
+type MockAssetRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockAssetRepoInterfaceMockRecorder
+}
+
+// MockAssetRepoInterfaceMockRecorder is the mock recorder for MockAssetRepoInterface.
+type MockAssetRepoInterfaceMockRecorder struct {
+	mock *MockAssetRepoInterface
+}
+
+// NewMockAssetRepoInterface creates a new mock instance.
+func NewMockAssetRepoInterface(ctrl *gomock.Controller) *MockAssetRepoInterface {
+	mock := &MockAssetRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockAssetRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAssetRepoInterface) EXPECT() *MockAssetRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// CreateAsset mocks base method.
+func (m *MockAssetRepoInterface) CreateAsset(arg0 entity.Asset) (entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAsset", arg0)
+	ret0, _ := ret[0].(entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAsset indicates an expected call of CreateAsset.
+func (mr *MockAssetRepoInterfaceMockRecorder) CreateAsset(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAsset", reflect.TypeOf((*MockAssetRepoInterface)(nil).CreateAsset), arg0)
+}
+
+// GetAsset mocks base method.
+func (m *MockAssetRepoInterface) GetAsset(arg0 int) (entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAsset", arg0)
+	ret0, _ := ret[0].(entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAsset indicates an expected call of GetAsset.
+func (mr *MockAssetRepoInterfaceMockRecorder) GetAsset(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAsset", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAsset), arg0)
+}
+
+// GetAssets mocks base method.
+func (m *MockAssetRepoInterface) GetAssets() ([]entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssets")
+	ret0, _ := ret[0].([]entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssets indicates an expected call of GetAssets.
+func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
 }

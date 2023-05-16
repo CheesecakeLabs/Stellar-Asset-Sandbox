@@ -1,4 +1,17 @@
 definitions:
+  entity.Asset:
+    properties:
+      code:
+        example: USDC
+        type: string
+      distributor:
+        $ref: '#/definitions/entity.Wallet'
+      id:
+        example: 1
+        type: integer
+      issuer:
+        $ref: '#/definitions/entity.Wallet'
+    type: object
   entity.Key:
     properties:
       id:
@@ -14,8 +27,25 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.User:
+    properties:
+      _:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      token_hash:
+        type: string
+      updated_at:
+        type: string
+    type: object
   entity.Wallet:
     properties:
+      funded:
+        type: boolean
       id:
         example: 1
         type: integer
@@ -24,6 +54,21 @@ definitions:
       type:
         example: sponsor
         type: string
+    type: object
+  v1.CreateAssetRequest:
+    properties:
+      code:
+        example: USDC
+        type: string
+      limit:
+        example: 1000
+        type: integer
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - code
+    - sponsor_id
     type: object
   v1.CreateWalletRequest:
     properties:
@@ -47,9 +92,110 @@ definitions:
         example: message
         type: string
     type: object
+  v1.userResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
 info:
   contact: {}
 paths:
+  /assets:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new asset
+      tags:
+      - Assets
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      operationId: create
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.userResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create user
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentication User
+      operationId: autentication
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.userResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Autentication User
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout User
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.userResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Logout User
+      tags:
+      - user
   /wallets:
     get:
       consumes:
