@@ -31,6 +31,18 @@ type CreateAssetRequest struct {
 	Limit     *int   `json:"limit"         example:"1000"`
 }
 
+type BurnAssetRequest struct {
+	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	Code      string `json:"code"       binding:"required"  example:"USDC"`
+	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+}
+
+type MintAssetRequest struct {
+	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	Code      string `json:"code"       binding:"required"  example:"USDC"`
+	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+}
+
 // @Summary     Create a new asset
 // @Description Create and issue a new asset on Stellar
 // @Tags  	    Assets
@@ -134,4 +146,74 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, asset)
+}
+
+// @Summary     Mint an asset
+// @Description Mint an asset on Stellar
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body issueAssetRequest true "Asset info"
+// @Success     200 {object} entity.Asset
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets [post]
+func (r *assetsRoutes) mintAsset(c *gin.Context) {
+	var request MintAssetRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	sponsor, err := r.w.Get(request.SponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
+
+	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 2})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "kms messaging problems")
+		return
+	}
+
+	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
+	if !ok || len(kpRes.PublicKeys) != 2 {
+		errorResponse(c, http.StatusInternalServerError, "unexpected kms response")
+		return
+	}
+	issuerPk := kpRes.PublicKeys[0]
+	distPk := kpRes.PublicKeys[1]
+
+	ops := []entity.Operation{
+		{
+			Type:   entity.PaymentOp,
+			Target: distPk,
+			Amount: request.Amount,
+			Asset: entity.OpAsset{
+				Code:   request.Code,
+				Issuer: issuerPk,
+			},
+			Origin: sponsor.Key.PublicKey,
+		},
+	}
+
+	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: sponsor.Key.PublicKey,
+		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
+		Operations: ops,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok = res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "asset minted"})
 }
