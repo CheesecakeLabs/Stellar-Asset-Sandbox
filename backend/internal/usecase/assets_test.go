@@ -11,11 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	issuerDbError = errors.New("issuerDbError")
-	distDbError   = errors.New("distDbError")
-	assetDbError  = errors.New("assetDbError")
-)
+var issuerDbError = errors.New("issuerDbError")
+var distDbError = errors.New("distDbError")
+var assetDbError = errors.New("assetDbError")
 
 type testAsset struct {
 	name string
@@ -163,4 +161,5 @@ func TestAssetUseCaseCreate(t *testing.T) {
 			}
 		})
 	}
+
 }

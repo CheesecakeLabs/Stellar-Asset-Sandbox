@@ -5,5 +5,4 @@ type Asset struct {
 	Code        string `json:"code" example:"USDC"`
 	Distributor Wallet `json:"distributor"`
 	Issuer      Wallet `json:"issuer"`
-	Amount      int    `json:"amount" example:"1000000"`
 }
