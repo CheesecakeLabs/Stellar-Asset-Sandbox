@@ -18,6 +18,11 @@ type MockUserRepo struct {
 	recorder *MockUserRepoMockRecorder
 }
 
+// GetUserByToken implements usecase.UserRepo
+func (*MockUserRepo) GetUserByToken(token string) (entity.User, error) {
+	panic("unimplemented")
+}
+
 // MockUserRepoMockRecorder is the mock recorder for MockUserRepo.
 type MockUserRepoMockRecorder struct {
 	mock *MockUserRepo

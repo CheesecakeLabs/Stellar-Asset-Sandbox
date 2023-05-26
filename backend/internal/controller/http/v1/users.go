@@ -12,27 +12,27 @@ import (
 type usersRoutes struct {
 	t usecase.UserUseCase
 	a usecase.AuthUseCase
+	rP usecase.RolePermissionUseCase
 	// l logger.Interface
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase) {
-	r := &usersRoutes{t, a}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase) {
+	r := &usersRoutes{t, a, rP}
 
 	h := handler.Group("/users")
 	{
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
 		h.POST("/logout", r.logout)
-		secured := h.Group("/").Use(Auth(a.ValidateToken()))
+		secured := h.Group("/").Use(Auth(a.ValidateToken())).Use(Validate(rP))
 		{
-			secured.GET("/detail", r.detail)
+			secured.GET("/approve-new-accounts", r.detail)
 		}
 	}
 }
 
 type userResponse struct {
 	User  entity.User `json:"user"`
-	Token string
 }
 
 func (r *usersRoutes) detail(c *gin.Context) {
@@ -88,7 +88,7 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 	var user entity.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// r.l.Error(err, "http - v1 - create")
-		// errorResponse(c, http.StatusBadRequest, "invalid request body")
+		errorResponse(c, http.StatusBadRequest, "invalid request body")
 		fmt.Println(err)
 		return
 	}
@@ -96,7 +96,7 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 	user, err := r.t.Autentication(user.Name, user.Password)
 	if err != nil {
 		// r.l.Error(err, "http - v1 - create")
-		// errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems")
 		fmt.Println(err)
 		return
 	}
@@ -106,13 +106,14 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	err = r.a.UpdateToken(user.Name, tokenString)
+	err = r.a.UpdateToken(user.ID, tokenString)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, userResponse{User: user, Token: tokenString})
+	user.Token = tokenString
+	c.JSON(http.StatusOK, userResponse{User: user})
 }
 
 // @Summary Logout User

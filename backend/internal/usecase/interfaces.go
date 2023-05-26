@@ -11,6 +11,7 @@ type (
 		CreateUser(user entity.User) error
 		UpdateToken(id string, token string) error
 		ValidateToken(token string) error
+		GetUserByToken(token string) (entity.User, error)
 	}
 
 	// User -.
@@ -41,5 +42,10 @@ type (
 	// Role -.
 	RoleRepoInterface interface {
 		GetRoles() ([]entity.Role, error)
+	}
+
+	// Role Permission-.
+	RolePermissionRepoInterface interface {
+		Validate(action string, roleId int) (entity.RolePermission, error)
 	}
 )
