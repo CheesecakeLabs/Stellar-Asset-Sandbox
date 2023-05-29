@@ -22,6 +22,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	h := handler.Group("/assets")
 	{
 		h.POST("", r.createAsset)
+		h.POST("/mint", r.mintAsset)
 	}
 }
 
@@ -38,6 +39,7 @@ type BurnAssetRequest struct {
 }
 
 type MintAssetRequest struct {
+	Id        string `json:"id"       binding:"required"  example:"12"`
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
@@ -172,36 +174,29 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 2})
+	asset, err := r.as.Get(request.Code)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "kms messaging problems")
+		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
 	}
-
-	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
-	if !ok || len(kpRes.PublicKeys) != 2 {
-		errorResponse(c, http.StatusInternalServerError, "unexpected kms response")
-		return
-	}
-	issuerPk := kpRes.PublicKeys[0]
-	distPk := kpRes.PublicKeys[1]
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.PaymentOp,
-			Target: distPk,
-			Amount: request.Amount,
+			Type:    entity.PaymentOp,
+			Target:  asset.Distributor.Key.PublicKey,
+			Amount:  request.Amount,
+			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
-				Issuer: issuerPk,
+				Issuer: asset.Issuer.Key.PublicKey,
 			},
-			Origin: sponsor.Key.PublicKey,
+			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
 
-	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
-		MainSource: sponsor.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: asset.Issuer.Key.PublicKey,
+		PublicKeys: []string{sponsor.Key.PublicKey, asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
@@ -209,7 +204,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	_, ok = res.Message.(entity.EnvelopeResponse)
+	_, ok := res.Message.(entity.EnvelopeResponse)
 	if !ok {
 		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
 		return

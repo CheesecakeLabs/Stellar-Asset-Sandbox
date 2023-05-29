@@ -45,9 +45,13 @@ func (uc *AssetUseCase) Mint(data entity.Asset) (entity.Asset, error) {
 		return entity.Asset{}, fmt.Errorf("AssetUseCase - Mint - uc.repo.GetAssetByCode: %w", err)
 	}
 
-	asset, err = uc.aRepo.MintAsset(asset, data.Amount)
+	return asset, nil
+}
+
+func (uc *AssetUseCase) Get(code string) (entity.Asset, error) {
+	asset, err := uc.aRepo.GetAssetByCode(code)
 	if err != nil {
-		return entity.Asset{}, fmt.Errorf("AssetUseCase - Mint - uc.repo.MintAsset: %w", err)
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetAssetByCode: %w", err)
 	}
 
 	return asset, nil
