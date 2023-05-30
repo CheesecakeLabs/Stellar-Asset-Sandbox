@@ -37,6 +37,5 @@ type (
 		GetAssets() ([]entity.Asset, error)
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
-		MintAsset(entity.Asset, int) (entity.Asset, error)
 	}
 )

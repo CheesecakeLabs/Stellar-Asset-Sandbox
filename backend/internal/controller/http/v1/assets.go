@@ -155,7 +155,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 // @Tags  	    Assets
 // @Accept      json
 // @Produce     json
-// @Param       request body issueAssetRequest true "Asset info"
+// @Param       request body MintAssetRequest true "Asset info"
 // @Success     200 {object} entity.Asset
 // @Failure     400 {object} response
 // @Failure     404 {object} response

@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/assets": {
             "post": {
-                "description": "Create and issue a new asset on Stellar",
+                "description": "Mint an asset on Stellar",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "Assets"
                 ],
-                "summary": "Create a new asset",
+                "summary": "Mint an asset",
                 "parameters": [
                     {
                         "description": "Asset info",
@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.CreateAssetRequest"
+                            "$ref": "#/definitions/v1.MintAssetRequest"
                         }
                     }
                 ],
@@ -294,6 +294,10 @@ const docTemplate = `{
         "entity.Asset": {
             "type": "object",
             "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 1000000
+                },
                 "code": {
                     "type": "string",
                     "example": "USDC"
@@ -415,6 +419,33 @@ const docTemplate = `{
                 "id": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "v1.MintAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "code",
+                "id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
