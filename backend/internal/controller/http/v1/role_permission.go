@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type rolePermission struct {
-	roleUseCase usecase.RoleUseCase
-	messengerController HTTPControllerMessenger
-}
-
 func Validate(rP usecase.RolePermissionUseCase) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		token := context.GetHeader("Authorization")
