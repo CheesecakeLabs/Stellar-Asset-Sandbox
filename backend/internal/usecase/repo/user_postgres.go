@@ -81,25 +81,13 @@ func (r UserRepo) ValidateToken(token string) error {
 }
 
 func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id FROM UserAccount WHERE token='%s'`, token)
-
-	rows, err := r.Db.Query(stmt)
+	stmt := `SELECT ID, Name, Password, role_id FROM UserAccount WHERE token = $1`
+        
+        var user entity.User
+	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("UserRepo - GetUserByToken - db.Query: %w", err)
 	}
 
-	defer rows.Close()
-
-	for rows.Next() {
-		var user entity.User
-
-		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
-		if err != nil {
-			return entity.User{}, fmt.Errorf("UserRepo - GetUserByToken - rows.Scan: %w", err)
-		}
-
-		return user, nil
-	}
-
-	return entity.User{}, nil
+	return user, nil
 }
