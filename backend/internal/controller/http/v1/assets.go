@@ -23,6 +23,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	{
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
+		h.POST("/burn", r.burnAsset)
 	}
 }
 
@@ -33,6 +34,7 @@ type CreateAssetRequest struct {
 }
 
 type BurnAssetRequest struct {
+	Id        string `json:"id"       binding:"required"  example:"001"`
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
@@ -211,4 +213,59 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset minted"})
+}
+
+// @Summary Burn an asset
+// @Description Burn an asset on Stellar
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body BurnAssetRequest true "Asset info"
+// @Success     200 {object} entity.Asset
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets [post]
+func (r *assetsRoutes) burnAsset(c *gin.Context) {
+	var request BurnAssetRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	asset, err := r.as.Get(request.Id)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "asset not found")
+		return
+	}
+
+	ops := []entity.Operation{
+		{
+			Type:    entity.PaymentOp,
+			Sponsor: asset.Distributor.Key.PublicKey,
+			Target:  asset.Issuer.Key.PublicKey,
+			Amount:  request.Amount,
+			Origin:  asset.Distributor.Key.PublicKey,
+		},
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: asset.Distributor.Key.PublicKey,
+		PublicKeys: []string{asset.Distributor.Key.PublicKey, asset.Issuer.Key.PublicKey},
+		Operations: ops,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Asset burned successfully",
+	})
 }

@@ -369,18 +369,3 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
 }
-
-// MintAsset mocks base method.
-func (m *MockAssetRepoInterface) MintAsset(arg0 entity.Asset, arg1 int) (entity.Asset, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MintAsset", arg0, arg1)
-	ret0, _ := ret[0].(entity.Asset)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// MintAsset indicates an expected call of MintAsset.
-func (mr *MockAssetRepoInterfaceMockRecorder) MintAsset(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MintAsset", reflect.TypeOf((*MockAssetRepoInterface)(nil).MintAsset), arg0, arg1)
-}
