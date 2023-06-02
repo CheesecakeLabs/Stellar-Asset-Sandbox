@@ -46,6 +46,6 @@ type (
 
 	// Role Permission-.
 	RolePermissionRepoInterface interface {
-		Validate(action string, roleId int) (entity.RolePermission, error)
+		Validate(action string, roleId int) (bool, error)
 	}
 )

@@ -26,5 +26,5 @@ func (uc *RolePermissionUseCase) Validate(token string, basePath string) bool {
 	if err != nil {
 		return false
 	}
-	return isAuthorized.IsAuthorized == 1
+	return isAuthorized
 }
