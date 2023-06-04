@@ -1,6 +1,9 @@
 definitions:
   entity.Asset:
     properties:
+      amount:
+        example: 1000000
+        type: integer
       code:
         example: USDC
         type: string
@@ -86,6 +89,26 @@ definitions:
     required:
     - id
     type: object
+  v1.MintAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      id:
+        example: "12"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - id
+    - sponsor_id
+    type: object
   v1.response:
     properties:
       error:
@@ -106,14 +129,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create and issue a new asset on Stellar
+      description: Mint an asset on Stellar
       parameters:
       - description: Asset info
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.CreateAssetRequest'
+          $ref: '#/definitions/v1.MintAssetRequest'
       produces:
       - application/json
       responses:
@@ -133,7 +156,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Create a new asset
+      summary: Mint an asset
       tags:
       - Assets
   /user/create:

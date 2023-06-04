@@ -22,7 +22,6 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 
 	var asset entity.Asset
 	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAsset - asset not found")
@@ -36,7 +35,6 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	stmt := `SELECT * FROM Asset`
 	rows, err := r.Db.Query(stmt)
-
 	if err != nil {
 		return nil, fmt.Errorf("AssetRepo - GetAssets - db.Query: %w", err)
 	}
@@ -59,11 +57,26 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	return entities, nil
 }
 
+func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
+	smtp := `SELECT * FROM Asset WHERE code=$1`
+	row := r.Db.QueryRow(smtp, code)
+
+	var asset entity.Asset
+	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetByCode - asset not found")
+		}
+		return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetByCode - row.Scan: %w", err)
+	}
+
+	return asset, nil
+}
+
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
 	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id) VALUES ($1, $2, $3) RETURNING id;`
 	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id).Scan(&res.Id)
-
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
 	}
