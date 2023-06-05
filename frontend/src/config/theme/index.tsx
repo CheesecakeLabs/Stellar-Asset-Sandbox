@@ -117,7 +117,7 @@ const theme = extendTheme({
       500: '#00ABE6',
       600: '#005F80',
       700: '#00394D',
-      800: '#002A38',
+      800: '#19AECF',
       900: '#002A38',
     },
     black: {
@@ -140,6 +140,9 @@ const theme = extendTheme({
     },
     yellow: {
       500: '#FBE995',
+    },
+    red: {
+      500: '#E85858',
     },
   },
   borders: {

@@ -25,8 +25,8 @@ export const Tag = {
         padding: '6px 12px',
       },
       container: {
-        bg: 'info.light',
-        color: 'info.normal',
+        bg: 'blue.800',
+        color: 'white',
       },
     },
     red: {
@@ -34,8 +34,8 @@ export const Tag = {
         padding: '6px 12px',
       },
       container: {
-        bg: 'error.light',
-        color: 'error.normal',
+        bg: 'red.500',
+        color: 'white',
       },
     },
     light: {

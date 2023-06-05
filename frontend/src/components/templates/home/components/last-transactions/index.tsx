@@ -10,24 +10,17 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 
-import { mockupAssets } from 'utils/mockups'
+import { mockupTransactions } from 'utils/mockups'
 
 import { SearchIcon } from 'components/icons'
 
-import { ItemAsset } from '../item-asset'
+import { ItemTransaction } from '../item-transaction'
 
-export const AssetsManagement: React.FC = () => {
-
+export const LastTransactions: React.FC = () => {
   return (
-    <Flex
-      borderRadius="1rem"
-      bg="white"
-      w="full"
-      p="2rem"
-      flexDir="column"
-    >
+    <Flex borderRadius="1rem" bg="white" w="full" p="2rem" flexDir="column">
       <Text size="sm" color="primary.light">
-        Assets Management
+        Last Transactions
       </Text>
       <InputGroup mt="1rem" mb="2rem" maxW="416px">
         <InputLeftElement pointerEvents="none" h="2.5rem">
@@ -36,7 +29,7 @@ export const AssetsManagement: React.FC = () => {
         <Input
           px="3rem"
           type="text"
-          placeholder="Asset Name"
+          placeholder="Asset Name, date or type"
           bg="gray.100"
           borderRadius="1rem"
           fontSize="xs"
@@ -46,8 +39,8 @@ export const AssetsManagement: React.FC = () => {
       <TableContainer>
         <Table>
           <Tbody>
-            {mockupAssets.map(asset => (
-              <ItemAsset asset={asset} />
+            {mockupTransactions.map(transaction => (
+              <ItemTransaction transaction={transaction} />
             ))}
           </Tbody>
         </Table>

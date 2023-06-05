@@ -53,16 +53,17 @@ export const NavItem: React.FC<INavItemProps> = ({
         {...rest}
       >
         {icon && (
-          <Box
+          <Flex
             width="2.5rem"
             fontSize="6"
             color="white"
             _groupHover={{
               color: 'white',
             }}
+            justifyContent="center"
           >
             {icon}
-          </Box>
+          </Flex>
         )}
         {children}
       </Flex>
