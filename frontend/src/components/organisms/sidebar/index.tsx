@@ -1,4 +1,10 @@
-import { Box, Drawer, DrawerContent, useDisclosure } from '@chakra-ui/react'
+import {
+  Box,
+  Drawer,
+  DrawerContent,
+  Flex,
+  useDisclosure,
+} from '@chakra-ui/react'
 import React, { ReactNode } from 'react'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -60,29 +66,31 @@ export const Sidebar: React.FC<IProps> = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box>
+    <Box w="full">
       <Header onOpen={onOpen} />
-      <SidebarContent
-        items={linkItems}
-        onClose={(): void => onClose()}
-        display={{ base: 'none', md: 'block' }}
-      />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size="full"
-      >
-        <DrawerContent>
-          <SidebarContent items={linkItems} onClose={onClose} />
-        </DrawerContent>
-      </Drawer>
-      <Box ml={{ base: 0, md: 60 }} p="4" data-testid="sidebar-overlay">
-        {children}
-      </Box>
+      <Flex pt="5rem">
+        <SidebarContent
+          items={linkItems}
+          onClose={(): void => onClose()}
+          display={{ base: 'none', md: 'block' }}
+        />
+        <Drawer
+          autoFocus={false}
+          isOpen={isOpen}
+          placement="left"
+          onClose={onClose}
+          returnFocusOnClose={false}
+          onOverlayClick={onClose}
+          size="full"
+        >
+          <DrawerContent>
+            <SidebarContent items={linkItems} onClose={onClose} />
+          </DrawerContent>
+        </Drawer>
+        <Box ml={{ base: 0, md: '265px' }} p="4" w="full">
+          {children}
+        </Box>
+      </Flex>
     </Box>
   )
 }

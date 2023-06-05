@@ -1,28 +1,23 @@
 export const Tag = {
   baseStyle: {
     label: {
-      fontSize: 'sm',
+      fontSize: 'xs',
       fontWeight: '400',
-      p: '8px',
     },
     container: {
       borderRadius: 'full',
+      fontSize: 'xs',
+      padding: '6px 24px',
     },
   },
   variants: {
-    user: {
-      container: {
-        bg: 'info.light',
-        color: 'black.300',
-      },
-    },
     yellow: {
       label: {
         padding: '6px 12px',
       },
       container: {
-        bg: 'warning.light',
-        color: 'warning.normal',
+        bg: 'yellow.500',
+        color: 'black.400',
       },
     },
     blue: {
@@ -52,44 +47,13 @@ export const Tag = {
         borderColor: 'blue.50',
       },
     },
-    number: {
-      label: {
-        fontSize: 'sm',
-        fontWeight: '400',
-      },
-    },
-    tab: {
-      label: {
-        fontSize: 'sm',
-        fontWeight: '400',
-      },
-      container: {
-        color: 'white',
-        fontSize: 'sm',
-        ml: '0.5rem',
-      },
-    },
-    option: {
-      container: {
-        bg: 'info.light',
-        padding: '4px 12px',
-      },
-    },
-    duration: {
-      container: {
-        bg: 'warning.light',
-        padding: '8px 12px',
-        gap: 2,
-        fontSize: 'xs',
-      },
-    },
     green: {
       label: {
         padding: '6px 12px',
       },
       container: {
-        bg: 'green.200',
-        color: 'green.500',
+        bg: 'green.500',
+        color: 'white',
       },
     },
   },

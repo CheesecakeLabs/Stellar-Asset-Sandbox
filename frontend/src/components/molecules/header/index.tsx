@@ -19,6 +19,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       align="center"
       ps={{ base: 2, md: 12 }}
       pe={6}
+      pos="fixed"
     >
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
       <StellarLogo />

@@ -1,6 +1,9 @@
-import { extendTheme } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/react';
 
-import * as components from './components'
+
+
+import * as components from './components';
+
 
 const theme = extendTheme({
   config: {
@@ -13,6 +16,7 @@ const theme = extendTheme({
     mono: '"Arial", sans-serif',
   },
   fontSizes: {
+    xxs: '0.625rem', // 10px
     xs: '0.75rem', // 12px
     sm: '0.875rem', // 14px
     md: '1rem', // 16px
@@ -99,11 +103,11 @@ const theme = extendTheme({
     },
     gray: {
       50: '#FBFCFD',
-      100: '#F1F5F9',
-      200: '#D0D3D4',
+      100: '#f8f8fb',
+      200: '#f1f2f6',
       300: '#AFB4B6',
       400: '#E5E5E5',
-      700: '#2D3748',
+      700: '#828282',
     },
     blue: {
       50: '#E5F8FF',
@@ -118,14 +122,14 @@ const theme = extendTheme({
     },
     black: {
       300: '#00171F',
-      800: '#002A38',
+      400: '#161616',
     },
     rose: {
       500: '#E34078',
     },
     green: {
       200: '#78f6a2',
-      500: '#4c9e66',
+      500: '#17B890',
     },
     purple: {
       100: '#758BFD',
@@ -133,6 +137,9 @@ const theme = extendTheme({
       200: '#30237d',
       250: '#3E1BDB',
       300: '#181142',
+    },
+    yellow: {
+      500: '#FBE995',
     },
   },
   borders: {
