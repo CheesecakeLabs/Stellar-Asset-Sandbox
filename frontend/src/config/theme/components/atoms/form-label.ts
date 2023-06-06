@@ -1,8 +1,8 @@
 export const FormLabel = {
   baseStyle: {
-    fontSize: 'xs',
-    fontWeight: '400',
-    lineHeight: 'base',
-    color: 'black.300',
+    fontSize: 'sm',
+    fontWeight: '500',
+    lineHeight: '2xl',
+    color: 'gray.800',
   },
 }

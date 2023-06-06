@@ -1,30 +1,33 @@
-import { inputAnatomy as parts } from '@chakra-ui/anatomy'
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react';
 
-const { definePartsStyle } = createMultiStyleConfigHelpers(parts.keys)
 
-const variantCustom = definePartsStyle(() => {
-  return {
+
+import { inputAnatomy } from '@chakra-ui/anatomy';
+
+
+const { definePartsStyle, defineMultiStyleConfig } =
+  createMultiStyleConfigHelpers(inputAnatomy.keys)
+
+const sizes = {
+  md: definePartsStyle({
     field: {
-      border: '1px solid',
-      borderColor: 'gray.200',
-      borderRadius: '0.5rem',
-      height: '3.5rem',
-      color: 'black.300',
-      fontSize: 'md',
-      _focusVisible: {
-        borderColor: 'blue.500',
-      },
+      height: '34px',
+      p: '6px 10px',
+      fontSize:'sm'
     },
-  }
+  }),
+}
+
+const baseStyle = definePartsStyle({
+  sizes: {
+    height: '50px',
+  },
+  field: {
+    border: '1px solid #EEEDEF',
+    borderRadius: '0.25rem',
+    color: 'gray.800',
+    _placeholder: { color: 'gray.800' },
+  },
 })
 
-export const Input = {
-  defaultProps: {
-    size: 'md',
-    variant: 'custom',
-  },
-  variants: {
-    custom: variantCustom,
-  },
-}
+export const Input = defineMultiStyleConfig({ baseStyle, sizes })

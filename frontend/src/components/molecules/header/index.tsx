@@ -2,7 +2,7 @@ import { Avatar, Flex, Spacer, Text } from '@chakra-ui/react'
 import React from 'react'
 
 import { MobileNav } from 'components/atoms'
-import { StellarLogo, MenuIcon } from 'components/icons'
+import { MenuIcon } from 'components/icons'
 
 import AvatarImg from 'app/core/resources/avatar.png'
 
@@ -23,7 +23,6 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       zIndex={99}
     >
       <MobileNav onOpen={onOpen} />
-      <StellarLogo />
       <Spacer />
       <Avatar src={AvatarImg} size="2rem" />
       <Text ps={3} pe={3} color="purple.100" fontSize="sm">

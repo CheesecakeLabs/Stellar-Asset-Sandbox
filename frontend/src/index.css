@@ -1,9 +1,5 @@
 @import 'config/theme/css-variables.css';
 
-html {
-  background-color: #f1f2f6;
-}
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

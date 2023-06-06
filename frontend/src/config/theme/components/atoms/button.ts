@@ -6,16 +6,10 @@ export const Button = {
     primary: {
       backgroundColor: 'primary.normal',
       color: 'white',
-      height: '3.5rem',
-      fontWeight: '400',
-      fontSize: 'md',
-      fontHeight: '2xl',
-      borderRadius: '0.5rem',
-      _hover: {
-        _disabled: {
-          backgroundColor: 'blue.200',
-        },
-      },
+      height: '2.125rem',
+      fontWeight: '500',
+      fontSize: 'sm',
+      borderRadius: '0.25rem',
     },
   },
 }

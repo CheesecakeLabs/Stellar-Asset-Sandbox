@@ -6,7 +6,7 @@ import { PathRoute } from 'components/enums/path-route'
 
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
-export const LoginTemplate: React.FC = () => {
+export const ResetPasswordTemplate: React.FC = () => {
   const navigate = useNavigate()
 
   return (
@@ -31,14 +31,22 @@ export const LoginTemplate: React.FC = () => {
         alignSelf="center"
       >
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem" color="black">
-          Sign in to Asset Sandbox
+          Reset password
         </Text>
 
         <FormLabel>Email address</FormLabel>
-        <Input type="email" placeholder="Email address" />
+        <Input
+          type="email"
+          placeholder="Email address"
+          value="paul@stellar.org"
+          disabled
+        />
 
-        <FormLabel mt="1.5rem">Password</FormLabel>
-        <Input placeholder="Password" type="password" />
+        <FormLabel mt="1.5rem">New Password</FormLabel>
+        <Input placeholder="New Password" type="password" />
+
+        <FormLabel mt="1.5rem">Confirm new password</FormLabel>
+        <Input placeholder="Confirm new password" type="password" />
 
         <Button
           variant="primary"
@@ -47,38 +55,8 @@ export const LoginTemplate: React.FC = () => {
             navigate(PathRoute.HOME)
           }}
         >
-          Sign in
+          Reset password
         </Button>
-
-        <Button
-          variant="link"
-          fontSize="sm"
-          color="primary.normal"
-          mt="1rem"
-          fontWeight="500"
-          onClick={(): void => {
-            navigate(PathRoute.RESET_PASSWORD)
-          }}
-        >
-          Forgot Password?
-        </Button>
-
-        <Flex gap={1} justifyContent="center" mt="3rem">
-          <Text color="black" fontSize="sm">
-            Don't have an account?
-          </Text>
-          <Button
-            variant="link"
-            fontSize="sm"
-            color="primary.normal"
-            fontWeight="500"
-            onClick={(): void => {
-              navigate(PathRoute.SIGNUP)
-            }}
-          >
-            Sign up!
-          </Button>
-        </Flex>
       </Flex>
     </Flex>
   )

@@ -9,10 +9,8 @@ import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
 import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
-import { ReactComponent as StellarLogo } from './fonts/stellar.svg'
 
 export {
-  StellarLogo,
   MenuIcon,
   ContractIcon,
   DashboardIcon,

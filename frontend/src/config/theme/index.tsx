@@ -53,7 +53,7 @@ const theme = extendTheme({
   colors: {
     primary: {
       light: '#728CE7',
-      normal: '#0027A5',
+      normal: '#6E56CF',
       dark: '#07002D',
     },
     secondary: {
@@ -106,8 +106,10 @@ const theme = extendTheme({
       100: '#f8f8fb',
       200: '#f1f2f6',
       300: '#AFB4B6',
-      400: '#E5E5E5',
+      400: '#EEEDEF',
+      500: '#f9f8f9',
       700: '#828282',
+      800: '#908E96',
     },
     blue: {
       50: '#E5F8FF',
