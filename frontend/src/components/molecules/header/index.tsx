@@ -22,7 +22,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       pos="fixed"
       zIndex={99}
     >
-      <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
+      <MobileNav onOpen={onOpen} />
       <StellarLogo />
       <Spacer />
       <Avatar src={AvatarImg} size="2rem" />

@@ -1,4 +1,4 @@
-import { Box, Flex, FlexProps, Link } from '@chakra-ui/react'
+import { Flex, FlexProps, Link } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 

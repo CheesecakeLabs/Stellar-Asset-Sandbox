@@ -30,7 +30,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       w={{ base: 'full', md: 60 }}
       minW="265px"
       pos="fixed"
-      h="calc(100vh - 5rem)"
+      h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
       pb="2rem"
       {...rest}
     >

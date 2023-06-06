@@ -13,6 +13,7 @@ export const MobileNav: React.FC<IMobileProps> = ({ onOpen }: IMobileProps) => {
       onClick={onOpen}
       aria-label="open menu"
       me={4}
+      display={{ base: 'flex', md: 'none' }} 
       icon={<MenuLineIcon width="1rem" />}
     />
   )
