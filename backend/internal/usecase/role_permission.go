@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -16,7 +17,7 @@ func NewRolePermissionUseCase(r RolePermissionRepoInterface, userUsecase UserUse
 	}
 }
 
-func (uc *RolePermissionUseCase) Validate(token string, basePath string) bool {
+func (uc *RolePermissionUseCase) Validate(token string, basePath string) (bool, error) {
 	user, err := uc.userUsecase.repo.GetUserByToken(token)
 	
 	pieces := strings.Split(basePath, "/")
@@ -24,7 +25,8 @@ func (uc *RolePermissionUseCase) Validate(token string, basePath string) bool {
 	isAuthorized, err := uc.repo.Validate(action, user.RoleId)
 
 	if err != nil {
-		return false
+		return false, fmt.Errorf("RolePermissionUseCase - Validate - uc.userUsecase.repo.GetUserByToken: %w", err)
 	}
-	return isAuthorized
+
+	return isAuthorized, nil
 }
