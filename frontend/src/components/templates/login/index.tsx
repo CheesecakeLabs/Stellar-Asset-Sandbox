@@ -18,7 +18,7 @@ export const LoginTemplate: React.FC = () => {
       bg="gray.500"
       h="100vh"
     >
-      <StellarLogo fill="black" width="300px" />
+      <StellarLogo fill="black" />
       <Flex
         flexDir="column"
         mt="6rem"
