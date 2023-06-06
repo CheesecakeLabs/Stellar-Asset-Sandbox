@@ -6,6 +6,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	rolePermission "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/role_permission"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +25,7 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.Au
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
 		h.POST("/logout", r.logout)
-		secured := h.Group("/").Use(Auth(a.ValidateToken())).Use(Validate(rP))
+		secured := h.Group("/").Use(Auth(a.ValidateToken())).Use(rolePermission.Validate(rP))
 		{
 			secured.GET("/approve-new-accounts", r.detail)
 		}
