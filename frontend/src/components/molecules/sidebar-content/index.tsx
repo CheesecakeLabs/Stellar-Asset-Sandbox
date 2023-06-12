@@ -1,16 +1,15 @@
 import {
   Box,
   BoxProps,
-  Center,
   CloseButton,
-  Divider,
   Flex,
   Spacer,
+  Text,
 } from '@chakra-ui/react'
 
 import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { SettingsIcon } from 'components/icons'
+import { ProfileIcon, SettingsIcon } from 'components/icons'
 
 import { ILinkItemProps } from '../../organisms/sidebar'
 
@@ -26,11 +25,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
 }: ISidebarProps) => {
   return (
     <Box
-      bgGradient="linear(176.48deg, #27187E 0%, #1C1542 100%)"
       w={{ base: 'full', md: 60 }}
-      minW="265px"
+      minW="282px"
       pos="fixed"
       h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
+      borderRight="1px solid"
+      borderColor="gray.600"
       pb="2rem"
       {...rest}
     >
@@ -43,12 +43,16 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
             <NavItem key={item.name} icon={item.icon} path={item.path}>
               {item.name}
             </NavItem>
-            <Center>
-              <Divider bg="purple.250" w="6rem" h="1px" border="none" mb={2} />
-            </Center>
           </Box>
         ))}
         <Spacer />
+        <NavItem
+          key={'System Admin'}
+          icon={<ProfileIcon />}
+          path={PathRoute.PROFILE}
+        >
+          Profile
+        </NavItem>
         <NavItem
           key={'System Admin'}
           icon={<SettingsIcon />}
@@ -56,6 +60,15 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         >
           System Admin
         </NavItem>
+        <Text
+          color="gray.800"
+          fontWeight="600"
+          ml="2rem"
+          fontSize="sm"
+          mt="0.5rem"
+        >
+          v2.01
+        </Text>
       </Flex>
     </Box>
   )

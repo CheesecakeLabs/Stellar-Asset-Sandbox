@@ -153,6 +153,13 @@ const theme = extendTheme({
     mid: '0px 2px 4px 2px rgba(42, 42, 42, 0.2);',
     higher: '0px 2px 4px 2px rgba(42, 42, 42, 0.3);',
   },
+  styles: {
+    global: () => ({
+      body: {
+        bg: 'gray.500',
+      },
+    }),
+  },
   components: { ...components },
 })
 

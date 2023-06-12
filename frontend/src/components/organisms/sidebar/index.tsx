@@ -87,7 +87,7 @@ export const Sidebar: React.FC<IProps> = ({ children }) => {
             <SidebarContent items={linkItems} onClose={onClose} />
           </DrawerContent>
         </Drawer>
-        <Box ml={{ base: 0, md: '265px' }} p="4" w="full">
+        <Box ml={{ base: 0, md: '282px' }} p="4" w="full">
           {children}
         </Box>
       </Flex>

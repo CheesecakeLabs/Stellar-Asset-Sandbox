@@ -6,6 +6,7 @@ import { ReactComponent as HomeIcon } from './fonts/home.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
+import { ReactComponent as ProfileIcon } from './fonts/profile.svg'
 import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
@@ -22,4 +23,5 @@ export {
   MenuLineIcon,
   SearchIcon,
   EditIcon,
+  ProfileIcon,
 }

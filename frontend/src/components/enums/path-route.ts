@@ -9,4 +9,5 @@ export enum PathRoute {
   ASSETS_DASHBOARD = '/assets-dashboard',
   BLOCKCHAIN_EXPLORER = '/blockchain-explorer',
   SETTINGS = '/settings',
+  PROFILE = '/profile',
 }

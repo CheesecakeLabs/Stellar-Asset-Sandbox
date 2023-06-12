@@ -6,7 +6,7 @@ import { HomeTemplate } from 'components/templates/home'
 
 export const Home: React.FC = () => {
   return (
-    <Flex bg="gray.200">
+    <Flex>
       <Sidebar>
         <HomeTemplate />
       </Sidebar>

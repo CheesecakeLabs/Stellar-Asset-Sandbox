@@ -34,33 +34,23 @@ export const NavItem: React.FC<INavItemProps> = ({
     >
       <Flex
         align="center"
-        p="4"
         cursor="pointer"
         fontSize="sm"
         mb={2}
         fontWeight={400}
-        color={isCurrent() ? 'white' : 'purple.100'}
+        color={isCurrent() ? 'black' : 'gray.800'}
         _hover={{
-          bg: 'purple.200',
-          color: 'white',
-          borderEndRadius: '4rem',
+          cursor: 'pointer',
         }}
-        me={4}
-        borderColor={isCurrent() ? 'purple.150' : 'none'}
-        borderEndRadius={isCurrent() ? '4rem' : 'none'}
-        bg={isCurrent() ? 'purple.200' : 'none'}
-        gap={4}
+        pl="2rem"
+        py="0.375rem"
         {...rest}
       >
         {icon && (
           <Flex
-            width="2.5rem"
             fontSize="6"
-            color="white"
-            _groupHover={{
-              color: 'white',
-            }}
-            justifyContent="center"
+            width="2rem"
+            fill={isCurrent() ? 'black' : 'gray.800'}
           >
             {icon}
           </Flex>
