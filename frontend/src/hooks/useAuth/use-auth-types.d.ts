@@ -23,7 +23,7 @@ declare namespace Hooks {
     interface IAuthContext {
       signIn: (params: ISignIn) => Promise<IUser | null>
       signUp: (params: ISignUp) => Promise<IUser | null>
-      signOut: () => Promise<void>
+      signOut: () => Promise<boolean>
       isAuthenticated: boolean
       loading: boolean
     }

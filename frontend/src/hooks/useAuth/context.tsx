@@ -69,8 +69,20 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const signOut = async (): Promise<void> => {
-    Authentication.logout()
+  const signOut = async (): Promise<boolean> => {
+    setLoading(true)
+    try {
+      const response = await http.post(`users/logout`)
+      const isSuccess = response.status === 200
+      if (isSuccess) {
+        Authentication.logout()
+      }
+      return isSuccess
+    } catch (error) {
+      return false
+    } finally {
+      setLoading(false)
+    }
   }
 
   const isAuthenticated = !!user
