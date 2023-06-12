@@ -11,6 +11,8 @@ import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ProfileIcon, SettingsIcon } from 'components/icons'
 
+import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
+
 import { ILinkItemProps } from '../../organisms/sidebar'
 
 interface ISidebarProps extends BoxProps {
@@ -35,8 +37,17 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       {...rest}
     >
       <Flex direction="column" h="full" pt={4}>
-        <Flex h={14} align="center" display={{ base: 'flex', md: 'none' }}>
-          <CloseButton color="white" onClick={onClose} w="4rem" />
+        <Flex
+          h={14}
+          justifyContent="space-between"
+          alignItems="center"
+          display={{ base: 'flex', md: 'none' }}
+          w="full"
+          pl="2rem"
+          mb="1rem"
+        >
+          <StellarLogo fill="black" width="6rem" />
+          <CloseButton color="black" onClick={onClose} w="4rem" />
         </Flex>
         {items.map(item => (
           <Box>

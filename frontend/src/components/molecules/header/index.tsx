@@ -3,7 +3,10 @@ import React from 'react'
 
 import { MobileNav } from 'components/atoms'
 
+import Authentication from 'app/auth/services/auth'
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
+
+import { SwitchTheme } from '../switch-theme'
 
 interface IHeader {
   onOpen(): void
@@ -32,11 +35,13 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
         borderColor="gray.400"
         borderRadius="0.25rem"
         w="max-content"
+        mr="0.5rem"
       >
-        <Text fontSize="xs" color="black" py="0.5rem" lineHeight="20px">
-          John Anderson
+        <Text fontSize="xs" color="black" py="0.25rem" lineHeight="20px">
+          {Authentication.getUser()?.name || '-'}
         </Text>
       </Container>
+      <SwitchTheme />
     </Flex>
   )
 }
