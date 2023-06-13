@@ -20,12 +20,20 @@ declare namespace Hooks {
       role_id: number
     }
 
+    interface IRole {
+      id: number
+      name: string
+    }
+
     interface IAuthContext {
       signIn: (params: ISignIn) => Promise<IUser | null>
       signUp: (params: ISignUp) => Promise<IUser | null>
       signOut: () => Promise<boolean>
+      getRoles: () => Promise<void>
       isAuthenticated: boolean
       loading: boolean
+      loadingRoles: boolean
+      roles: IRole[] | undefined
     }
   }
 }

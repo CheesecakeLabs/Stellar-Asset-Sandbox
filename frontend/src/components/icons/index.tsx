@@ -3,6 +3,7 @@ import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
 import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as ExplorerIcon } from './fonts/explorer.svg'
 import { ReactComponent as HomeIcon } from './fonts/home.svg'
+import { ReactComponent as LoadingIcon } from './fonts/loading.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
 import { ReactComponent as MoonIcon } from './fonts/moon.svg'
@@ -28,4 +29,5 @@ export {
   ProfileIcon,
   SunIcon,
   MoonIcon,
+  LoadingIcon,
 }

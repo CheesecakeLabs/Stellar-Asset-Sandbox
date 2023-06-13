@@ -5,6 +5,7 @@ import {
   Flex,
   Spacer,
   Text,
+  useColorMode,
 } from '@chakra-ui/react'
 
 import { NavItem } from 'components/atoms'
@@ -25,6 +26,9 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
   onClose,
   ...rest
 }: ISidebarProps) => {
+  const { colorMode } = useColorMode()
+  const isDark = colorMode === 'dark'
+
   return (
     <Box
       w={{ base: 'full', md: 60 }}
@@ -32,8 +36,9 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       pos="fixed"
       h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
-      borderColor="gray.600"
+      borderColor={isDark ? 'black.800' : 'gray.600'}
       pb="2rem"
+      bg={{ sm: isDark ? 'black.600' : 'white', md: 'none' }}
       {...rest}
     >
       <Flex direction="column" h="full" pt={4}>
@@ -46,8 +51,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           pl="2rem"
           mb="1rem"
         >
-          <StellarLogo fill="black" width="6rem" />
-          <CloseButton color="black" onClick={onClose} w="4rem" />
+          <StellarLogo fill={isDark ? 'white' : 'black'} width="6rem" />
+          <CloseButton
+            color={isDark ? 'white' : 'black'}
+            onClick={onClose}
+            w="4rem"
+          />
         </Flex>
         {items.map(item => (
           <Box>
@@ -72,7 +81,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           System Admin
         </NavItem>
         <Text
-          color="gray.800"
+          color="gray.900"
           fontWeight="600"
           ml="2rem"
           fontSize="sm"

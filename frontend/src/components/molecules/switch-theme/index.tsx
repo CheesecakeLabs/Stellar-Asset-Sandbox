@@ -1,10 +1,11 @@
-import { FormLabel, Input, Flex } from '@chakra-ui/react'
-import { useState } from 'react'
+import { FormLabel, Input, Flex, useColorMode } from '@chakra-ui/react'
 
 import { MoonIcon, SunIcon } from 'components/icons'
 
 export const SwitchTheme: React.FC = () => {
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark')
+  const { colorMode, toggleColorMode } = useColorMode()
+
+  const isDark = colorMode === 'dark'
 
   return (
     <FormLabel
@@ -20,16 +21,14 @@ export const SwitchTheme: React.FC = () => {
       <Input
         id="theme-switcher"
         type="checkbox"
-        checked={themeMode.includes('light') ? true : false}
-        onChange={(): void =>
-          setThemeMode(themeMode.includes('light') ? 'dark' : 'light')
-        }
+        checked={colorMode.includes('light') ? true : false}
+        onChange={(): void => toggleColorMode()}
         display="inline-block"
         appearance="none"
         cursor="pointer"
-        height="12px"
-        width="32px"
-        backgroundColor="gray.600"
+        height="0.75rem"
+        width="2rem"
+        bg={isDark ? 'black.800' : 'gray.600'}
         borderRadius="full"
         mt="0.285rem"
       />
@@ -37,7 +36,7 @@ export const SwitchTheme: React.FC = () => {
         className={`iconMove`}
         transition="all 0.2s ease-in"
         transform={`${
-          themeMode.includes('light') ? 'translateX(0)' : 'translateX(12px)'
+          colorMode.includes('light') ? 'translateX(0)' : 'translateX(12px)'
         }`}
         position="absolute"
         cursor="pointer"
@@ -52,7 +51,11 @@ export const SwitchTheme: React.FC = () => {
         justifyContent="center"
         alignItems="center"
       >
-        {themeMode === 'light' ? <SunIcon width="11px"/> : <MoonIcon width="11px"/>}
+        {colorMode === 'light' ? (
+          <SunIcon width="11px" />
+        ) : (
+          <MoonIcon width="11px" />
+        )}
       </Flex>
     </FormLabel>
   )

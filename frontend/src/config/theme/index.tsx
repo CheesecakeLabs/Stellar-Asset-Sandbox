@@ -1,14 +1,22 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/react'
 
-
-
-import * as components from './components';
-
+import * as components from './components'
 
 const theme = extendTheme({
   config: {
     initialColorMode: 'light',
+    useSystemColorMode: false,
     cssVarPrefix: '',
+  },
+  styles: {
+    global: () => ({
+      body: {
+        bg: 'gray.500',
+        _dark: {
+          bg: 'black.600',
+        },
+      },
+    }),
   },
   fonts: {
     body: '"Arial", sans-serif',
@@ -51,60 +59,14 @@ const theme = extendTheme({
     '12': '3.375rem', // 54px
   },
   colors: {
-    brand: {
-      50: '#f7fafc',
-      500: '#718096',
-      900: '#171923',
-    },
     primary: {
       light: '#728CE7',
       normal: '#6E56CF',
-      dark: '#07002D',
-    },
-    secondary: {
-      light: '#FF935F',
-      normal: '#D26333',
-      dark: '#9B3505',
     },
     background: {
       light: '#FFFFFF',
       normal: '#F8F8F8',
       dark: '#F0F0F0',
-    },
-    darkish: {
-      light: '#3D3D3D',
-      normal: '#00171F',
-      dark: '#151515',
-    },
-    grayish: {
-      light: '#F8FAFC',
-      normal: '#A0A0A0',
-      dark: '#7D7D7D',
-    },
-    whitish: {
-      light: '#FFFFFF',
-      normal: '#F8F8F8',
-      dark: '#F0F0F0',
-    },
-    success: {
-      light: '#8DEB7E',
-      normal: '#75C568',
-      dark: '#5C9A52',
-    },
-    info: {
-      light: '#E5F8FF',
-      normal: '#005F80',
-      dark: '#428BAA',
-    },
-    warning: {
-      light: '#FFF4DC',
-      normal: '#A77701',
-      dark: '#C8AC1D',
-    },
-    error: {
-      light: '#FDF2F6',
-      normal: '#781235',
-      dark: '#E34078',
     },
     gray: {
       50: '#FBFCFD',
@@ -116,42 +78,23 @@ const theme = extendTheme({
       500: '#f9f8f9',
       600: '#E9E8EA',
       700: '#828282',
-      800: '#908E96',
+      900: '#908E96',
     },
     blue: {
       50: '#E5F8FF',
-      100: '#B3EBFF',
       200: '#80DEFF',
-      300: '#4CD1FF',
       500: '#00ABE6',
-      600: '#005F80',
-      700: '#00394D',
       800: '#19AECF',
-      900: '#002A38',
     },
     black: {
       300: '#00171F',
       400: '#161616',
-    },
-    rose: {
-      500: '#E34078',
+      600: '#292d3e',
+      700: '#303448',
+      800: '#3a3e4d',
     },
     green: {
-      200: '#78f6a2',
       500: '#17B890',
-    },
-    purple: {
-      100: '#758BFD',
-      150: '#4628cd',
-      200: '#30237d',
-      250: '#3E1BDB',
-      300: '#181142',
-      400: '#181142',
-      500: '#181142',
-      600: '#181142',
-      700: '#181142',
-      800: '#181142',
-      900: '#181142',
     },
     yellow: {
       500: '#FBE995',
@@ -167,13 +110,6 @@ const theme = extendTheme({
     lower: '0px 2px 4px 2px rgba(42, 42, 42, 0.1);',
     mid: '0px 2px 4px 2px rgba(42, 42, 42, 0.2);',
     higher: '0px 2px 4px 2px rgba(42, 42, 42, 0.3);',
-  },
-  styles: {
-    global: () => ({
-      body: {
-        bg: 'gray.500',
-      },
-    }),
   },
   components: { ...components },
 })

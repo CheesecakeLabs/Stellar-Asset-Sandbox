@@ -2,16 +2,19 @@ import {
   Alert,
   AlertIcon,
   Button,
+  Container,
   Flex,
   FormLabel,
   Input,
   Text,
+  useColorMode,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { PathRoute } from 'components/enums/path-route'
+import { SwitchTheme } from 'components/molecules'
 
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
@@ -27,6 +30,9 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit } = useForm()
+  const { colorMode } = useColorMode()
+
+  const isDark = colorMode === 'dark'
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     setError(null)
@@ -48,15 +54,11 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
   }
 
   return (
-    <Flex
-      w="full"
-      pt="1.5rem"
-      px="2rem"
-      flexDir="column"
-      bg="gray.500"
-      h="100vh"
-    >
-      <StellarLogo fill="black" width="300px" />
+    <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
+      <Flex w="full" justifyContent="space-between">
+        <StellarLogo fill={isDark ? 'white' : 'black'} width="300px" />
+        <SwitchTheme />
+      </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem">
         {error && (
           <Alert mb="0.75rem" status="error">
@@ -64,15 +66,8 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
             {error}
           </Alert>
         )}
-        <Flex
-          flexDir="column"
-          justifyContent="center"
-          bg="white"
-          p="2rem"
-          border="1px solid gray.400"
-          borderRadius="0.5rem"
-        >
-          <Text fontSize="2xl" fontWeight="400" mb="1.5rem" color="black">
+        <Container variant="primary" justifyContent="center" p="2rem">
+          <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
             Sign in to Asset Sandbox
           </Text>
 
@@ -119,9 +114,7 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
           </Button>
 
           <Flex gap={1} justifyContent="center" mt="3rem">
-            <Text color="black" fontSize="sm">
-              Don't have an account?
-            </Text>
+            <Text fontSize="sm">Don't have an account?</Text>
             <Button
               variant="link"
               fontSize="sm"
@@ -134,7 +127,7 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
               Sign up!
             </Button>
           </Flex>
-        </Flex>
+        </Container>
       </Flex>
     </Flex>
   )

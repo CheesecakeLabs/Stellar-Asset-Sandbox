@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react'
+import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -17,6 +17,8 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Authentication.getUser()
   )
   const [loading, setLoading] = useState(false)
+  const [loadingRoles, setLoadingRoles] = useState(false)
+  const [roles, setRoles] = useState<Hooks.UseAuthTypes.IRole[] | undefined>()
 
   const signIn = async (
     params: Hooks.UseAuthTypes.ISignIn
@@ -85,6 +87,21 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getRoles = useCallback(async (): Promise<void> => {
+    setLoadingRoles(true)
+    try {
+      const response = await http.get(`role`)
+      const data = response.data
+      if (data) {
+        setRoles(data)
+      }
+    } catch (error) {
+      return
+    } finally {
+      setLoadingRoles(false)
+    }
+  }, [])
+
   const isAuthenticated = !!user
 
   return (
@@ -93,8 +110,11 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         signIn,
         signOut,
         signUp,
+        getRoles,
         isAuthenticated,
         loading,
+        loadingRoles,
+        roles,
       }}
     >
       {children}

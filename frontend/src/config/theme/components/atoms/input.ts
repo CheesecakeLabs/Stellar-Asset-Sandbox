@@ -23,7 +23,8 @@ const baseStyle = definePartsStyle({
     border: '1px solid #EEEDEF',
     borderRadius: '0.25rem',
     color: 'black',
-    _placeholder: { color: 'gray.800' },
+    _placeholder: { color: 'gray.900' },
+    _dark: { color: 'white' },
   },
 })
 

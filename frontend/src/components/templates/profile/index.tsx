@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Button, Container, Flex, Text, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 
 import Authentication from 'app/auth/services/auth'
@@ -12,53 +12,48 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
   handleSignOut,
   loading,
 }) => {
+  const { colorMode } = useColorMode()
+
   return (
     <Flex flexDir="column" w="full">
-      <Flex w="584px" alignSelf="center" flexDir="column">
-        <Text fontSize="2xl" color="black" fontWeight="400" mb="1.5rem">
+      <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
+        <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Profile
         </Text>
-        <Flex
-          flexDir="column"
-          bg="white"
-          border="1px solid"
-          borderColor="gray.600"
-          borderRadius="0.5rem"
-          p="1.5rem"
-        >
+        <Container variant="primary">
           <Flex
             borderBottom="1px solid"
-            borderColor="gray.400"
+            borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
             py="1rem"
             alignItems="center"
           >
-            <Text fontSize="sm" w="50%" color="black">
+            <Text fontSize="sm" w="50%">
               Name
             </Text>
-            <Text fontSize="sm" color="black" fontWeight="400">
+            <Text fontSize="sm" fontWeight="400">
               {Authentication.getUser()?.name}
             </Text>
           </Flex>
           <Flex
             borderBottom="1px solid"
-            borderColor="gray.400"
+            borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
             py="1rem"
             alignItems="center"
           >
-            <Text fontSize="sm" w="50%" color="black">
+            <Text fontSize="sm" w="50%">
               Email
             </Text>
-            <Text fontSize="sm" color="black" fontWeight="400">
+            <Text fontSize="sm" fontWeight="400">
               {Authentication.getUser()?.email}
             </Text>
           </Flex>
           <Flex
             borderBottom="1px solid"
-            borderColor="gray.400"
+            borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
             py="1rem"
             alignItems="center"
           >
-            <Text fontSize="sm" w="50%" color="black">
+            <Text fontSize="sm" w="50%">
               Sign out of account
             </Text>
             <Button
@@ -70,7 +65,7 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
               Log out
             </Button>
           </Flex>
-        </Flex>
+        </Container>
       </Flex>
     </Flex>
   )
