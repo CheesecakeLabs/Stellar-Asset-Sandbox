@@ -13,6 +13,8 @@ import React, { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
+import { isDark } from 'utils'
+
 import { PathRoute } from 'components/enums/path-route'
 import { SwitchTheme } from 'components/molecules'
 
@@ -31,8 +33,6 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit } = useForm()
   const { colorMode } = useColorMode()
-
-  const isDark = colorMode === 'dark'
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     setError(null)
@@ -56,7 +56,10 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
   return (
     <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
       <Flex w="full" justifyContent="space-between">
-        <StellarLogo fill={isDark ? 'white' : 'black'} width="300px" />
+        <StellarLogo
+          fill={isDark(colorMode) ? 'white' : 'black'}
+          width="300px"
+        />
         <SwitchTheme />
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem">

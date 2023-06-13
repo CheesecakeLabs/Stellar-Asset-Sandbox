@@ -1,11 +1,11 @@
 import { FormLabel, Input, Flex, useColorMode } from '@chakra-ui/react'
 
+import { isDark } from 'utils'
+
 import { MoonIcon, SunIcon } from 'components/icons'
 
 export const SwitchTheme: React.FC = () => {
   const { colorMode, toggleColorMode } = useColorMode()
-
-  const isDark = colorMode === 'dark'
 
   return (
     <FormLabel
@@ -28,7 +28,7 @@ export const SwitchTheme: React.FC = () => {
         cursor="pointer"
         height="0.75rem"
         width="2rem"
-        bg={isDark ? 'black.800' : 'gray.600'}
+        bg={isDark(colorMode) ? 'black.800' : 'gray.600'}
         borderRadius="full"
         mt="0.285rem"
       />

@@ -1,6 +1,8 @@
 import { Container, Flex, Spacer, Text, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 
+import { isDark } from 'utils'
+
 import { MobileNav } from 'components/atoms'
 
 import Authentication from 'app/auth/services/auth'
@@ -14,7 +16,6 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = ({ onOpen }) => {
   const { colorMode } = useColorMode()
-  const isDark = colorMode === 'dark'
 
   return (
     <Flex
@@ -26,12 +27,18 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       pos="fixed"
       zIndex={99}
       borderBottom="1px solid"
-      borderColor={isDark ? 'black.800' : 'gray.600'}
+      borderColor={isDark(colorMode) ? 'black.800' : 'gray.600'}
     >
       <MobileNav onOpen={onOpen} />
-      <StellarLogo fill={isDark ? 'white' : 'black'} />
+      <StellarLogo fill={isDark(colorMode) ? 'white' : 'black'} />
       <Spacer />
-      <Container variant="primary" w="max-content" mr="1rem" px="0.75rem" py="0.25rem">
+      <Container
+        variant="primary"
+        w="max-content"
+        mr="1rem"
+        px="0.75rem"
+        py="0.25rem"
+      >
         <Text fontSize="xs" py="0.25rem" lineHeight="20px">
           {Authentication.getUser()?.name || '-'}
         </Text>

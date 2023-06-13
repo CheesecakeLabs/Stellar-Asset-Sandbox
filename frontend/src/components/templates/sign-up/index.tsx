@@ -1,16 +1,26 @@
-import { Alert, AlertIcon, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, Select, Text, useColorMode } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { FieldValues, useForm } from 'react-hook-form';
+import {
+  Alert,
+  AlertIcon,
+  Button,
+  Container,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Select,
+  Text,
+  useColorMode,
+} from '@chakra-ui/react'
+import React, { useState } from 'react'
+import { FieldValues, useForm } from 'react-hook-form'
 
+import { isDark } from 'utils'
 
+import { Loading } from 'components/atoms'
+import { SwitchTheme } from 'components/molecules'
 
-import { Loading } from 'components/atoms';
-import { SwitchTheme } from 'components/molecules';
-
-
-
-import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg';
-
+import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
 interface ISignUpTemplate {
   handleSignUp(params: Hooks.UseAuthTypes.ISignUp): Promise<void>
@@ -33,8 +43,6 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
     formState: { errors },
   } = useForm()
   const { colorMode } = useColorMode()
-
-  const isDark = colorMode === 'dark'
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     if (data.password !== data.confirmPassword) {
@@ -61,7 +69,10 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
   return (
     <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
       <Flex w="full" justifyContent="space-between">
-        <StellarLogo fill={isDark ? 'white' : 'black'} width="300px" />
+        <StellarLogo
+          fill={isDark(colorMode) ? 'white' : 'black'}
+          width="300px"
+        />
         <SwitchTheme />
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem" pb="1rem">
@@ -135,7 +146,8 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                   {...register('confirmPassword', { required: true })}
                 />
                 <FormErrorMessage>
-                  {errors?.confirmPassword?.message?.toString() || 'Confirm your password'}
+                  {errors?.confirmPassword?.message?.toString() ||
+                    'Confirm your password'}
                 </FormErrorMessage>
               </FormControl>
 

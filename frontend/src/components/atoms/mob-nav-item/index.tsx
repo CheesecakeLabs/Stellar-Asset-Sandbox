@@ -1,5 +1,7 @@
 import { FlexProps, IconButton, useColorMode } from '@chakra-ui/react'
 
+import { isDark } from 'utils'
+
 import { MenuLineIcon } from 'components/icons'
 
 interface IMobileProps extends FlexProps {
@@ -7,8 +9,6 @@ interface IMobileProps extends FlexProps {
 }
 export const MobileNav: React.FC<IMobileProps> = ({ onOpen }: IMobileProps) => {
   const { colorMode } = useColorMode()
-
-  const isDark = colorMode === 'dark'
 
   return (
     <IconButton
@@ -18,7 +18,12 @@ export const MobileNav: React.FC<IMobileProps> = ({ onOpen }: IMobileProps) => {
       aria-label="open menu"
       me={4}
       display={{ base: 'flex', md: 'none' }}
-      icon={<MenuLineIcon width="1rem" fill={isDark ? 'white' : 'black'} />}
+      icon={
+        <MenuLineIcon
+          width="1rem"
+          fill={isDark(colorMode) ? 'white' : 'black'}
+        />
+      }
     />
   )
 }

@@ -17,7 +17,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Authentication.getUser()
   )
   const [loading, setLoading] = useState(false)
-  const [loadingRoles, setLoadingRoles] = useState(false)
+  const [loadingRoles, setLoadingRoles] = useState(true)
   const [roles, setRoles] = useState<Hooks.UseAuthTypes.IRole[] | undefined>()
 
   const signIn = async (

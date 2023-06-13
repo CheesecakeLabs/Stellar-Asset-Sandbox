@@ -10,6 +10,8 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { isDark } from 'utils'
+
 import { PathRoute } from 'components/enums/path-route'
 import { SwitchTheme } from 'components/molecules'
 
@@ -19,12 +21,13 @@ export const ResetPasswordTemplate: React.FC = () => {
   const navigate = useNavigate()
   const { colorMode } = useColorMode()
 
-  const isDark = colorMode === 'dark'
-
   return (
     <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
       <Flex w="full" justifyContent="space-between">
-        <StellarLogo fill={isDark ? 'white' : 'black'} width="300px" />
+        <StellarLogo
+          fill={isDark(colorMode) ? 'white' : 'black'}
+          width="300px"
+        />
         <SwitchTheme />
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem">

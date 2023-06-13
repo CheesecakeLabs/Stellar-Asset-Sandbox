@@ -8,6 +8,8 @@ import {
   useColorMode,
 } from '@chakra-ui/react'
 
+import { isDark } from 'utils'
+
 import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ProfileIcon, SettingsIcon } from 'components/icons'
@@ -27,7 +29,6 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
   ...rest
 }: ISidebarProps) => {
   const { colorMode } = useColorMode()
-  const isDark = colorMode === 'dark'
 
   return (
     <Box
@@ -36,9 +37,9 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       pos="fixed"
       h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
-      borderColor={isDark ? 'black.800' : 'gray.600'}
+      borderColor={isDark(colorMode) ? 'black.800' : 'gray.600'}
       pb="2rem"
-      bg={{ sm: isDark ? 'black.600' : 'white', md: 'none' }}
+      bg={{ sm: isDark(colorMode) ? 'black.600' : 'white', md: 'none' }}
       {...rest}
     >
       <Flex direction="column" h="full" pt={4}>
@@ -51,9 +52,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           pl="2rem"
           mb="1rem"
         >
-          <StellarLogo fill={isDark ? 'white' : 'black'} width="6rem" />
+          <StellarLogo
+            fill={isDark(colorMode) ? 'white' : 'black'}
+            width="6rem"
+          />
           <CloseButton
-            color={isDark ? 'white' : 'black'}
+            color={isDark(colorMode) ? 'white' : 'black'}
             onClick={onClose}
             w="4rem"
           />
@@ -74,11 +78,11 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           Profile
         </NavItem>
         <NavItem
-          key={'System Admin'}
+          key={'Settings'}
           icon={<SettingsIcon />}
           path={PathRoute.SETTINGS}
         >
-          System Admin
+          Settings
         </NavItem>
         <Text
           color="gray.900"

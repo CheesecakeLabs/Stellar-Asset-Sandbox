@@ -2,26 +2,25 @@ export const Table = {
   baseStyle: {
     th: {
       border: 'none',
-      backgroundColor: 'gray.100',
-      fontFamily: 'arial',
-      fontWeight: '400',
-      textTransform: 'none',
       td: {
-        color: 'red',
+        color: 'gray.900',
+        lineHeight: '20px',
+        _dark: {
+          color: 'white',
+        },
       },
     },
     tr: {
       border: 'none',
-      bg: 'gray.50',
-      _odd: {
-        border: 'none',
-        bg: 'white',
-      },
     },
     td: {
       border: 'none',
       color: 'black.300',
-      fontSize: 'md',
+      fontSize: 'sm',
+      bg: 'none',
+      _dark: {
+        color: 'white',
+      },
     },
   },
 }
