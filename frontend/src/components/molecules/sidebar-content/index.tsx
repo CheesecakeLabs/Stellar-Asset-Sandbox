@@ -41,6 +41,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       pb="2rem"
       bg={{ sm: isDark(colorMode) ? 'black.600' : 'white', md: 'none' }}
       {...rest}
+      overflowY="auto"
     >
       <Flex direction="column" h="full" pt={4}>
         <Flex
@@ -63,15 +64,15 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           />
         </Flex>
         {items.map(item => (
-          <Box>
-            <NavItem key={item.name} icon={item.icon} path={item.path}>
+          <Box key={item.name}>
+            <NavItem icon={item.icon} path={item.path}>
               {item.name}
             </NavItem>
           </Box>
         ))}
         <Spacer />
         <NavItem
-          key={'System Admin'}
+          key={'Profile'}
           icon={<ProfileIcon />}
           path={PathRoute.PROFILE}
         >
