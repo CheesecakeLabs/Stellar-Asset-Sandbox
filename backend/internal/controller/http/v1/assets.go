@@ -23,6 +23,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	{
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
+		h.POST("/freeze", r.freezeAccount)
 	}
 }
 
@@ -43,6 +44,14 @@ type MintAssetRequest struct {
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+}
+
+type FreezeAccountRequest struct {
+	IssuerId   int      `json:"issuer_id" binding:"required"  example:"2"`
+	Code       string   `json:"code"       binding:"required"  example:"USDC"`
+	TrustorId  int      `json:"trustor_id" binding:"required"  example:"2"`
+	Order      int      `json:"order" binding:"required"  example:"1"`
+	ClearFlags []string `json:"clear_flags" example:"[auth_revocable_flag]"`
 }
 
 // @Summary     Create a new asset
@@ -211,4 +220,73 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset minted"})
+}
+
+// @Summary     Freeze an account
+// @Description Set TrustLine flags on a Stellar account to freeze it
+// @Tags        Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body FreezeAccountRequest true "Account Freeze info"
+// @Success     200 {object} response[string]
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/freeze [post]
+func (r *assetsRoutes) freezeAccount(c *gin.Context) {
+	var request FreezeAccountRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	issuer, err := r.w.Get(request.IssuerId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "issuer wallet not found")
+		return
+	}
+
+	trustor, err := r.w.Get(request.TrustorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "trustor wallet not found")
+		return
+	}
+
+	asset, err := r.as.Get(request.Code)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "asset not found")
+		return
+	}
+
+	ops := []entity.Operation{
+		{
+			Type:    entity.SetTrustLineFlagsOp,
+			Order:   request.Order,
+			Trustor: trustor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   request.Code,
+				Issuer: asset.Issuer.Key.PublicKey,
+			},
+			ClearFlags: request.ClearFlags,
+			Origin:     issuer.Key.PublicKey,
+		},
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: issuer.Key.PublicKey,
+		PublicKeys: []string{issuer.Key.PublicKey, trustor.Key.PublicKey},
+		Operations: ops,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "account frozen"})
 }

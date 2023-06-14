@@ -30,6 +30,15 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.Role:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
   entity.User:
     properties:
       _:
@@ -80,6 +89,32 @@ definitions:
         type: string
     required:
     - type
+    type: object
+  v1.FreezeAccountRequest:
+    properties:
+      clear_flags:
+        example:
+        - '[auth_revocable_flag]'
+        items:
+          type: string
+        type: array
+      code:
+        example: USDC
+        type: string
+      issuer_id:
+        example: 2
+        type: integer
+      order:
+        example: 1
+        type: integer
+      trustor_id:
+        example: 2
+        type: integer
+    required:
+    - code
+    - issuer_id
+    - order
+    - trustor_id
     type: object
   v1.FundWalletRequest:
     properties:
@@ -159,6 +194,63 @@ paths:
       summary: Mint an asset
       tags:
       - Assets
+  /assets/freeze:
+    post:
+      consumes:
+      - application/json
+      description: Set TrustLine flags on a Stellar account to freeze it
+      parameters:
+      - description: Account Freeze info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.FreezeAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Freeze an account
+      tags:
+      - Assets
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
   /user/create:
     post:
       consumes:

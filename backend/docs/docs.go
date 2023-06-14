@@ -68,6 +68,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/freeze": {
+            "post": {
+                "description": "Set TrustLine flags on a Stellar account to freeze it",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Freeze an account",
+                "parameters": [
+                    {
+                        "description": "Account Freeze info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.FreezeAccountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role": {
+            "get": {
+                "description": "List role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Type",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Create user",
@@ -335,6 +422,19 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Role": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Admin"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
@@ -407,6 +507,42 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "sponsor"
+                }
+            }
+        },
+        "v1.FreezeAccountRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "issuer_id",
+                "order",
+                "trustor_id"
+            ],
+            "properties": {
+                "clear_flags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[auth_revocable_flag]"
+                    ]
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "issuer_id": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "order": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "trustor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
