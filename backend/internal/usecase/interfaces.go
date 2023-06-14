@@ -38,4 +38,9 @@ type (
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 	}
+
+	// Role -.
+	RoleRepoInterface interface {
+		GetRoles() ([]entity.Role, error)
+	}
 )
