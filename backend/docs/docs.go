@@ -68,6 +68,93 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/clawback": {
+            "post": {
+                "description": "Clawback an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Clawback an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ClawbackAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role": {
+            "get": {
+                "description": "List role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Type",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Create user",
@@ -335,6 +422,19 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Role": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Admin"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
@@ -374,6 +474,38 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "sponsor"
+                }
+            }
+        },
+        "v1.ClawbackAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "claimable_id",
+                "code",
+                "from",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "claimable_id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "from": {
+                    "type": "string",
+                    "example": "GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },

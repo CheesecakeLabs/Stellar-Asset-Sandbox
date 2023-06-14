@@ -30,6 +30,15 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.Role:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
   entity.User:
     properties:
       _:
@@ -57,6 +66,30 @@ definitions:
       type:
         example: sponsor
         type: string
+    type: object
+  v1.ClawbackAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      claimable_id:
+        example: 12
+        type: integer
+      code:
+        example: USDC
+        type: string
+      from:
+        example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - claimable_id
+    - code
+    - from
+    - sponsor_id
     type: object
   v1.CreateAssetRequest:
     properties:
@@ -159,6 +192,63 @@ paths:
       summary: Mint an asset
       tags:
       - Assets
+  /assets/clawback:
+    post:
+      consumes:
+      - application/json
+      description: Clawback an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ClawbackAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Clawback an asset
+      tags:
+      - Assets
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
   /user/create:
     post:
       consumes:
