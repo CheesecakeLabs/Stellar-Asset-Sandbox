@@ -370,17 +370,40 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
 }
 
-// MintAsset mocks base method.
-func (m *MockAssetRepoInterface) MintAsset(arg0 entity.Asset, arg1 int) (entity.Asset, error) {
+// MockRoleRepoInterface is a mock of RoleRepoInterface interface.
+type MockRoleRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockRoleRepoInterfaceMockRecorder
+}
+
+// MockRoleRepoInterfaceMockRecorder is the mock recorder for MockRoleRepoInterface.
+type MockRoleRepoInterfaceMockRecorder struct {
+	mock *MockRoleRepoInterface
+}
+
+// NewMockRoleRepoInterface creates a new mock instance.
+func NewMockRoleRepoInterface(ctrl *gomock.Controller) *MockRoleRepoInterface {
+	mock := &MockRoleRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockRoleRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRoleRepoInterface) EXPECT() *MockRoleRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// GetRoles mocks base method.
+func (m *MockRoleRepoInterface) GetRoles() ([]entity.Role, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MintAsset", arg0, arg1)
-	ret0, _ := ret[0].(entity.Asset)
+	ret := m.ctrl.Call(m, "GetRoles")
+	ret0, _ := ret[0].([]entity.Role)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// MintAsset indicates an expected call of MintAsset.
-func (mr *MockAssetRepoInterfaceMockRecorder) MintAsset(arg0, arg1 interface{}) *gomock.Call {
+// GetRoles indicates an expected call of GetRoles.
+func (mr *MockRoleRepoInterfaceMockRecorder) GetRoles() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MintAsset", reflect.TypeOf((*MockAssetRepoInterface)(nil).MintAsset), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockRoleRepoInterface)(nil).GetRoles))
 }
