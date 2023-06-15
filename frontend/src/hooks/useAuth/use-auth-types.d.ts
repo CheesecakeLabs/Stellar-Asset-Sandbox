@@ -39,18 +39,28 @@ declare namespace Hooks {
       id_role: number
     }
 
+    interface IPermission {
+      name: string
+      description: string
+    }
+
     interface IAuthContext {
       signIn: (params: ISignIn) => Promise<IUser | null>
       signUp: (params: ISignUp) => Promise<IUser | null>
       signOut: () => Promise<boolean>
       getRoles: () => Promise<void>
       getAllUsers: () => Promise<void>
-      updateUserRole: (params: IUserRole) => Promise<boolean>
+      getProfile: () => Promise<void>
+      editUsersRole: (params: IUserRole) => Promise<boolean>
+      getPermissions: () => Promise<void>
+      editProfile: (params: IUserRole) => Promise<boolean>
       isAuthenticated: boolean
       loading: boolean
       loadingRoles: boolean
       roles: IRole[] | undefined
       users: IUserDto[] | undefined
+      profile: IUserDto | undefined
+      permissions: IPermission[] | undefined
     }
   }
 }

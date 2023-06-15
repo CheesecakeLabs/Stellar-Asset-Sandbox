@@ -13,5 +13,18 @@ export const Container = {
         border: '0',
       },
     },
+    secondary: {
+      backgroundColor: 'gray.100',
+      borderRadius: '0.5rem',
+      px: '1rem',
+      py: '0.5rem',
+      flexDir: 'column',
+      m: '0',
+      gap: '1rem',
+      _dark: {
+        bg: 'black.700',
+        border: '0',
+      },
+    },
   },
 }

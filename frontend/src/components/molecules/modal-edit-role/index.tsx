@@ -3,6 +3,7 @@ import {
   AlertIcon,
   Box,
   Button,
+  Container,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -26,7 +27,7 @@ interface IModalReject {
   loading: boolean
   loadingRoles: boolean
   user: Hooks.UseAuthTypes.IUserDto
-  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): void
+  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
 }
 
@@ -49,10 +50,14 @@ export const ModalEditRole: React.FC<IModalReject> = ({
   const onSubmit = async (data: FieldValues): Promise<void> => {
     setErrorSubmit(null)
     try {
-      await handleEditRole({
+      const isSuccess = await handleEditRole({
         id_user: user.id,
         id_role: data.role_id,
       })
+
+      if (isSuccess) {
+        onClose()
+      }
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
@@ -78,7 +83,10 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   {errorSubmit}
                 </Alert>
               )}
-              <Text>{user.name}</Text>
+              <Container variant="secondary">
+                <Text fontSize="sm" fontWeight="700">{user.name}</Text>
+                <Text fontSize="xs">{user.email}</Text>
+              </Container>
               <form
                 onSubmit={handleSubmit(data => {
                   onSubmit(data)
@@ -105,7 +113,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   mb="1.5rem"
                   type="submit"
                   variant="primary"
-                  mt="1.5rem"
+                  mt="2rem"
                   isLoading={loading}
                 >
                   Edit role

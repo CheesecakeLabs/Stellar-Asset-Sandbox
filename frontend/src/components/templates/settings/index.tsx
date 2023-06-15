@@ -1,21 +1,19 @@
-import {
-  Container,
-  Flex,
-  Table,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useColorMode,
-} from '@chakra-ui/react'
-import React from 'react'
+import { Container, Flex, Table, Text, Th, Thead, Tr, useColorMode } from '@chakra-ui/react';
+import React from 'react';
 
-import { isDark } from 'utils'
 
-import { Loading } from 'components/atoms'
-import { AddUserIcon, InfoIcon } from 'components/icons'
 
-import { ItemMember } from './item-user'
+import { isDark } from 'utils';
+
+
+
+import { Loading } from 'components/atoms';
+import { AddUserIcon, InfoIcon } from 'components/icons';
+
+
+
+import { ItemMember } from './item-user';
+
 
 interface ISettingsTemplate {
   users: Hooks.UseAuthTypes.IUserDto[] | undefined
@@ -23,6 +21,7 @@ interface ISettingsTemplate {
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
+  permissions: Hooks.UseAuthTypes.IPermission[] | undefined
 }
 
 export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
@@ -31,6 +30,7 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
   handleEditRole,
   roles,
   loadingRoles,
+  permissions,
 }) => {
   const { colorMode } = useColorMode()
 
@@ -76,6 +76,7 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
                     handleEditRole={handleEditRole}
                     roles={roles}
                     loadingRoles={loadingRoles}
+                    permissions={permissions}
                   />
                 ))}
               </Table>

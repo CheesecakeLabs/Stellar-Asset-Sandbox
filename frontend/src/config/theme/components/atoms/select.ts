@@ -22,7 +22,10 @@ const baseStyle = definePartsStyle({
   field: {
     border: '1px solid #EEEDEF',
     borderRadius: '0.25rem',
-    color: 'gray.900',
+    color: 'black',
+    _dark: {
+      color: 'white',
+    },
   },
 })
 
