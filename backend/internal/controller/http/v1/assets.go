@@ -47,11 +47,10 @@ type MintAssetRequest struct {
 }
 
 type ClawbackAssetRequest struct {
-	SponsorId  int    `json:"sponsor_id"       binding:"required"  example:"2"`
-	Code       string `json:"code"       binding:"required"  example:"USDC"`
-	Amount     string `json:"amount"       binding:"required"  example:"1000"`
-	From       string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
-	ClaimbleId int    `json:"claimable_id"       binding:"required"  example:"12"`
+	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	Code      string `json:"code"       binding:"required"  example:"USDC"`
+	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+	From      string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
 }
 
 // @Summary     Create a new asset
@@ -255,7 +254,6 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	ops := []entity.Operation{
 		{
 			Type:   entity.ClawbackOp,
-			Order:  request.ClaimbleId,
 			Origin: asset.Issuer.Key.PublicKey,
 			Target: request.From,
 			Amount: request.Amount,
