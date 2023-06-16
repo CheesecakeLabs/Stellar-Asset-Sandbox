@@ -274,7 +274,7 @@ func (r *assetsRoutes) freezeAccount(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: issuer.Key.PublicKey,
-		PublicKeys: []string{issuer.Key.PublicKey, trustor.Key.PublicKey},
+		PublicKeys: []string{issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
