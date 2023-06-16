@@ -21,21 +21,6 @@ type rolePermissionTest struct {
 	err  error
 }
 
-// func rolePermission(t *testing.T) (*usecase.RolePermissionUseCase, *mocks.MockRolePermissionRepoInterface) {
-	// t.Helper()
-
-	// mockCtl := gomock.NewController(t)
-	// defer mockCtl.Finish()
-
-	// userRepo := mocks.NewMockUserRepo(mockCtl)
-	// userUseCase := usecase.NewUserUseCase(userRepo, "test")
-
-	// roleRepo := mocks.NewMockRolePermissionRepoInterface(mockCtl)
-	// useCase := usecase.NewRolePermissionUseCase(roleRepo, *userUseCase)
-
-// 	return useCase, roleRepo
-// }
-
 func TestRolePermissionUseCase_Validate(t *testing.T) {
 	t.Helper()
 

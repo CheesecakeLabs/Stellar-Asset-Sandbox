@@ -24,7 +24,7 @@ func (uc *RolePermissionUseCase) Validate(token string, basePath string) (bool, 
 	}
 
 	pieces := strings.Split(basePath, "/")
-	action := pieces[len(pieces) - 1]  
+	action := pieces[len(pieces) - 1]
 	isAuthorized, err := uc.repo.Validate(action, user.RoleId)
 	if err != nil {
 		return false, fmt.Errorf("RolePermissionUseCase - Validate - uc.repo.Validate: %w", err)
