@@ -238,10 +238,15 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		return
 	}
 
+	sponsor, err := r.w.Get(request.SponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
 	ops := []entity.Operation{
 		{
 			Type:    entity.PaymentOp,
-			Sponsor: asset.Distributor.Key.PublicKey,
+			Sponsor: sponsor.Key.PublicKey,
 			Target:  asset.Issuer.Key.PublicKey,
 			Amount:  request.Amount,
 			Asset: entity.OpAsset{
@@ -254,7 +259,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Distributor.Key.PublicKey,
-		PublicKeys: []string{asset.Distributor.Key.PublicKey, asset.Issuer.Key.PublicKey},
+		PublicKeys: []string{asset.Distributor.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
