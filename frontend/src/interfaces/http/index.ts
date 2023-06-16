@@ -26,6 +26,11 @@ http.interceptors.response.use(
     return Promise.resolve(response)
   },
   error => {
+    const status = error.response?.status || 500
+    if (status === 401) {
+      Authentication.logout()
+      window.location.href = '/login/expired'
+    }
     return Promise.reject(error)
   }
 )

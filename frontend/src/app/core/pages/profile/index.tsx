@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 
-import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ProfileTemplate } from 'components/templates/profile'
 
@@ -24,7 +23,7 @@ export const Profile: React.FC = () => {
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
-      navigate(PathRoute.LOGIN)
+      navigate('/login')
     }
   }
 

@@ -1,19 +1,19 @@
-import { Container, Flex, Table, Text, Th, Thead, Tr, useColorMode } from '@chakra-ui/react';
-import React from 'react';
+import {
+  Container,
+  Flex,
+  Table,
+  Tbody,
+  Text,
+  Th,
+  Thead,
+  Tr,
+} from '@chakra-ui/react'
+import React from 'react'
 
+import { Loading } from 'components/atoms'
+import { InfoIcon } from 'components/icons'
 
-
-import { isDark } from 'utils';
-
-
-
-import { Loading } from 'components/atoms';
-import { AddUserIcon, InfoIcon } from 'components/icons';
-
-
-
-import { ItemMember } from './item-user';
-
+import { ItemUser } from './item-user'
 
 interface ISettingsTemplate {
   users: Hooks.UseAuthTypes.IUserDto[] | undefined
@@ -32,8 +32,6 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
   loadingRoles,
   permissions,
 }) => {
-  const { colorMode } = useColorMode()
-
   return (
     <>
       <Flex flexDir="column" w="full">
@@ -47,14 +45,19 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
               px="1.25rem"
               pb="1rem"
               borderBottom="1px solid"
-              borderColor={isDark(colorMode) ? 'gray.700' : 'gray.100'}
+              borderColor={'gray.400'}
+              _dark={{ borderColor: 'black.800' }}
               alignItems="center"
             >
-              <Flex gap={1} alignItems="center">
+              <Flex
+                gap={1}
+                alignItems="center"
+                fill="gray"
+                _dark={{ fill: 'white' }}
+              >
                 <Text>Team members</Text>
-                <InfoIcon fill={isDark(colorMode) ? 'white' : 'gray'} />
+                <InfoIcon />
               </Flex>
-              <AddUserIcon fill={isDark(colorMode) ? 'white' : 'black'} />
             </Flex>
             {loading || !users ? (
               <Loading />
@@ -62,23 +65,48 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
               <Table w="full">
                 <Thead w="full">
                   <Tr>
-                    <Th color={'gray.700'}>Member</Th>
-                    <Th color={'gray.700'}>Role</Th>
-                    <Th color={'gray.700'}>Last active</Th>
-                    <Th color={'gray.700'} w="1rem" p={0}></Th>
+                    <Th
+                      color={'gray.700'}
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      Member
+                    </Th>
+                    <Th
+                      color={'gray.700'}
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      Role
+                    </Th>
+                    <Th
+                      color={'gray.700'}
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      Last active
+                    </Th>
+                    <Th
+                      color={'gray.700'}
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                      w="1rem"
+                      p={0}
+                    ></Th>
                   </Tr>
                 </Thead>
-                {users.map(user => (
-                  <ItemMember
-                    user={user}
-                    isDark={isDark(colorMode)}
-                    loading={loading}
-                    handleEditRole={handleEditRole}
-                    roles={roles}
-                    loadingRoles={loadingRoles}
-                    permissions={permissions}
-                  />
-                ))}
+                <Tbody>
+                  {users.map(user => (
+                    <ItemUser
+                      user={user}
+                      loading={loading}
+                      handleEditRole={handleEditRole}
+                      roles={roles}
+                      loadingRoles={loadingRoles}
+                      permissions={permissions}
+                    />
+                  ))}
+                </Tbody>
               </Table>
             )}
           </Container>

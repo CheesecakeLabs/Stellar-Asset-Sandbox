@@ -19,7 +19,6 @@ import { ModalEditRole } from 'components/molecules'
 
 interface IItemUser {
   user: Hooks.UseAuthTypes.IUserDto
-  isDark: boolean
   loading: boolean
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
@@ -27,9 +26,8 @@ interface IItemUser {
   permissions: Hooks.UseAuthTypes.IPermission[] | undefined
 }
 
-export const ItemMember: React.FC<IItemUser> = ({
+export const ItemUser: React.FC<IItemUser> = ({
   user,
-  isDark,
   loading,
   handleEditRole,
   roles,
@@ -49,11 +47,22 @@ export const ItemMember: React.FC<IItemUser> = ({
         handleEditRole={handleEditRole}
         roles={roles}
       />
-      <Tr>
-        <Td>{user.name}</Td>
-        <Td>{user.role}</Td>
-        <Td>{<TimeAgo date={Date.parse(user.updated_at)} />}</Td>
-        <Td w="1rem" p={0}>
+      <Tr borderColor="red">
+        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
+          {user.name}
+        </Td>
+        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
+          {user.role}
+        </Td>
+        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
+          {<TimeAgo date={Date.parse(user.updated_at)} />}
+        </Td>
+        <Td
+          borderColor={'gray.400'}
+          _dark={{ borderColor: 'black.800' }}
+          w="1rem"
+          p={0}
+        >
           {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
             <Menu>
               {({ isOpen }): ReactNode => (
@@ -65,7 +74,9 @@ export const ItemMember: React.FC<IItemUser> = ({
                     h="2rem"
                     w="0.5rem"
                     p="0"
-                    icon={<MenuDotsIcon fill={isDark ? 'white' : 'black'} />}
+                    fill="black"
+                    _dark={{ fill: 'white' }}
+                    icon={<MenuDotsIcon />}
                   />
                   <MenuList>
                     <MenuItem onClick={onOpen}>Edit role</MenuItem>

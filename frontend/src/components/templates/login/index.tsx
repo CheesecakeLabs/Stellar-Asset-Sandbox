@@ -7,13 +7,10 @@ import {
   FormLabel,
   Input,
   Text,
-  useColorMode,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-
-import { isDark } from 'utils'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SwitchTheme } from 'components/molecules'
@@ -32,7 +29,7 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit } = useForm()
-  const { colorMode } = useColorMode()
+  const { expired } = useParams()
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     setError(null)
@@ -55,18 +52,26 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
 
   return (
     <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
-      <Flex w="full" justifyContent="space-between">
-        <StellarLogo
-          fill={isDark(colorMode) ? 'white' : 'black'}
-          width="300px"
-        />
+      <Flex
+        w="full"
+        justifyContent="space-between"
+        fill="black"
+        _dark={{ fill: 'white' }}
+      >
+        <StellarLogo width="300px" />
         <SwitchTheme />
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem">
         {error && (
-          <Alert mb="0.75rem" status="error">
+          <Alert mb="0.75rem" status="error" variant="purple">
             <AlertIcon />
             {error}
+          </Alert>
+        )}
+        {expired && (
+          <Alert mb="0.75rem" status="info" variant="purple">
+            <AlertIcon />
+            Your session timed out, please login again
           </Alert>
         )}
         <Container variant="primary" justifyContent="center" p="2rem">

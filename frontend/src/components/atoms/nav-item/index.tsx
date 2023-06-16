@@ -1,10 +1,7 @@
-import { Flex, FlexProps, Link, useColorMode } from '@chakra-ui/react'
+import { Flex, FlexProps, Link } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { isDark } from 'utils'
-
-const REQUESTS_PATH_PREFIX = '/requests/'
 interface INavItemProps extends FlexProps {
   icon: ReactNode
   children: ReactNode
@@ -18,13 +15,9 @@ export const NavItem: React.FC<INavItemProps> = ({
 }: INavItemProps) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { colorMode } = useColorMode()
 
   const isCurrent = (): boolean => {
-    return location.pathname.includes(REQUESTS_PATH_PREFIX) &&
-      path.includes(REQUESTS_PATH_PREFIX)
-      ? true
-      : location.pathname === path
+    return location.pathname === path
   }
 
   return (
@@ -41,9 +34,8 @@ export const NavItem: React.FC<INavItemProps> = ({
         fontSize="sm"
         mb={2}
         fontWeight={400}
-        color={
-          isCurrent() ? (isDark(colorMode) ? 'white' : 'black') : 'gray.900'
-        }
+        color={isCurrent() ? 'black' : 'gray.900'}
+        _dark={isCurrent() ? { color: 'white' } : { color: 'gray.900' }}
         _hover={{
           cursor: 'pointer',
         }}
@@ -55,9 +47,8 @@ export const NavItem: React.FC<INavItemProps> = ({
           <Flex
             fontSize="6"
             width="2rem"
-            fill={
-              isCurrent() ? (isDark(colorMode) ? 'white' : 'black') : 'gray.900'
-            }
+            fill={isCurrent() ? 'black' : 'gray.900'}
+            _dark={isCurrent() ? { fill: 'white' } : { fill: 'gray.900' }}
           >
             {icon}
           </Flex>
