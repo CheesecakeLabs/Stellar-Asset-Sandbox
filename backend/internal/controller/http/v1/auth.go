@@ -12,6 +12,7 @@ import (
 type JWTClaim struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+	
 	jwt.StandardClaims
 }
 
