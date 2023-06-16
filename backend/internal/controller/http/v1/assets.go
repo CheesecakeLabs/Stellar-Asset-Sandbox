@@ -267,7 +267,7 @@ func (r *assetsRoutes) freezeAccount(c *gin.Context) {
 				Code:   request.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
 			},
-			ClearFlags: request.ClearFlags,
+			ClearFlags: ["TRUST_LINE_AUTHORIZED"],
 			Origin:     issuer.Key.PublicKey,
 		},
 	}
