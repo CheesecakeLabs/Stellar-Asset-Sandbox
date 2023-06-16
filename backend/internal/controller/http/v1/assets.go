@@ -36,7 +36,6 @@ type CreateAssetRequest struct {
 type BurnAssetRequest struct {
 	Id        string `json:"id"       binding:"required"  example:"001"`
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 }
 
