@@ -47,11 +47,8 @@ type MintAssetRequest struct {
 }
 
 type FreezeAccountRequest struct {
-	IssuerId   int      `json:"issuer_id" binding:"required"  example:"2"`
-	Code       string   `json:"code"       binding:"required"  example:"USDC"`
+	AssetId   int      `json:"asset_id" binding:"required"  example:"2"`
 	TrustorId  int      `json:"trustor_id" binding:"required"  example:"2"`
-	Order      int      `json:"order" binding:"required"  example:"1"`
-	ClearFlags []string `json:"clear_flags" example:"[auth_revocable_flag]"`
 }
 
 // @Summary     Create a new asset
