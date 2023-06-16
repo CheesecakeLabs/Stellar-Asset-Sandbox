@@ -224,7 +224,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 // @Failure     400 {object} response
 // @Failure     404 {object} response
 // @Failure     500 {object} response
-// @Router      /assets [post]
+// @Router      /assets/burn [post]
 func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	var request BurnAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
