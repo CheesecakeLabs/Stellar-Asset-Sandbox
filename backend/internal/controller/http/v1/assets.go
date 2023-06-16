@@ -244,7 +244,11 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 			Sponsor: asset.Distributor.Key.PublicKey,
 			Target:  asset.Issuer.Key.PublicKey,
 			Amount:  request.Amount,
-			Origin:  asset.Distributor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   asset.Code,
+				Issuer: asset.Issuer.Key.PublicKey,
+			},
+			Origin: asset.Distributor.Key.PublicKey,
 		},
 	}
 
