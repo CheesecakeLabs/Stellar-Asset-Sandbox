@@ -160,7 +160,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 // @Failure     400 {object} response
 // @Failure     404 {object} response
 // @Failure     500 {object} response
-// @Router      /assets [post]
+// @Router      /assets/mint [post]
 func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	var request MintAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
