@@ -45,5 +45,6 @@ func NewRouter(
 		newWalletsRoutes(groupV1, walletUseCase, messengerController)
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
+		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
 	}
 }

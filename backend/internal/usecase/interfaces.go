@@ -7,16 +7,19 @@ import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 type (
 	// UserRepo -.
 	UserRepo interface {
-		GetUser(name string) (entity.User, error)
+		GetUser(email string) (entity.User, error)
 		CreateUser(user entity.User) error
 		UpdateToken(id string, token string) error
 		ValidateToken(token string) error
 		GetUserByToken(token string) (entity.User, error)
+		GetAllUsers() ([]entity.UserResponse, error)
+		EditUsersRole(id_user string, id_role string) error
+		GetProfile(token string) (entity.UserResponse, error)
 	}
 
 	// User -.
 	User interface {
-		Detail(name string) (entity.User, error)
+		Detail(email string) (entity.User, error)
 		CreateUser(user entity.User) error
 		Autentication(name string, password string) (User, error)
 	}
@@ -47,5 +50,6 @@ type (
 	// Role Permission-.
 	RolePermissionRepoInterface interface {
 		Validate(action string, roleId int) (bool, error)
+		GetRolePermissions(token string) ([]entity.RolePermissionResponse, error)
 	}
 )

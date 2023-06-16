@@ -10,8 +10,9 @@ import (
 )
 
 type JWTClaim struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -36,10 +37,11 @@ func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 }
 
 func GenerateJWT(user entity.User, jwtSecretKey string) (tokenString string, err error) {
-	expirationTime := time.Now().Add(15 * time.Minute)
+	expirationTime := time.Now().Add(1440 * time.Minute)
 	claims := &JWTClaim{
-		ID:   user.ID, // TODO
-		Name: user.Name,
+		ID:    user.ID, // TODO
+		Name:  user.Name,
+		Email: user.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

@@ -16,8 +16,8 @@ func New(pg *postgres.Postgres) UserRepo {
 	return UserRepo{pg}
 }
 
-func (r UserRepo) GetUser(name string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id FROM UserAccount WHERE name='%s'`, name)
+func (r UserRepo) GetUser(email string) (entity.User, error) {
+	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE email='%s'`, email)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
@@ -29,7 +29,7 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	for rows.Next() {
 		var user entity.User
 
-		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
+		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
 		if err != nil {
 			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
 		}
@@ -41,8 +41,8 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 }
 
 func (r UserRepo) CreateUser(user entity.User) error {
-	stmt := `INSERT INTO UserAccount (name, password, role_id) VALUES ($1, $2, $3)`
-	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId)
+	stmt := `INSERT INTO UserAccount (name, password, role_id, email, token) VALUES ($1, $2, $3, $4, $5)`
+	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId, user.Email, user.Token)
 	if err != nil {
 		panic(err)
 		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
@@ -81,12 +81,67 @@ func (r UserRepo) ValidateToken(token string) error {
 }
 
 func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
-	stmt := `SELECT ID, Name, Password, role_id FROM UserAccount WHERE token = $1`
-        
-        var user entity.User
-	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
+	stmt := `SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE token = $1`
+
+	var user entity.User
+	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("UserRepo - GetUserByToken - db.Query: %w", err)
+	}
+
+	return user, nil
+}
+
+func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
+	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
+			 FROM UserAccount u 
+			 LEFT JOIN Role r ON u.role_id = r.id 
+			 ORDER BY u.name ASC`
+
+	rows, err := r.Db.Query(stmt)
+
+	if err != nil {
+		return nil, fmt.Errorf("UserRepo - GetAllUsers - db.Query: %w", err)
+	}
+
+	defer rows.Close()
+
+	entities := make([]entity.UserResponse, 0, _defaultEntityCap)
+
+	for rows.Next() {
+		var user entity.UserResponse
+
+		err = rows.Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email)
+		if err != nil {
+			return nil, fmt.Errorf("UserRepo - GetAllUsers - rows.Scan: %w", err)
+		}
+
+		entities = append(entities, user)
+	}
+
+	return entities, nil
+}
+
+func (r UserRepo) EditUsersRole(id_user string, role_id string) error {
+	stmt := `UPDATE UserAccount SET role_id=$2 WHERE id = $1`
+	_, err := r.Db.Exec(stmt, id_user, role_id)
+	if err != nil {
+		// panic(err)
+		return fmt.Errorf("UserRepo - EditUsersRole - db.Exec: %w", err)
+	}
+	return nil
+}
+
+func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
+	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
+			 FROM UserAccount u 
+			 LEFT JOIN Role r ON u.role_id = r.id 
+			 WHERE u.token = $1`
+
+	var user entity.UserResponse
+	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email)
+	if err != nil {
+		return entity.UserResponse{}, fmt.Errorf("UserRepo - GetProfile - db.Query: %w", err)
 	}
 
 	return user, nil
