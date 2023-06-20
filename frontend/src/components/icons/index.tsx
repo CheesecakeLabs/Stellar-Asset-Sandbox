@@ -1,5 +1,10 @@
+import { ReactComponent as AddIcon } from './fonts/add.svg'
 import { ReactComponent as AddUserIcon } from './fonts/add_user.svg'
 import { ReactComponent as ArrowRightIcon } from './fonts/arrow_right.svg'
+import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
+import { ReactComponent as BackIcon } from './fonts/back.svg'
+import { ReactComponent as BlockIcon } from './fonts/block.svg'
+import { ReactComponent as BurnIcon } from './fonts/burn.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
 import { ReactComponent as EditIcon } from './fonts/edit.svg'
@@ -18,6 +23,7 @@ import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
+import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
 
 export {
   MenuIcon,
@@ -40,4 +46,10 @@ export {
   InfoIcon,
   JoinIcon,
   ArrowRightIcon,
+  AddIcon,
+  TransferIcon,
+  BurnIcon,
+  AuthorizeIcon,
+  BlockIcon,
+  BackIcon,
 }

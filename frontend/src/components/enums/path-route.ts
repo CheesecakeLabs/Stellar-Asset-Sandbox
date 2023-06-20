@@ -11,4 +11,10 @@ export enum PathRoute {
   SETTINGS = '/settings',
   PROFILE = '/profile',
   FORGE_ASSET = '/forge-asset',
+  MINT_ASSET = '/asset-management/mint',
+  BURN_ASSET = '/asset-management/burn',
+  DISTRIBUTE_ASSET = '/asset-management/distribute',
+  AUTHORIZE_ACCOUNT = '/asset-management/authorize',
+  CLAWBACK_ASSET = '/asset-management/clawback',
+  FREEZE_ACCOUNT = '/asset-management/freeze',
 }

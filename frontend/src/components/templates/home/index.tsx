@@ -71,7 +71,11 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
               </Thead>
               <Tbody>
                 {assets.map(asset => (
-                  <Tr borderColor="red">
+                  <Tr
+                    borderColor="red"
+                    cursor="pointer"
+                    onClick={(): void => navigate(PathRoute.MINT_ASSET)}
+                  >
                     <Td
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}

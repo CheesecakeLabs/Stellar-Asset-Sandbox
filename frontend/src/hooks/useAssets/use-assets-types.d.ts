@@ -4,6 +4,7 @@ declare namespace Hooks {
       id: number
       code: string
       name: string
+      assetType: string
     }
   }
 }
