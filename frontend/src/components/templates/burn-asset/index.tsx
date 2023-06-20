@@ -10,7 +10,7 @@ import {
 import React from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-interface IMintAssetTemplate {
+interface IBurnAssetTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
@@ -18,7 +18,7 @@ interface IMintAssetTemplate {
   loading: boolean
 }
 
-export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
+export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
   onSubmit,
   loading,
 }) => {
@@ -56,7 +56,7 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             mt="1.5rem"
             isLoading={loading}
           >
-            Mint asset
+            Burn asset
           </Button>
         </form>
       </Container>

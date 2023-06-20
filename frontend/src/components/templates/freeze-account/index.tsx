@@ -10,7 +10,7 @@ import {
 import React from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-interface IMintAssetTemplate {
+interface IFreezeAccountTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
@@ -18,7 +18,7 @@ interface IMintAssetTemplate {
   loading: boolean
 }
 
-export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
+export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
   onSubmit,
   loading,
 }) => {
@@ -37,27 +37,35 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             onSubmit(data, setValue)
           })}
         >
-          <FormControl isInvalid={errors?.amount !== undefined}>
-            <FormLabel>Amount</FormLabel>
+          <FormControl isInvalid={errors?.trustor_id !== undefined}>
+            <FormLabel>Wallet</FormLabel>
             <Input
-              type="number"
-              placeholder="Amount"
-              autoComplete="off"
-              {...register('amount', {
+              type="text"
+              placeholder="Wallet"
+              {...register('trustor_id', {
                 required: true,
               })}
             />
             <FormErrorMessage>Required</FormErrorMessage>
           </FormControl>
-
-          <Button
-            type="submit"
-            variant="primary"
-            mt="1.5rem"
-            isLoading={loading}
-          >
-            Mint asset
-          </Button>
+          <Flex gap={4}>
+            <Button
+              type="submit"
+              variant="primary"
+              mt="1.5rem"
+              isLoading={loading}
+            >
+              Freeze
+            </Button>
+            <Button
+              type="submit"
+              variant="secondary"
+              mt="1.5rem"
+              isLoading={loading}
+            >
+              Unfreeze
+            </Button>
+          </Flex>
         </form>
       </Container>
     </Flex>

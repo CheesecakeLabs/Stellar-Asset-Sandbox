@@ -22,9 +22,11 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
 
   return (
     <Flex maxW="290px" flexDir="column" w="full">
-      <Text fontSize="2xl" fontWeight="400" mb="1rem">
-        Actions
-      </Text>
+      <Flex h="3.5rem" alignItems="center">
+        <Text fontSize="md" fontWeight="400">
+          Actions
+        </Text>
+      </Flex>
       <Container variant="primary" p="1rem">
         <Button
           variant={

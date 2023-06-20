@@ -20,7 +20,7 @@ export const RadioCard: React.FC<IRadioCard> = ({ title }) => {
         borderRadius="0.25rem"
         fontSize="sm"
         _checked={{
-          bg: 'purple.500',
+          bg: 'primary.normal',
           color: 'white',
         }}
         px={5}

@@ -10,7 +10,7 @@ import {
 import React from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-interface IMintAssetTemplate {
+interface IClawbackAssetTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
@@ -18,7 +18,7 @@ interface IMintAssetTemplate {
   loading: boolean
 }
 
-export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
+export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
   onSubmit,
   loading,
 }) => {
@@ -37,7 +37,19 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             onSubmit(data, setValue)
           })}
         >
-          <FormControl isInvalid={errors?.amount !== undefined}>
+          <FormControl isInvalid={errors?.destination_wallet_id !== undefined}>
+            <FormLabel>Wallet</FormLabel>
+            <Input
+              type="text"
+              placeholder="Wallet"
+              {...register('from', {
+                required: true,
+              })}
+            />
+            <FormErrorMessage>Required</FormErrorMessage>
+          </FormControl>
+
+          <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
             <FormLabel>Amount</FormLabel>
             <Input
               type="number"
@@ -56,7 +68,7 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             mt="1.5rem"
             isLoading={loading}
           >
-            Mint asset
+            Clawback
           </Button>
         </form>
       </Container>

@@ -13,6 +13,21 @@ export const Button = {
         },
       },
     },
+    secondary: {
+      background: 'none',
+      color: 'primary.normal',
+      border: '1px solid',
+      borderColor: 'primary.normal',
+      height: '2.125rem',
+      fontWeight: '500',
+      fontSize: 'sm',
+      borderRadius: '0.25rem',
+      _loading: {
+        _hover: {
+          bg: 'primary.normal',
+        },
+      },
+    },
     icon: {
       bg: 'none',
       color: 'black',

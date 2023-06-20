@@ -10,7 +10,7 @@ import {
 import React from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-interface IMintAssetTemplate {
+interface IAuthorizeAccountTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
@@ -18,7 +18,7 @@ interface IMintAssetTemplate {
   loading: boolean
 }
 
-export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
+export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
   onSubmit,
   loading,
 }) => {
@@ -37,26 +37,24 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             onSubmit(data, setValue)
           })}
         >
-          <FormControl isInvalid={errors?.amount !== undefined}>
-            <FormLabel>Amount</FormLabel>
+          <FormControl isInvalid={errors?.wallet !== undefined}>
+            <FormLabel>Wallet</FormLabel>
             <Input
-              type="number"
-              placeholder="Amount"
-              autoComplete="off"
-              {...register('amount', {
+              type="text"
+              placeholder="Wallet"
+              {...register('wallet', {
                 required: true,
               })}
             />
             <FormErrorMessage>Required</FormErrorMessage>
           </FormControl>
-
           <Button
             type="submit"
             variant="primary"
             mt="1.5rem"
             isLoading={loading}
           >
-            Mint asset
+            Authorize
           </Button>
         </form>
       </Container>

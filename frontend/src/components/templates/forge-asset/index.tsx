@@ -92,7 +92,7 @@ export const ForgeAssetTemplate: React.FC = () => {
             <FormControl>
               <FormLabel mt="1.5rem">Asset type</FormLabel>
               <Select
-                {...register('role_id', { required: true })}
+                {...register('asset_type', { required: true })}
                 defaultValue={typesAsset[0].id}
               >
                 {typesAsset.map(typeAsset => (
