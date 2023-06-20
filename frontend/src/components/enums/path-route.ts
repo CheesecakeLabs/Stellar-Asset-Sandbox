@@ -10,4 +10,5 @@ export enum PathRoute {
   BLOCKCHAIN_EXPLORER = '/blockchain-explorer',
   SETTINGS = '/settings',
   PROFILE = '/profile',
+  FORGE_ASSET = '/forge-asset',
 }

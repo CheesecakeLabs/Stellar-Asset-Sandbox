@@ -33,7 +33,6 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
   permissions,
 }) => {
   return (
-    <>
       <Flex flexDir="column" w="full">
         <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
           <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
@@ -112,6 +111,5 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
           </Container>
         </Flex>
       </Flex>
-    </>
   )
 }

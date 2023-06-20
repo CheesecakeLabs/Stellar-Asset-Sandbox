@@ -1,10 +1,12 @@
 import { ReactComponent as AddUserIcon } from './fonts/add_user.svg'
+import { ReactComponent as ArrowRightIcon } from './fonts/arrow_right.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
 import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as ExplorerIcon } from './fonts/explorer.svg'
 import { ReactComponent as HomeIcon } from './fonts/home.svg'
 import { ReactComponent as InfoIcon } from './fonts/info.svg'
+import { ReactComponent as JoinIcon } from './fonts/join.svg'
 import { ReactComponent as LoadingIcon } from './fonts/loading.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuDotsIcon } from './fonts/menu_dots.svg'
@@ -36,4 +38,6 @@ export {
   MenuDotsIcon,
   AddUserIcon,
   InfoIcon,
+  JoinIcon,
+  ArrowRightIcon,
 }
