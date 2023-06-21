@@ -1,33 +1,29 @@
-import { Box, useRadio } from '@chakra-ui/react'
+import { Flex, Switch, Text } from '@chakra-ui/react'
 
 interface IRadioCard {
   title: string
+  description: string
 }
 
-export const RadioCard: React.FC<IRadioCard> = ({ title }) => {
-  const { getInputProps, getRadioProps } = useRadio()
-
-  const input = getInputProps()
-  const checkbox = getRadioProps()
-
+export const RadioCard: React.FC<IRadioCard> = ({ title, description }) => {
   return (
-    <Box as="label">
-      <input {...input} />
-      <Box
-        {...checkbox}
-        cursor="pointer"
-        borderWidth="1px"
-        borderRadius="0.25rem"
-        fontSize="sm"
-        _checked={{
-          bg: 'primary.normal',
-          color: 'white',
-        }}
-        px={5}
-        py={1}
-      >
+    <Flex
+      gap="1rem"
+      justifyContent="space-between"
+      pb="1rem"
+      my="0.5rem"
+      borderBottom="1px solid"
+      borderColor={'gray.600'}
+      _dark={{ borderColor: 'black.800' }}
+      alignItems="center"
+    >
+      <Text fontSize="sm" minW="5rem" textAlign="center">
         {title}
-      </Box>
-    </Box>
+      </Text>
+      <Text fontSize="xs" color="gray.650">
+        {description}
+      </Text>
+      <Switch />
+    </Flex>
   )
 }

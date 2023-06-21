@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { ArrowRightIcon, JoinIcon } from 'components/icons'
+import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
 
 interface IHomeTemplate {
   loading: boolean
@@ -51,6 +51,13 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     color={'gray.700'}
                     borderColor={'gray.400'}
                     _dark={{ borderColor: 'black.800' }}
+                    w="2rem"
+                    p={0}
+                  />
+                  <Th
+                    color={'gray.700'}
+                    borderColor={'gray.400'}
+                    _dark={{ borderColor: 'black.800' }}
                   >
                     Code
                   </Th>
@@ -62,11 +69,18 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     Name
                   </Th>
                   <Th
+                    color={'gray.700'}
+                    borderColor={'gray.400'}
+                    _dark={{ borderColor: 'black.800' }}
+                  >
+                    Supply
+                  </Th>
+                  <Th
                     borderColor={'gray.400'}
                     _dark={{ borderColor: 'black.800' }}
                     w="2rem"
                     p={0}
-                  ></Th>
+                  />
                 </Tr>
               </Thead>
               <Tbody>
@@ -75,7 +89,16 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     borderColor="red"
                     cursor="pointer"
                     onClick={(): void => navigate(PathRoute.MINT_ASSET)}
+                    fill="black"
+                    stroke="black"
+                    _dark={{ fill: 'white', stroke: 'white' }}
                   >
+                    <Td
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      <CoinIcon width="2rem" />
+                    </Td>
                     <Td
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
@@ -87,6 +110,12 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                       _dark={{ borderColor: 'black.800' }}
                     >
                       {asset.name}
+                    </Td>
+                    <Td
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      {asset.supply}
                     </Td>
                     <Td
                       borderColor={'gray.400'}

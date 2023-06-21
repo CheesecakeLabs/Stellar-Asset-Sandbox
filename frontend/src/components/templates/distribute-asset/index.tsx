@@ -38,7 +38,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
           })}
         >
           <FormControl isInvalid={errors?.destination_wallet_id !== undefined}>
-            <FormLabel>Destination wallet</FormLabel>
+            <FormLabel>Destination Vault</FormLabel>
             <Input
               type="text"
               placeholder="Wallet"

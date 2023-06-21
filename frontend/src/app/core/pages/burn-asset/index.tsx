@@ -67,7 +67,11 @@ export const BurnAsset: React.FC = () => {
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
             <AssetHeader asset={asset} />
-            <BurnAssetTemplate onSubmit={onSubmit} loading={loading} />
+            <BurnAssetTemplate
+              onSubmit={onSubmit}
+              loading={loading}
+              asset={asset}
+            />
           </Flex>
           <MenuActionsAsset action={AssetActions.BURN} />
         </Flex>

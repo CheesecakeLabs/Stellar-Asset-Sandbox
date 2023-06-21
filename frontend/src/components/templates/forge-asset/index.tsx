@@ -7,7 +7,6 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  HStack,
   Input,
   Select,
   Text,
@@ -41,10 +40,10 @@ export const ForgeAssetTemplate: React.FC = () => {
         <Container variant="primary" justifyContent="center" p="2rem">
           <form>
             <FormControl isInvalid={errors?.name !== undefined}>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Asset name</FormLabel>
               <Input
                 type="text"
-                placeholder="Name"
+                placeholder="Asset name"
                 {...register('name', {
                   required: true,
                   minLength: 3,
@@ -80,15 +79,6 @@ export const ForgeAssetTemplate: React.FC = () => {
               </FormControl>
             </Flex>
 
-            <FormControl isInvalid={errors?.password !== undefined}>
-              <FormLabel mt="1.5rem">Asset flags</FormLabel>
-              <HStack>
-                {assetFlags.map(assetFlag => {
-                  return <RadioCard title={assetFlag.title} />
-                })}
-              </HStack>
-            </FormControl>
-
             <FormControl>
               <FormLabel mt="1.5rem">Asset type</FormLabel>
               <Select
@@ -99,7 +89,20 @@ export const ForgeAssetTemplate: React.FC = () => {
                   <option value={typeAsset.id}>{typeAsset.name}</option>
                 ))}
               </Select>
-              <FormErrorMessage>Inform the role</FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors?.password !== undefined}>
+              <FormLabel mt="1.5rem">Control mechanisms</FormLabel>
+              <Flex flexDir="column">
+                {assetFlags.map(assetFlag => {
+                  return (
+                    <RadioCard
+                      title={assetFlag.title}
+                      description={assetFlag.description}
+                    />
+                  )
+                })}
+              </Flex>
             </FormControl>
 
             <Button type="submit" variant="primary" mt="1.5rem">

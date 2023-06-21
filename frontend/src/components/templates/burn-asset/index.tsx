@@ -6,6 +6,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Text,
 } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
@@ -16,11 +17,13 @@ interface IBurnAssetTemplate {
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
   loading: boolean
+  asset: Hooks.UseAssetsTypes.IAsset
 }
 
 export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
   onSubmit,
   loading,
+  asset,
 }) => {
   const {
     register,
@@ -38,7 +41,12 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
           })}
         >
           <FormControl isInvalid={errors?.amount !== undefined}>
-            <FormLabel>Amount</FormLabel>
+            <Flex justifyContent="space-between" w="full">
+              <FormLabel>Amount</FormLabel>
+              <Text color="gray.650" fontWeight="700" fontSize="xs">
+                {`Circulation supply: ${asset.supply} ${asset.code}`}
+              </Text>
+            </Flex>
             <Input
               type="number"
               placeholder="Amount"

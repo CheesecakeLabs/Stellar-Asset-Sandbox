@@ -7,6 +7,7 @@ declare namespace Hooks {
       assetType: string
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
+      supply: number
     }
 
     interface IAssetRequest {
