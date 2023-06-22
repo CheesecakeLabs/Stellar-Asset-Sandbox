@@ -66,6 +66,7 @@ declare namespace Hooks {
       authorize: (params: IAuthorizeRequest) => Promise<boolean>
       freeze: (params: IFreezeRequest) => Promise<boolean>
       clawback: (params: IClawbackRequest) => Promise<boolean>
+      forge: (params: IAssetRequest) => Promise<boolean>
     }
   }
 }

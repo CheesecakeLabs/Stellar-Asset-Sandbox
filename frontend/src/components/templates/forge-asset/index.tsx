@@ -12,17 +12,30 @@ import {
   Text,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { assetFlags, typesAsset } from 'utils/constants/data-constants'
 
 import { RadioCard } from 'components/atoms'
 
-export const ForgeAssetTemplate: React.FC = () => {
+interface IForgeAssetTemplate {
+  onSubmit(
+    data: FieldValues,
+    setValue: UseFormSetValue<FieldValues>
+  ): Promise<void>
+  loading: boolean
+}
+
+export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
+  onSubmit,
+  loading,
+}) => {
   const [errorSubmit] = useState<string | null>(null)
   const {
     register,
     formState: { errors },
+    handleSubmit,
+    setValue,
   } = useForm()
 
   return (
@@ -38,7 +51,11 @@ export const ForgeAssetTemplate: React.FC = () => {
           </Alert>
         )}
         <Container variant="primary" justifyContent="center" p="2rem">
-          <form>
+          <form
+            onSubmit={handleSubmit(data => {
+              onSubmit(data, setValue)
+            })}
+          >
             <FormControl isInvalid={errors?.name !== undefined}>
               <FormLabel>Asset name</FormLabel>
               <Input
@@ -105,7 +122,12 @@ export const ForgeAssetTemplate: React.FC = () => {
               </Flex>
             </FormControl>
 
-            <Button type="submit" variant="primary" mt="1.5rem">
+            <Button
+              type="submit"
+              variant="primary"
+              mt="1.5rem"
+              isLoading={loading}
+            >
               Forge asset
             </Button>
           </form>

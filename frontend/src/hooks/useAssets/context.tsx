@@ -16,6 +16,23 @@ interface IProps {
 export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [loading, setLoading] = useState(false)
 
+  const forge = async (
+    params: Hooks.UseAssetsTypes.IAssetRequest
+  ): Promise<boolean> => {
+    setLoading(true)
+    try {
+      const response = await http.post(`assets`, params)
+      return response.status === 200
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const mint = async (
     params: Hooks.UseAssetsTypes.IMintRequest
   ): Promise<boolean> => {
@@ -128,6 +145,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         authorize,
         freeze,
         clawback,
+        forge,
       }}
     >
       {children}
