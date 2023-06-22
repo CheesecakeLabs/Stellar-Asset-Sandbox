@@ -261,6 +261,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
