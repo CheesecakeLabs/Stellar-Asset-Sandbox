@@ -50,7 +50,8 @@ type MintAssetRequest struct {
 
 type TransferAssetRequest struct {
 	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
-	DestinationWalletID int    `json:"destination_wallet_id" binding:"required" example:"12"`
+	SponsorId           int    `json:"sponsor_id" binding:"required" example:"2"`
+	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
 	AssetID             string `json:"asset_id" binding:"required" example:"12"`
 	Amount              string `json:"amount" binding:"required" example:"12"`
 }
@@ -302,9 +303,9 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
-	destinationWallet, err := r.w.Get(request.DestinationWalletID)
+	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "destination wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
 	}
 
@@ -316,10 +317,9 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:    entity.PaymentOp,
-			Sponsor: sourceWallet.Key.PublicKey,
-			Target:  destinationWallet.Key.PublicKey,
-			Amount:  request.Amount,
+			Type:   entity.PaymentOp,
+			Target: request.DestinationWalletPK,
+			Amount: request.Amount,
 			Asset: entity.OpAsset{
 				Code:   asset.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
@@ -328,19 +328,14 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
-		PublicKeys: []string{sourceWallet.Key.PublicKey, destinationWallet.Key.PublicKey},
+		PublicKeys: []string{sourceWallet.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
 		return
 	}
 
