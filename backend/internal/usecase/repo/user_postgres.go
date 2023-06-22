@@ -17,7 +17,7 @@ func New(pg *postgres.Postgres) UserRepo {
 }
 
 func (r UserRepo) GetUser(name string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT * FROM UserAccount WHERE name='%s'`, name)
+	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id FROM UserAccount WHERE name='%s'`, name)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
@@ -29,7 +29,7 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 	for rows.Next() {
 		var user entity.User
 
-		err = rows.Scan(&user.Name, &user.Password)
+		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
 		if err != nil {
 			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
 		}
@@ -41,9 +41,8 @@ func (r UserRepo) GetUser(name string) (entity.User, error) {
 }
 
 func (r UserRepo) CreateUser(user entity.User) error {
-	stmt := `INSERT INTO public."UserAccount" (name, password) VALUES ($1, $2)`
-	fmt.Println(user)
-	_, err := r.Db.Exec(stmt, user.Name, user.Password)
+	stmt := `INSERT INTO UserAccount (name, password, role_id) VALUES ($1, $2, $3)`
+	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId)
 	if err != nil {
 		panic(err)
 		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
@@ -54,11 +53,11 @@ func (r UserRepo) CreateUser(user entity.User) error {
 
 func (r UserRepo) UpdateToken(id string, token string) error {
 	// insert into if not exists if exist replace
-	stmt := `INSERT INTO public."UserAccount" (id, token) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET token = $2`
+	stmt := `UPDATE UserAccount SET token=$2 WHERE id = $1`
 	_, err := r.Db.Exec(stmt, id, token)
 	if err != nil {
 		// panic(err)
-		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+		return fmt.Errorf("UserRepo - UpdateToken - db.Exec: %w", err)
 	}
 	return nil
 }
@@ -79,4 +78,16 @@ func (r UserRepo) ValidateToken(token string) error {
 	}
 
 	return nil
+}
+
+func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
+	stmt := `SELECT ID, Name, Password, role_id FROM UserAccount WHERE token = $1`
+        
+        var user entity.User
+	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.Password, &user.RoleId)
+	if err != nil {
+		return entity.User{}, fmt.Errorf("UserRepo - GetUserByToken - db.Query: %w", err)
+	}
+
+	return user, nil
 }

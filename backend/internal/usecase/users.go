@@ -72,3 +72,12 @@ func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) 
 	}
 	return nil
 }
+
+
+func (uc *UserUseCase) GetUserByToken(token string) (user entity.User, err error) {
+	user, err = uc.repo.GetUserByToken(token)
+	if err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
+}
