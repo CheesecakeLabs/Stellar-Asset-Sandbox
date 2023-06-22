@@ -328,14 +328,20 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
-		PublicKeys: []string{sourceWallet.Key.PublicKey},
+		PublicKeys: []string{sourceWallet.Key.PublicKey, sponsor.Key.PublicKey},
 		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
 		return
 	}
 
