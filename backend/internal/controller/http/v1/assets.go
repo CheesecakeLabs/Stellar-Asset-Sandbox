@@ -197,6 +197,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, asset.Issuer.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
