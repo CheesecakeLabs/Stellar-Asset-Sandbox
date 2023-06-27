@@ -5,10 +5,7 @@ import {
   Flex,
   Spacer,
   Text,
-  useColorMode,
 } from '@chakra-ui/react'
-
-import { isDark } from 'utils'
 
 import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
@@ -28,8 +25,6 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
   onClose,
   ...rest
 }: ISidebarProps) => {
-  const { colorMode } = useColorMode()
-
   return (
     <Box
       w={{ base: 'full', md: 60 }}
@@ -37,10 +32,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       pos="fixed"
       h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
-      borderColor={isDark(colorMode) ? 'black.800' : 'gray.600'}
+      borderColor={'gray.600'}
       pb="2rem"
-      bg={{ sm: isDark(colorMode) ? 'black.600' : 'white', md: 'none' }}
+      bg={{ sm: 'white', md: 'none' }}
+      _dark={{ bg: { sm: 'black.600', md: 'none' }, borderColor: 'black.800' }}
       {...rest}
+      overflowY="auto"
     >
       <Flex direction="column" h="full" pt={4}>
         <Flex
@@ -51,27 +48,27 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           w="full"
           pl="2rem"
           mb="1rem"
+          fill="black"
+          _dark={{ fill: 'white' }}
         >
-          <StellarLogo
-            fill={isDark(colorMode) ? 'white' : 'black'}
-            width="6rem"
-          />
+          <StellarLogo width="6rem" />
           <CloseButton
-            color={isDark(colorMode) ? 'white' : 'black'}
+            color={'black'}
+            _dark={{ color: 'white' }}
             onClick={onClose}
             w="4rem"
           />
         </Flex>
         {items.map(item => (
-          <Box>
-            <NavItem key={item.name} icon={item.icon} path={item.path}>
+          <Box key={item.name}>
+            <NavItem icon={item.icon} path={item.path}>
               {item.name}
             </NavItem>
           </Box>
         ))}
         <Spacer />
         <NavItem
-          key={'System Admin'}
+          key={'Profile'}
           icon={<ProfileIcon />}
           path={PathRoute.PROFILE}
         >
