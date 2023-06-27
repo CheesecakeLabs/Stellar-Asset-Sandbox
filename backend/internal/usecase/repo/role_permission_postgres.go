@@ -21,7 +21,7 @@ func (rpr RolePermissionRepo) Validate(action string, roleId int) (bool, error) 
 			SELECT per.id FROM rolepermissionjunction rpj 
 			LEFT JOIN permission per ON (rpj.permission_id = per.id) 
 			LEFT JOIN operation ope ON (per.id = ope.permission_id) 
-			WHERE per.name = $1 AND role_id = $2
+			WHERE action = $1 AND role_id = $2
 		)
 	`
 
