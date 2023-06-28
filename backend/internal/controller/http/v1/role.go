@@ -2,12 +2,13 @@ package v1
 
 import (
 	"net/http"
+
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
 type role struct {
-	roleUseCase usecase.RoleUseCase
+	roleUseCase         usecase.RoleUseCase
 	messengerController HTTPControllerMessenger
 }
 
@@ -21,7 +22,7 @@ func newRoleRoutes(handler *gin.RouterGroup, roleUseCase usecase.RoleUseCase, me
 }
 
 // @Summary List
-// @Description List role 
+// @Description List role
 // @Schemes
 // @Tags Role
 // @Accept json
