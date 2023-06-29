@@ -1,0 +1,1 @@
+ALTER TABLE UserAccount DROP COLUMN email;

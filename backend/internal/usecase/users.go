@@ -22,8 +22,8 @@ func NewUserUseCase(r UserRepo, k string) *UserUseCase {
 }
 
 // History - getting translate history from store.
-func (uc *UserUseCase) Detail(name string) (entity.User, error) {
-	user, err := uc.repo.GetUser(name)
+func (uc *UserUseCase) Detail(email string) (entity.User, error) {
+	user, err := uc.repo.GetUser(email)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("TranslationUseCase - History - s.repo.GetHistory: %w", err)
 	}
@@ -45,8 +45,8 @@ func (uc *UserUseCase) CreateUser(user entity.User) error {
 	return nil
 }
 
-func (uc *UserUseCase) Autentication(name string, password string) (user entity.User, err error) {
-	user, err = uc.repo.GetUser(name)
+func (uc *UserUseCase) Autentication(email string, password string) (user entity.User, err error) {
+	user, err = uc.repo.GetUser(email)
 	if err != nil {
 		return user, err
 	}
@@ -71,4 +71,39 @@ func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) 
 		return err
 	}
 	return nil
+}
+
+func (uc *UserUseCase) GetUserByToken(token string) (user entity.User, err error) {
+	user, err = uc.repo.GetUserByToken(token)
+	if err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
+}
+
+func (uc *UserUseCase) GetAllUsers() ([]entity.UserResponse, error) {
+	users, err := uc.repo.GetAllUsers()
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}
+
+func (uc *UserUseCase) EditUsersRole(userRole entity.UserRole) error {
+	var err error
+	if err != nil {
+		return err
+	}
+	uc.repo.EditUsersRole(userRole.ID_user, userRole.ID_role)
+	return nil
+}
+
+func (uc *UserUseCase) GetProfile(token string) (entity.UserResponse, error) {
+	profile, err := uc.repo.GetProfile(token)
+	if err != nil {
+		return profile, err
+	}
+
+	return profile, nil
 }
