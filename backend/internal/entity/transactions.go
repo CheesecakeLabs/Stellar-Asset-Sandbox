@@ -9,4 +9,5 @@ const (
 	EndSponsoringFutureReservesOp   = "endSponsoringFutureReserves"
 	SetTrustLineFlagsOp             = "setTrustLineFlags"
 	FundWithFriendbotHor            = "fundWithFriendbot"
+	ClawbackOp                      = "clawback"
 )

@@ -38,3 +38,12 @@ func (uc *AssetUseCase) Create(data entity.Asset) (entity.Asset, error) {
 
 	return asset, nil
 }
+
+func (uc *AssetUseCase) Get(code string) (entity.Asset, error) {
+	asset, err := uc.aRepo.GetAssetByCode(code)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetAssetByCode: %w", err)
+	}
+
+	return asset, nil
+}

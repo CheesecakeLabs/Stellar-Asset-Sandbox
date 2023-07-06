@@ -414,6 +414,21 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAsset(arg0 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAsset", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAsset), arg0)
 }
 
+// GetAssetByCode mocks base method.
+func (m *MockAssetRepoInterface) GetAssetByCode(arg0 string) (entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetByCode", arg0)
+	ret0, _ := ret[0].(entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetByCode indicates an expected call of GetAssetByCode.
+func (mr *MockAssetRepoInterfaceMockRecorder) GetAssetByCode(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetByCode", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssetByCode), arg0)
+}
+
 // GetAssets mocks base method.
 func (m *MockAssetRepoInterface) GetAssets() ([]entity.Asset, error) {
 	m.ctrl.T.Helper()
@@ -427,6 +442,44 @@ func (m *MockAssetRepoInterface) GetAssets() ([]entity.Asset, error) {
 func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
+}
+
+// MockRoleRepoInterface is a mock of RoleRepoInterface interface.
+type MockRoleRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockRoleRepoInterfaceMockRecorder
+}
+
+// MockRoleRepoInterfaceMockRecorder is the mock recorder for MockRoleRepoInterface.
+type MockRoleRepoInterfaceMockRecorder struct {
+	mock *MockRoleRepoInterface
+}
+
+// NewMockRoleRepoInterface creates a new mock instance.
+func NewMockRoleRepoInterface(ctrl *gomock.Controller) *MockRoleRepoInterface {
+	mock := &MockRoleRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockRoleRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRoleRepoInterface) EXPECT() *MockRoleRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// GetRoles mocks base method.
+func (m *MockRoleRepoInterface) GetRoles() ([]entity.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoles")
+	ret0, _ := ret[0].([]entity.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoles indicates an expected call of GetRoles.
+func (mr *MockRoleRepoInterfaceMockRecorder) GetRoles() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockRoleRepoInterface)(nil).GetRoles))
 }
 
 // MockRoleRepoInterface is a mock of RoleRepoInterface interface.
