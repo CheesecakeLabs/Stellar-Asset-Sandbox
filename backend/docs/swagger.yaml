@@ -30,6 +30,15 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.Role:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
   entity.User:
     properties:
       _:
@@ -57,6 +66,42 @@ definitions:
       type:
         example: sponsor
         type: string
+    type: object
+  v1.BurnAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      id:
+        example: "001"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - id
+    - sponsor_id
+    type: object
+  v1.ClawbackAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      from:
+        example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - from
+    - sponsor_id
     type: object
   v1.CreateAssetRequest:
     properties:
@@ -109,6 +154,32 @@ definitions:
     - id
     - sponsor_id
     type: object
+  v1.TransferAssetRequest:
+    properties:
+      amount:
+        example: "12"
+        type: string
+      asset_id:
+        example: "12"
+        type: string
+      destination_wallet_pk:
+        example: GABCD....
+        type: string
+      source_wallet_id:
+        example: 1
+        type: integer
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - asset_id
+    - destination_wallet_pk
+    - source_wallet_id
+    - sponsor_id
+    type: object
+  v1.UpdateAuthFlagsRequest:
+    type: object
   v1.response:
     properties:
       error:
@@ -126,6 +197,142 @@ info:
   contact: {}
 paths:
   /assets:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new asset
+      tags:
+      - Assets
+  /assets/auth-flags:
+    post:
+      consumes:
+      - application/json
+      description: Update the authorization flags of a trust line on Stellar
+      parameters:
+      - description: Authorization flags
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateAuthFlagsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update authorization flags of a trust line
+      tags:
+      - Assets
+  /assets/burn:
+    post:
+      consumes:
+      - application/json
+      description: Burn an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.BurnAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Burn an asset
+      tags:
+      - Assets
+  /assets/clawback:
+    post:
+      consumes:
+      - application/json
+      description: Clawback an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ClawbackAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Clawback an asset
+      tags:
+      - Assets
+  /assets/mint:
     post:
       consumes:
       - application/json
@@ -159,6 +366,63 @@ paths:
       summary: Mint an asset
       tags:
       - Assets
+  /assets/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer an asset between wallets on Stellar
+      parameters:
+      - description: Transfer info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TransferAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Transfer an asset
+      tags:
+      - Assets
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
   /user/create:
     post:
       consumes:

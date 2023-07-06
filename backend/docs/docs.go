@@ -18,6 +18,214 @@ const docTemplate = `{
     "paths": {
         "/assets": {
             "post": {
+                "description": "Create and issue a new asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Create a new asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/auth-flags": {
+            "post": {
+                "description": "Update the authorization flags of a trust line on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Update authorization flags of a trust line",
+                "parameters": [
+                    {
+                        "description": "Authorization flags",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateAuthFlagsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/burn": {
+            "post": {
+                "description": "Burn an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Burn an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.BurnAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/clawback": {
+            "post": {
+                "description": "Clawback an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Clawback an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ClawbackAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/mint": {
+            "post": {
                 "description": "Mint an asset on Stellar",
                 "consumes": [
                     "application/json"
@@ -63,6 +271,93 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/transfer": {
+            "post": {
+                "description": "Transfer an asset between wallets on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Transfer an asset",
+                "parameters": [
+                    {
+                        "description": "Transfer info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.TransferAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role": {
+            "get": {
+                "description": "List role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Type",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
                         }
                     }
                 }
@@ -335,6 +630,19 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Role": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Admin"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
@@ -374,6 +682,55 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "sponsor"
+                }
+            }
+        },
+        "v1.BurnAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "001"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "v1.ClawbackAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "code",
+                "from",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "from": {
+                    "type": "string",
+                    "example": "GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -448,6 +805,41 @@ const docTemplate = `{
                     "example": 2
                 }
             }
+        },
+        "v1.TransferAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "asset_id",
+                "destination_wallet_pk",
+                "source_wallet_id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "destination_wallet_pk": {
+                    "type": "string",
+                    "example": "GABCD...."
+                },
+                "source_wallet_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "v1.UpdateAuthFlagsRequest": {
+            "type": "object"
         },
         "v1.response": {
             "type": "object",
