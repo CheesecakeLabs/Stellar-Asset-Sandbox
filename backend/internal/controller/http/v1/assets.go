@@ -168,7 +168,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 // @Failure     400 {object} response
 // @Failure     404 {object} response
 // @Failure     500 {object} response
-// @Router      /assets [post]
+// @Router      /assets/mint [post]
 func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	var request MintAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -205,6 +205,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, asset.Issuer.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
