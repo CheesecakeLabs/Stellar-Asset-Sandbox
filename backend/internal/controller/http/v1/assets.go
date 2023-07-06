@@ -23,6 +23,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	{
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
+		h.POST("/update-auth-flags", r.updateAuthFlags)
 		h.POST("/clawback", r.clawbackAsset)
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
@@ -61,6 +62,14 @@ type TransferAssetRequest struct {
 	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
 	AssetID             string `json:"asset_id" binding:"required" example:"12"`
 	Amount              string `json:"amount" binding:"required" example:"12"`
+}
+
+type UpdateAuthFlagsRequest struct {
+	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
+	Issuer     int      `json:"issuer"       binding:"required"  example:"KSJDS..."`
+	Code       string   `json:"code"       binding:"required"  example:"USDC"`
+	SetFlags   []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	ClearFlags []string `json:"clear_flags"       example:"[\"AUTH_IMMUTABLE\"]"`
 }
 
 // @Summary     Create a new asset
@@ -426,4 +435,66 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset clawed back"})
+}
+
+// @Summary     Update authorization flags of a trust line
+// @Description Update the authorization flags of a trust line on Stellar
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body UpdateAuthFlagsRequest true "Authorization flags"
+// @Success     200 {object} entity.Asset
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/auth-flags [post]
+func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
+	var request UpdateAuthFlagsRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	asset, err := r.as.Get(request.Code)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "asset not found")
+		return
+	}
+
+	trustor, err := r.w.Get(request.TrustorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "trustor wallet not found")
+		return
+	}
+
+	op := entity.Operation{
+		Type:    entity.SetTrustLineFlagsOp,
+		Trustor: trustor.Key.PublicKey,
+		Asset: entity.OpAsset{
+			Issuer: asset.Issuer.Key.PublicKey,
+			Code:   request.Code,
+		},
+		SetFlags:   request.SetFlags,
+		ClearFlags: request.ClearFlags,
+		Origin:     asset.Issuer.Key.PublicKey,
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: asset.Issuer.Key.PublicKey,
+		PublicKeys: []string{trustor.Key.PublicKey, asset.Issuer.Key.PublicKey},
+		FeeBump:    trustor.Key.PublicKey,
+		Operations: []entity.Operation{op},
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})
 }
