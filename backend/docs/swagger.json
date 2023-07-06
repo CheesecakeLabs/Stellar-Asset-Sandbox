@@ -56,6 +56,58 @@
                 }
             }
         },
+        "/assets/auth-flags": {
+            "post": {
+                "description": "Update the authorization flags of a trust line on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Update authorization flags of a trust line",
+                "parameters": [
+                    {
+                        "description": "Authorization flags",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateAuthFlagsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets/burn": {
             "post": {
                 "description": "Burn an asset on Stellar",
@@ -773,6 +825,9 @@
                     "example": 2
                 }
             }
+        },
+        "v1.UpdateAuthFlagsRequest": {
+            "type": "object"
         },
         "v1.response": {
             "type": "object",

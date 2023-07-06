@@ -178,6 +178,8 @@ definitions:
     - source_wallet_id
     - sponsor_id
     type: object
+  v1.UpdateAuthFlagsRequest:
+    type: object
   v1.response:
     properties:
       error:
@@ -226,6 +228,40 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Create a new asset
+      tags:
+      - Assets
+  /assets/auth-flags:
+    post:
+      consumes:
+      - application/json
+      description: Update the authorization flags of a trust line on Stellar
+      parameters:
+      - description: Authorization flags
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateAuthFlagsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update authorization flags of a trust line
       tags:
       - Assets
   /assets/burn:
