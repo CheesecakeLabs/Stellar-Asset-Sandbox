@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/assets": {
             "post": {
-                "description": "Mint an asset on Stellar",
+                "description": "Create and issue a new asset on Stellar",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "Assets"
                 ],
-                "summary": "Mint an asset",
+                "summary": "Create a new asset",
                 "parameters": [
                     {
                         "description": "Asset info",
@@ -36,7 +36,59 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.MintAssetRequest"
+                            "$ref": "#/definitions/v1.CreateAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/burn": {
+            "post": {
+                "description": "Burn an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Burn an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.BurnAssetRequest"
                         }
                     }
                 ],
@@ -89,6 +141,110 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.ClawbackAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/mint": {
+            "post": {
+                "description": "Mint an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Mint an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.MintAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/transfer": {
+            "post": {
+                "description": "Transfer an asset between wallets on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Transfer an asset",
+                "parameters": [
+                    {
+                        "description": "Transfer info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.TransferAssetRequest"
                         }
                     }
                 ],
@@ -477,11 +633,32 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.BurnAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "001"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
         "v1.ClawbackAssetRequest": {
             "type": "object",
             "required": [
                 "amount",
-                "claimable_id",
                 "code",
                 "from",
                 "sponsor_id"
@@ -490,10 +667,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "string",
                     "example": "1000"
-                },
-                "claimable_id": {
-                    "type": "integer",
-                    "example": 12
                 },
                 "code": {
                     "type": "string",
@@ -574,6 +747,38 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "12"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "v1.TransferAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "asset_id",
+                "destination_wallet_pk",
+                "source_wallet_id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "destination_wallet_pk": {
+                    "type": "string",
+                    "example": "GABCD...."
+                },
+                "source_wallet_id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "sponsor_id": {
                     "type": "integer",

@@ -11,9 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var issuerDbError = errors.New("issuerDbError")
-var distDbError = errors.New("distDbError")
-var assetDbError = errors.New("assetDbError")
+var (
+	issuerDbError = errors.New("issuerDbError")
+	distDbError   = errors.New("distDbError")
+	assetDbError  = errors.New("assetDbError")
+)
 
 type testAsset struct {
 	name string
@@ -162,4 +164,40 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		})
 	}
 
+	tests = []testAsset{
+		{
+			name: "get - success",
+			req:  req,
+			mock: func() {
+				ra.EXPECT().GetAssetByCode(req.Code).Return(updatedReq, nil)
+			},
+			res: updatedReq,
+			err: nil,
+		},
+		{
+			name: "get - database error",
+			req:  req,
+			mock: func() {
+				ra.EXPECT().GetAssetByCode(req.Code).Return(entity.Asset{}, assetDbError)
+			},
+			res: entity.Asset{},
+			err: assetDbError,
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			res, err := u.Get(tc.req.(entity.Asset).Code)
+
+			require.EqualValues(t, tc.res, res)
+			if tc.err == nil {
+				require.EqualValues(t, err, tc.err)
+			} else {
+				require.ErrorContains(t, err, tc.err.Error())
+			}
+		})
+	}
 }

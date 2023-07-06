@@ -24,6 +24,8 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
 		h.POST("/clawback", r.clawbackAsset)
+		h.POST("/burn", r.burnAsset)
+		h.POST("/transfer", r.transferAsset)
 	}
 }
 
@@ -34,8 +36,8 @@ type CreateAssetRequest struct {
 }
 
 type BurnAssetRequest struct {
+	Id        string `json:"id"       binding:"required"  example:"001"`
 	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 }
 
@@ -51,6 +53,14 @@ type ClawbackAssetRequest struct {
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 	From      string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
+}
+
+type TransferAssetRequest struct {
+	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
+	SponsorId           int    `json:"sponsor_id" binding:"required" example:"2"`
+	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
+	AssetID             string `json:"asset_id" binding:"required" example:"12"`
+	Amount              string `json:"amount" binding:"required" example:"12"`
 }
 
 // @Summary     Create a new asset
@@ -220,6 +230,139 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset minted"})
+}
+
+// @Summary Burn an asset
+// @Description Burn an asset on Stellar
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body BurnAssetRequest true "Asset info"
+// @Success     200 {object} entity.Asset
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/burn [post]
+func (r *assetsRoutes) burnAsset(c *gin.Context) {
+	var request BurnAssetRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	asset, err := r.as.Get(request.Id)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "asset not found")
+		return
+	}
+
+	sponsor, err := r.w.Get(request.SponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
+	ops := []entity.Operation{
+		{
+			Type:   entity.PaymentOp,
+			Target: asset.Issuer.Key.PublicKey,
+			Amount: request.Amount,
+			Asset: entity.OpAsset{
+				Code:   asset.Code,
+				Issuer: asset.Issuer.Key.PublicKey,
+			},
+			Origin: asset.Distributor.Key.PublicKey,
+		},
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: asset.Distributor.Key.PublicKey,
+		PublicKeys: []string{asset.Distributor.Key.PublicKey, sponsor.Key.PublicKey},
+		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Asset burned successfully",
+	})
+}
+
+// @Summary Transfer an asset
+// @Description Transfer an asset between wallets on Stellar
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body TransferAssetRequest true "Transfer info"
+// @Success     200 {object} response
+// @Failure     400 {object} response
+// @Failure     404 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/transfer [post]
+func (r *assetsRoutes) transferAsset(c *gin.Context) {
+	var request TransferAssetRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	sourceWallet, err := r.w.Get(request.SourceWalletID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "source wallet not found")
+		return
+	}
+
+	sponsor, err := r.w.Get(request.SponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
+
+	asset, err := r.as.Get(request.AssetID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "asset not found")
+		return
+	}
+
+	ops := []entity.Operation{
+		{
+			Type:   entity.PaymentOp,
+			Target: request.DestinationWalletPK,
+			Amount: request.Amount,
+			Asset: entity.OpAsset{
+				Code:   asset.Code,
+				Issuer: asset.Issuer.Key.PublicKey,
+			},
+			Origin: sourceWallet.Key.PublicKey,
+		},
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: sourceWallet.Key.PublicKey,
+		PublicKeys: []string{sourceWallet.Key.PublicKey, sponsor.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
+		Operations: ops,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "asset transferred"})
 }
 
 // @Summary     Clawback an asset
