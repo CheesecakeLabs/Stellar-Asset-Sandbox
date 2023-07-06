@@ -10,12 +10,9 @@ import {
   Input,
   Select,
   Text,
-  useColorMode,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
-
-import { isDark } from 'utils'
 
 import { Loading } from 'components/atoms'
 import { SwitchTheme } from 'components/molecules'
@@ -42,7 +39,6 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
     setError,
     formState: { errors },
   } = useForm()
-  const { colorMode } = useColorMode()
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     if (data.password !== data.confirmPassword) {
@@ -68,11 +64,13 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
 
   return (
     <Flex w="full" pt="1.5rem" px="2rem" flexDir="column" h="100vh">
-      <Flex w="full" justifyContent="space-between">
-        <StellarLogo
-          fill={isDark(colorMode) ? 'white' : 'black'}
-          width="300px"
-        />
+      <Flex
+        w="full"
+        justifyContent="space-between"
+        fill="black"
+        _dark={{ fill: 'white' }}
+      >
+        <StellarLogo width="300px" />
         <SwitchTheme />
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem" pb="1rem">

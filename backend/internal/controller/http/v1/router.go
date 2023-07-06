@@ -24,6 +24,7 @@ func NewRouter(
 	walletUseCase usecase.WalletUseCase,
 	assetUseCase usecase.AssetUseCase,
 	roleUseCase usecase.RoleUseCase,
+	rolePermissionUc usecase.RolePermissionUseCase,
 ) {
 	// Options
 	handler.Use(gin.Logger())
@@ -40,9 +41,10 @@ func NewRouter(
 	groupV1 := handler.Group("/v1")
 	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv)
 	{
-		newUserRoutes(groupV1, userUseCase, authUseCase)
+		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController)
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
+		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
 	}
 }

@@ -1,7 +1,5 @@
-import { Container, Flex, Spacer, Text, useColorMode } from '@chakra-ui/react'
+import { Container, Flex, Spacer, Text } from '@chakra-ui/react'
 import React from 'react'
-
-import { isDark } from 'utils'
 
 import { MobileNav } from 'components/atoms'
 
@@ -15,8 +13,6 @@ interface IHeader {
 }
 
 export const Header: React.FC<IHeader> = ({ onOpen }) => {
-  const { colorMode } = useColorMode()
-
   return (
     <Flex
       h="4.5rem"
@@ -26,11 +22,15 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       pe={6}
       pos="fixed"
       zIndex={99}
+      bg="gray.500"
       borderBottom="1px solid"
-      borderColor={isDark(colorMode) ? 'black.800' : 'gray.600'}
+      borderColor="gray.600"
+      _dark={{ borderColor: 'black.800', bg: 'black.600' }}
     >
       <MobileNav onOpen={onOpen} />
-      <StellarLogo fill={isDark(colorMode) ? 'white' : 'black'} />
+      <Flex fill="black" _dark={{ fill: 'white' }}>
+        <StellarLogo />
+      </Flex>
       <Spacer />
       <Container
         variant="primary"

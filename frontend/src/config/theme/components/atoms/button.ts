@@ -13,5 +13,13 @@ export const Button = {
         },
       },
     },
+    icon: {
+      bg: 'none',
+      color: 'black',
+      h: '18px',
+      _dark: {
+        color: 'white',
+      },
+    },
   },
 }

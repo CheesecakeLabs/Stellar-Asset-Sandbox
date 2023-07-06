@@ -1,6 +1,6 @@
 export enum PathRoute {
   HOME = '/',
-  LOGIN = '/login',
+  LOGIN = '/login/:expired?',
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
   PAYMENT_TOKENS = '/payment-tokens',

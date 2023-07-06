@@ -4,15 +4,20 @@ export const Alert = {
       fontSize: 'sm',
       padding: '1rem',
       color: 'black',
+    },
+    icon: {
       _dark: {
-        color: 'white',
+        color: 'black.700',
       },
     },
   },
   variants: {
-    error: {
-      label: {
-        padding: '6px 12px',
+    purple: {
+      container: {
+        bg: 'purple.200',
+      },
+      icon: {
+        color: 'purple.500',
       },
     },
   },
