@@ -245,10 +245,9 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 	ops := []entity.Operation{
 		{
-			Type:    entity.PaymentOp,
-			Sponsor: sponsor.Key.PublicKey,
-			Target:  asset.Issuer.Key.PublicKey,
-			Amount:  request.Amount,
+			Type:   entity.PaymentOp,
+			Target: asset.Issuer.Key.PublicKey,
+			Amount: request.Amount,
 			Asset: entity.OpAsset{
 				Code:   asset.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
