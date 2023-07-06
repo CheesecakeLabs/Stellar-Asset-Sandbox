@@ -30,6 +30,15 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.Role:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
   entity.User:
     properties:
       _:
@@ -57,6 +66,26 @@ definitions:
       type:
         example: sponsor
         type: string
+    type: object
+  v1.BurnAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      id:
+        example: "001"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - id
+    - sponsor_id
     type: object
   v1.CreateAssetRequest:
     properties:
@@ -109,6 +138,26 @@ definitions:
     - id
     - sponsor_id
     type: object
+  v1.TransferAssetRequest:
+    properties:
+      amount:
+        example: "12"
+        type: string
+      asset_id:
+        example: "12"
+        type: string
+      destination_wallet_id:
+        example: 12
+        type: integer
+      source_wallet_id:
+        example: 1
+        type: integer
+    required:
+    - amount
+    - asset_id
+    - destination_wallet_id
+    - source_wallet_id
+    type: object
   v1.response:
     properties:
       error:
@@ -129,14 +178,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: Mint an asset on Stellar
+      description: Burn an asset on Stellar
       parameters:
       - description: Asset info
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.MintAssetRequest'
+          $ref: '#/definitions/v1.BurnAssetRequest'
       produces:
       - application/json
       responses:
@@ -156,9 +205,66 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Mint an asset
+      summary: Burn an asset
       tags:
       - Assets
+  /assets/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer an asset between wallets on Stellar
+      parameters:
+      - description: Transfer info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TransferAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Transfer an asset
+      tags:
+      - Assets
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
   /user/create:
     post:
       consumes:

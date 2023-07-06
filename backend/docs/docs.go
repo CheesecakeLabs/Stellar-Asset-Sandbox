@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/assets": {
             "post": {
-                "description": "Mint an asset on Stellar",
+                "description": "Burn an asset on Stellar",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@ const docTemplate = `{
                 "tags": [
                     "Assets"
                 ],
-                "summary": "Mint an asset",
+                "summary": "Burn an asset",
                 "parameters": [
                     {
                         "description": "Asset info",
@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.MintAssetRequest"
+                            "$ref": "#/definitions/v1.BurnAssetRequest"
                         }
                     }
                 ],
@@ -63,6 +63,93 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/transfer": {
+            "post": {
+                "description": "Transfer an asset between wallets on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Transfer an asset",
+                "parameters": [
+                    {
+                        "description": "Transfer info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.TransferAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role": {
+            "get": {
+                "description": "List role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Type",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Role"
+                            }
                         }
                     }
                 }
@@ -335,6 +422,19 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Role": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Admin"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
@@ -374,6 +474,33 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "sponsor"
+                }
+            }
+        },
+        "v1.BurnAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "code",
+                "id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "001"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -446,6 +573,33 @@ const docTemplate = `{
                 "sponsor_id": {
                     "type": "integer",
                     "example": 2
+                }
+            }
+        },
+        "v1.TransferAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "asset_id",
+                "destination_wallet_id",
+                "source_wallet_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "12"
+                },
+                "destination_wallet_id": {
+                    "type": "integer",
+                    "example": 12
+                },
+                "source_wallet_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
