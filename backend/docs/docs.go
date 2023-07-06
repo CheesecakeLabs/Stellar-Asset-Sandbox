@@ -18,6 +18,58 @@ const docTemplate = `{
     "paths": {
         "/assets": {
             "post": {
+                "description": "Create and issue a new asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Create a new asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/burn": {
+            "post": {
                 "description": "Burn an asset on Stellar",
                 "consumes": [
                     "application/json"
@@ -37,6 +89,110 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.BurnAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/clawback": {
+            "post": {
+                "description": "Clawback an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Clawback an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ClawbackAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/mint": {
+            "post": {
+                "description": "Mint an asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Mint an asset",
+                "parameters": [
+                    {
+                        "description": "Asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.MintAssetRequest"
                         }
                     }
                 ],
@@ -481,8 +637,30 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "code",
                 "id",
+                "sponsor_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "001"
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "v1.ClawbackAssetRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "code",
+                "from",
                 "sponsor_id"
             ],
             "properties": {
@@ -494,9 +672,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "USDC"
                 },
-                "id": {
+                "from": {
                     "type": "string",
-                    "example": "001"
+                    "example": "GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"
                 },
                 "sponsor_id": {
                     "type": "integer",
@@ -581,8 +759,9 @@ const docTemplate = `{
             "required": [
                 "amount",
                 "asset_id",
-                "destination_wallet_id",
-                "source_wallet_id"
+                "destination_wallet_pk",
+                "source_wallet_id",
+                "sponsor_id"
             ],
             "properties": {
                 "amount": {
@@ -593,13 +772,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "12"
                 },
-                "destination_wallet_id": {
-                    "type": "integer",
-                    "example": 12
+                "destination_wallet_pk": {
+                    "type": "string",
+                    "example": "GABCD...."
                 },
                 "source_wallet_id": {
                     "type": "integer",
                     "example": 1
+                },
+                "sponsor_id": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },

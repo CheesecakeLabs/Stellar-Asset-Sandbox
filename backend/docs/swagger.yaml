@@ -72,9 +72,6 @@ definitions:
       amount:
         example: "1000"
         type: string
-      code:
-        example: USDC
-        type: string
       id:
         example: "001"
         type: string
@@ -83,8 +80,27 @@ definitions:
         type: integer
     required:
     - amount
-    - code
     - id
+    - sponsor_id
+    type: object
+  v1.ClawbackAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      from:
+        example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - from
     - sponsor_id
     type: object
   v1.CreateAssetRequest:
@@ -146,17 +162,21 @@ definitions:
       asset_id:
         example: "12"
         type: string
-      destination_wallet_id:
-        example: 12
-        type: integer
+      destination_wallet_pk:
+        example: GABCD....
+        type: string
       source_wallet_id:
         example: 1
+        type: integer
+      sponsor_id:
+        example: 2
         type: integer
     required:
     - amount
     - asset_id
-    - destination_wallet_id
+    - destination_wallet_pk
     - source_wallet_id
+    - sponsor_id
     type: object
   v1.response:
     properties:
@@ -175,6 +195,40 @@ info:
   contact: {}
 paths:
   /assets:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new asset
+      tags:
+      - Assets
+  /assets/burn:
     post:
       consumes:
       - application/json
@@ -206,6 +260,74 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Burn an asset
+      tags:
+      - Assets
+  /assets/clawback:
+    post:
+      consumes:
+      - application/json
+      description: Clawback an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ClawbackAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Clawback an asset
+      tags:
+      - Assets
+  /assets/mint:
+    post:
+      consumes:
+      - application/json
+      description: Mint an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.MintAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Mint an asset
       tags:
       - Assets
   /assets/transfer:
