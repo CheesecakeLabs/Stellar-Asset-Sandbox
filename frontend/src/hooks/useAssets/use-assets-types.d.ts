@@ -10,6 +10,16 @@ declare namespace Hooks {
       supply: number
     }
 
+    interface IAssetDto {
+      id: number
+      code: string
+      name: string
+      assetType: string
+      issuer: Hooks.UseWalletsTypes.IWallet
+      distributor: Hooks.UseWalletsTypes.IWallet
+      supply: number
+    }
+
     interface IAssetRequest {
       sponsor_id: number
       code: string
@@ -67,6 +77,8 @@ declare namespace Hooks {
       freeze: (params: IFreezeRequest) => Promise<boolean>
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<boolean>
+      getAssets: () => Promise<void>
+      assets: IAssetDto[] | undefined
     }
   }
 }

@@ -3,7 +3,7 @@ export enum PathRoute {
   LOGIN = '/login/:expired?',
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
-  PAYMENT_TOKENS = '/payment-tokens',
+  PAYMENTS_TOKENS = '/payments-tokens',
   SECURITIES_TOKENS = '/securities-tokens',
   SOROBAN_SMART_CONTRACTS = '/soroban-smart-contracts',
   ASSETS_DASHBOARD = '/assets-dashboard',

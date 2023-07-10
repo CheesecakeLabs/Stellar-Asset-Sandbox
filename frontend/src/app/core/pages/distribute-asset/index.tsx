@@ -11,11 +11,13 @@ import { AssetActions } from 'components/enums/asset-actions'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
+import {useLocation} from "react-router-dom";
 
 export const DistributeAsset: React.FC = () => {
   const { distribute, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -72,7 +74,7 @@ export const DistributeAsset: React.FC = () => {
             <AssetHeader asset={asset} />
             <DistributeAssetTemplate onSubmit={onSubmit} loading={loading} />
           </Flex>
-          <MenuActionsAsset action={AssetActions.DISTRIBUTE} />
+          <MenuActionsAsset action={AssetActions.DISTRIBUTE} asset={asset} />
         </Flex>
       </Sidebar>
     </Flex>

@@ -11,11 +11,13 @@ import { AssetActions } from 'components/enums/asset-actions'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { BurnAssetTemplate } from 'components/templates/burn-asset'
+import {useLocation} from "react-router-dom";
 
 export const BurnAsset: React.FC = () => {
   const { burn, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -73,7 +75,7 @@ export const BurnAsset: React.FC = () => {
               asset={asset}
             />
           </Flex>
-          <MenuActionsAsset action={AssetActions.BURN} />
+          <MenuActionsAsset action={AssetActions.BURN} asset={asset}/>
         </Flex>
       </Sidebar>
     </Flex>

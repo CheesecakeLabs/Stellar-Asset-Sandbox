@@ -4,18 +4,19 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { useAssets } from 'hooks/useAssets'
 import { MessagesError } from 'utils/constants/messages-error'
-import { mockupAssets } from 'utils/mockups'
 
 import { AssetHeader } from 'components/atoms'
 import { AssetActions } from 'components/enums/asset-actions'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
+import { useLocation } from "react-router-dom";
 
 export const MintAsset: React.FC = () => {
   const { mint, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -69,7 +70,7 @@ export const MintAsset: React.FC = () => {
             <AssetHeader asset={asset} />
             <MintAssetTemplate onSubmit={onSubmit} loading={loading} asset={asset} />
           </Flex>
-          <MenuActionsAsset action={AssetActions.MINT} />
+          <MenuActionsAsset action={AssetActions.MINT} asset={asset} />
         </Flex>
       </Sidebar>
     </Flex>

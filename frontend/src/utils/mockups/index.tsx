@@ -2,7 +2,7 @@ export const mockupAssets = [
   {
     id: 1,
     code: 'LMS',
-    name: 'Lucas Coin',
+    name: 'Lucas Coin MVN',
     assetType: 'Payment token',
     distributor: {
       id: 1,

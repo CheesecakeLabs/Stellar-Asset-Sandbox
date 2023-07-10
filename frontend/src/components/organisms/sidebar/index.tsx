@@ -38,7 +38,7 @@ const linkItems: ILinkItemProps[] = [
   {
     name: 'Payment Tokens',
     icon: <PaymentsIcon />,
-    path: `${PathRoute.PAYMENT_TOKENS}`,
+    path: `${PathRoute.PAYMENTS_TOKENS}`,
   },
   {
     name: 'Securities Tokens',

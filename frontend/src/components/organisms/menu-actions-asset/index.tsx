@@ -14,10 +14,11 @@ import {
 } from 'components/icons'
 
 interface IMenuActionsAsset {
-  action: AssetActions
+  action: AssetActions,
+  asset: Hooks.UseAssetsTypes.IAssetDto
 }
 
-export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
+export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action, asset }) => {
   const navigate = useNavigate()
 
   return (
@@ -38,7 +39,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.MINT_ASSET)
+            navigate(PathRoute.MINT_ASSET, {state : asset})
           }}
         >
           Mint Assets
@@ -53,7 +54,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.BURN_ASSET)
+            navigate(PathRoute.BURN_ASSET, {state : asset})
           }}
         >
           Burn Assets
@@ -70,7 +71,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.DISTRIBUTE_ASSET)
+            navigate(PathRoute.DISTRIBUTE_ASSET, {state : asset})
           }}
         >
           Distribute
@@ -87,7 +88,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.AUTHORIZE_ACCOUNT)
+            navigate(PathRoute.AUTHORIZE_ACCOUNT, {state : asset})
           }}
         >
           Authorize account
@@ -102,7 +103,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.FREEZE_ACCOUNT)
+            navigate(PathRoute.FREEZE_ACCOUNT, {state : asset})
           }}
         >
           Freeze account
@@ -119,7 +120,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(PathRoute.CLAWBACK_ASSET)
+            navigate(PathRoute.CLAWBACK_ASSET, {state : asset})
           }}
         >
           Clawback

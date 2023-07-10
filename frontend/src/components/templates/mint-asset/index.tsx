@@ -17,7 +17,7 @@ interface IMintAssetTemplate {
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
   loading: boolean
-  asset: Hooks.UseAssetsTypes.IAsset
+  asset: Hooks.UseAssetsTypes.IAssetDto
 }
 
 export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({

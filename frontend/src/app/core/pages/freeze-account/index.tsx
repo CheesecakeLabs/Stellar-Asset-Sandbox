@@ -11,11 +11,13 @@ import { AssetActions } from 'components/enums/asset-actions'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { FreezeAccountTemplate } from 'components/templates/freeze-account'
+import {useLocation} from "react-router-dom";
 
 export const FreezeAccount: React.FC = () => {
   const { freeze, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -72,7 +74,7 @@ export const FreezeAccount: React.FC = () => {
             <AssetHeader asset={asset} />
             <FreezeAccountTemplate onSubmit={onSubmit} loading={loading} />
           </Flex>
-          <MenuActionsAsset action={AssetActions.FREEZE} />
+          <MenuActionsAsset action={AssetActions.FREEZE} asset={asset} />
         </Flex>
       </Sidebar>
     </Flex>

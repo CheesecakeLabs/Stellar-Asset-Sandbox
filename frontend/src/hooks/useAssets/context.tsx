@@ -1,9 +1,10 @@
-import { createContext, useState } from 'react'
+import {createContext, useCallback, useState} from 'react'
 
 import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
+import {mockupAssets} from "../../utils/mockups";
 
 export const AssetsContext = createContext(
   {} as Hooks.UseAssetsTypes.IAssetsContext
@@ -15,6 +16,7 @@ interface IProps {
 
 export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [loading, setLoading] = useState(false)
+  const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[] | undefined>()
 
   const forge = async (
     params: Hooks.UseAssetsTypes.IAssetRequest
@@ -135,6 +137,22 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getAssets = useCallback(async (): Promise<void> => {
+    setLoading(true)
+    setAssets(mockupAssets)
+    // try {
+    //   const response = await http.get(`role`)
+    //   const data = response.data
+    //   if (data) {
+    //     setAssets(data)
+    //   }
+    // } catch (error) {
+    //   return
+    // } finally {
+    //   setLoading(false)
+    // }
+  }, [])
+
   return (
     <AssetsContext.Provider
       value={{
@@ -146,6 +164,8 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         freeze,
         clawback,
         forge,
+        getAssets,
+        assets,
       }}
     >
       {children}

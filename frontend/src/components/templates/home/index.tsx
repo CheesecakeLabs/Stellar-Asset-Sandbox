@@ -19,7 +19,7 @@ import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
 
 interface IHomeTemplate {
   loading: boolean
-  assets: Hooks.UseAssetsTypes.IAsset[] | undefined
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
 }
 
 export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
@@ -35,7 +35,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
           <Button
             variant="primary"
             leftIcon={<JoinIcon fill="white" />}
-            onClick={(): void => navigate(PathRoute.FORGE_ASSET)}
+            onClick={(): void => navigate({pathname: PathRoute.FORGE_ASSET})}
           >
             Forge asset
           </Button>
@@ -85,10 +85,11 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
               </Thead>
               <Tbody>
                 {assets.map(asset => (
+
                   <Tr
                     borderColor="red"
                     cursor="pointer"
-                    onClick={(): void => navigate(PathRoute.MINT_ASSET)}
+                    onClick={(): void => navigate(PathRoute.MINT_ASSET, {state : asset})}
                     fill="black"
                     stroke="black"
                     _dark={{ fill: 'white', stroke: 'white' }}

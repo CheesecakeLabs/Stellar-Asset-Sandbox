@@ -11,11 +11,13 @@ import { AssetActions } from 'components/enums/asset-actions'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
+import {useLocation} from "react-router-dom";
 
 export const ClawbackAsset: React.FC = () => {
   const { clawback, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -73,7 +75,7 @@ export const ClawbackAsset: React.FC = () => {
             <AssetHeader asset={asset} />
             <ClawbackAssetTemplate onSubmit={onSubmit} loading={loading} />
           </Flex>
-          <MenuActionsAsset action={AssetActions.CLAWBACK} />
+          <MenuActionsAsset action={AssetActions.CLAWBACK} asset={asset} />
         </Flex>
       </Sidebar>
     </Flex>

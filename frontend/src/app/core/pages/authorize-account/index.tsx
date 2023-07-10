@@ -11,11 +11,13 @@ import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
 import { AssetHeader } from 'components/atoms'
+import {useLocation} from "react-router-dom";
 
 export const AuthorizeAccount: React.FC = () => {
   const { authorize, loading } = useAssets()
   const toast = useToast()
-  const asset = mockupAssets[0]
+  const location = useLocation();
+  const asset = location.state;
 
   const onSubmit = async (
     data: FieldValues,
@@ -67,7 +69,7 @@ export const AuthorizeAccount: React.FC = () => {
             <AssetHeader asset={asset} />
             <AuthorizeAccountTemplate onSubmit={onSubmit} loading={loading} />
           </Flex>
-          <MenuActionsAsset action={AssetActions.AUTHORIZE} />
+          <MenuActionsAsset action={AssetActions.AUTHORIZE} asset={asset}/>
         </Flex>
       </Sidebar>
     </Flex>
