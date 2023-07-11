@@ -21,6 +21,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	r := &assetsRoutes{w, as, m}
 	h := handler.Group("/assets")
 	{
+		h.GET("", r.getAllAssets)
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
 		h.POST("/update-auth-flags", r.updateAuthFlags)
@@ -66,7 +67,7 @@ type TransferAssetRequest struct {
 
 type UpdateAuthFlagsRequest struct {
 	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
-	Issuer     int      `json:"issuer"       binding:"required"  example:"KSJDS..."`
+	Issuer     int      `json:"issuer"       binding:"required"  example:"2"`
 	Code       string   `json:"code"       binding:"required"  example:"USDC"`
 	SetFlags   []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
 	ClearFlags []string `json:"clear_flags"       example:"[\"AUTH_IMMUTABLE\"]"`
@@ -497,4 +498,22 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})
+}
+
+// @Summary Get all assets
+// @Description Get all assets
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} []entity.Asset
+// @Failure     500 {object} response
+// @Router      /assets [get]
+func (r *assetsRoutes) getAllAssets(c *gin.Context) {
+	assets, err := r.as.GetAll()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		return
+	}
+
+	c.JSON(http.StatusOK, assets)
 }
