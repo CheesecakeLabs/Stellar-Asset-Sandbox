@@ -363,9 +363,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/role-permission/permissions": {
+            "get": {
+                "description": "Role permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RolePermissions"
+                ],
+                "summary": "Role permissions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.RolePermissionResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
-                "description": "Create user",
+                "description": "Edit users role",
                 "consumes": [
                     "application/json"
                 ],
@@ -375,13 +401,13 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Create user",
-                "operationId": "create",
+                "summary": "Edit users role",
+                "operationId": "editUsersRole",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.userResponse"
+                            "$ref": "#/definitions/entity.UserRole"
                         }
                     },
                     "500": {
@@ -448,6 +474,29 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Get PRofile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "GET Profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserResponse"
                         }
                     }
                 }
@@ -643,13 +692,26 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.RolePermissionResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Edit action"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Edit"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
-                "_": {
+                "created_at": {
                     "type": "string"
                 },
-                "created_at": {
+                "email": {
                     "type": "string"
                 },
                 "id": {
@@ -658,10 +720,50 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "token_hash": {
+                "password": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "token": {
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UserResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UserRole": {
+            "type": "object",
+            "properties": {
+                "id_role": {
+                    "type": "string"
+                },
+                "id_user": {
                     "type": "string"
                 }
             }
@@ -741,6 +843,10 @@ const docTemplate = `{
                 "sponsor_id"
             ],
             "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "1000"
+                },
                 "code": {
                     "type": "string",
                     "example": "USDC"
@@ -748,6 +854,17 @@ const docTemplate = `{
                 "limit": {
                     "type": "integer",
                     "example": 1000
+                },
+                "set_flags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"AUTH_REQUIRED\"",
+                        " \"AUTH_REVOCABLE\"",
+                        "\"AUTH_CLAWBACK_ENABLED\"]"
+                    ]
                 },
                 "sponsor_id": {
                     "type": "integer",
@@ -853,9 +970,6 @@ const docTemplate = `{
         "v1.userResponse": {
             "type": "object",
             "properties": {
-                "token": {
-                    "type": "string"
-                },
                 "user": {
                     "$ref": "#/definitions/entity.User"
                 }

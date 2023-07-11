@@ -39,19 +39,54 @@ definitions:
         example: Admin
         type: string
     type: object
+  entity.RolePermissionResponse:
+    properties:
+      description:
+        example: Edit action
+        type: string
+      name:
+        example: Edit
+        type: string
+    type: object
   entity.User:
     properties:
-      _:
-        type: string
       created_at:
+        type: string
+      email:
         type: string
       id:
         type: string
       name:
         type: string
-      token_hash:
+      password:
+        type: string
+      role_id:
+        type: integer
+      token:
         type: string
       updated_at:
+        type: string
+    type: object
+  entity.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.UserRole:
+    properties:
+      id_role:
+        type: string
+      id_user:
         type: string
     type: object
   entity.Wallet:
@@ -105,12 +140,23 @@ definitions:
     type: object
   v1.CreateAssetRequest:
     properties:
+      amount:
+        example: "1000"
+        type: string
       code:
         example: USDC
         type: string
       limit:
         example: 1000
         type: integer
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED"'
+        - ' "AUTH_REVOCABLE"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
       sponsor_id:
         example: 2
         type: integer
@@ -188,8 +234,6 @@ definitions:
     type: object
   v1.userResponse:
     properties:
-      token:
-        type: string
       user:
         $ref: '#/definitions/entity.User'
     type: object
@@ -423,24 +467,41 @@ paths:
       summary: List
       tags:
       - Role
-  /user/create:
-    post:
+  /role-permission/permissions:
+    get:
       consumes:
       - application/json
-      description: Create user
-      operationId: create
+      description: Role permissions
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.userResponse'
+            items:
+              $ref: '#/definitions/entity.RolePermissionResponse'
+            type: array
+      summary: Role permissions
+      tags:
+      - RolePermissions
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Edit users role
+      operationId: editUsersRole
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserRole'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Create user
+      summary: Edit users role
       tags:
       - user
   /user/login:
@@ -481,6 +542,21 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Logout User
+      tags:
+      - user
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get PRofile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserResponse'
+      summary: GET Profile
       tags:
       - user
   /wallets:

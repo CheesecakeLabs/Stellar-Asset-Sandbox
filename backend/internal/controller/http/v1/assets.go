@@ -31,9 +31,11 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 }
 
 type CreateAssetRequest struct {
-	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
-	Limit     *int   `json:"limit"         example:"1000"`
+	SponsorId int      `json:"sponsor_id"       binding:"required"  example:"2"`
+	Code      string   `json:"code"       binding:"required"  example:"USDC"`
+	Limit     *int     `json:"limit"         example:"1000"`
+	Amount    string   `json:"amount"        example:"1000"`
+	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
 }
 
 type BurnAssetRequest struct {
@@ -68,8 +70,8 @@ type UpdateAuthFlagsRequest struct {
 	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
 	Issuer     int      `json:"issuer"       binding:"required"  example:"KSJDS..."`
 	Code       string   `json:"code"       binding:"required"  example:"USDC"`
-	SetFlags   []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
-	ClearFlags []string `json:"clear_flags"       example:"[\"AUTH_IMMUTABLE\"]"`
+	SetFlags   []string `json:"set_flags"   example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	ClearFlags []string `json:"clear_flags"  example:"[\"AUTH_IMMUTABLE\"]"`
 }
 
 // @Summary     Create a new asset
@@ -134,6 +136,34 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 			Origin:     distPk,
 		},
 	}
+
+	if request.Amount != "" {
+		ops = append(ops, entity.Operation{
+			Type:    entity.PaymentOp,
+			Sponsor: sponsor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   request.Code,
+				Issuer: issuerPk,
+			},
+			Amount: request.Amount,
+			Origin: issuerPk,
+			Target: distPk,
+		})
+	}
+
+	if request.SetFlags != nil {
+		ops = append(ops, entity.Operation{
+			Type:    entity.SetTrustLineFlagsOp,
+			Trustor: distPk,
+			Asset: entity.OpAsset{
+				Issuer: issuerPk,
+				Code:   request.Code,
+			},
+			SetFlags: request.SetFlags,
+			Origin:   issuerPk,
+		})
+	}
+
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
