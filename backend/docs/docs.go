@@ -642,6 +642,9 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1000000
                 },
+                "asset_type": {
+                    "type": "string"
+                },
                 "code": {
                     "type": "string",
                     "example": "USDC"
@@ -655,6 +658,10 @@ const docTemplate = `{
                 },
                 "issuer": {
                     "$ref": "#/definitions/entity.Wallet"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "USD Coin"
                 }
             }
         },
@@ -839,13 +846,19 @@ const docTemplate = `{
         "v1.CreateAssetRequest": {
             "type": "object",
             "required": [
+                "asset_type",
                 "code",
+                "name",
                 "sponsor_id"
             ],
             "properties": {
                 "amount": {
                     "type": "string",
                     "example": "1000"
+                },
+                "asset_type": {
+                    "type": "string",
+                    "example": "security_token"
                 },
                 "code": {
                     "type": "string",
@@ -854,6 +867,10 @@ const docTemplate = `{
                 "limit": {
                     "type": "integer",
                     "example": 1000
+                },
+                "name": {
+                    "type": "string",
+                    "example": "USDC"
                 },
                 "set_flags": {
                     "type": "array",

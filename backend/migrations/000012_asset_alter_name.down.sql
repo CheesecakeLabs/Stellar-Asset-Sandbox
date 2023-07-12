@@ -1,0 +1,1 @@
+ALTER TABLE Asset DROP COLUMN name, DROP COLUMN asset_type;

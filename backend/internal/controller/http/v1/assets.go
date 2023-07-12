@@ -32,6 +32,8 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 
 type CreateAssetRequest struct {
 	SponsorId int      `json:"sponsor_id"       binding:"required"  example:"2"`
+	Name      string   `json:"name"       binding:"required"  example:"USDC"`
+	AssetType string   `json:"asset_type"       binding:"required"  example:"security_token"`
 	Code      string   `json:"code"       binding:"required"  example:"USDC"`
 	Limit     *int     `json:"limit"         example:"1000"`
 	Amount    string   `json:"amount"        example:"1000"`
@@ -180,7 +182,9 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 
 	asset := entity.Asset{
-		Code: request.Code,
+		Name:      request.Name,
+		AssetType: request.AssetType,
+		Code:      request.Code,
 		Issuer: entity.Wallet{
 			Type:   entity.IssuerType,
 			Funded: true,
