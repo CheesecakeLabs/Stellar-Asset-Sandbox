@@ -4,6 +4,8 @@ definitions:
       amount:
         example: 1000000
         type: integer
+      asset_type:
+        type: string
       code:
         example: USDC
         type: string
@@ -14,6 +16,9 @@ definitions:
         type: integer
       issuer:
         $ref: '#/definitions/entity.Wallet'
+      name:
+        example: USD Coin
+        type: string
     type: object
   entity.Key:
     properties:
@@ -140,18 +145,36 @@ definitions:
     type: object
   v1.CreateAssetRequest:
     properties:
+      amount:
+        example: "1000"
+        type: string
+      asset_type:
+        example: security_token
+        type: string
       code:
         example: USDC
         type: string
       limit:
         example: 1000
         type: integer
+      name:
+        example: USDC
+        type: string
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED"'
+        - ' "AUTH_REVOCABLE"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
       sponsor_id:
         example: 2
         type: integer
     required:
+    - asset_type
     - code
-    - sponsor_id
+    - name
     type: object
   v1.CreateWalletRequest:
     properties:
