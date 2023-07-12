@@ -9,7 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const _startingBalance = "10"
+const (
+	_startingBalance = "10"
+	_sponsorId       = 1
+)
 
 type assetsRoutes struct {
 	w  usecase.WalletUseCase
@@ -32,7 +35,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 }
 
 type CreateAssetRequest struct {
-	SponsorId int      `json:"sponsor_id"       binding:"required"  example:"2"`
+	SponsorId int      `json:"sponsor_id"    example:"2"`
 	Name      string   `json:"name"       binding:"required"  example:"USDC"`
 	AssetType string   `json:"asset_type"       binding:"required"  example:"security_token"`
 	Code      string   `json:"code"       binding:"required"  example:"USDC"`
@@ -95,7 +98,12 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+
+	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return

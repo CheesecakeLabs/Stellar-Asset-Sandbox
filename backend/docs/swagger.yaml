@@ -175,7 +175,6 @@ definitions:
     - asset_type
     - code
     - name
-    - sponsor_id
     type: object
   v1.CreateWalletRequest:
     properties:

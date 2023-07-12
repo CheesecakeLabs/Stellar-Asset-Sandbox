@@ -878,8 +878,7 @@ const docTemplate = `{
             "required": [
                 "asset_type",
                 "code",
-                "name",
-                "sponsor_id"
+                "name"
             ],
             "properties": {
                 "amount": {
