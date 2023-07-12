@@ -18,9 +18,11 @@ export const ForgeAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await forge({
-        sponsor_id: 1,
-        code: 'LMS',
-        limit: 999999999999999,
+        asset_name: data.name,
+        code: data.code,
+        initial_supply: data.initial_supply,
+        type_asset: data.asset_type,
+        control_mechanism: ['AUTH_REQUIRED'],
       })
 
       if (isSuccess) {

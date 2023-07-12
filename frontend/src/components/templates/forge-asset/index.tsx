@@ -92,21 +92,47 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 
               <FormControl>
                 <FormLabel>Initial supply</FormLabel>
-                <Input type="number" placeholder="Initial supply" />
+                <Input
+                    type="number"
+                    placeholder="Initial supply"
+                    {...register('initial_supply', {
+                      required: true,
+                      minLength: 3,
+                      maxLength: 3,
+                    })}
+                />
               </FormControl>
             </Flex>
 
-            <FormControl>
-              <FormLabel mt="1.5rem">Asset type</FormLabel>
-              <Select
-                {...register('asset_type', { required: true })}
-                defaultValue={typesAsset[0].id}
+            <Flex
+              flexDir={{ md: 'row', sm: 'column' }}
+              gap="1.5rem"
+              mt="1.5rem"
               >
-                {typesAsset.map(typeAsset => (
-                  <option value={typeAsset.id}>{typeAsset.name}</option>
-                ))}
-              </Select>
-            </FormControl>
+              <FormControl>
+                <FormLabel>Limit</FormLabel>
+                <Input
+                    type="number"
+                    placeholder="Limit"
+                    {...register('limit', {
+                      required: true,
+                      minLength: 3,
+                      maxLength: 3,
+                    })}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Asset type</FormLabel>
+                <Select
+                  {...register('asset_type', { required: true })}
+                  defaultValue={typesAsset[0].id}
+                  >
+                  {typesAsset.map(typeAsset => (
+                    <option value={typeAsset.id}>{typeAsset.name}</option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Flex>
 
             <FormControl isInvalid={errors?.password !== undefined}>
               <FormLabel mt="1.5rem">Control mechanisms</FormLabel>

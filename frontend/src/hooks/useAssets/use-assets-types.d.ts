@@ -1,3 +1,5 @@
+import {typesAsset} from "../../utils/constants/data-constants";
+
 declare namespace Hooks {
   namespace UseAssetsTypes {
     interface IAsset {
@@ -21,9 +23,11 @@ declare namespace Hooks {
     }
 
     interface IAssetRequest {
-      sponsor_id: number
+      asset_name: string
       code: string
-      limit: number
+      initial_supply: number
+      typeAsset: number
+      control_mechanism: string[]
     }
 
     interface IMintRequest {
