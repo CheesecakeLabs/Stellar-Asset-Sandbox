@@ -17,6 +17,36 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/assets": {
+            "get": {
+                "description": "Get all assets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Get all assets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Asset"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create and issue a new asset on Stellar",
                 "consumes": [
@@ -973,7 +1003,46 @@ const docTemplate = `{
             }
         },
         "v1.UpdateAuthFlagsRequest": {
-            "type": "object"
+            "type": "object",
+            "required": [
+                "code",
+                "issuer",
+                "trustor_id"
+            ],
+            "properties": {
+                "clear_flags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"AUTH_IMMUTABLE\"]"
+                    ]
+                },
+                "code": {
+                    "type": "string",
+                    "example": "USDC"
+                },
+                "issuer": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "set_flags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"AUTH_REQUIRED\"",
+                        " \"AUTH_REVOCABLE\"",
+                        "\"AUTH_CLAWBACK_ENABLED\"]"
+                    ]
+                },
+                "trustor_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
         },
         "v1.response": {
             "type": "object",

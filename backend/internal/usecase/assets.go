@@ -47,3 +47,12 @@ func (uc *AssetUseCase) Get(code string) (entity.Asset, error) {
 
 	return asset, nil
 }
+
+func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
+	assets, err := uc.aRepo.GetAssets()
+	if err != nil {
+		return nil, fmt.Errorf("AssetUseCase - GetAll - uc.repo.GetAssets: %w", err)
+	}
+
+	return assets, nil
+}
