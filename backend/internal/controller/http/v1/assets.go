@@ -9,7 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const _startingBalance = "10"
+const (
+	_startingBalance = "10"
+	_sponsorId       = 1
+)
 
 type assetsRoutes struct {
 	w  usecase.WalletUseCase
@@ -21,6 +24,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	r := &assetsRoutes{w, as, m}
 	h := handler.Group("/assets")
 	{
+		h.GET("", r.getAllAssets)
 		h.POST("", r.createAsset)
 		h.POST("/mint", r.mintAsset)
 		h.POST("/update-auth-flags", r.updateAuthFlags)
@@ -31,9 +35,13 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 }
 
 type CreateAssetRequest struct {
-	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
-	Limit     *int   `json:"limit"         example:"1000"`
+	SponsorId int      `json:"sponsor_id"    example:"2"`
+	Name      string   `json:"name"       binding:"required"  example:"USDC"`
+	AssetType string   `json:"asset_type"       binding:"required"  example:"security_token"`
+	Code      string   `json:"code"       binding:"required"  example:"USDC"`
+	Limit     *int     `json:"limit"         example:"1000"`
+	Amount    string   `json:"amount"        example:"1000"`
+	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
 }
 
 type BurnAssetRequest struct {
@@ -66,10 +74,10 @@ type TransferAssetRequest struct {
 
 type UpdateAuthFlagsRequest struct {
 	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
-	Issuer     int      `json:"issuer"       binding:"required"  example:"KSJDS..."`
+	Issuer     int      `json:"issuer"       binding:"required"  example:"2"`
 	Code       string   `json:"code"       binding:"required"  example:"USDC"`
-	SetFlags   []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
-	ClearFlags []string `json:"clear_flags"       example:"[\"AUTH_IMMUTABLE\"]"`
+	SetFlags   []string `json:"set_flags"   example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	ClearFlags []string `json:"clear_flags"  example:"[\"AUTH_IMMUTABLE\"]"`
 }
 
 // @Summary     Create a new asset
@@ -90,7 +98,12 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+
+	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
@@ -134,6 +147,34 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 			Origin:     distPk,
 		},
 	}
+
+	if request.Amount != "" {
+		ops = append(ops, entity.Operation{
+			Type:    entity.PaymentOp,
+			Sponsor: sponsor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   request.Code,
+				Issuer: issuerPk,
+			},
+			Amount: request.Amount,
+			Origin: issuerPk,
+			Target: distPk,
+		})
+	}
+
+	if request.SetFlags != nil {
+		ops = append(ops, entity.Operation{
+			Type:    entity.SetTrustLineFlagsOp,
+			Trustor: distPk,
+			Asset: entity.OpAsset{
+				Issuer: issuerPk,
+				Code:   request.Code,
+			},
+			SetFlags: request.SetFlags,
+			Origin:   issuerPk,
+		})
+	}
+
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
@@ -150,7 +191,9 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 
 	asset := entity.Asset{
-		Code: request.Code,
+		Name:      request.Name,
+		AssetType: request.AssetType,
+		Code:      request.Code,
 		Issuer: entity.Wallet{
 			Type:   entity.IssuerType,
 			Funded: true,
@@ -497,4 +540,22 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})
+}
+
+// @Summary Get all assets
+// @Description Get all assets
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} []entity.Asset
+// @Failure     500 {object} response
+// @Router      /assets [get]
+func (r *assetsRoutes) getAllAssets(c *gin.Context) {
+	assets, err := r.as.GetAll()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		return
+	}
+
+	c.JSON(http.StatusOK, assets)
 }

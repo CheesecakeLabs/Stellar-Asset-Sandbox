@@ -4,6 +4,8 @@ definitions:
       amount:
         example: 1000000
         type: integer
+      asset_type:
+        type: string
       code:
         example: USDC
         type: string
@@ -14,6 +16,9 @@ definitions:
         type: integer
       issuer:
         $ref: '#/definitions/entity.Wallet'
+      name:
+        example: USD Coin
+        type: string
     type: object
   entity.Key:
     properties:
@@ -39,19 +44,54 @@ definitions:
         example: Admin
         type: string
     type: object
+  entity.RolePermissionResponse:
+    properties:
+      description:
+        example: Edit action
+        type: string
+      name:
+        example: Edit
+        type: string
+    type: object
   entity.User:
     properties:
-      _:
-        type: string
       created_at:
+        type: string
+      email:
         type: string
       id:
         type: string
       name:
         type: string
-      token_hash:
+      password:
+        type: string
+      role_id:
+        type: integer
+      token:
         type: string
       updated_at:
+        type: string
+    type: object
+  entity.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.UserRole:
+    properties:
+      id_role:
+        type: string
+      id_user:
         type: string
     type: object
   entity.Wallet:
@@ -105,18 +145,36 @@ definitions:
     type: object
   v1.CreateAssetRequest:
     properties:
+      amount:
+        example: "1000"
+        type: string
+      asset_type:
+        example: security_token
+        type: string
       code:
         example: USDC
         type: string
       limit:
         example: 1000
         type: integer
+      name:
+        example: USDC
+        type: string
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED"'
+        - ' "AUTH_REVOCABLE"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
       sponsor_id:
         example: 2
         type: integer
     required:
+    - asset_type
     - code
-    - sponsor_id
+    - name
     type: object
   v1.CreateWalletRequest:
     properties:
@@ -179,6 +237,34 @@ definitions:
     - sponsor_id
     type: object
   v1.UpdateAuthFlagsRequest:
+    properties:
+      clear_flags:
+        example:
+        - '["AUTH_IMMUTABLE"]'
+        items:
+          type: string
+        type: array
+      code:
+        example: USDC
+        type: string
+      issuer:
+        example: 2
+        type: integer
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED"'
+        - ' "AUTH_REVOCABLE"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      trustor_id:
+        example: 2
+        type: integer
+    required:
+    - code
+    - issuer
+    - trustor_id
     type: object
   v1.response:
     properties:
@@ -188,8 +274,6 @@ definitions:
     type: object
   v1.userResponse:
     properties:
-      token:
-        type: string
       user:
         $ref: '#/definitions/entity.User'
     type: object
@@ -197,6 +281,26 @@ info:
   contact: {}
 paths:
   /assets:
+    get:
+      consumes:
+      - application/json
+      description: Get all assets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Asset'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all assets
+      tags:
+      - Assets
     post:
       consumes:
       - application/json
@@ -423,24 +527,41 @@ paths:
       summary: List
       tags:
       - Role
-  /user/create:
-    post:
+  /role-permission/permissions:
+    get:
       consumes:
       - application/json
-      description: Create user
-      operationId: create
+      description: Role permissions
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.userResponse'
+            items:
+              $ref: '#/definitions/entity.RolePermissionResponse'
+            type: array
+      summary: Role permissions
+      tags:
+      - RolePermissions
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Edit users role
+      operationId: editUsersRole
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserRole'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Create user
+      summary: Edit users role
       tags:
       - user
   /user/login:
@@ -481,6 +602,21 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Logout User
+      tags:
+      - user
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get PRofile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserResponse'
+      summary: GET Profile
       tags:
       - user
   /wallets:
