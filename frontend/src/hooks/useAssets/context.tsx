@@ -23,6 +23,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setLoading(true)
     try {
+      console.log(params)
       const response = await http.post(`assets`, params)
       return response.status === 200
     } catch (error) {

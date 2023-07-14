@@ -96,7 +96,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                     type="number"
                     placeholder="Initial supply"
                     {...register('initial_supply', {
-                      required: true,
+                      required: false,
                       minLength: 3,
                       maxLength: 3,
                     })}
@@ -115,7 +115,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                     type="number"
                     placeholder="Limit"
                     {...register('limit', {
-                      required: true,
+                      required: false,
                       minLength: 3,
                       maxLength: 3,
                     })}
@@ -134,7 +134,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               </FormControl>
             </Flex>
 
-            <FormControl isInvalid={errors?.password !== undefined}>
+            <FormControl>
               <FormLabel mt="1.5rem">Control mechanisms</FormLabel>
               <Flex flexDir="column">
                 {assetFlags.map(assetFlag => {
@@ -153,7 +153,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               variant="primary"
               mt="1.5rem"
               isLoading={loading}
-            >
+              >
               Forge asset
             </Button>
           </form>

@@ -18,11 +18,11 @@ export const ForgeAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await forge({
-        asset_name: data.name,
+        assetName: data.name,
         code: data.code,
-        initial_supply: data.initial_supply,
-        type_asset: data.asset_type,
-        control_mechanism: ['AUTH_REQUIRED'],
+        initialSupply: data.initial_supply,
+        typeAsset: data.asset_type,
+        controlMechanism: ['AUTH_REQUIRED'],
       })
 
       if (isSuccess) {

@@ -3,6 +3,7 @@ import { Flex, Switch, Text } from '@chakra-ui/react'
 interface IRadioCard {
   title: string
   description: string
+  isChecked: boolean
 }
 
 export const RadioCard: React.FC<IRadioCard> = ({ title, description }) => {
@@ -24,6 +25,7 @@ export const RadioCard: React.FC<IRadioCard> = ({ title, description }) => {
         {description}
       </Text>
       <Switch />
+
     </Flex>
   )
 }

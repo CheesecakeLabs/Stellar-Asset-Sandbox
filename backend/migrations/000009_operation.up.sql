@@ -3,6 +3,7 @@ CREATE TABLE Operation (
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255),
     permission_id INT NOT NULL,
+    action VARCHAR(255),
     FOREIGN KEY (permission_id) REFERENCES Permission(id)
 );
 

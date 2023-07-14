@@ -1,9 +1,9 @@
 export const typesAsset = [
-  { id: 1, name: 'Security Token' },
-  { id: 2, name: 'Payment Token' },
-  { id: 3, name: 'Utility Token' },
-  { id: 4, name: 'Stablecoin' },
-  { id: 5, name: 'DeFi Token (Soroban)' },
+  { id: 'SECURITY_TOKEN', name: 'Security Token' },
+  { id: 'PAYMENT_TOKEN', name: 'Payment Token' },
+  { id: 'UTILITY_TOKEN', name: 'Utility Token' },
+  { id: 'STABLECOIN', name: 'Stablecoin' },
+  { id: 'DEFI_TOKEN_SOROBAN', name: 'DeFi Token (Soroban)' },
 ]
 
 export const assetFlags = [
