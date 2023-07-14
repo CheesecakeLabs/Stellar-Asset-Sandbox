@@ -3,7 +3,7 @@ version: '3.7'
 services:
   postgres:
     container_name: postgres
-    profiles: ["tests"]
+    profiles: ["all", "starlabs" , "tests"]
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -25,7 +25,7 @@ services:
   
   backend:
     platform: linux/amd64
-    profiles: ["all", "starlabs" , "tests"]
+    profiles: ["all","tests"]
     container_name: token-factory-v2
     build:
       context: ./backend
@@ -55,8 +55,8 @@ services:
     environment:
       KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
       KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-broker:9092}
-      KAFKA_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-consumer_topic}
-      KAFKA_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-producer_topic}
+      KAFKA_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-generatedKeypairs}
+      KAFKA_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-generateKeypair}
       KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema_registry:8085}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
@@ -130,8 +130,12 @@ services:
       "
       # blocks until kafka is reachable
       kafka-topics --bootstrap-server broker:9092 --list
-      kafka-topics --create --topic $$KAFKA_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
-      kafka-topics --create --topic $$KAFKA_PRODUCER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$generateKeypair --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$generatedKeypairs --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$createEnvelope --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$submitResponse --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$horizonRequest --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
+      kafka-topics --create --topic $$horizonResponse --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server broker:9092
       broker cub kafka-ready -b localhost:29092 1 20
       "
 
@@ -150,8 +154,12 @@ services:
     environment:
       KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
       KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-broker:9092}
-      KAFKA_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-consumer_topic}
-      KAFKA_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-producer_topic}
+      KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-horizonResponse}
+      KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_PRODUCER_TOPIC:-horizonRequest}
+      KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
+      KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-createEnvelope}
+      KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-generatedKeypairs}
+      KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-generateKeypair}
       KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema_registry:8085}
     depends_on:
       broker:

@@ -18,11 +18,12 @@ type assetsRoutes struct {
 	w  usecase.WalletUseCase
 	as usecase.AssetUseCase
 	m  HTTPControllerMessenger
+	a  usecase.AuthUseCase
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger) {
-	r := &assetsRoutes{w, as, m}
-	h := handler.Group("/assets")
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
+	r := &assetsRoutes{w, as, m, a}
+	h := handler.Group("/assets").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllAssets)
 		h.POST("", r.createAsset)

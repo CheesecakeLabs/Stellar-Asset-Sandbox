@@ -43,7 +43,7 @@ func NewRouter(
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController)
-		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController)
+		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
 	}
