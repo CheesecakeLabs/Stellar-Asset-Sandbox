@@ -14,8 +14,6 @@ services:
        - postgres:/data/postgres
     ports:
       - "5432:5432"
-    networks:
-      - stellar-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
@@ -31,8 +29,6 @@ services:
       context: ./backend
       dockerfile: dev.Dockerfile
     image: mullberry-backend
-    networks:
-      - stellar-network
     ports:
       - "8080:8080"
     volumes:
@@ -45,18 +41,19 @@ services:
     platform: linux/amd64
     profiles: ["all", "starlabs" , "tests"]
     container_name: kms
-    networks:
-      - stellar-network
     build:
       context: ./stellar-kms
       dockerfile: dev.Dockerfile
     volumes:
       - '.:/workspace'
     environment:
+      KAFKA_ENABLLE: ${KAFKA_ENABLLE:-True}
       KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
       KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-kafka1:19092}
-      KAFKA_CONSUMER_TOPICS: ${KMS_KAFKA_CONSUMER_TOPICS:-kms_input}
-      KAFKA_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-kms_output}
+      KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KMS_KAFKA_CONSUMER_TOPICS:-kms_input}
+      KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-kms_output}
+      KAFKA_SIGN_CONSUMER_TOPICS: ${KAFKA_SIGN_CONSUMER_TOPICS:-horizon_input}
+      KAFKA_SIGN_PRODUCER_TOPIC: ${KAFKA_SIGN_PRODUCER_TOPIC:-horizon_output}
       KAFKA_SCHEMA_REGISTRY_URL: ${KAFKA_SCHEMA_REGISTRY_URL:-http://schema_registry:8085}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
@@ -66,6 +63,8 @@ services:
       MASTER_KEY: ${MASTER_KEY:-da52f130e6fd477256b0c554aba89503}
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka1:
         condition: service_healthy
 
   zoo1:
@@ -187,8 +186,7 @@ services:
     platform: linux/amd64
     profiles: ["all", "starlabs" , "tests"]
     container_name: starlabs
-    networks:
-      - stellar-network
+
     build:
       context: ./starlabs
       dockerfile: dev.Dockerfile
@@ -211,8 +209,6 @@ services:
   integration:
     profiles: ["tests" ]
     platform: linux/amd64
-    networks:
-      - stellar-network
     build:
       context: ./backend
       dockerfile: integration-test/Dockerfile
@@ -225,6 +221,3 @@ services:
 
 volumes:
     postgres:
-
-networks:
-  stellar-network:
