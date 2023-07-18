@@ -137,14 +137,23 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             <FormControl>
               <FormLabel mt="1.5rem">Control mechanisms</FormLabel>
               <Flex flexDir="column">
-                {assetFlags.map(assetFlag => {
-                  return (
+                {assetFlags.map(assetFlag => (
                     <RadioCard
+                      register={register}
                       title={assetFlag.title}
                       description={assetFlag.description}
-                    />
-                  )
-                })}
+                      value={assetFlag.flag}
+                      />
+                  // return {...register(assetFlag.name)}
+
+                    // <RadioCard
+                    //   name={assetFlag.name}
+                    //   isChecked={assetFlag.isChecked}
+                    //   title={assetFlag.title}
+                    //   description={assetFlag.description}
+                    //   />
+                // )
+                ))}
               </Flex>
             </FormControl>
 

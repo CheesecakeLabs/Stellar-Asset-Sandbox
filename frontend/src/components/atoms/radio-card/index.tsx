@@ -1,12 +1,15 @@
 import { Flex, Switch, Text } from '@chakra-ui/react'
+import {UseFormRegister} from "react-hook-form/dist/types/form";
+import {FieldValues} from "react-hook-form";
 
 interface IRadioCard {
+  register: UseFormRegister<FieldValues>
   title: string
   description: string
-  isChecked: boolean
+  value: string
 }
 
-export const RadioCard: React.FC<IRadioCard> = ({ title, description }) => {
+export const RadioCard: React.FC<IRadioCard> = ({ title, description, register, value }) => {
   return (
     <Flex
       gap="1rem"
@@ -24,7 +27,11 @@ export const RadioCard: React.FC<IRadioCard> = ({ title, description }) => {
       <Text fontSize="xs" color="gray.650">
         {description}
       </Text>
-      <Switch />
+      <Switch
+        {...register('control_mechanisms[]')}
+        name={'control_mechanisms[]'}
+        value={value}
+        />
 
     </Flex>
   )

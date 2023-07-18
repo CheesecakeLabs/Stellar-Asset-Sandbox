@@ -22,7 +22,7 @@ export const ForgeAsset: React.FC = () => {
         code: data.code,
         initialSupply: data.initial_supply,
         typeAsset: data.asset_type,
-        controlMechanism: ['AUTH_REQUIRED'],
+        controlMechanism: data.control_mechanisms,
       })
 
       if (isSuccess) {

@@ -8,21 +8,27 @@ export const typesAsset = [
 
 export const assetFlags = [
   {
-    flag: 'auth_required',
+    name: 'auth_required',
+    flag: 'AUTH_REQUIRED',
     title: 'Authorize Required',
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+    isChecked: false
   },
   {
-    flag: 'clawback',
+    name: 'auth_clawback',
+    flag: 'AUTH_CLAWBACK_ENABLED',
     title: 'Clawback enabled',
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+    isChecked: false
   },
   {
-    flag: 'freeze',
+    name: 'auth_revocable',
+    flag: 'AUTH_REVOCABLE',
     title: 'Freeze enabled',
     description:
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+    isChecked: false
   },
 ]
