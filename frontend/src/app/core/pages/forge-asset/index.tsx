@@ -18,11 +18,12 @@ export const ForgeAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await forge({
-        assetName: data.name,
+        name: data.name,
         code: data.code,
-        initialSupply: data.initial_supply,
-        typeAsset: data.asset_type,
-        controlMechanism: data.control_mechanisms,
+        amount: data.initial_supply,
+        asset_type: data.asset_type,
+        set_flags: data.control_mechanisms,
+        sponsor_id: "2"
       })
 
       if (isSuccess) {

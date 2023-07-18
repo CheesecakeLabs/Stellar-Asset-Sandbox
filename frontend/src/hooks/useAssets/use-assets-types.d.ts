@@ -21,11 +21,13 @@ declare namespace Hooks {
     }
 
     interface IAssetRequest {
-      assetName: string
+      amount?: number
+      asset_type: number
       code: string
-      initialSupply: number
-      typeAsset: number
-      controlMechanism: string[]
+      limit?: number
+      name: string
+      set_flags?: string[]
+      sponsor_id?: string
     }
 
     interface IMintRequest {
