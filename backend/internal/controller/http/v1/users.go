@@ -71,7 +71,8 @@ func (r *usersRoutes) createUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// r.l.Error(err, "http - v1 - create")
 		// errorResponse(c, http.StatusBadRequest, "invalid request body")
-		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Abort()
 		return
 	}
 
@@ -85,8 +86,8 @@ func (r *usersRoutes) createUser(c *gin.Context) {
 
 	if err := r.t.CreateUser(user); err != nil {
 		// r.l.Error(err, "http - v1 - create")
-		// errorResponse(c, http.StatusInternalServerError, "database problems")
-		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Abort()
 		return
 	}
 
@@ -220,7 +221,6 @@ func (r *usersRoutes) editUsersRole(c *gin.Context) {
 func (r *usersRoutes) getProfile(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	profile, err := r.t.GetProfile(token)
-
 	if err != nil {
 		// r.l.Error(err, "http - v1 - history")
 		// errorResponse(c, http.StatusInternalServerError, "database problems")
