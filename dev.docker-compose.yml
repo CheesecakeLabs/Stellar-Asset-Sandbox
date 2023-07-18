@@ -1,9 +1,9 @@
-version: '3.7'
+version: "3.7"
 
 services:
   postgres:
     container_name: postgres
-    profiles: ["all", "starlabs" , "tests"]
+    profiles: ["all", "starlabs", "tests"]
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -11,19 +11,23 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       PGDATA: /data/postgres
     volumes:
-       - postgres:/data/postgres
+      - postgres:/data/postgres
     ports:
       - "5432:5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+        ]
       interval: 10s
       timeout: 3s
       retries: 3
-  
+
   backend:
     platform: linux/amd64
-    profiles: ["all","tests"]
+    profiles: ["all", "tests"]
     container_name: token-factory-v2
     build:
       context: ./backend
@@ -39,15 +43,15 @@ services:
 
   stellar-kms:
     platform: linux/amd64
-    profiles: ["all", "starlabs" , "tests"]
+    profiles: ["all", "starlabs", "tests"]
     container_name: kms
     build:
       context: ./stellar-kms
       dockerfile: dev.Dockerfile
     volumes:
-      - '.:/workspace'
+      - ".:/workspace"
     environment:
-      KAFKA_ENABLLE: ${KAFKA_ENABLLE:-True}
+      KAFKA_ENABLED: ${KAFKA_ENABLED:-True}
       KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
       KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-kafka1:19092}
       KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KMS_KAFKA_CONSUMER_TOPICS:-kms_input}
@@ -120,8 +124,8 @@ services:
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
       SCHEMA_REGISTRY_HOST_NAME: schema_registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zoo1:2181
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: '*'
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: 'GET,POST,PUT,OPTIONS'
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
+      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,OPTIONS"
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092
     healthcheck:
       start_period: 10s
@@ -137,7 +141,7 @@ services:
     profiles: ["all", "kafka", "starlabs", "kms"]
     image: confluentinc/cp-kafka:7.1.2
     container_name: kafka_init
-    entrypoint: [ '/bin/sh', '-c' ]
+    entrypoint: ["/bin/sh", "-c"]
     environment:
       KAFKA_CONSUMER_TOPICS_STARLABS: ${STARLABS_KAFKA_CONSUMER_TOPICS:-starlabs_input}
       KAFKA_PRODUCER_TOPIC_STARLABS: ${STARLABS_KAFKA_PRODUCER_TOPIC:-starlabs_output}
@@ -145,7 +149,7 @@ services:
       KAFKA_PRODUCER_TOPIC_KMS: ${KMS_KAFKA_PRODUCER_TOPIC:-kms_output}
       KAFKA_CONSUMER_TOPICS_HORIZON: ${HORIZON_KAFKA_CONSUMER_TOPICS:-horizon_input}
       KAFKA_PRODUCER_TOPIC_HORIZON: ${HORIZON_KAFKA_PRODUCER_TOPIC:-horizon_output}
-      
+
     depends_on:
       kafka1:
         condition: service_healthy
@@ -184,15 +188,16 @@ services:
   #Starlabs Service#
   starlabs:
     platform: linux/amd64
-    profiles: ["all", "starlabs" , "tests"]
+    profiles: ["all", "starlabs", "tests"]
     container_name: starlabs
 
     build:
       context: ./starlabs
       dockerfile: dev.Dockerfile
     volumes:
-      - '.:/workspace'
+      - ".:/workspace"
     environment:
+      KAFKA_ENABLED: ${KAFKA_ENABLED:-True}
       KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
       KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-kafka1:19092}
       KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_CONSUMER_TOPICS:-horizonResponse}
@@ -207,7 +212,7 @@ services:
         condition: service_healthy
 
   integration:
-    profiles: ["tests" ]
+    profiles: ["tests"]
     platform: linux/amd64
     build:
       context: ./backend
@@ -220,4 +225,4 @@ services:
       - starlabs
 
 volumes:
-    postgres:
+  postgres:
