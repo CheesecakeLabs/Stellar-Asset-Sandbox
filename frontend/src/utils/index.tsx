@@ -11,7 +11,7 @@ export const havePermission = (
   if (!permissions) return false
   return (
     permissions.filter(
-      (item: Hooks.UseAuthTypes.IPermission) => item.name === permission
+      (item: Hooks.UseAuthTypes.IPermission) => item.action === permission
     ).length > 0
   )
 }

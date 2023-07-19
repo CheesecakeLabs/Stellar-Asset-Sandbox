@@ -7,23 +7,27 @@ import { MessagesError } from 'utils/constants/messages-error'
 
 import { Sidebar } from 'components/organisms/sidebar'
 import { ForgeAssetTemplate } from 'components/templates/forge-asset'
+import {PathRoute} from "../../../../components/enums/path-route";
+import {useNavigate} from "react-router-dom";
 
 export const ForgeAsset: React.FC = () => {
   const { forge, loading } = useAssets()
   const toast = useToast()
+  const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
     try {
-      const isSuccess = await forge({
+      const asset = {
         name: data.name,
         code: data.code,
         amount: data.initial_supply,
         asset_type: data.asset_type,
         set_flags: data.control_mechanisms,
-      })
+      }
+      const isSuccess = await forge(asset)
 
       if (isSuccess) {
         setValue('amount', '')
@@ -35,6 +39,7 @@ export const ForgeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        navigate(PathRoute.MINT_ASSET, {state : asset})
         return
       }
       toastError(MessagesError.errorOccurred)
