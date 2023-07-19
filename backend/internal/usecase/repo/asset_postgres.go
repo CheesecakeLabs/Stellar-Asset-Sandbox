@@ -33,7 +33,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
-	stmt := `SELECT * FROM Asset`
+	stmt := `SELECT id, name, code, distributor_id as distributor, issuer_id as issuer FROM Asset`
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
 		return nil, fmt.Errorf("AssetRepo - GetAssets - db.Query: %w", err)
@@ -46,7 +46,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	for rows.Next() {
 		var asset entity.Asset
 
-		err = rows.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+		err = rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
 		if err != nil {
 			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
 		}

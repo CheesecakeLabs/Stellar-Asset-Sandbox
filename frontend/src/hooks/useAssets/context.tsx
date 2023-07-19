@@ -4,7 +4,6 @@ import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
-import {mockupAssets} from "../../utils/mockups";
 
 export const AssetsContext = createContext(
   {} as Hooks.UseAssetsTypes.IAssetsContext
@@ -139,18 +138,20 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
 
   const getAssets = useCallback(async (): Promise<void> => {
     setLoading(true)
-    setAssets(mockupAssets)
-    // try {
-    //   const response = await http.get(`role`)
-    //   const data = response.data
-    //   if (data) {
-    //     setAssets(data)
-    //   }
-    // } catch (error) {
-    //   return
-    // } finally {
-    //   setLoading(false)
-    // }
+    try {
+      const response = await http.get(`assets`)
+      const data = response.data
+      if (data) {
+        setAssets(data)
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   return (

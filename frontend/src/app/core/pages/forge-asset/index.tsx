@@ -23,7 +23,6 @@ export const ForgeAsset: React.FC = () => {
         amount: data.initial_supply,
         asset_type: data.asset_type,
         set_flags: data.control_mechanisms,
-        sponsor_id: "2"
       })
 
       if (isSuccess) {
