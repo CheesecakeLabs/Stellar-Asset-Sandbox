@@ -213,7 +213,9 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		},
 	}
 	asset, err = r.as.Create(asset)
+	fmt.Println("asset", asset)
 	if err != nil {
+		fmt.Println("err", err)
 		errorResponse(c, http.StatusNotFound, "database problems")
 		return
 	}
@@ -239,6 +241,10 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
@@ -309,6 +315,10 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		return
 	}
 
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
@@ -373,6 +383,10 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
@@ -436,6 +450,10 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		return
 	}
 
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
