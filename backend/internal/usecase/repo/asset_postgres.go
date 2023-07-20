@@ -45,8 +45,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 
 	for rows.Next() {
 		var asset entity.Asset
-
-		err = rows.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id, &asset.Name, &asset.AssetType)
+		err = rows.Scan(&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
 		if err != nil {
 			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
 		}
