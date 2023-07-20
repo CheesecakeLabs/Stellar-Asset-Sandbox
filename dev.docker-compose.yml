@@ -144,12 +144,12 @@ services:
     container_name: kafka_init
     entrypoint: ["/bin/sh", "-c"]
     environment:
-      KAFKA_CONSUMER_TOPICS_STARLABS: ${STARLABS_KAFKA_CONSUMER_TOPICS:-starlabs_input}
-      KAFKA_PRODUCER_TOPIC_STARLABS: ${STARLABS_KAFKA_PRODUCER_TOPIC:-starlabs_output}
-      KAFKA_CONSUMER_TOPICS_KMS: ${KMS_KAFKA_CONSUMER_TOPICS:-kms_input}
-      KAFKA_PRODUCER_TOPIC_KMS: ${KMS_KAFKA_PRODUCER_TOPIC:-kms_output}
-      KAFKA_CONSUMER_TOPICS_HORIZON: ${HORIZON_KAFKA_CONSUMER_TOPICS:-horizon_input}
-      KAFKA_PRODUCER_TOPIC_HORIZON: ${HORIZON_KAFKA_PRODUCER_TOPIC:-horizon_output}
+      KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KAFKA_CREATE_KP_PRODUCER_TOPIC:-generateKeypair}
+      KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KAFKA_CREATE_KP_CONSUMER_TOPICS:-generatedKeypairs}
+      KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-createEnvelope}
+      KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
+      KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
+      KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
 
     depends_on:
       kafka1:
@@ -158,12 +158,12 @@ services:
       "
       # blocks until kafka is reachable
       kafka-topics --bootstrap-server kafka1:19092 --list
-      kafka-topics --create --topic $$KAFKA_CONSUMER_TOPICS_STARLABS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka-topics --create --topic $$KAFKA_PRODUCER_TOPIC_STARLABS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka-topics --create --topic $$KAFKA_CONSUMER_TOPICS_KMS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka-topics --create --topic $$KAFKA_PRODUCER_TOPIC_KMS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka-topics --create --topic $$KAFKA_CONSUMER_TOPICS_HORIZON --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka-topics --create --topic $$KAFKA_PRODUCER_TOPIC_HORIZON --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_CREATE_KP_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_CREATE_KP_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_ENVELOPE_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_ENVELOPE_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka1 cub kafka-ready -b kafka1:129092 1 20
       "
 
