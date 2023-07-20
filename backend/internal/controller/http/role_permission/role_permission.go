@@ -12,7 +12,6 @@ func Validate(rP usecase.RolePermissionUseCase) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		token := context.GetHeader("Authorization")
 		validate, err := rP.Validate(token, context.Request.URL.Path)
-		fmt.Println(err)
 		if validate {
 			context.Next()
 			return

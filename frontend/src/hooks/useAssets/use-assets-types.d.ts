@@ -14,7 +14,7 @@ declare namespace Hooks {
       id: number
       code: string
       name: string
-      assetType: string
+      asset_type: string
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
       supply: number

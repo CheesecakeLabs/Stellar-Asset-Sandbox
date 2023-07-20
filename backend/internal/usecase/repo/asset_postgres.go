@@ -33,7 +33,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
-	stmt := `SELECT id, name, code, distributor_id as distributor, issuer_id as issuer FROM Asset`
+	stmt := `SELECT id, name, code, distributor_id as distributor, issuer_id as issuer, asset_type FROM Asset`
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
 		return nil, fmt.Errorf("AssetRepo - GetAssets - db.Query: %w", err)
@@ -46,7 +46,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	for rows.Next() {
 		var asset entity.Asset
 
-		err = rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+		err = rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id, &asset.AssetType)
 		if err != nil {
 			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
 		}
@@ -58,11 +58,12 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
-	smtp := `SELECT * FROM Asset WHERE code=$1`
+	smtp := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE code=$1`
 	row := r.Db.QueryRow(smtp, code)
 
 	var asset entity.Asset
 	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	fmt.Println(err)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetByCode - asset not found")
@@ -75,8 +76,8 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id) VALUES ($1, $2, $3) RETURNING id;`
-	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id).Scan(&res.Id)
+	stmt := `INSERT INTO Asset (name, code, distributor_id, issuer_id, asset_type) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Name, data.Code, data.Distributor.Id, data.Issuer.Id, data.AssetType).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
 	}

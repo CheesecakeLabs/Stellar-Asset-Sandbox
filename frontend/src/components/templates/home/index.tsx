@@ -73,7 +73,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     borderColor={'gray.400'}
                     _dark={{ borderColor: 'black.800' }}
                   >
-                    Supply
+                    Asset type
                   </Th>
                   <Th
                     borderColor={'gray.400'}
@@ -116,7 +116,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
                     >
-                      {asset.supply}
+                      {asset.asset_type}
                     </Td>
                     <Td
                       borderColor={'gray.400'}
