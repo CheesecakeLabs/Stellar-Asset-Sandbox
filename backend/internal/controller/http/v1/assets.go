@@ -67,7 +67,7 @@ type ClawbackAssetRequest struct {
 
 type TransferAssetRequest struct {
 	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
-	SponsorId           int    `json:"sponsor_id" binding:"required" example:"2"`
+	SponsorId           int    `json:"sponsor_id" example:"2"`
 	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
 	AssetID             string `json:"asset_id" binding:"required" example:"12"`
 	Amount              string `json:"amount" binding:"required" example:"12"`
@@ -303,7 +303,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.Get(request.Id)
+	asset, err := r.as.GetById(request.Id)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
@@ -386,7 +386,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.Get(request.AssetID)
+	asset, err := r.as.GetById(request.AssetID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return

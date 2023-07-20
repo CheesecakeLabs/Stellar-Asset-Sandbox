@@ -83,3 +83,17 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 
 	return res, nil
 }
+
+func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
+	stmt := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE id=$1`
+	row := r.Db.QueryRow(stmt, id)
+	var asset entity.Asset
+	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - asset not found")
+		}
+		return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - row.Scan: %w", err)
+	}
+	return asset, nil
+}
