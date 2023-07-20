@@ -35,6 +35,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	stmt := `SELECT id, name, code, distributor_id as distributor, issuer_id as issuer, asset_type FROM Asset`
 	rows, err := r.Db.Query(stmt)
+	fmt.Println(err)
 	if err != nil {
 		return nil, fmt.Errorf("AssetRepo - GetAssets - db.Query: %w", err)
 	}
@@ -47,6 +48,8 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 		var asset entity.Asset
 
 		err = rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id, &asset.AssetType)
+		fmt.Println(err)
+
 		if err != nil {
 			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
 		}
@@ -76,11 +79,25 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (name, code, distributor_id, issuer_id, asset_type) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
-	err := r.Db.QueryRow(stmt, data.Name, data.Code, data.Distributor.Id, data.Issuer.Id, data.AssetType).Scan(&res.Id)
+	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type) VALUES ($1, $2, $3,$4, $5) RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
 	}
 
 	return res, nil
+}
+
+func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
+	stmt := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE id=$1`
+	row := r.Db.QueryRow(stmt, id)
+	var asset entity.Asset
+	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - asset not found")
+		}
+		return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - row.Scan: %w", err)
+	}
+	return asset, nil
 }

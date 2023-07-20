@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	_startingBalance = "10"
+	_startingBalance = "1000"
 	_sponsorId       = 1
 )
 
@@ -47,19 +47,19 @@ type CreateAssetRequest struct {
 
 type BurnAssetRequest struct {
 	Id        string `json:"id"       binding:"required"  example:"001"`
-	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	SponsorId int    `json:"sponsor_id"        example:"2"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 }
 
 type MintAssetRequest struct {
 	Id        string `json:"id"       binding:"required"  example:"12"`
-	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	SponsorId int    `json:"sponsor_id"       example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 }
 
 type ClawbackAssetRequest struct {
-	SponsorId int    `json:"sponsor_id"       binding:"required"  example:"2"`
+	SponsorId int    `json:"sponsor_id"   example:"2"`
 	Code      string `json:"code"       binding:"required"  example:"USDC"`
 	Amount    string `json:"amount"       binding:"required"  example:"1000"`
 	From      string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
@@ -67,7 +67,7 @@ type ClawbackAssetRequest struct {
 
 type TransferAssetRequest struct {
 	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
-	SponsorId           int    `json:"sponsor_id" binding:"required" example:"2"`
+	SponsorId           int    `json:"sponsor_id" example:"2"`
 	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
 	AssetID             string `json:"asset_id" binding:"required" example:"12"`
 	Amount              string `json:"amount" binding:"required" example:"12"`
@@ -239,7 +239,11 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+	_, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
@@ -250,13 +254,11 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
 	}
-
 	ops := []entity.Operation{
 		{
-			Type:    entity.PaymentOp,
-			Target:  asset.Distributor.Key.PublicKey,
-			Amount:  request.Amount,
-			Sponsor: sponsor.Key.PublicKey,
+			Type:   entity.PaymentOp,
+			Target: asset.Distributor.Key.PublicKey,
+			Amount: request.Amount,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
@@ -264,11 +266,9 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
-
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, asset.Issuer.Key.PublicKey},
-		FeeBump:    sponsor.Key.PublicKey,
+		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
@@ -303,13 +303,17 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.Get(request.Id)
+	asset, err := r.as.GetById(request.Id)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
@@ -329,9 +333,8 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Distributor.Key.PublicKey,
-		PublicKeys: []string{asset.Distributor.Key.PublicKey, sponsor.Key.PublicKey},
+		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
-		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
@@ -373,13 +376,17 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
 	}
 
-	asset, err := r.as.Get(request.AssetID)
+	asset, err := r.as.GetById(request.AssetID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
@@ -400,8 +407,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
-		PublicKeys: []string{sourceWallet.Key.PublicKey, sponsor.Key.PublicKey},
-		FeeBump:    sponsor.Key.PublicKey,
+		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
@@ -436,7 +442,11 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		return
 	}
 
-	sponsor, err := r.w.Get(request.SponsorId)
+	sponsorID := request.SponsorId
+	if sponsorID == 0 {
+		sponsorID = _sponsorId
+	}
+	_, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
@@ -463,8 +473,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, asset.Issuer.Key.PublicKey},
-		FeeBump:    sponsor.Key.PublicKey,
+		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
@@ -525,8 +534,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
-		PublicKeys: []string{trustor.Key.PublicKey, asset.Issuer.Key.PublicKey},
-		FeeBump:    trustor.Key.PublicKey,
+		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {

@@ -45,6 +45,56 @@ func (uc *AssetUseCase) Get(code string) (entity.Asset, error) {
 		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetAssetByCode: %w", err)
 	}
 
+	asset.Issuer, err = uc.wRepo.GetWallet(asset.Issuer.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetWallet: %w", err)
+	}
+
+	asset.Issuer.Key, err = uc.wRepo.GetKeyByWallet(asset.Issuer.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
+	}
+
+	asset.Distributor, err = uc.wRepo.GetWallet(asset.Distributor.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetWallet: %w", err)
+	}
+
+	asset.Distributor.Key, err = uc.wRepo.GetKeyByWallet(asset.Distributor.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
+	}
+	return asset, nil
+}
+
+func (uc *AssetUseCase) GetById(id string) (entity.Asset, error) {
+	asset, err := uc.aRepo.GetAssetById(id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetAssetByCode: %w", err)
+	}
+
+	wallet, err := uc.wRepo.GetWallet(asset.Issuer.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetWallet: %w", err)
+	}
+
+	wallet.Key, err = uc.wRepo.GetKeyByWallet(wallet.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
+	}
+
+	asset.Issuer = wallet
+
+	asset.Distributor, err = uc.wRepo.GetWallet(asset.Distributor.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("AssetUseCase - Get - uc.repo.GetWallet: %w", err)
+	}
+
+	asset.Distributor.Key, err = uc.wRepo.GetKeyByWallet(asset.Distributor.Id)
+	if err != nil {
+		return entity.Asset{}, fmt.Errorf("WalletUseCase - Get - uc.repo.GetKey: %w", err)
+	}
+
 	return asset, nil
 }
 
