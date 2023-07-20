@@ -46,7 +46,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	for rows.Next() {
 		var asset entity.Asset
 
-		err = rows.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+		err = rows.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id, &asset.Name, &asset.AssetType)
 		if err != nil {
 			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
 		}
@@ -58,7 +58,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
-	smtp := `SELECT * FROM Asset WHERE code=$1`
+	smtp := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE code=$1`
 	row := r.Db.QueryRow(smtp, code)
 
 	var asset entity.Asset
