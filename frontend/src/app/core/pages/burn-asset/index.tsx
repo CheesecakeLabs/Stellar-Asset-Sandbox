@@ -25,9 +25,9 @@ export const BurnAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await burn({
-        id: 1,
+        id: asset.id.toString(),
         code: asset.code,
-        sponsor_id: asset.issuer.id,
+        sponsor_id: 1,
         amount: data.amount,
       })
 

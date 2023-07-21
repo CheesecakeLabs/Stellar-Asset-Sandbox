@@ -24,9 +24,9 @@ export const MintAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await mint({
-        id: 1,
+        id: asset.id.toString(),
         code: asset.code,
-        sponsor_id: asset.issuer.id,
+        sponsor_id: 1,
         amount: data.amount,
       })
 

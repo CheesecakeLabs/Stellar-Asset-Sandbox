@@ -24,13 +24,13 @@ export const FreezeAccount: React.FC = () => {
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
     try {
-      const isSuccess = await freeze({
-        clear_flags: ['auth_revocable_flag'],
-        code: asset.code,
-        issuer_id: asset.issuer.id,
-        order: 1,
-        trustor_id: data.trustor_id,
-      })
+      const isSuccess = await freeze(
+          {
+            trustor_pk: data.wallet,
+            issuer: asset.issuer.id,
+            code: asset.code,
+            clear_flags: ["TRUST_LINE_AUTHORIZED"]
+          })
 
       if (isSuccess) {
         setValue('trustor_id', '')

@@ -25,8 +25,10 @@ export const AuthorizeAccount: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await authorize({
-        wallet: data.wallet,
-        asset_id: asset.id,
+        trustor_pk: data.wallet,
+        issuer: asset.issuer.id,
+        code: asset.code,
+        set_flags: ["TRUST_LINE_AUTHORIZED"]
       })
 
       if (isSuccess) {

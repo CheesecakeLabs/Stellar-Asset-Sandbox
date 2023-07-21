@@ -90,7 +90,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setLoading(true)
     try {
-      const response = await http.post(`assets/authorize`, params)
+      const response = await http.post(`assets/update-auth-flags`, params)
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -107,7 +107,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setLoading(true)
     try {
-      const response = await http.post(`assets/freeze`, params)
+      const response = await http.post(`assets/update-auth-flags`, params)
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {

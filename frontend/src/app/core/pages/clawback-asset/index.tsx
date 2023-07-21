@@ -25,11 +25,10 @@ export const ClawbackAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await clawback({
+        sponsor_id: 1,
         amount: data.amount,
-        claimable_id: 0,
         code: asset.code,
         from: data.from,
-        sponsor_id: asset.issuer.id,
       })
 
       if (isSuccess) {

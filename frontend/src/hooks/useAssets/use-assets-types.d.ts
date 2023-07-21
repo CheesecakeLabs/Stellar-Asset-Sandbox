@@ -27,11 +27,11 @@ declare namespace Hooks {
       limit?: number
       name: string
       set_flags?: string[]
-      sponsor_id?: string
+      sponsor_id?: int
     }
 
     interface IMintRequest {
-      id: number
+      id: string
       code: string
       sponsor_id: number
       amount: number
@@ -46,30 +46,31 @@ declare namespace Hooks {
 
     interface IDistributeRequest {
       source_wallet_id: number
-      destination_wallet_id: number
+      destination_wallet_pk: number
       asset_id: number
       amount: number
-    }
-
-    interface IClawbackRequest {
-      amount: number
-      claimable_id: number
-      code: string
-      from: string
       sponsor_id: number
     }
 
-    interface IFreezeRequest {
-      clear_flags: string[]
+    interface IClawbackRequest {
+      sponsor_id: number
       code: string
-      issuer_id: number
-      order: number
-      trustor_id: string
+      amount: number
+      from: string
+    }
+
+    interface IFreezeRequest {
+      issuer: number
+      code: string
+      clear_flags: string[]
+      trustor_pk: string
     }
 
     interface IAuthorizeRequest {
-      asset_id: number
-      wallet: string
+      trustor_pk: string,
+      issuer: number,
+      code: string,
+      set_flags: string[]
     }
 
     interface IAssetsContext {

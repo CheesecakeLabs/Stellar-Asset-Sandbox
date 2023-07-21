@@ -84,7 +84,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   {...register('code', {
                     required: true,
                     minLength: 3,
-                    maxLength: 3,
+                    maxLength: 12,
                   })}
                 />
                 <FormErrorMessage>Code must be 3 characters</FormErrorMessage>
@@ -98,7 +98,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                     {...register('initial_supply', {
                       required: false,
                       minLength: 3,
-                      maxLength: 3,
+                      maxLength: 922337203685,
                     })}
                 />
               </FormControl>

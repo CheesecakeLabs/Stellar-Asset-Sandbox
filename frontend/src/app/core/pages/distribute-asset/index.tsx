@@ -26,8 +26,9 @@ export const DistributeAsset: React.FC = () => {
     try {
       const isSuccess = await distribute({
         source_wallet_id: asset.issuer.id,
-        destination_wallet_id: data.destination_wallet_id,
-        asset_id: asset.id,
+        destination_wallet_pk: data.destination_wallet_id,
+        asset_id: asset.id.toString(),
+        sponsor_id: 1,
         amount: data.amount,
       })
 
