@@ -42,7 +42,7 @@ type CreateAssetRequest struct {
 	Code      string   `json:"code"       binding:"required"  example:"USDC"`
 	Limit     *int     `json:"limit"         example:"1000"`
 	Amount    string   `json:"amount"        example:"1000"`
-	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
 }
 
 type BurnAssetRequest struct {
@@ -77,8 +77,8 @@ type UpdateAuthFlagsRequest struct {
 	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
 	Issuer     int      `json:"issuer"       binding:"required"  example:"2"`
 	Code       string   `json:"code"       binding:"required"  example:"USDC"`
-	SetFlags   []string `json:"set_flags"   example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
-	ClearFlags []string `json:"clear_flags"  example:"[\"AUTH_IMMUTABLE\"]"`
+	SetFlags   []string `json:"set_flags"   example:"[\"TRUST_LINE_AUTHORIZED\", \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\",\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
+	ClearFlags []string `json:"clear_flags"  example:"[\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
 }
 
 // @Summary     Create a new asset
