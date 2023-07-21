@@ -178,7 +178,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
+		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
