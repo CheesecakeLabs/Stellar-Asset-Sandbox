@@ -250,7 +250,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.Get(request.Code)
+	asset, err := r.as.GetById(request.Id)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return

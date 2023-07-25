@@ -414,6 +414,21 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssetByCode(arg0 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetByCode", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssetByCode), arg0)
 }
 
+// GetAssetById mocks base method.
+func (m *MockAssetRepoInterface) GetAssetById(arg0 string) (entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetById", arg0)
+	ret0, _ := ret[0].(entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetById indicates an expected call of GetAssetById.
+func (mr *MockAssetRepoInterfaceMockRecorder) GetAssetById(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetById", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssetById), arg0)
+}
+
 // GetAssets mocks base method.
 func (m *MockAssetRepoInterface) GetAssets() ([]entity.Asset, error) {
 	m.ctrl.T.Helper()

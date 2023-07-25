@@ -33,41 +33,91 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
-	stmt := `SELECT * FROM Asset`
-	rows, err := r.Db.Query(stmt)
-	if err != nil {
-		return nil, fmt.Errorf("AssetRepo - GetAssets - db.Query: %w", err)
-	}
+	query := `
+		SELECT 
+			a.id AS asset_id, a.name AS asset_name, a.asset_type,
+			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+		FROM asset a
+		JOIN wallet d ON a.distributor_id = d.id
+		JOIN key dk ON d.id = dk.wallet_id
+		JOIN wallet i ON a.issuer_id = i.id
+		JOIN key ik ON i.id = ik.wallet_id;
+	`
 
+	rows, err := r.Db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("AssetRepo - GetAllAssets - Query: %w", err)
+	}
 	defer rows.Close()
 
-	entities := make([]entity.Asset, 0, _defaultEntityCap)
+	var assets []entity.Asset
 
 	for rows.Next() {
 		var asset entity.Asset
-		err = rows.Scan(&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+		var distributor entity.Wallet
+		var issuer entity.Wallet
+
+		err := rows.Scan(
+			&asset.Id, &asset.Name, &asset.AssetType,
+			&distributor.Id, &distributor.Type, &distributor.Funded,
+			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
+			&issuer.Id, &issuer.Type, &issuer.Funded,
+			&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
+		)
 		if err != nil {
-			return nil, fmt.Errorf("AssetRepo - GetAssets - rows.Scan: %w", err)
+			return nil, fmt.Errorf("AssetRepo - GetAllAssets - row.Scan: %w", err)
 		}
 
-		entities = append(entities, asset)
+		asset.Distributor = distributor
+		asset.Issuer = issuer
+
+		assets = append(assets, asset)
 	}
 
-	return entities, nil
+	return assets, nil
 }
 
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
-	smtp := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE code=$1`
-	row := r.Db.QueryRow(smtp, code)
+	query := `
+		SELECT 
+			a.id AS asset_id, a.name AS asset_name, a.asset_type,
+			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+		FROM asset a
+		JOIN wallet d ON a.distributor_id = d.id
+		JOIN key dk ON d.id = dk.wallet_id
+		JOIN wallet i ON a.issuer_id = i.id
+		JOIN key ik ON i.id = ik.wallet_id
+		WHERE a.code = $1;
+	`
+
+	row := r.Db.QueryRow(query, code)
 
 	var asset entity.Asset
-	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	var distributor entity.Wallet
+	var issuer entity.Wallet
+
+	err := row.Scan(
+		&asset.Id, &asset.Name, &asset.AssetType,
+		&distributor.Id, &distributor.Type, &distributor.Funded,
+		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
+		&issuer.Id, &issuer.Type, &issuer.Funded,
+		&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetByCode - asset not found")
 		}
 		return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetByCode - row.Scan: %w", err)
 	}
+
+	asset.Distributor = distributor
+	asset.Issuer = issuer
 
 	return asset, nil
 }
@@ -84,15 +134,43 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 }
 
 func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
-	stmt := `SELECT id, code, distributor_id, issuer_id FROM Asset WHERE id=$1`
-	row := r.Db.QueryRow(stmt, id)
+	query := `
+		SELECT 
+			a.id AS asset_id, a.name AS asset_name, a.asset_type,
+			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+		FROM asset a
+		JOIN wallet d ON a.distributor_id = d.id
+		JOIN key dk ON d.id = dk.wallet_id
+		JOIN wallet i ON a.issuer_id = i.id
+		JOIN key ik ON i.id = ik.wallet_id
+		WHERE a.id = $1;
+	`
+
+	row := r.Db.QueryRow(query, id)
+
 	var asset entity.Asset
-	err := row.Scan(&asset.Id, &asset.Code, &asset.Distributor.Id, &asset.Issuer.Id)
+	var distributor entity.Wallet
+	var issuer entity.Wallet
+
+	err := row.Scan(
+		&asset.Id, &asset.Name, &asset.AssetType,
+		&distributor.Id, &distributor.Type, &distributor.Funded,
+		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
+		&issuer.Id, &issuer.Type, &issuer.Funded,
+		&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - asset not found")
 		}
 		return entity.Asset{}, fmt.Errorf("AssetRepo - GetAssetById - row.Scan: %w", err)
 	}
+
+	asset.Distributor = distributor
+	asset.Issuer = issuer
+
 	return asset, nil
 }
