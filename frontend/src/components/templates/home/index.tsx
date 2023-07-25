@@ -13,6 +13,8 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { typesAsset } from 'utils/constants/data-constants'
+
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
@@ -35,7 +37,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
           <Button
             variant="primary"
             leftIcon={<JoinIcon fill="white" />}
-            onClick={(): void => navigate({pathname: PathRoute.FORGE_ASSET})}
+            onClick={(): void => navigate({ pathname: PathRoute.FORGE_ASSET })}
           >
             Forge asset
           </Button>
@@ -85,11 +87,12 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
               </Thead>
               <Tbody>
                 {assets.map(asset => (
-
                   <Tr
                     borderColor="red"
                     cursor="pointer"
-                    onClick={(): void => navigate(PathRoute.MINT_ASSET, {state : asset})}
+                    onClick={(): void =>
+                      navigate(PathRoute.MINT_ASSET, { state: asset })
+                    }
                     fill="black"
                     stroke="black"
                     _dark={{ fill: 'white', stroke: 'white' }}
@@ -116,7 +119,8 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
                     >
-                      {asset.asset_type}
+                      {typesAsset.find(type => type.id === asset.asset_type)
+                        ?.name || ''}
                     </Td>
                     <Td
                       borderColor={'gray.400'}

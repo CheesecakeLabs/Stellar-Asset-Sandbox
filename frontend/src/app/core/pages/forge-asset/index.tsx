@@ -1,14 +1,14 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { MessagesError } from 'utils/constants/messages-error'
 
+import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ForgeAssetTemplate } from 'components/templates/forge-asset'
-import {PathRoute} from "../../../../components/enums/path-route";
-import {useNavigate} from "react-router-dom";
 
 export const ForgeAsset: React.FC = () => {
   const { forge, loading } = useAssets()
@@ -39,7 +39,7 @@ export const ForgeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        navigate(PathRoute.MINT_ASSET, {state : asset})
+        navigate(PathRoute.MINT_ASSET, { state: asset })
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -64,9 +64,8 @@ export const ForgeAsset: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar>
-        <ForgeAssetTemplate onSubmit={onSubmit}
-              loading={loading}/>
+      <Sidebar highlightMenu={PathRoute.HOME}>
+        <ForgeAssetTemplate onSubmit={onSubmit} loading={loading} />
       </Sidebar>
     </Flex>
   )

@@ -20,6 +20,7 @@ import { SidebarContent } from 'components/molecules'
 import { Header } from 'components/molecules/header'
 
 interface IProps {
+  highlightMenu: PathRoute
   children: ReactNode
 }
 
@@ -62,7 +63,7 @@ const linkItems: ILinkItemProps[] = [
   },
 ]
 
-export const Sidebar: React.FC<IProps> = ({ children }) => {
+export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
@@ -73,6 +74,7 @@ export const Sidebar: React.FC<IProps> = ({ children }) => {
           items={linkItems}
           onClose={(): void => onClose()}
           display={{ base: 'none', md: 'block' }}
+          highlightMenu={highlightMenu}
         />
         <Drawer
           autoFocus={false}
@@ -84,7 +86,11 @@ export const Sidebar: React.FC<IProps> = ({ children }) => {
           size="full"
         >
           <DrawerContent>
-            <SidebarContent items={linkItems} onClose={onClose} />
+            <SidebarContent
+              items={linkItems}
+              onClose={onClose}
+              highlightMenu={highlightMenu}
+            />
           </DrawerContent>
         </Drawer>
         <Box ml={{ base: 0, md: '282px' }} p="4" w="full">

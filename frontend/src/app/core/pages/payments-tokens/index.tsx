@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 
+import { PaymentsTokensTemplate } from '../../../../components/templates/payments-tokens'
+import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
-import { ProfileTemplate } from 'components/templates/profile'
-import {PaymentsTokensTemplate} from "../../../../components/templates/payments-tokens";
 
 export const PaymentsTokens: React.FC = () => {
   const navigate = useNavigate()
@@ -29,7 +29,7 @@ export const PaymentsTokens: React.FC = () => {
   }
 
   const handleEditRole = async (
-      params: Hooks.UseAuthTypes.IUserRole
+    params: Hooks.UseAuthTypes.IUserRole
   ): Promise<boolean> => {
     const isEdited = await editProfile(params)
 
@@ -46,17 +46,17 @@ export const PaymentsTokens: React.FC = () => {
   }, [getProfile, getRoles])
 
   return (
-      <Flex>
-        <Sidebar>
-          <PaymentsTokensTemplate
-              handleSignOut={handleSignOut}
-              loading={loading}
-              profile={profile}
-              handleEditRole={handleEditRole}
-              roles={roles}
-              loadingRoles={loadingRoles}
-          />
-        </Sidebar>
-      </Flex>
+    <Flex>
+      <Sidebar highlightMenu={PathRoute.HOME}>
+        <PaymentsTokensTemplate
+          handleSignOut={handleSignOut}
+          loading={loading}
+          profile={profile}
+          handleEditRole={handleEditRole}
+          roles={roles}
+          loadingRoles={loadingRoles}
+        />
+      </Sidebar>
+    </Flex>
   )
 }
