@@ -130,12 +130,14 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 			Type:   entity.CreateAccountOp,
 			Target: issuerPk,
 			Amount: _startingBalance,
+			// Sponsor: sponsor.Key.PublicKey,
 			Origin: sponsor.Key.PublicKey,
 		},
 		{
 			Type:   entity.CreateAccountOp,
 			Target: distPk,
 			Amount: _startingBalance,
+			// Sponsor: sponsor.Key.PublicKey,
 			Origin: sponsor.Key.PublicKey,
 		},
 		{
@@ -392,7 +394,6 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
 	}
-
 	ops := []entity.Operation{
 		{
 			Type:   entity.PaymentOp,
@@ -461,10 +462,11 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.ClawbackOp,
-			Origin: asset.Issuer.Key.PublicKey,
-			Target: request.From,
-			Amount: request.Amount,
+			Type:    entity.ClawbackOp,
+			Target:  asset.Issuer.Key.PublicKey,
+			Origin:  request.From,
+			Amount:  request.Amount,
+			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
