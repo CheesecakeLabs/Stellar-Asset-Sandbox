@@ -61,6 +61,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <Input
                 type="text"
                 placeholder="Asset name"
+                autoComplete="off"
                 {...register('name', {
                   required: true,
                   minLength: 3,
@@ -81,6 +82,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                 <Input
                   type="text"
                   placeholder="Code"
+                  autoComplete="off"
                   {...register('code', {
                     required: true,
                     minLength: 3,
@@ -93,13 +95,13 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel>Initial supply</FormLabel>
                 <Input
-                    type="number"
-                    placeholder="Initial supply"
-                    {...register('initial_supply', {
-                      required: false,
-                      minLength: 3,
-                      maxLength: 922337203685,
-                    })}
+                  type="number"
+                  placeholder="Initial supply"
+                  {...register('initial_supply', {
+                    required: false,
+                    minLength: 3,
+                    maxLength: 922337203685,
+                  })}
                 />
               </FormControl>
             </Flex>
@@ -108,17 +110,17 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               flexDir={{ md: 'row', sm: 'column' }}
               gap="1.5rem"
               mt="1.5rem"
-              >
+            >
               <FormControl>
                 <FormLabel>Limit</FormLabel>
                 <Input
-                    type="number"
-                    placeholder="Limit"
-                    {...register('limit', {
-                      required: false,
-                      minLength: 3,
-                      maxLength: 3,
-                    })}
+                  type="number"
+                  placeholder="Limit"
+                  {...register('limit', {
+                    required: false,
+                    minLength: 3,
+                    maxLength: 3,
+                  })}
                 />
               </FormControl>
               <FormControl>
@@ -126,7 +128,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                 <Select
                   {...register('asset_type', { required: true })}
                   defaultValue={typesAsset[0].id}
-                  >
+                >
                   {typesAsset.map(typeAsset => (
                     <option value={typeAsset.id}>{typeAsset.name}</option>
                   ))}
@@ -138,21 +140,12 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormLabel mt="1.5rem">Control mechanisms</FormLabel>
               <Flex flexDir="column">
                 {assetFlags.map(assetFlag => (
-                    <RadioCard
-                      register={register}
-                      title={assetFlag.title}
-                      description={assetFlag.description}
-                      value={assetFlag.flag}
-                      />
-                  // return {...register(assetFlag.name)}
-
-                    // <RadioCard
-                    //   name={assetFlag.name}
-                    //   isChecked={assetFlag.isChecked}
-                    //   title={assetFlag.title}
-                    //   description={assetFlag.description}
-                    //   />
-                // )
+                  <RadioCard
+                    register={register}
+                    title={assetFlag.title}
+                    description={assetFlag.description}
+                    value={assetFlag.flag}
+                  />
                 ))}
               </Flex>
             </FormControl>
@@ -162,7 +155,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               variant="primary"
               mt="1.5rem"
               isLoading={loading}
-              >
+            >
               Forge asset
             </Button>
           </form>

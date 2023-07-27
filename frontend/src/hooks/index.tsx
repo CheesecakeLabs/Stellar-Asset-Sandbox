@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 
 import { AssetsProvider } from './useAssets/context'
 import { AuthProvider } from './useAuth/context'
+import { HorizonProvider } from './useHorizon/context'
 
 interface IProps {
   children: ReactNode
@@ -10,7 +11,9 @@ interface IProps {
 export const AppProvider: React.FC<IProps> = ({ children }) => {
   return (
     <AuthProvider>
-      <AssetsProvider>{children}</AssetsProvider>
+      <HorizonProvider>
+        <AssetsProvider>{children}</AssetsProvider>
+      </HorizonProvider>
     </AuthProvider>
   )
 }

@@ -14,6 +14,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { typesAsset } from 'utils/constants/data-constants'
+import { toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
@@ -29,7 +30,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="680px" alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
             Asset Management
@@ -75,6 +76,13 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     borderColor={'gray.400'}
                     _dark={{ borderColor: 'black.800' }}
                   >
+                    Supply
+                  </Th>
+                  <Th
+                    color={'gray.700'}
+                    borderColor={'gray.400'}
+                    _dark={{ borderColor: 'black.800' }}
+                  >
                     Asset type
                   </Th>
                   <Th
@@ -114,6 +122,14 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                       _dark={{ borderColor: 'black.800' }}
                     >
                       {asset.name}
+                    </Td>
+                    <Td
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                    >
+                      {asset.assetData
+                        ? toCrypto(Number(asset.assetData?.amount))
+                        : '-'}
                     </Td>
                     <Td
                       borderColor={'gray.400'}

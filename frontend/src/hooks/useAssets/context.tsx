@@ -1,6 +1,7 @@
-import {createContext, useCallback, useState} from 'react'
+import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
@@ -15,15 +16,21 @@ interface IProps {
 
 export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [loading, setLoading] = useState(false)
-  const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[] | undefined>()
+  const [assets, setAssets] = useState<
+    Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  >()
+  const { getAssetData } = useHorizon()
 
   const forge = async (
     params: Hooks.UseAssetsTypes.IAssetRequest
-  ): Promise<boolean> => {
+  ): Promise<Hooks.UseAssetsTypes.IAsset | undefined> => {
     setLoading(true)
     try {
       const response = await http.post(`assets`, params)
-      return response.status === 200
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -102,8 +109,8 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const freeze = async (
-    params: Hooks.UseAssetsTypes.IFreezeRequest
+  const updateAuthFlags = async (
+    params: Hooks.UseAssetsTypes.IUpdateAuthFlagsRequest
   ): Promise<boolean> => {
     setLoading(true)
     try {
@@ -142,6 +149,13 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       const response = await http.get(`assets`)
       const data = response.data
       if (data) {
+        data.forEach(async (asset: Hooks.UseAssetsTypes.IAsset) => {
+          const assetData = await getAssetData(
+            asset.code,
+            asset.issuer.key.publicKey
+          )
+          asset.assetData = assetData
+        })
         setAssets(data)
       }
     } catch (error) {
@@ -152,7 +166,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [getAssetData])
 
   return (
     <AssetsContext.Provider
@@ -162,7 +176,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         burn,
         distribute,
         authorize,
-        freeze,
+        updateAuthFlags,
         clawback,
         forge,
         getAssets,

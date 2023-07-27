@@ -1,16 +1,7 @@
-import {
-  Button,
-  Container,
-  Flex,
-  IconButton,
-  Text,
-  useColorMode,
-  useDisclosure,
-} from '@chakra-ui/react'
+import { Container, Flex, Text, useDisclosure } from '@chakra-ui/react'
 import React from 'react'
 
 import { Loading } from 'components/atoms'
-import { EditIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
 
 interface IProfileTemplate {
@@ -23,15 +14,13 @@ interface IProfileTemplate {
 }
 
 export const PaymentsTokensTemplate: React.FC<IProfileTemplate> = ({
-  handleSignOut,
   loading,
   profile,
   handleEditRole,
   loadingRoles,
   roles,
 }) => {
-  const { colorMode } = useColorMode()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onClose } = useDisclosure()
 
   return (
     <>
@@ -52,14 +41,7 @@ export const PaymentsTokensTemplate: React.FC<IProfileTemplate> = ({
             Payments Tokens
           </Text>
           <Container variant="primary">
-            {loading && !profile ? (
-              <Loading />
-            ) : (
-              <>
-
-
-              </>
-            )}
+            {loading && !profile ? <Loading /> : <></>}
           </Container>
         </Flex>
       </Flex>

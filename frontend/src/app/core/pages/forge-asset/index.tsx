@@ -27,9 +27,9 @@ export const ForgeAsset: React.FC = () => {
         asset_type: data.asset_type,
         set_flags: data.control_mechanisms,
       }
-      const isSuccess = await forge(asset)
+      const assetForged = await forge(asset)
 
-      if (isSuccess) {
+      if (assetForged) {
         setValue('amount', '')
         toast({
           title: 'Forge success!',
@@ -39,7 +39,7 @@ export const ForgeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        navigate(PathRoute.MINT_ASSET, { state: asset })
+        navigate(PathRoute.MINT_ASSET, { state: assetForged })
         return
       }
       toastError(MessagesError.errorOccurred)

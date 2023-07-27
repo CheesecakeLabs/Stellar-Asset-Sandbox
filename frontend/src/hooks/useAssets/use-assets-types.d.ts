@@ -8,6 +8,7 @@ declare namespace Hooks {
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
       supply: number
+      assetData: Hooks.UseHorizonTypes.IAsset | undefined
     }
 
     interface IAssetDto {
@@ -18,6 +19,7 @@ declare namespace Hooks {
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
       supply: number
+      assetData: Hooks.UseHorizonTypes.IAsset | undefined
     }
 
     interface IAssetRequest {
@@ -59,17 +61,18 @@ declare namespace Hooks {
       from: string
     }
 
-    interface IFreezeRequest {
+    interface IUpdateAuthFlagsRequest {
       issuer: number
       code: string
       clear_flags: string[]
       trustor_pk: string
+      set_flags: string[]
     }
 
     interface IAuthorizeRequest {
-      trustor_pk: string,
-      issuer: number,
-      code: string,
+      trustor_pk: string
+      issuer: number
+      code: string
       set_flags: string[]
     }
 
@@ -79,9 +82,9 @@ declare namespace Hooks {
       burn: (params: IBurnRequest) => Promise<boolean>
       distribute: (params: IDistributeRequest) => Promise<boolean>
       authorize: (params: IAuthorizeRequest) => Promise<boolean>
-      freeze: (params: IFreezeRequest) => Promise<boolean>
+      updateAuthFlags: (params: IFreezeRequest) => Promise<boolean>
       clawback: (params: IClawbackRequest) => Promise<boolean>
-      forge: (params: IAssetRequest) => Promise<boolean>
+      forge: (params: IAssetRequest) => Promise<IAsset | undefined>
       getAssets: () => Promise<void>
       assets: IAssetDto[] | undefined
     }
