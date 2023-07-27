@@ -60,11 +60,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 		repo.NewRolePermissionRepo(pg),
 		*userUc,
 	)
+	vaultCategoryUc := usecase.NewVaultCategoryUseCase(
+		repo.NewVaultCategoryRepo(pg),
+	)
 
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(CORSMiddleware())
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc)
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),

@@ -54,4 +54,9 @@ type (
 		Validate(action string, roleId int) (bool, error)
 		GetRolePermissions(token string) ([]entity.RolePermissionResponse, error)
 	}
+
+	VaultCategoryRepoInterface interface {
+		GetVaultCategories() ([]entity.VaultCategory, error)
+		CreateVaultCategory(entity.VaultCategory) (entity.VaultCategory, error)
+	}
 )
