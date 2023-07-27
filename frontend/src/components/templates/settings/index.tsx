@@ -66,6 +66,10 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
                 <Thead w="full">
                   <Tr>
                     <Th
+                      borderColor={'gray.400'}
+                      _dark={{ borderColor: 'black.800' }}
+                      />
+                    <Th
                       color={'gray.700'}
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
