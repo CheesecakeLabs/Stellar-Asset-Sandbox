@@ -15,6 +15,7 @@ import {
   HomeIcon,
   PaymentsIcon,
   SecurityIcon,
+  VaultIcon,
 } from 'components/icons'
 import { SidebarContent } from 'components/molecules'
 import { Header } from 'components/molecules/header'
@@ -50,6 +51,11 @@ const linkItems: ILinkItemProps[] = [
     name: 'Soroban Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+  },
+  {
+    name: 'Treasury',
+    icon: <VaultIcon />,
+    path: `${PathRoute.VAULTS}`,
   },
   {
     name: 'Assets Dashboard',

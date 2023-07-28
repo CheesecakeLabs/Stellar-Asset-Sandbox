@@ -26,6 +26,7 @@ import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
 import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
+import { ReactComponent as VaultIcon } from './fonts/vault.svg'
 
 export {
   MenuIcon,
@@ -56,4 +57,5 @@ export {
   BackIcon,
   CoinIcon,
   HelpIcon,
+  VaultIcon,
 }
