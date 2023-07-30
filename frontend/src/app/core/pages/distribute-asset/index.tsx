@@ -1,9 +1,10 @@
 import { Flex, useToast, Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
@@ -14,18 +15,20 @@ import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
   const { distribute, loading } = useAssets()
+  const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
   const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void> => {
     try {
       const isSuccess = await distribute({
         source_wallet_id: asset.issuer.id,
-        destination_wallet_pk: data.destination_wallet_id,
+        destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
         asset_id: asset.id.toString(),
         sponsor_id: 1,
         amount: data.amount,
@@ -66,6 +69,10 @@ export const DistributeAsset: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    getVaults()
+  }, [getVaults])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
@@ -78,6 +85,7 @@ export const DistributeAsset: React.FC = () => {
               onSubmit={onSubmit}
               loading={loading}
               asset={asset}
+              vaults={vaults}
             />
           </Flex>
           <MenuActionsAsset action={AssetActions.DISTRIBUTE} asset={asset} />

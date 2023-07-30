@@ -15,11 +15,13 @@ import { ReactComponent as HomeIcon } from './fonts/home.svg'
 import { ReactComponent as InfoIcon } from './fonts/info.svg'
 import { ReactComponent as JoinIcon } from './fonts/join.svg'
 import { ReactComponent as LoadingIcon } from './fonts/loading.svg'
+import { ReactComponent as LockIcon } from './fonts/lock.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuDotsIcon } from './fonts/menu_dots.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
 import { ReactComponent as MoonIcon } from './fonts/moon.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
+import { ReactComponent as PlusIcon } from './fonts/plus.svg'
 import { ReactComponent as ProfileIcon } from './fonts/profile.svg'
 import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
@@ -58,4 +60,6 @@ export {
   CoinIcon,
   HelpIcon,
   VaultIcon,
+  PlusIcon,
+  LockIcon,
 }

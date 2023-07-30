@@ -1,12 +1,4 @@
-import {
-  Container,
-  Flex,
-  Text,
-  Button,
-  SimpleGrid,
-  Box,
-  Tag,
-} from '@chakra-ui/react'
+import { Container, Flex, Text, SimpleGrid, Box, Tag } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -14,7 +6,7 @@ import { toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { CoinIcon, JoinIcon } from 'components/icons'
+import { CoinIcon, LockIcon, PlusIcon } from 'components/icons'
 
 interface IVaultsTemplate {
   loading: boolean
@@ -34,21 +26,22 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Vaults
           </Text>
-          <Button
-            variant="primary"
-            leftIcon={<JoinIcon fill="white" />}
-            onClick={(): void => navigate({ pathname: PathRoute.VAULT_CREATE })}
-          >
-            Create vault
-          </Button>
         </Flex>
         <Box p={0} maxW="full">
           {loading || !vaults ? (
             <Loading />
           ) : (
-            <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={4}>
+            <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={5}>
               {vaults.map(vault => (
-                <Container variant="primary" display="flex" flexDir="column">
+                <Container
+                  variant="primary"
+                  display="flex"
+                  flexDir="column"
+                  onClick={(): void =>
+                    navigate(PathRoute.VAULT_DETAIL, { state: vault })
+                  }
+                  cursor="pointer"
+                >
                   <Text
                     pb="0.5rem"
                     borderBottom="1px solid"
@@ -85,20 +78,42 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
                             stroke="black"
                             _dark={{ fill: 'white', stroke: 'white' }}
                             alignItems="center"
-                            mt="0.25rem"
+                            h="1.5rem"
                           >
                             <Flex alignItems="center" gap={2}>
                               <CoinIcon width="1rem" />
                               <Text fontSize="xs">{balance.asset_code}</Text>
                             </Flex>
-                            <Text fontSize="xs">
-                              {toCrypto(Number(balance.balance))}
-                            </Text>
+                            <Flex alignItems="center" gap={2}>
+                              <Text fontSize="xs">
+                                {toCrypto(Number(balance.balance))}
+                              </Text>
+                              {!balance.is_authorized && (
+                                <LockIcon width="0.75rem" />
+                              )}
+                            </Flex>
                           </Flex>
                         )
                     )}
                 </Container>
               ))}
+              <Container
+                variant="primary"
+                display="flex"
+                flexDir="column"
+                onClick={(): void =>
+                  navigate({ pathname: PathRoute.VAULT_CREATE })
+                }
+                fill="gray.650"
+                stroke="gray.650"
+                _dark={{ fill: 'white', stroke: 'white' }}
+                cursor="pointer"
+                justifyContent="center"
+                alignItems="center"
+                bg="none"
+              >
+                <PlusIcon width="10rem" />
+              </Container>
             </SimpleGrid>
           )}
         </Box>

@@ -1,9 +1,10 @@
 import { Flex, useToast, Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
@@ -14,17 +15,19 @@ import { AuthorizeAccountTemplate } from 'components/templates/authorize-account
 
 export const AuthorizeAccount: React.FC = () => {
   const { authorize, loading } = useAssets()
+  const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
   const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void> => {
     try {
       const isSuccess = await authorize({
-        trustor_pk: data.wallet,
+        trustor_pk: wallet ? wallet : data.wallet,
         issuer: asset.issuer.id,
         code: asset.code,
         set_flags: ['TRUST_LINE_AUTHORIZED'],
@@ -62,6 +65,10 @@ export const AuthorizeAccount: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    getVaults()
+  }, [getVaults])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
@@ -74,6 +81,7 @@ export const AuthorizeAccount: React.FC = () => {
               onSubmit={onSubmit}
               loading={loading}
               asset={asset}
+              vaults={vaults}
             />
           </Flex>
           <MenuActionsAsset action={AssetActions.AUTHORIZE} asset={asset} />
