@@ -33,3 +33,12 @@ func (uc *VaultCategoryUseCase) GetAll() ([]entity.VaultCategory, error) {
 
 	return vaultCategories, nil
 }
+
+func (uc *VaultCategoryUseCase) GetById(id int) (entity.VaultCategory, error) {
+	vaultCategory, err := uc.vcRepo.GetVaultCategoryById(id)
+	if err != nil {
+		return entity.VaultCategory{}, fmt.Errorf("VaultCategoryUseCase - GetAll - uc.repo.GetVaultCategories: %w", err)
+	}
+
+	return vaultCategory, nil
+}

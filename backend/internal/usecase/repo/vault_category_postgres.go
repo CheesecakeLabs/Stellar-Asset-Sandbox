@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -38,6 +39,24 @@ func (r VaultCategoryRepo) GetVaultCategories() ([]entity.VaultCategory, error) 
 	}
 
 	return vaultCategories, nil
+}
+
+func (r VaultCategoryRepo) GetVaultCategoryById(id int) (entity.VaultCategory, error) {
+	query := `SELECT id, name FROM VaultCategory WHERE id = $1`
+
+	row := r.Db.QueryRow(query, id)
+
+	var vaultCategory entity.VaultCategory
+
+	err := row.Scan(&vaultCategory.Id, &vaultCategory.Name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.VaultCategory{}, fmt.Errorf("VaultCategoryRepo - GetVaultCategoryById - Vault category not found")
+		}
+		return entity.VaultCategory{}, fmt.Errorf("VaultCategoryRepo - GetVaultCategoryById - row.Scan: %w", err)
+	}
+
+	return vaultCategory, nil
 }
 
 func (r VaultCategoryRepo) CreateVaultCategory(data entity.VaultCategory) (entity.VaultCategory, error) {

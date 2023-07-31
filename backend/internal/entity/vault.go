@@ -2,7 +2,7 @@ package entity
 
 type Vault struct {
 	Id            int           `json:"id" example:"1"`
-	Name          string        `json:"name" example:"Tresury"`
+	Name          string        `json:"name" example:"Treasury"`
 	Wallet        Wallet        `json:"wallet"`
-	ValutCategory VaultCategory `json:"vault_category"`
+	VaultCategory VaultCategory `json:"vault_category"`
 }
