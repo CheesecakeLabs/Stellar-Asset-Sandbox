@@ -1,14 +1,17 @@
-import { Flex, useToast, Text } from '@chakra-ui/react'
+import { Flex, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
+import { distributeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
+import { ActionHelper } from 'components/molecules/action-helper'
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
@@ -78,9 +81,7 @@ export const DistributeAsset: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.HOME}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
-            <Text fontSize="2xl" fontWeight="400" h="3.5rem">
-              Asset Management
-            </Text>
+            <ManagementBreadcrumb title={'Distribute'} />
             <DistributeAssetTemplate
               onSubmit={onSubmit}
               loading={loading}
@@ -88,7 +89,13 @@ export const DistributeAsset: React.FC = () => {
               vaults={vaults}
             />
           </Flex>
-          <MenuActionsAsset action={AssetActions.DISTRIBUTE} asset={asset} />
+          <VStack>
+            <MenuActionsAsset action={AssetActions.DISTRIBUTE} asset={asset} />
+            <ActionHelper
+              title={'About Distribute'}
+              description={distributeHelper}
+            />
+          </VStack>
         </Flex>
       </Sidebar>
     </Flex>

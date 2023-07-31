@@ -5,6 +5,7 @@ import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
 import { ReactComponent as BackIcon } from './fonts/back.svg'
 import { ReactComponent as BlockIcon } from './fonts/block.svg'
 import { ReactComponent as BurnIcon } from './fonts/burn.svg'
+import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
 import { ReactComponent as CoinIcon } from './fonts/coin.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
@@ -62,4 +63,5 @@ export {
   VaultIcon,
   PlusIcon,
   LockIcon,
+  ChevronRight,
 }
