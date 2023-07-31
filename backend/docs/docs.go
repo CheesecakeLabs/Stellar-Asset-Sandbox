@@ -16,6 +16,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/": {
+            "get": {
+                "description": "Get all vault categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault category"
+                ],
+                "summary": "Get all vault categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.VaultCategory"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets": {
             "get": {
                 "description": "Get all assets",
@@ -532,6 +564,110 @@ const docTemplate = `{
                 }
             }
         },
+        "/vault": {
+            "post": {
+                "description": "Create and issue a new asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Create a new vault",
+                "parameters": [
+                    {
+                        "description": "Vault info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateVaultRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault-category": {
+            "post": {
+                "description": "Create and issue a new asset on Stellar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault Category"
+                ],
+                "summary": "Create a new vault category",
+                "parameters": [
+                    {
+                        "description": "Vault Category info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateVaultCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.VaultCategory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/wallets": {
             "get": {
                 "description": "List wallets by type",
@@ -805,6 +941,38 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Vault": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                },
+                "vault_category": {
+                    "$ref": "#/definitions/entity.VaultCategory"
+                },
+                "wallet": {
+                    "$ref": "#/definitions/entity.Wallet"
+                }
+            }
+        },
+        "entity.VaultCategory": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                }
+            }
+        },
         "entity.Wallet": {
             "type": "object",
             "properties": {
@@ -828,8 +996,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -851,8 +1018,7 @@ const docTemplate = `{
             "required": [
                 "amount",
                 "code",
-                "from",
-                "sponsor_id"
+                "from"
             ],
             "properties": {
                 "amount": {
@@ -907,8 +1073,8 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
+                        "[\"AUTH_REQUIRED_FLAGS\"",
+                        " \"AUTH_REVOCABLE_FLAGS\"",
                         "\"AUTH_CLAWBACK_ENABLED\"]"
                     ]
                 },
@@ -917,6 +1083,21 @@ const docTemplate = `{
                     "example": 2
                 }
             }
+        },
+        "v1.CreateVaultCategoryRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                }
+            }
+        },
+        "v1.CreateVaultRequest": {
+            "type": "object"
         },
         "v1.CreateWalletRequest": {
             "type": "object",
@@ -947,8 +1128,7 @@ const docTemplate = `{
             "required": [
                 "amount",
                 "code",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -975,8 +1155,7 @@ const docTemplate = `{
                 "amount",
                 "asset_id",
                 "destination_wallet_pk",
-                "source_wallet_id",
-                "sponsor_id"
+                "source_wallet_id"
             ],
             "properties": {
                 "amount": {
@@ -1005,8 +1184,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "code",
-                "issuer",
-                "trustor_id"
+                "issuer"
             ],
             "properties": {
                 "clear_flags": {
@@ -1015,7 +1193,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_IMMUTABLE\"]"
+                        "[\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "code": {
@@ -1032,14 +1210,18 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
-                        "\"AUTH_CLAWBACK_ENABLED\"]"
+                        "[\"TRUST_LINE_AUTHORIZED\"",
+                        " \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\"",
+                        "\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "trustor_id": {
                     "type": "integer",
                     "example": 2
+                },
+                "trustor_pk": {
+                    "type": "string",
+                    "example": "2"
                 }
             }
         },

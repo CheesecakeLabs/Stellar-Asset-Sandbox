@@ -25,6 +25,8 @@ func NewRouter(
 	assetUseCase usecase.AssetUseCase,
 	roleUseCase usecase.RoleUseCase,
 	rolePermissionUc usecase.RolePermissionUseCase,
+	vaultCategoryUc usecase.VaultCategoryUseCase,
+	vaultUc usecase.VaultUseCase,
 ) {
 	// Options
 	handler.Use(gin.Logger())
@@ -46,5 +48,7 @@ func NewRouter(
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
+		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc)
+		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase)
 	}
 }
