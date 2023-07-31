@@ -62,7 +62,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
                       textAlign="center"
                       fontSize="xs"
                       fontWeight="700"
-                      w="min-content"
+                      w="fit-content"
                     >
                       {vault.vault_category.name}
                     </Tag>

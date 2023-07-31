@@ -49,8 +49,8 @@ declare namespace Hooks {
     interface IDistributeRequest {
       source_wallet_id: number
       destination_wallet_pk: number
-      asset_id: number
-      amount: number
+      asset_id: string
+      amount: string
       sponsor_id: number
     }
 

@@ -1,20 +1,37 @@
-import { Container, Flex, Tag, Text } from '@chakra-ui/react'
+import { Flex, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
+import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
-import { toCrypto } from 'utils/formatter'
-
-import { CoinIcon, LockIcon } from 'components/icons'
+import { DistributeVault } from './components/distribute'
+import { ListAssets } from './components/list-assets'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault
+  onSubmit(
+    data: FieldValues,
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined,
+    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  ): Promise<void>
+  loading: boolean
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   vault,
+  onSubmit,
+  loading,
+  assets,
+  vaults,
 }) => {
+  const filteredVaults = vaults?.filter(
+    (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault.id
+  )
+
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="860px" alignSelf="center" flexDir="column" w="full">
         <Flex alignItems="center" mb="1.5rem">
           <Text fontSize="2xl" fontWeight="400">
             {vault.name}
@@ -25,36 +42,20 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
             textAlign="center"
             fontSize="xs"
             fontWeight="700"
-            w="min-content"
+            w="fit-content"
           >
             {vault.vault_category.name}
           </Tag>
         </Flex>
-        <Container variant="primary" justifyContent="center" p="2rem">
-          {vault.accountData &&
-            vault.accountData.balances.map(
-              balance =>
-                balance.asset_code && (
-                  <Flex
-                    justifyContent="space-between"
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
-                    alignItems="center"
-                    mb="0.75rem"
-                  >
-                    <Flex alignItems="center" gap={2}>
-                      <CoinIcon width="1.5rem" />
-                      <Text fontSize="sm">{balance.asset_code}</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={2}>
-                      {toCrypto(Number(balance.balance))}
-                      {!balance.is_authorized && <LockIcon width="1rem" />}
-                    </Flex>
-                  </Flex>
-                )
-            )}
-        </Container>
+        <Flex gap="1rem">
+          <ListAssets vault={vault} />
+          <DistributeVault
+            onSubmit={onSubmit}
+            loading={loading}
+            assets={assets}
+            vaults={filteredVaults}
+          />
+        </Flex>
       </Flex>
     </Flex>
   )
