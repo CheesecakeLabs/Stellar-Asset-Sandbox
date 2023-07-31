@@ -828,8 +828,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -851,8 +850,7 @@ const docTemplate = `{
             "required": [
                 "amount",
                 "code",
-                "from",
-                "sponsor_id"
+                "from"
             ],
             "properties": {
                 "amount": {
@@ -907,8 +905,8 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
+                        "[\"AUTH_REQUIRED_FLAGS\"",
+                        " \"AUTH_REVOCABLE_FLAGS\"",
                         "\"AUTH_CLAWBACK_ENABLED\"]"
                     ]
                 },
@@ -947,8 +945,7 @@ const docTemplate = `{
             "required": [
                 "amount",
                 "code",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -975,8 +972,7 @@ const docTemplate = `{
                 "amount",
                 "asset_id",
                 "destination_wallet_pk",
-                "source_wallet_id",
-                "sponsor_id"
+                "source_wallet_id"
             ],
             "properties": {
                 "amount": {
@@ -1005,8 +1001,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "code",
-                "issuer",
-                "trustor_id"
+                "issuer"
             ],
             "properties": {
                 "clear_flags": {
@@ -1015,7 +1010,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_IMMUTABLE\"]"
+                        "[\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "code": {
@@ -1032,14 +1027,18 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
-                        "\"AUTH_CLAWBACK_ENABLED\"]"
+                        "[\"TRUST_LINE_AUTHORIZED\"",
+                        " \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\"",
+                        "\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "trustor_id": {
                     "type": "integer",
                     "example": 2
+                },
+                "trustor_pk": {
+                    "type": "string",
+                    "example": "2"
                 }
             }
         },

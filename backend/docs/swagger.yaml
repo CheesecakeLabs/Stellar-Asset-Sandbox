@@ -121,7 +121,6 @@ definitions:
     required:
     - amount
     - id
-    - sponsor_id
     type: object
   v1.ClawbackAssetRequest:
     properties:
@@ -141,7 +140,6 @@ definitions:
     - amount
     - code
     - from
-    - sponsor_id
     type: object
   v1.CreateAssetRequest:
     properties:
@@ -162,8 +160,8 @@ definitions:
         type: string
       set_flags:
         example:
-        - '["AUTH_REQUIRED"'
-        - ' "AUTH_REVOCABLE"'
+        - '["AUTH_REQUIRED_FLAGS"'
+        - ' "AUTH_REVOCABLE_FLAGS"'
         - '"AUTH_CLAWBACK_ENABLED"]'
         items:
           type: string
@@ -210,7 +208,6 @@ definitions:
     - amount
     - code
     - id
-    - sponsor_id
     type: object
   v1.TransferAssetRequest:
     properties:
@@ -234,13 +231,12 @@ definitions:
     - asset_id
     - destination_wallet_pk
     - source_wallet_id
-    - sponsor_id
     type: object
   v1.UpdateAuthFlagsRequest:
     properties:
       clear_flags:
         example:
-        - '["AUTH_IMMUTABLE"]'
+        - '["TRUST_LINE_CLAWBACK_ENABLED"]'
         items:
           type: string
         type: array
@@ -252,19 +248,21 @@ definitions:
         type: integer
       set_flags:
         example:
-        - '["AUTH_REQUIRED"'
-        - ' "AUTH_REVOCABLE"'
-        - '"AUTH_CLAWBACK_ENABLED"]'
+        - '["TRUST_LINE_AUTHORIZED"'
+        - ' "TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES"'
+        - '"TRUST_LINE_CLAWBACK_ENABLED"]'
         items:
           type: string
         type: array
       trustor_id:
         example: 2
         type: integer
+      trustor_pk:
+        example: "2"
+        type: string
     required:
     - code
     - issuer
-    - trustor_id
     type: object
   v1.response:
     properties:

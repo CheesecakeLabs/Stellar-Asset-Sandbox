@@ -816,8 +816,7 @@
             "type": "object",
             "required": [
                 "amount",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -839,8 +838,7 @@
             "required": [
                 "amount",
                 "code",
-                "from",
-                "sponsor_id"
+                "from"
             ],
             "properties": {
                 "amount": {
@@ -895,8 +893,8 @@
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
+                        "[\"AUTH_REQUIRED_FLAGS\"",
+                        " \"AUTH_REVOCABLE_FLAGS\"",
                         "\"AUTH_CLAWBACK_ENABLED\"]"
                     ]
                 },
@@ -935,8 +933,7 @@
             "required": [
                 "amount",
                 "code",
-                "id",
-                "sponsor_id"
+                "id"
             ],
             "properties": {
                 "amount": {
@@ -963,8 +960,7 @@
                 "amount",
                 "asset_id",
                 "destination_wallet_pk",
-                "source_wallet_id",
-                "sponsor_id"
+                "source_wallet_id"
             ],
             "properties": {
                 "amount": {
@@ -993,8 +989,7 @@
             "type": "object",
             "required": [
                 "code",
-                "issuer",
-                "trustor_id"
+                "issuer"
             ],
             "properties": {
                 "clear_flags": {
@@ -1003,7 +998,7 @@
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_IMMUTABLE\"]"
+                        "[\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "code": {
@@ -1020,14 +1015,18 @@
                         "type": "string"
                     },
                     "example": [
-                        "[\"AUTH_REQUIRED\"",
-                        " \"AUTH_REVOCABLE\"",
-                        "\"AUTH_CLAWBACK_ENABLED\"]"
+                        "[\"TRUST_LINE_AUTHORIZED\"",
+                        " \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\"",
+                        "\"TRUST_LINE_CLAWBACK_ENABLED\"]"
                     ]
                 },
                 "trustor_id": {
                     "type": "integer",
                     "example": 2
+                },
+                "trustor_pk": {
+                    "type": "string",
+                    "example": "2"
                 }
             }
         },
