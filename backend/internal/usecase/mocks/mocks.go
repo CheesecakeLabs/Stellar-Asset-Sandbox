@@ -534,3 +534,124 @@ func (mr *MockRolePermissionRepoInterfaceMockRecorder) Validate(action, roleId i
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Validate", reflect.TypeOf((*MockRolePermissionRepoInterface)(nil).Validate), action, roleId)
 }
+
+// MockVaultCategoryRepoInterface is a mock of VaultCategoryRepoInterface interface.
+type MockVaultCategoryRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockVaultCategoryRepoInterfaceMockRecorder
+}
+
+// MockVaultCategoryRepoInterfaceMockRecorder is the mock recorder for MockVaultCategoryRepoInterface.
+type MockVaultCategoryRepoInterfaceMockRecorder struct {
+	mock *MockVaultCategoryRepoInterface
+}
+
+// NewMockVaultCategoryRepoInterface creates a new mock instance.
+func NewMockVaultCategoryRepoInterface(ctrl *gomock.Controller) *MockVaultCategoryRepoInterface {
+	mock := &MockVaultCategoryRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockVaultCategoryRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockVaultCategoryRepoInterface) EXPECT() *MockVaultCategoryRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// CreateVaultCategory mocks base method.
+func (m *MockVaultCategoryRepoInterface) CreateVaultCategory(arg0 entity.VaultCategory) (entity.VaultCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateVaultCategory", arg0)
+	ret0, _ := ret[0].(entity.VaultCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateVaultCategory indicates an expected call of CreateVaultCategory.
+func (mr *MockVaultCategoryRepoInterfaceMockRecorder) CreateVaultCategory(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVaultCategory", reflect.TypeOf((*MockVaultCategoryRepoInterface)(nil).CreateVaultCategory), arg0)
+}
+
+// GetVaultCategories mocks base method.
+func (m *MockVaultCategoryRepoInterface) GetVaultCategories() ([]entity.VaultCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetVaultCategories")
+	ret0, _ := ret[0].([]entity.VaultCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVaultCategories indicates an expected call of GetVaultCategories.
+func (mr *MockVaultCategoryRepoInterfaceMockRecorder) GetVaultCategories() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVaultCategories", reflect.TypeOf((*MockVaultCategoryRepoInterface)(nil).GetVaultCategories))
+}
+
+// GetVaultCategoryById mocks base method.
+func (m *MockVaultCategoryRepoInterface) GetVaultCategoryById(id int) (entity.VaultCategory, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetVaultCategoryById", id)
+	ret0, _ := ret[0].(entity.VaultCategory)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVaultCategoryById indicates an expected call of GetVaultCategoryById.
+func (mr *MockVaultCategoryRepoInterfaceMockRecorder) GetVaultCategoryById(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVaultCategoryById", reflect.TypeOf((*MockVaultCategoryRepoInterface)(nil).GetVaultCategoryById), id)
+}
+
+// MockVaultRepoInterface is a mock of VaultRepoInterface interface.
+type MockVaultRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockVaultRepoInterfaceMockRecorder
+}
+
+// MockVaultRepoInterfaceMockRecorder is the mock recorder for MockVaultRepoInterface.
+type MockVaultRepoInterfaceMockRecorder struct {
+	mock *MockVaultRepoInterface
+}
+
+// NewMockVaultRepoInterface creates a new mock instance.
+func NewMockVaultRepoInterface(ctrl *gomock.Controller) *MockVaultRepoInterface {
+	mock := &MockVaultRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockVaultRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockVaultRepoInterface) EXPECT() *MockVaultRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// CreateVault mocks base method.
+func (m *MockVaultRepoInterface) CreateVault(arg0 entity.Vault) (entity.Vault, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateVault", arg0)
+	ret0, _ := ret[0].(entity.Vault)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateVault indicates an expected call of CreateVault.
+func (mr *MockVaultRepoInterfaceMockRecorder) CreateVault(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).CreateVault), arg0)
+}
+
+// GetVaults mocks base method.
+func (m *MockVaultRepoInterface) GetVaults() ([]entity.Vault, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetVaults")
+	ret0, _ := ret[0].([]entity.Vault)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVaults indicates an expected call of GetVaults.
+func (mr *MockVaultRepoInterfaceMockRecorder) GetVaults() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVaults", reflect.TypeOf((*MockVaultRepoInterface)(nil).GetVaults))
+}

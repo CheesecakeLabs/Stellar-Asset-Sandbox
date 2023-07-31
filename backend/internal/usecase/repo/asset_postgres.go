@@ -35,7 +35,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	query := `
 		SELECT 
-			a.id AS asset_id, a.name AS asset_name, a.asset_type,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -61,7 +61,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 		var issuer entity.Wallet
 
 		err := rows.Scan(
-			&asset.Id, &asset.Name, &asset.AssetType,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
