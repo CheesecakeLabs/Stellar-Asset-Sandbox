@@ -33,7 +33,7 @@ type CreateVaultCategoryRequest struct {
 // @Tags  	    Vault Category
 // @Accept      json
 // @Produce     json
-// @Param       request body CreateCategoryRequest true "Vault Category info"
+// @Param       request body CreateVaultCategoryRequest true "Vault Category info"
 // @Success     200 {object} entity.VaultCategory
 // @Failure     400 {object} response
 // @Failure     404 {object} response

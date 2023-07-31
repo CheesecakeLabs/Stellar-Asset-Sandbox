@@ -94,6 +94,28 @@ definitions:
       id_user:
         type: string
     type: object
+  entity.Vault:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      vault_category:
+        $ref: '#/definitions/entity.VaultCategory'
+      wallet:
+        $ref: '#/definitions/entity.Wallet'
+    type: object
+  entity.VaultCategory:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+    type: object
   entity.Wallet:
     properties:
       funded:
@@ -173,6 +195,16 @@ definitions:
     - asset_type
     - code
     - name
+    type: object
+  v1.CreateVaultCategoryRequest:
+    properties:
+      name:
+        example: Treasury
+        type: string
+    required:
+    - name
+    type: object
+  v1.CreateVaultRequest:
     type: object
   v1.CreateWalletRequest:
     properties:
@@ -278,6 +310,27 @@ definitions:
 info:
   contact: {}
 paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Get all vault categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.VaultCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all vault categories
+      tags:
+      - Vault category
   /assets:
     get:
       consumes:
@@ -617,6 +670,74 @@ paths:
       summary: GET Profile
       tags:
       - user
+  /vault:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Vault info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault
+      tags:
+      - Vault
+  /vault-category:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.VaultCategory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault category
+      tags:
+      - Vault Category
   /wallets:
     get:
       consumes:
