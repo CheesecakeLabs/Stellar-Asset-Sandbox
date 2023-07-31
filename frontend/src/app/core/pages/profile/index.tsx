@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 
+import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ProfileTemplate } from 'components/templates/profile'
 
@@ -46,7 +47,7 @@ export const Profile: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar>
+      <Sidebar highlightMenu={PathRoute.PROFILE}>
         <ProfileTemplate
           handleSignOut={handleSignOut}
           loading={loading}

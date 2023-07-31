@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 
+import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { SettingsTemplate } from 'components/templates/settings'
 
@@ -39,7 +40,7 @@ export const Settings: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar>
+      <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <SettingsTemplate
           users={users}
           loading={loading}

@@ -33,7 +33,6 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
   permissions,
 }) => {
   return (
-    <>
       <Flex flexDir="column" w="full">
         <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
           <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
@@ -66,9 +65,9 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
                 <Thead w="full">
                   <Tr>
                     <Th
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                      />
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                    />
                     <Th
                       color={'gray.700'}
                       borderColor={'gray.400'}
@@ -116,6 +115,5 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
           </Container>
         </Flex>
       </Flex>
-    </>
   )
 }

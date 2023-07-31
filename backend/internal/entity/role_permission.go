@@ -7,7 +7,7 @@ type (
 
 	RolePermissionResponse struct {
 		Name        string `json:"name" example:"Edit"`
-		Description string `json:"description" example:"Edit action"`
+		Action string `json:"action" example:"Edit action"`
 	}
 
 	RolePermissionRequest struct {
