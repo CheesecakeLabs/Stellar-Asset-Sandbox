@@ -20,13 +20,15 @@ type vaultRoutes struct {
 }
 
 func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, v usecase.VaultUseCase, vc usecase.VaultCategoryUseCase,
-	w usecase.WalletUseCase, as usecase.AssetUseCase) {
+	w usecase.WalletUseCase, as usecase.AssetUseCase,
+) {
 	r := &vaultRoutes{m, a, v, vc, w, as}
 	h := handler.Group("/vault").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("/", r.getVaultById)
 		h.POST("", r.createVault)
 		h.GET("list", r.getAllVaults)
+		h.PUT("/:id", r.UpdateVaultCategory)
 	}
 }
 
@@ -34,6 +36,11 @@ type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
 	VaultCategoryId int    `json:"vault_category_id"   binding:"required"  example:"1"`
 	AssetsId        []int  `json:"assets_id"   binding:"required"  example:"[1]"`
+}
+
+type UpdateVaultCategoryRequest struct {
+	Name            string `json:"name" example:"Vault 2"`
+	VaultCategoryId int    `json:"vault_category_id"   binding:"required"  example:"1"`
 }
 
 // @Summary     Create a new vault
@@ -184,4 +191,55 @@ func (r *vaultRoutes) getVaultById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, vault)
+}
+
+// @Summary     Update a vault category
+// @Description Update a vault category by providing the Vault Category ID and the updated information.
+// @Tags  	    Vault Category
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Vault Category ID" Format(uuid)
+// @Param       request body UpdateVaultCategoryRequest true "Vault Category info"
+// @Success     200 {object} entity.Vault "Updated vault category information"
+// @Failure     400 {object} response "Bad Request: Invalid input data"
+// @Failure     404 {object} response "Not Found: Vault category not found"
+// @Failure     500 {object} response "Internal Server Error: Failed to update vault category"
+// @Router      /vault-category/{id} [put]
+func (r *vaultRoutes) UpdateVaultCategory(c *gin.Context) {
+	// Get the ID of the vault to be updated from the URL parameters
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+
+	var request UpdateVaultCategoryRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	// Find the existing vault by its ID
+	existingVault, err := r.v.GetById(id)
+	if err != nil {
+		if err.Error() == "VaultRepo - GetVaultById - Vault not found" {
+			errorResponse(c, http.StatusNotFound, "vault not found")
+			return
+		}
+		errorResponse(c, http.StatusInternalServerError, "error finding vault")
+		return
+	}
+
+	// Update the vault data
+	existingVault.Name = request.Name
+	existingVault.VaultCategory.Id = request.VaultCategoryId
+
+	updatedVault, err := r.v.UpdateVault(existingVault)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating vault category")
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedVault)
 }
