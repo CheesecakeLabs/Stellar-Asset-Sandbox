@@ -61,7 +61,7 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 	return vaults, nil
 }
 
-func (r VaultRepo) GetVaultById(id string) (entity.Vault, error) {
+func (r VaultRepo) GetVaultById(id int) (entity.Vault, error) {
 	query := `
 		SELECT 
 			v.id AS vault_id, v.name AS vault_name,

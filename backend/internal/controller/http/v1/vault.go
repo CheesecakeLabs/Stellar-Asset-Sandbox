@@ -43,6 +43,10 @@ type UpdateVaultCategoryRequest struct {
 	VaultCategoryId int    `json:"vault_category_id"   binding:"required"  example:"1"`
 }
 
+type UpdateVaultAssetRequest struct {
+	AssetsId []int `json:"assets_id"   binding:"required"  example:"[1]"`
+}
+
 // @Summary     Create a new vault
 // @Description Create and issue a new asset on Stellar
 // @Tags  	    Vault
