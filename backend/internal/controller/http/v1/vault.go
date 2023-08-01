@@ -45,7 +45,7 @@ type UpdateVaultCategoryRequest struct {
 }
 
 type UpdateVaultAssetRequest struct {
-	AssetsId []int `json:"assets_id"   binding:"required"  example:"[1]"`
+	AssetsId int `json:"assets_id"   binding:"required"  example:"1"`
 }
 
 // @Summary     Create a new vault
@@ -264,7 +264,7 @@ func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 	// Get the ID of the vault to be updated from the URL parameters
 	idStr := c.Param("id")
-	_, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
 		return
@@ -275,4 +275,60 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
+
+	vault, err := r.v.GetById(id)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "vault not found")
+		return
+	}
+
+	asset, err := r.as.GetById(strconv.Itoa(request.AssetsId))
+	if err != nil {
+		if err.Error() == "AssetRepo - GetAssetById - Asset not found" {
+			errorResponse(c, http.StatusNotFound, "asset not found")
+			return
+		}
+		errorResponse(c, http.StatusInternalServerError, "error finding asset")
+		return
+	}
+
+	sponsor, err := r.w.Get(_sponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
+
+	ops := []entity.Operation{
+		{
+			Type:    entity.ChangeTrustOp,
+			Origin:  vault.Wallet.Key.PublicKey,
+			Sponsor: sponsor.Key.PublicKey,
+			Asset: entity.OpAsset{
+				Code:   asset.Code,
+				Issuer: asset.Issuer.Key.PublicKey,
+			},
+			ClearFlags: []string{
+				"TRUST_LINE_AUTHORIZED",
+			},
+		},
+	}
+
+	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		MainSource: sponsor.Key.PublicKey,
+		PublicKeys: []string{sponsor.Key.PublicKey, vault.Wallet.Key.PublicKey},
+		Operations: ops,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		return
+	}
+
+	_, ok := res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		return
+	}
+	// Update the vault data in the database
+
+	c.JSON(http.StatusOK, vault)
 }
