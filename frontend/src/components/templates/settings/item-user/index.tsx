@@ -14,7 +14,7 @@ import TimeAgo from 'react-timeago'
 import { havePermission } from 'utils'
 
 import { Permissions } from 'components/enums/permissions'
-import { MenuDotsIcon } from 'components/icons'
+import {EditIcon, MenuDotsIcon} from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
 
 interface IItemUser {
@@ -48,6 +48,14 @@ export const ItemUser: React.FC<IItemUser> = ({
         roles={roles}
       />
       <Tr borderColor="red">
+        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
+          <IconButton
+              variant="icon"
+              icon={<EditIcon />}
+              aria-label={'Edit'}
+              onClick={onOpen}
+          />
+        </Td>
         <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
           {user.name}
         </Td>

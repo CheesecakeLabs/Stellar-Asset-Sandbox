@@ -5,8 +5,8 @@ export const toCurrency = (value: number): string => {
 
 export const toCrypto = (value?: number, prefix?: string): string => {
   const moneyFormatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 7,
   })
   const formatted = moneyFormatter.format(value || 0)
 

@@ -1,23 +1,26 @@
 import { Flex, FlexProps, Link } from '@chakra-ui/react'
 import { ReactNode } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
+import { PathRoute } from 'components/enums/path-route'
 
 interface INavItemProps extends FlexProps {
   icon: ReactNode
   children: ReactNode
   path: string
+  highlightMenu: PathRoute
 }
 export const NavItem: React.FC<INavItemProps> = ({
   icon,
   path,
+  highlightMenu,
   children,
   ...rest
 }: INavItemProps) => {
   const navigate = useNavigate()
-  const location = useLocation()
 
   const isCurrent = (): boolean => {
-    return location.pathname === path
+    return highlightMenu === path
   }
 
   return (

@@ -41,7 +41,7 @@ declare namespace Hooks {
 
     interface IPermission {
       name: string
-      description: string
+      action: string
     }
 
     interface IAuthContext {

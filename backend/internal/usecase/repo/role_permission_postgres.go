@@ -34,9 +34,10 @@ func (rpr RolePermissionRepo) Validate(action string, roleId int) (bool, error) 
 }
 
 func (r RolePermissionRepo) GetRolePermissions(token string) ([]entity.RolePermissionResponse, error) {
-	stmt := `SELECT p.name, p.description FROM useraccount ua
+	stmt := `SELECT p.name, op.action FROM useraccount ua
 			 LEFT JOIN rolepermissionjunction rpj ON ua.role_id = rpj.role_id
 			 INNER JOIN permission p ON p.id = rpj.permission_id
+			 INNER JOIN operation op ON (p.id = op.permission_id)
 			 WHERE ua.token = $1`
 
 	rows, err := r.Db.Query(stmt, token)
@@ -52,7 +53,7 @@ func (r RolePermissionRepo) GetRolePermissions(token string) ([]entity.RolePermi
 	for rows.Next() {
 		var rolePermission entity.RolePermissionResponse
 
-		err = rows.Scan(&rolePermission.Name, &rolePermission.Description)
+		err = rows.Scan(&rolePermission.Name, &rolePermission.Action)
 		if err != nil {
 			return nil, fmt.Errorf("UserRepo - GetRolePermissions - rows.Scan: %w", err)
 		}

@@ -34,7 +34,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	query := `
-		SELECT 
+		SELECT
 			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
@@ -82,7 +82,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 	query := `
-		SELECT 
+		SELECT
 			a.id AS asset_id, a.name AS asset_name, a.asset_type,a.code as asset_code,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
@@ -135,7 +135,7 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 
 func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	query := `
-		SELECT 
+		SELECT
 			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,

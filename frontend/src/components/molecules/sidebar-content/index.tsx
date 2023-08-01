@@ -16,11 +16,13 @@ import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 import { ILinkItemProps } from '../../organisms/sidebar'
 
 interface ISidebarProps extends BoxProps {
+  highlightMenu: PathRoute
   items: ILinkItemProps[]
   onClose: () => void
 }
 
 export const SidebarContent: React.FC<ISidebarProps> = ({
+  highlightMenu,
   items,
   onClose,
   ...rest
@@ -61,7 +63,11 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         </Flex>
         {items.map(item => (
           <Box key={item.name}>
-            <NavItem icon={item.icon} path={item.path}>
+            <NavItem
+              icon={item.icon}
+              path={item.path}
+              highlightMenu={highlightMenu}
+            >
               {item.name}
             </NavItem>
           </Box>
@@ -71,6 +77,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           key={'Profile'}
           icon={<ProfileIcon />}
           path={PathRoute.PROFILE}
+          highlightMenu={highlightMenu}
         >
           Profile
         </NavItem>
@@ -78,6 +85,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           key={'Settings'}
           icon={<SettingsIcon />}
           path={PathRoute.SETTINGS}
+          highlightMenu={highlightMenu}
         >
           Settings
         </NavItem>
