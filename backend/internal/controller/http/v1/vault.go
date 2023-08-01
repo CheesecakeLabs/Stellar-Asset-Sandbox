@@ -28,7 +28,8 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 		h.GET("/", r.getVaultById)
 		h.POST("", r.createVault)
 		h.GET("list", r.getAllVaults)
-		h.PUT("/:id", r.UpdateVaultCategory)
+		h.PUT("/vault-category/:id", r.updateVaultCategory)
+		h.PUT("vault-asset/:id", r.updateVaultAsset)
 	}
 }
 
@@ -209,7 +210,7 @@ func (r *vaultRoutes) getVaultById(c *gin.Context) {
 // @Failure     404 {object} response "Not Found: Vault category not found"
 // @Failure     500 {object} response "Internal Server Error: Failed to update vault category"
 // @Router      /vault-category/{id} [put]
-func (r *vaultRoutes) UpdateVaultCategory(c *gin.Context) {
+func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 	// Get the ID of the vault to be updated from the URL parameters
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -246,4 +247,32 @@ func (r *vaultRoutes) UpdateVaultCategory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updatedVault)
+}
+
+// @Summary     Update a vault asset
+// @Description Update a vault by providing the Vault ID and the updated the asset.
+// @Tags  	    Vault
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Vault ID" Format(uuid)
+// @Param       request body UpdateVaultAssetRequest true "Vault asset info"
+// @Success     200 {object} entity "Updated vault asset information"
+// @Failure     400 {object} response "Bad Request: Invalid input data"
+// @Failure     404 {object} response "Not Found: Vault not found"
+// @Failure     500 {object} response "Internal Server Error: Failed to update vault asset"
+// @Router      /vault-asset/{id} [put]
+func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
+	// Get the ID of the vault to be updated from the URL parameters
+	idStr := c.Param("id")
+	_, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+
+	var request UpdateVaultAssetRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
 }
