@@ -35,8 +35,8 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 
 type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
-	VaultCategoryId int    `json:"vault_category_id"   binding:"required"  example:"1"`
-	AssetsId        []int  `json:"assets_id"   binding:"required"  example:"[1]"`
+	VaultCategoryId int    `json:"vault_category_id" binding:"required" example:"1"`
+	AssetsId        []int  `json:"assets_id" binding:"required" example:"[1,2]"`
 }
 
 type UpdateVaultCategoryRequest struct {
@@ -45,7 +45,7 @@ type UpdateVaultCategoryRequest struct {
 }
 
 type UpdateVaultAssetRequest struct {
-	AssetsId int `json:"assets_id"   binding:"required"  example:"1"`
+	AssetId int `json:"asset_id"   binding:"required"  example:"1"`
 }
 
 // @Summary     Create a new vault
@@ -256,7 +256,7 @@ func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 // @Produce     json
 // @Param       id path string true "Vault ID" Format(uuid)
 // @Param       request body UpdateVaultAssetRequest true "Vault asset info"
-// @Success     200 {object} entity "Updated vault asset information"
+// @Success     200 {object} entity.Vault "Updated vault asset information"
 // @Failure     400 {object} response "Bad Request: Invalid input data"
 // @Failure     404 {object} response "Not Found: Vault not found"
 // @Failure     500 {object} response "Internal Server Error: Failed to update vault asset"
@@ -276,13 +276,14 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		return
 	}
 
+	// Get the vault by its ID and the asset by its ID
 	vault, err := r.v.GetById(id)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "vault not found")
 		return
 	}
 
-	asset, err := r.as.GetById(strconv.Itoa(request.AssetsId))
+	asset, err := r.as.GetById(strconv.Itoa(request.AssetId))
 	if err != nil {
 		if err.Error() == "AssetRepo - GetAssetById - Asset not found" {
 			errorResponse(c, http.StatusNotFound, "asset not found")
@@ -298,6 +299,8 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		return
 	}
 
+	// Create the the envelope transaction
+	_trustLimit := 0
 	ops := []entity.Operation{
 		{
 			Type:    entity.ChangeTrustOp,
@@ -306,10 +309,7 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 			Asset: entity.OpAsset{
 				Code:   asset.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
-			},
-			ClearFlags: []string{
-				"TRUST_LINE_AUTHORIZED",
-			},
+			}, TrustLimit: &_trustLimit, // Initialize directly as a pointer to int and set 0
 		},
 	}
 
@@ -328,7 +328,6 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
 		return
 	}
-	// Update the vault data in the database
 
 	c.JSON(http.StatusOK, vault)
 }
