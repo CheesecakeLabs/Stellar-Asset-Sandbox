@@ -21,7 +21,7 @@ export const DistributeAsset: React.FC = () => {
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
-  const asset = location.state
+  const asset = location.state as Hooks.UseAssetsTypes.IAssetDto
 
   const onSubmit = async (
     data: FieldValues,

@@ -24,8 +24,10 @@ import { ReactComponent as MoonIcon } from './fonts/moon.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
 import { ReactComponent as PlusIcon } from './fonts/plus.svg'
 import { ReactComponent as ProfileIcon } from './fonts/profile.svg'
+import { ReactComponent as ReceivedIcon } from './fonts/received.svg'
 import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
+import { ReactComponent as SendedIcon } from './fonts/sended.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
 import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
@@ -64,4 +66,6 @@ export {
   PlusIcon,
   LockIcon,
   ChevronRight,
+  ReceivedIcon,
+  SendedIcon,
 }

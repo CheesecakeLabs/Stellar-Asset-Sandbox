@@ -1,9 +1,10 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 
@@ -13,25 +14,28 @@ import { VaultDetailTemplate } from 'components/templates/vault-detail'
 
 export const VaultDetail: React.FC = () => {
   const location = useLocation()
-  const vault = location.state
-
-  const { distribute, loading, assets, getAssets } = useAssets()
-  const { vaults, getVaults } = useVaults()
   const toast = useToast()
+  const vault = location.state as Hooks.UseVaultsTypes.IVault
+
+  const { loading, assets, getAssets, distribute } = useAssets()
+  const { vaults, getVaults } = useVaults()
+  const { paymentsData, getPaymentsData } = useHorizon()
+
+  const [selectedAsset, setSelectedAsset] =
+    useState<Hooks.UseAssetsTypes.IAssetDto>()
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    wallet: string | undefined,
-    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    wallet: string | undefined
   ): Promise<void> => {
     try {
-      if (!asset) return
+      if (!selectedAsset) return
 
       const isSuccess = await distribute({
-        source_wallet_id: asset.issuer.id,
+        source_wallet_id: vault.wallet.id,
         destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
-        asset_id: asset.id.toString(),
+        asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
         amount: data.amount,
       })
@@ -42,7 +46,7 @@ export const VaultDetail: React.FC = () => {
 
         toast({
           title: 'Distribute success!',
-          description: `You distributed ${data.amount} ${asset.code} to ${data.destination_wallet_id}`,
+          description: `You distributed ${data.amount} ${selectedAsset.code} to ${data.destination_wallet_id}`,
           status: 'success',
           duration: 9000,
           isClosable: true,
@@ -74,7 +78,8 @@ export const VaultDetail: React.FC = () => {
   useEffect(() => {
     getVaults()
     getAssets()
-  }, [getVaults, getAssets])
+    getPaymentsData(vault.wallet.key.publicKey)
+  }, [getVaults, getAssets, getPaymentsData, vault.wallet.key.publicKey])
 
   return (
     <Flex>
@@ -85,6 +90,9 @@ export const VaultDetail: React.FC = () => {
           loading={loading}
           assets={assets}
           vaults={vaults}
+          payments={paymentsData}
+          setSelectedAsset={setSelectedAsset}
+          selectedAsset={selectedAsset}
         />
       </Sidebar>
     </Flex>

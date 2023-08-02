@@ -1,29 +1,37 @@
 import { Flex, Tag, Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { DistributeVault } from './components/distribute'
 import { ListAssets } from './components/list-assets'
+import { ListPayments } from './components/list-payments'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    wallet: string | undefined,
-    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    wallet: string | undefined
   ): Promise<void>
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  payments: Hooks.UseHorizonTypes.IPayment[] | undefined
+  setSelectedAsset: Dispatch<
+    SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
+  >
+  selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   vault,
   onSubmit,
+  setSelectedAsset,
   loading,
   assets,
   vaults,
+  payments,
+  selectedAsset,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault.id
@@ -48,13 +56,21 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
           </Tag>
         </Flex>
         <Flex gap="1rem">
-          <ListAssets vault={vault} />
+          <ListAssets
+            vault={vault}
+            assets={assets}
+            setSelectedAsset={setSelectedAsset}
+            selectedAsset={selectedAsset}
+          />
           <DistributeVault
             onSubmit={onSubmit}
             loading={loading}
-            assets={assets}
             vaults={filteredVaults}
+            selectedAsset={selectedAsset}
           />
+        </Flex>
+        <Flex mt="1rem" w="full">
+          <ListPayments payments={payments} vaults={vaults} vault={vault} />
         </Flex>
       </Flex>
     </Flex>

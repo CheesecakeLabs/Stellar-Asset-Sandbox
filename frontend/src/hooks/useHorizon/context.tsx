@@ -18,6 +18,8 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
   const [assetData, setAssetData] = useState<Hooks.UseHorizonTypes.IAsset>()
   const [accountData, setAccountData] =
     useState<Hooks.UseHorizonTypes.IAccount>()
+  const [paymentsData, setPaymentsData] =
+    useState<Hooks.UseHorizonTypes.IPayment[]>()
 
   const getAssetData = useCallback(
     async (
@@ -66,14 +68,43 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getPaymentsData = useCallback(
+    async (
+      wallet: string
+    ): Promise<Hooks.UseHorizonTypes.IPayment | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/accounts/${wallet}/payments`
+        )
+        const data = response.data?._embedded?.records
+        if (data) {
+          setPaymentsData(data)
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    []
+  )
+
   return (
     <HorizonContext.Provider
       value={{
         loadingHorizon,
         assetData,
         accountData,
+        paymentsData,
         getAssetData,
         getAccountData,
+        getPaymentsData,
       }}
     >
       {children}
