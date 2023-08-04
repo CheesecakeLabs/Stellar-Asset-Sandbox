@@ -1,7 +1,7 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useHorizon } from 'hooks/useHorizon'
@@ -13,12 +13,11 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { VaultDetailTemplate } from 'components/templates/vault-detail'
 
 export const VaultDetail: React.FC = () => {
-  const location = useLocation()
   const toast = useToast()
-  const vault = location.state as Hooks.UseVaultsTypes.IVault
 
+  const { id } = useParams()
   const { loading, assets, getAssets, distribute } = useAssets()
-  const { vaults, getVaults } = useVaults()
+  const { vaults, getVaults, vault, getVaultById } = useVaults()
   const { paymentsData, getPaymentsData } = useHorizon()
 
   const [selectedAsset, setSelectedAsset] =
@@ -33,7 +32,7 @@ export const VaultDetail: React.FC = () => {
       if (!selectedAsset) return
 
       const isSuccess = await distribute({
-        source_wallet_id: vault.wallet.id,
+        source_wallet_id: vault?.wallet.id,
         destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
@@ -52,6 +51,15 @@ export const VaultDetail: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+
+        if (vault) {
+          getPaymentsData(vault.wallet.key.publicKey)
+        }
+
+        if (id) {
+          getVaultById(id)
+        }
+
         return
       }
 
@@ -76,10 +84,21 @@ export const VaultDetail: React.FC = () => {
   }
 
   useEffect(() => {
+    if (id) {
+      getVaultById(id)
+    }
+  }, [getVaultById, id])
+
+  useEffect(() => {
+    if (vault) {
+      getPaymentsData(vault.wallet.key.publicKey)
+    }
+  }, [getPaymentsData, vault])
+
+  useEffect(() => {
     getVaults()
     getAssets()
-    getPaymentsData(vault.wallet.key.publicKey)
-  }, [getVaults, getAssets, getPaymentsData, vault.wallet.key.publicKey])
+  }, [getAssets, getVaults])
 
   return (
     <Flex>

@@ -9,6 +9,7 @@ export interface IOption {
 interface ISelectVault {
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   setWallet: Dispatch<SetStateAction<string | undefined>>
+  distributorWallet?: string
 }
 
 const createOption = (label: string, value: string): IOption => ({
@@ -16,15 +17,27 @@ const createOption = (label: string, value: string): IOption => ({
   value: value,
 })
 
-export const SelectVault: React.FC<ISelectVault> = ({ vaults, setWallet }) => {
-  const [options, setOptions] = useState<IOption[]>([])
+export const SelectVault: React.FC<ISelectVault> = ({
+  vaults,
+  setWallet,
+  distributorWallet,
+}) => {
+  const [options, setOptions] = useState<IOption[] | []>([])
 
   useEffect(() => {
-    const ops = vaults?.map((vault: Hooks.UseVaultsTypes.IVault) =>
+    const listVaults = vaults?.map((vault: Hooks.UseVaultsTypes.IVault) =>
       createOption(vault.name, vault.wallet.key.publicKey)
     )
+
+    let ops = distributorWallet
+      ? [createOption('Distributor', distributorWallet)]
+      : []
+    if (listVaults) {
+      ops = [...ops, ...listVaults]
+    }
+
     setOptions(ops || [])
-  }, [vaults])
+  }, [distributorWallet, vaults])
 
   return (
     <Select

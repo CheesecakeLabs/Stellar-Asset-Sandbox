@@ -48,24 +48,6 @@ export const ListAssets: React.FC<IListAssets> = ({
         </Text>
       </Flex>
       <Box>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          borderBottom="1px solid"
-          borderColor="gray.100"
-          h="3.5rem"
-          px="1rem"
-          cursor="pointer"
-        >
-          <Flex alignItems="center" gap={3} fontWeight="700">
-            <Text fontSize="sm">Distributor</Text>
-          </Flex>
-          <Flex alignItems="center" gap={2}>
-            <Flex ms="0.5rem" fill="gray.650" _dark={{ fill: 'white' }}>
-              <ChevronRight />
-            </Flex>
-          </Flex>
-        </Flex>
         {vault.accountData &&
           vault.accountData.balances.map(
             balance =>

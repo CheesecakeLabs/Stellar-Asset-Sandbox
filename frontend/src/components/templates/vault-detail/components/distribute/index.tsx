@@ -84,7 +84,11 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
 
               <FormControl mt="1.5rem">
                 <FormLabel>Destination Vault</FormLabel>
-                <SelectVault vaults={vaults} setWallet={setWallet} />
+                <SelectVault
+                  vaults={vaults}
+                  setWallet={setWallet}
+                  distributorWallet={selectedAsset.distributor.key.publicKey}
+                />
               </FormControl>
 
               <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">

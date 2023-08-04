@@ -38,7 +38,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
                   display="flex"
                   flexDir="column"
                   onClick={(): void =>
-                    navigate(PathRoute.VAULT_DETAIL, { state: vault })
+                    navigate(`${PathRoute.VAULT_DETAIL}/${vault.id}`)
                   }
                   cursor="pointer"
                 >

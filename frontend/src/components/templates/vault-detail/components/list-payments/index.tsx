@@ -20,14 +20,19 @@ interface IListPayments {
   payments: Hooks.UseHorizonTypes.IPayment[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vault: Hooks.UseVaultsTypes.IVault | undefined
+  distributorWallet: string
 }
 
 export const ListPayments: React.FC<IListPayments> = ({
   payments,
   vaults,
   vault,
+  distributorWallet,
 }) => {
-  const publicKeyToVault = (publicKey: string): string => {
+  const walletToName = (publicKey: string): string => {
+    if (publicKey === distributorWallet) {
+      return 'Distributor'
+    }
     return (
       vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||
       'External account'
@@ -136,13 +141,13 @@ export const ListPayments: React.FC<IListPayments> = ({
                         borderColor={'gray.400'}
                         _dark={{ borderColor: 'black.800' }}
                       >
-                        {publicKeyToVault(payment.from)}
+                        {walletToName(payment.from)}
                       </Td>
                       <Td
                         borderColor={'gray.400'}
                         _dark={{ borderColor: 'black.800' }}
                       >
-                        {publicKeyToVault(payment.to)}
+                        {walletToName(payment.to)}
                       </Td>
                       <Td
                         borderColor={'gray.400'}

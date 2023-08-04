@@ -1,7 +1,10 @@
-import { createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useState } from 'react';
 
-import axios from 'axios'
-import { MessagesError } from 'utils/constants/messages-error'
+
+
+import axios from 'axios';
+import { MessagesError } from 'utils/constants/messages-error';
+
 
 export const HorizonContext = createContext(
   {} as Hooks.UseHorizonTypes.IHorizonContext
@@ -75,7 +78,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
       setLoadingHorizon(true)
       try {
         const response = await axios.get(
-          `${BASE_URL}/accounts/${wallet}/payments`
+          `${BASE_URL}/accounts/${wallet}/payments?order=desc`
         )
         const data = response.data?._embedded?.records
         if (data) {

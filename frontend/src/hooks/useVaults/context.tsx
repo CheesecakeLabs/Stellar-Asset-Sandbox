@@ -1,15 +1,10 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useState } from 'react'
 
+import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import axios from 'axios';
-import { useHorizon } from 'hooks/useHorizon';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { http } from 'interfaces/http';
-
+import { http } from 'interfaces/http'
 
 export const VaultsContext = createContext(
   {} as Hooks.UseVaultsTypes.IVaultsContext
@@ -24,6 +19,7 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
   const [vaults, setVaults] = useState<
     Hooks.UseVaultsTypes.IVault[] | undefined
   >()
+  const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault | undefined>()
   const [vaultCategories, setVaultCategories] = useState<
     Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   >()
@@ -109,16 +105,41 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getVaultById = useCallback(
+    async (id: string): Promise<void> => {
+      setLoading(true)
+      try {
+        const response = await http.get(`vault/${id}`)
+        const data = response.data
+        if (data) {
+          const accountData = await getAccountData(data.wallet.key.publicKey)
+          data.accountData = accountData
+          setVault(data)
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [getAccountData]
+  )
+
   return (
     <VaultsContext.Provider
       value={{
         loading,
         vaults,
         vaultCategories,
+        vault,
         getVaults,
         getVaultCategories,
         createVault,
         createVaultCategory,
+        getVaultById,
       }}
     >
       {children}
