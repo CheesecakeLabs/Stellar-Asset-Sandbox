@@ -24,7 +24,7 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 	r := &vaultRoutes{m, a, v, vc, w, as}
 	h := handler.Group("/vault").Use(Auth(r.a.ValidateToken()))
 	{
-		h.GET("/", r.getVaultById)
+		h.GET("/:id", r.getVaultById)
 		h.POST("", r.createVault)
 		h.GET("list", r.getAllVaults)
 	}
@@ -177,7 +177,8 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 // @Failure     500 {object} response
 // @Router      / [get]
 func (r *vaultRoutes) getVaultById(c *gin.Context) {
-	vault, err := r.v.GetAll()
+	userid := c.Param("id")
+	vault, err := r.v.GetById(userid)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting vault")
 		return

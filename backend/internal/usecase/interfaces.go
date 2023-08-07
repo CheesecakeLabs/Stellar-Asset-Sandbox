@@ -64,5 +64,6 @@ type (
 	VaultRepoInterface interface {
 		GetVaults() ([]entity.Vault, error)
 		CreateVault(entity.Vault) (entity.Vault, error)
+		GetVaultById(id string) (entity.Vault, error)
 	}
 )

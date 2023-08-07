@@ -42,3 +42,12 @@ func (uc *VaultUseCase) GetAll() ([]entity.Vault, error) {
 
 	return vault, nil
 }
+
+func (uc *VaultUseCase) GetById(id string) (entity.Vault, error) {
+	asset, err := uc.vRepo.GetVaultById(id)
+	if err != nil {
+		return entity.Vault{}, fmt.Errorf("VaultUseCase - Get - uc.repo.GetVaultById: %w", err)
+	}
+
+	return asset, nil
+}
