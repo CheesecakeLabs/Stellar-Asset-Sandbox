@@ -13,7 +13,9 @@ type AssetRepo struct {
 }
 
 func NewAssetRepo(pg *postgres.Postgres) AssetRepo {
-	return AssetRepo{pg}
+	return AssetRepo{
+		Postgres: pg,
+	}
 }
 
 func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {

@@ -3,18 +3,23 @@ package usecase
 import (
 	"fmt"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 )
 
 type AssetUseCase struct {
 	aRepo AssetRepoInterface
 	wRepo WalletRepoInterface
+	tRepo TomlInterface
+	cfg   config.Horizon
 }
 
-func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface) *AssetUseCase {
+func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tRepo TomlInterface, cfg config.Horizon) *AssetUseCase {
 	return &AssetUseCase{
 		aRepo: aRepo,
 		wRepo: wRepo,
+		tRepo: tRepo,
+		cfg:   cfg,
 	}
 }
 
@@ -64,4 +69,16 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 	}
 
 	return assets, nil
+}
+
+func (uc *AssetUseCase) CreateToml(req entity.TomlData) (string, error) {
+	toml, err := uc.tRepo.GenerateToml(req, uc.cfg)
+
+	return toml, err
+}
+
+func (uc *AssetUseCase) RetrieveToml(code string) (string, error) {
+	toml, err := uc.tRepo.RetrieveToml(code)
+
+	return toml, err
 }

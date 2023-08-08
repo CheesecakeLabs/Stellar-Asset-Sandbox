@@ -1,6 +1,9 @@
 package usecase
 
-import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+import (
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+)
 
 // mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks.go -package=mocks
 
@@ -53,6 +56,11 @@ type (
 	RolePermissionRepoInterface interface {
 		Validate(action string, roleId int) (bool, error)
 		GetRolePermissions(token string) ([]entity.RolePermissionResponse, error)
+	}
+
+	TomlInterface interface {
+		GenerateToml(entity.TomlData, config.Horizon) (string, error)
+		RetrieveToml(string) (string, error)
 	}
 
 	VaultCategoryRepoInterface interface {

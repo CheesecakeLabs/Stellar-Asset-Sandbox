@@ -32,6 +32,9 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/clawback", r.clawbackAsset)
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
+		h.POST("/generate-toml", r.generateTOML)
+		h.GET("/retrieve-toml/:asset_issuer", r.retrieveToml)
+
 	}
 }
 
@@ -581,4 +584,53 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, assets)
+}
+
+// @Summary Create a TOML file
+// @Description Create a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body entity.TomlData true "TOML info"
+// @Success     200 {object} response[string]
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/generate-toml [post]
+func (r *assetsRoutes) generateTOML(c *gin.Context) {
+	var request entity.TomlData
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	toml, err := r.as.CreateToml(request)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error creating TOML")
+		return
+	}
+
+	c.Data(http.StatusOK, "application/toml", []byte(toml))
+}
+
+// @Summary Retrieve a TOML file
+// @Description Retrieve a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       asset_issuer path string true "Asset issuer"
+// @Success     200 {object} response[string]
+// @Failure     500 {object} response
+// @Router      /assets/toml/{asset_issuer} [get]
+func (r *assetsRoutes) retrieveToml(c *gin.Context) {
+	// Get the asset issuer from the request URL
+	assetIssuer := c.Param("asset_issuer")
+
+	// Retrieve the TOML content for the specified asset issuer
+	tomlContent, err := r.as.RetrieveToml(assetIssuer)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML")
+		return
+	}
+
+	c.Data(http.StatusOK, "application/toml", []byte(tomlContent))
 }

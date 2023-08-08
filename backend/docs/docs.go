@@ -286,6 +286,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/generate-toml": {
+            "post": {
+                "description": "Create a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Create a TOML file",
+                "parameters": [
+                    {
+                        "description": "TOML info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets/mint": {
             "post": {
                 "description": "Mint an asset on Stellar",
@@ -325,6 +371,44 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/toml/{asset_issuer}": {
+            "get": {
+                "description": "Retrieve a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Retrieve a TOML file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset issuer",
+                        "name": "asset_issuer",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -831,6 +915,127 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Currency": {
+            "type": "object",
+            "properties": {
+                "anchorAsset": {
+                    "type": "string"
+                },
+                "anchorAssetType": {
+                    "type": "string"
+                },
+                "approvalCriteria": {
+                    "type": "string"
+                },
+                "approvalServer": {
+                    "type": "string"
+                },
+                "attestationOfReserve": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "collateralAddressMessages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "collateralAddressSignatures": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "collateralAddresses": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "conditions": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "displayDecimals": {
+                    "type": "integer"
+                },
+                "fixedNumber": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "isAssetAnchored": {
+                    "type": "boolean"
+                },
+                "isUnlimited": {
+                    "type": "boolean"
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "maxNumber": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "redemptionInstructions": {
+                    "type": "string"
+                },
+                "regulated": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "entity.Documentation": {
+            "type": "object",
+            "properties": {
+                "orgDBA": {
+                    "type": "string"
+                },
+                "orgDescription": {
+                    "type": "string"
+                },
+                "orgGithub": {
+                    "type": "string"
+                },
+                "orgKeybase": {
+                    "type": "string"
+                },
+                "orgLogo": {
+                    "type": "string"
+                },
+                "orgName": {
+                    "type": "string"
+                },
+                "orgOfficialEmail": {
+                    "type": "string"
+                },
+                "orgPhoneNumber": {
+                    "type": "string"
+                },
+                "orgPhoneNumberAttestation": {
+                    "type": "string"
+                },
+                "orgPhysicalAddress": {
+                    "type": "string"
+                },
+                "orgPhysicalAddressAttestation": {
+                    "type": "string"
+                },
+                "orgTwitter": {
+                    "type": "string"
+                },
+                "orgURL": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.Key": {
             "type": "object",
             "properties": {
@@ -852,6 +1057,32 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.Principal": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "idphotoHash": {
+                    "type": "string"
+                },
+                "keybase": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "twitter": {
+                    "type": "string"
+                },
+                "verificationPhotoHash": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.Role": {
             "type": "object",
             "properties": {
@@ -868,13 +1099,63 @@ const docTemplate = `{
         "entity.RolePermissionResponse": {
             "type": "object",
             "properties": {
-                "description": {
+                "action": {
                     "type": "string",
                     "example": "Edit action"
                 },
                 "name": {
                     "type": "string",
                     "example": "Edit"
+                }
+            }
+        },
+        "entity.TomlData": {
+            "type": "object",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "currencies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Currency"
+                    }
+                },
+                "documentation": {
+                    "$ref": "#/definitions/entity.Documentation"
+                },
+                "federationServer": {
+                    "type": "string"
+                },
+                "horizonURL": {
+                    "type": "string"
+                },
+                "networkPassphrase": {
+                    "type": "string"
+                },
+                "principals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Principal"
+                    }
+                },
+                "signingKey": {
+                    "type": "string"
+                },
+                "transferServer": {
+                    "type": "string"
+                },
+                "validators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Validator"
+                    }
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -937,6 +1218,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id_user": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Validator": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "type": "string"
+                },
+                "history": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "publicKey": {
                     "type": "string"
                 }
             }

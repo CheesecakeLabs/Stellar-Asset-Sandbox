@@ -20,6 +20,86 @@ definitions:
         example: USD Coin
         type: string
     type: object
+  entity.Currency:
+    properties:
+      anchorAsset:
+        type: string
+      anchorAssetType:
+        type: string
+      approvalCriteria:
+        type: string
+      approvalServer:
+        type: string
+      attestationOfReserve:
+        type: string
+      code:
+        type: string
+      collateralAddressMessages:
+        items:
+          type: string
+        type: array
+      collateralAddressSignatures:
+        items:
+          type: string
+        type: array
+      collateralAddresses:
+        items:
+          type: string
+        type: array
+      conditions:
+        type: string
+      description:
+        type: string
+      displayDecimals:
+        type: integer
+      fixedNumber:
+        type: integer
+      image:
+        type: string
+      isAssetAnchored:
+        type: boolean
+      isUnlimited:
+        type: boolean
+      issuer:
+        type: string
+      maxNumber:
+        type: integer
+      name:
+        type: string
+      redemptionInstructions:
+        type: string
+      regulated:
+        type: boolean
+    type: object
+  entity.Documentation:
+    properties:
+      orgDBA:
+        type: string
+      orgDescription:
+        type: string
+      orgGithub:
+        type: string
+      orgKeybase:
+        type: string
+      orgLogo:
+        type: string
+      orgName:
+        type: string
+      orgOfficialEmail:
+        type: string
+      orgPhoneNumber:
+        type: string
+      orgPhoneNumberAttestation:
+        type: string
+      orgPhysicalAddress:
+        type: string
+      orgPhysicalAddressAttestation:
+        type: string
+      orgTwitter:
+        type: string
+      orgURL:
+        type: string
+    type: object
   entity.Key:
     properties:
       id:
@@ -35,6 +115,23 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.Principal:
+    properties:
+      email:
+        type: string
+      github:
+        type: string
+      idphotoHash:
+        type: string
+      keybase:
+        type: string
+      name:
+        type: string
+      twitter:
+        type: string
+      verificationPhotoHash:
+        type: string
+    type: object
   entity.Role:
     properties:
       id:
@@ -46,11 +143,44 @@ definitions:
     type: object
   entity.RolePermissionResponse:
     properties:
-      description:
+      action:
         example: Edit action
         type: string
       name:
         example: Edit
+        type: string
+    type: object
+  entity.TomlData:
+    properties:
+      accounts:
+        items:
+          type: string
+        type: array
+      currencies:
+        items:
+          $ref: '#/definitions/entity.Currency'
+        type: array
+      documentation:
+        $ref: '#/definitions/entity.Documentation'
+      federationServer:
+        type: string
+      horizonURL:
+        type: string
+      networkPassphrase:
+        type: string
+      principals:
+        items:
+          $ref: '#/definitions/entity.Principal'
+        type: array
+      signingKey:
+        type: string
+      transferServer:
+        type: string
+      validators:
+        items:
+          $ref: '#/definitions/entity.Validator'
+        type: array
+      version:
         type: string
     type: object
   entity.User:
@@ -92,6 +222,19 @@ definitions:
       id_role:
         type: string
       id_user:
+        type: string
+    type: object
+  entity.Validator:
+    properties:
+      alias:
+        type: string
+      displayName:
+        type: string
+      history:
+        type: string
+      host:
+        type: string
+      publicKey:
         type: string
     type: object
   entity.Vault:
@@ -487,6 +630,36 @@ paths:
       summary: Clawback an asset
       tags:
       - Assets
+  /assets/generate-toml:
+    post:
+      consumes:
+      - application/json
+      description: Create a TOML file
+      parameters:
+      - description: TOML info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TomlData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a TOML file
+      tags:
+      - Assets
   /assets/mint:
     post:
       consumes:
@@ -519,6 +692,31 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Mint an asset
+      tags:
+      - Assets
+  /assets/toml/{asset_issuer}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a TOML file
+      parameters:
+      - description: Asset issuer
+        in: path
+        name: asset_issuer
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve a TOML file
       tags:
       - Assets
   /assets/transfer:

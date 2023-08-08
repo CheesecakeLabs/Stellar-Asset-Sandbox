@@ -17,6 +17,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -36,9 +37,8 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator) {
 	// l := logger.New(cfg.Log.Level)
-
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -52,6 +52,8 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	assetUc := usecase.NewAssetUseCase(
 		repo.NewAssetRepo(pg),
 		repo.NewWalletRepo(pg),
+		tRepo,
+		cfg.Horizon,
 	)
 	roleUc := usecase.NewRoleUseCase(
 		repo.NewRoleRepo(pg),

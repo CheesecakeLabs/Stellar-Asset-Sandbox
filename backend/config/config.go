@@ -9,10 +9,11 @@ import (
 
 type (
 	Config struct {
-		Kafka KafkaConfig
-		PG    PGConfig
-		HTTP  HTTP
-		JWT   JWT
+		Kafka   KafkaConfig
+		PG      PGConfig
+		HTTP    HTTP
+		JWT     JWT
+		Horizon Horizon
 	}
 
 	KafkaConfig struct {
@@ -47,6 +48,14 @@ type (
 
 	JWT struct {
 		SecretKey string `env-required:"true" env:"JWT_SECRET_KEY"`
+	}
+
+	Horizon struct {
+		PublicAPIServer    string `env:"HORIZON_PUBLIC_API_SERVER"`
+		TestAPIServer      string `env:"HORIZON_TEST_API_SERVER"`
+		PublicNetworkPass  string `env:"PUBLIC_NETWORK_PASSPHRASE"`
+		TestNetworkPass    string `env:"TEST_NETWORK_PASSPHRASE"`
+		StellarTomlVersion string `env:"STELLAR_TOML_VERSION"`
 	}
 )
 
