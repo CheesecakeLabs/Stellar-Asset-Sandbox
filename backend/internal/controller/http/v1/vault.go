@@ -20,7 +20,8 @@ type vaultRoutes struct {
 }
 
 func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, v usecase.VaultUseCase, vc usecase.VaultCategoryUseCase,
-	w usecase.WalletUseCase, as usecase.AssetUseCase) {
+	w usecase.WalletUseCase, as usecase.AssetUseCase,
+) {
 	r := &vaultRoutes{m, a, v, vc, w, as}
 	h := handler.Group("/vault").Use(Auth(r.a.ValidateToken()))
 	{
@@ -33,7 +34,7 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
 	VaultCategoryId int    `json:"vault_category_id"   binding:"required"  example:"1"`
-	AssetsId        []int  `json:"assets_id"   binding:"required"  example:"[1]"`
+	AssetsId        []int  `json:"assets_id" binding:"required" example:"[11,2]"`
 }
 
 // @Summary     Create a new vault
@@ -41,7 +42,7 @@ type CreateVaultRequest struct {
 // @Tags  	    Vault
 // @Accept      json
 // @Produce     json
-// @Param       request body CreateVaultRequest true "Vault info"
+// @Param       request body CreateVaultRequest true "CreateVaultRequest"
 // @Success     200 {object} entity.Vault
 // @Failure     400 {object} response
 // @Failure     404 {object} response

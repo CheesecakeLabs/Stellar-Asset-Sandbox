@@ -26,6 +26,11 @@ func (g *DefaultTomlGenerator) GenerateToml(req entity.TomlData, cfg config.Hori
 	return string(tomlBytes), nil
 }
 
-func (g *DefaultTomlGenerator) RetrieveToml(asset string) (string, error) {
-	return "", nil
+func (g *DefaultTomlGenerator) RetrieveToml(data string) (entity.TomlData, error) {
+	var cfg entity.TomlData
+	err := toml.Unmarshal([]byte(data), &cfg)
+	if err != nil {
+		return entity.TomlData{}, err
+	}
+	return cfg, nil
 }

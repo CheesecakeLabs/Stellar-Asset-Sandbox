@@ -89,3 +89,10 @@ type Validator struct {
 	PublicKey   string `toml:"PUBLIC_KEY"`
 	History     string `toml:"HISTORY"`
 }
+
+type Toml struct {
+	ID        int
+	Content   string
+	CreatedAt string `pg:"default:now()"`
+	UpdatedAt string `pg:"default:now()"`
+}

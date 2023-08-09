@@ -575,10 +575,10 @@ func (mr *MockTomlInterfaceMockRecorder) GenerateToml(arg0, arg1 interface{}) *g
 }
 
 // RetrieveToml mocks base method.
-func (m *MockTomlInterface) RetrieveToml(arg0 string) (string, error) {
+func (m *MockTomlInterface) RetrieveToml(arg0 string) (entity.TomlData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RetrieveToml", arg0)
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(entity.TomlData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -587,6 +587,59 @@ func (m *MockTomlInterface) RetrieveToml(arg0 string) (string, error) {
 func (mr *MockTomlInterfaceMockRecorder) RetrieveToml(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveToml", reflect.TypeOf((*MockTomlInterface)(nil).RetrieveToml), arg0)
+}
+
+// MockTomlRepoInterface is a mock of TomlRepoInterface interface.
+type MockTomlRepoInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockTomlRepoInterfaceMockRecorder
+}
+
+// MockTomlRepoInterfaceMockRecorder is the mock recorder for MockTomlRepoInterface.
+type MockTomlRepoInterfaceMockRecorder struct {
+	mock *MockTomlRepoInterface
+}
+
+// NewMockTomlRepoInterface creates a new mock instance.
+func NewMockTomlRepoInterface(ctrl *gomock.Controller) *MockTomlRepoInterface {
+	mock := &MockTomlRepoInterface{ctrl: ctrl}
+	mock.recorder = &MockTomlRepoInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTomlRepoInterface) EXPECT() *MockTomlRepoInterfaceMockRecorder {
+	return m.recorder
+}
+
+// CreateToml mocks base method.
+func (m *MockTomlRepoInterface) CreateToml(arg0 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateToml", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateToml indicates an expected call of CreateToml.
+func (mr *MockTomlRepoInterfaceMockRecorder) CreateToml(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateToml", reflect.TypeOf((*MockTomlRepoInterface)(nil).CreateToml), arg0)
+}
+
+// GetToml mocks base method.
+func (m *MockTomlRepoInterface) GetToml() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetToml")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetToml indicates an expected call of GetToml.
+func (mr *MockTomlRepoInterfaceMockRecorder) GetToml() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetToml", reflect.TypeOf((*MockTomlRepoInterface)(nil).GetToml))
 }
 
 // MockVaultCategoryRepoInterface is a mock of VaultCategoryRepoInterface interface.

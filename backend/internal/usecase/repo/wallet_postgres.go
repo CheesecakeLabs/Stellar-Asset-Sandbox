@@ -24,7 +24,6 @@ func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
 
 	var wallet entity.Wallet
 	err := row.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Wallet{}, fmt.Errorf("WalletRepo - GetWallet - wallet not found")
@@ -36,29 +35,29 @@ func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
 }
 
 func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
-	stmt := `SELECT * FROM Wallet WHERE type=$1`
+	stmt := `SELECT wallet.*, key.* FROM Wallet LEFT JOIN Key ON wallet.id = key.wallet_id WHERE wallet.type=$1`
 	rows, err := r.Db.Query(stmt, wType)
-
 	if err != nil {
 		return nil, fmt.Errorf("WalletRepo - GetWallets - db.Query: %w", err)
 	}
-
 	defer rows.Close()
 
-	entities := make([]entity.Wallet, 0, _defaultEntityCap)
+	var wallets []entity.Wallet
 
 	for rows.Next() {
 		var wallet entity.Wallet
+		var key entity.Key
 
-		err = rows.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
+		err = rows.Scan(&wallet.Id, &wallet.Type, &wallet.Funded, &key.Id, &key.PublicKey, &key.Weight, &key.WalletId)
 		if err != nil {
 			return nil, fmt.Errorf("WalletRepo - GetWallets - rows.Scan: %w", err)
 		}
 
-		entities = append(entities, wallet)
+		wallet.Key = key
+		wallets = append(wallets, wallet)
 	}
 
-	return entities, nil
+	return wallets, nil
 }
 
 func (r WalletRepo) GetKeyByWallet(walletId int) (entity.Key, error) {
@@ -67,7 +66,6 @@ func (r WalletRepo) GetKeyByWallet(walletId int) (entity.Key, error) {
 
 	var key entity.Key
 	err := row.Scan(&key.Id, &key.PublicKey, &key.Weight, &key.WalletId)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Key{}, fmt.Errorf("WalletRepo - GetKeyByWallet - key not found")
@@ -82,7 +80,6 @@ func (r WalletRepo) CreateWallet(data entity.Wallet) (entity.Wallet, error) {
 	res := data
 	stmt := `INSERT INTO Wallet (type) VALUES ($1) RETURNING id;`
 	err := r.Db.QueryRow(stmt, data.Type).Scan(&res.Id)
-
 	if err != nil {
 		return entity.Wallet{}, fmt.Errorf("WalletRepo - CreateWallet - db.QueryRow: %w", err)
 	}
@@ -94,7 +91,6 @@ func (r WalletRepo) CreateKey(data entity.Key) (entity.Key, error) {
 	res := data
 	stmt := `INSERT INTO Key (public_key, weight, wallet_id) VALUES ($1, $2, $3) RETURNING id;`
 	err := r.Db.QueryRow(stmt, data.PublicKey, data.Weight, data.WalletId).Scan(&res.Id)
-
 	if err != nil {
 		return entity.Key{}, fmt.Errorf("WalletRepo - CreateKey - db.QueryRow: %w", err)
 	}
@@ -114,13 +110,11 @@ func (r WalletRepo) CreateWalletWithKey(data entity.Wallet) (entity.Wallet, erro
 		return entity.Wallet{}, fmt.Errorf("WalletRepo - CreateWalletWithKey - uc.repo.CreateKey: %w", err)
 	}
 	return wallet, nil
-
 }
 
 func (r WalletRepo) UpdateWallet(data entity.Wallet) (entity.Wallet, error) {
 	stmt := `UPDATE Wallet SET funded=($1) WHERE id=($2);`
 	result, err := r.Db.Exec(stmt, data.Funded, data.Id)
-
 	if err != nil {
 		return entity.Wallet{}, fmt.Errorf("WalletRepo - UpdateWallet - db.Exec: %v", err)
 	}

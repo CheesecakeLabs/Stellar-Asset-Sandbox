@@ -35,7 +35,8 @@ func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, 
 	rw := mocks.NewMockWalletRepoInterface(mockCtl)
 	ra := mocks.NewMockAssetRepoInterface(mockCtl)
 	tg := mocks.NewMockTomlInterface(mockCtl)
-	u := usecase.NewAssetUseCase(ra, rw, tg, config.Horizon{})
+	tr := mocks.NewMockTomlRepoInterface(mockCtl)
+	u := usecase.NewAssetUseCase(ra, rw, tg, tr, config.Horizon{})
 
 	return u, ra, rw, tg
 }

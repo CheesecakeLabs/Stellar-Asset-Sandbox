@@ -21,6 +21,14 @@ type assetsRoutes struct {
 	a  usecase.AuthUseCase
 }
 
+func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
+	r := &assetsRoutes{w, as, m, a}
+	h := handler.Group("/").Use()
+	{
+		h.GET("/.well-known/stellar.toml", r.retrieveToml)
+	}
+}
+
 func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
 	r := &assetsRoutes{w, as, m, a}
 	h := handler.Group("/assets").Use(Auth(r.a.ValidateToken()))
@@ -33,19 +41,19 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
 		h.POST("/generate-toml", r.generateTOML)
-		h.GET("/retrieve-toml/:asset_issuer", r.retrieveToml)
-
 	}
 }
 
 type CreateAssetRequest struct {
-	SponsorId int      `json:"sponsor_id"    example:"2"`
-	Name      string   `json:"name"       binding:"required"  example:"USDC"`
-	AssetType string   `json:"asset_type"       binding:"required"  example:"security_token"`
-	Code      string   `json:"code"       binding:"required"  example:"USDC"`
-	Limit     *int     `json:"limit"         example:"1000"`
-	Amount    string   `json:"amount"        example:"1000"`
-	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	SponsorId int             `json:"sponsor_id"    example:"2"`
+	Name      string          `json:"name"       binding:"required"  example:"USDC"`
+	AssetType string          `json:"asset_type"       binding:"required"  example:"security_token"`
+	Code      string          `json:"code"       binding:"required"  example:"USDC"`
+	Limit     *int            `json:"limit"         example:"1000"`
+	Amount    string          `json:"amount"        example:"1000"`
+	SetFlags  []string        `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	SetToml   bool            `json:"set_toml"       example:"true"`
+	TomlData  entity.TomlData `json:"toml_data" example:"Example entity.TomlData"`
 }
 
 type BurnAssetRequest struct {
@@ -221,6 +229,17 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	asset, err = r.as.Create(asset)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "database problems")
+		return
+	}
+
+	// See if we need to create a TOML file
+	if !request.SetToml {
+		c.JSON(http.StatusOK, asset)
+	}
+
+	_, err = r.as.UpdateToml(request.TomlData)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to retrieve TOML ")
 		return
 	}
 
@@ -592,7 +611,7 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 // @Accept      json
 // @Produce     json
 // @Param       request body entity.TomlData true "TOML info"
-// @Success     200 {object} response[string]
+// @Success     200 {object} entity.TomlData
 // @Failure     400 {object} response
 // @Failure     500 {object} response
 // @Router      /assets/generate-toml [post]
@@ -618,19 +637,15 @@ func (r *assetsRoutes) generateTOML(c *gin.Context) {
 // @Accept      json
 // @Produce     json
 // @Param       asset_issuer path string true "Asset issuer"
-// @Success     200 {object} response[string]
+// @Success     200 {object} entity.TomlData
 // @Failure     500 {object} response
-// @Router      /assets/toml/{asset_issuer} [get]
+// @Router      /.well-known/stellar.toml [get]
 func (r *assetsRoutes) retrieveToml(c *gin.Context) {
-	// Get the asset issuer from the request URL
-	assetIssuer := c.Param("asset_issuer")
-
-	// Retrieve the TOML content for the specified asset issuer
-	tomlContent, err := r.as.RetrieveToml(assetIssuer)
+	tomlContent, err := r.as.RetrieveToml()
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML")
 		return
 	}
 
-	c.Data(http.StatusOK, "application/toml", []byte(tomlContent))
+	c.Data(http.StatusOK, "text/plain", []byte(tomlContent))
 }

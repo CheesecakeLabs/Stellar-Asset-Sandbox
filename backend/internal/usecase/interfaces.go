@@ -60,7 +60,12 @@ type (
 
 	TomlInterface interface {
 		GenerateToml(entity.TomlData, config.Horizon) (string, error)
-		RetrieveToml(string) (string, error)
+		RetrieveToml(string) (entity.TomlData, error)
+	}
+
+	TomlRepoInterface interface {
+		CreateToml(string) (string, error)
+		GetToml() (string, error)
 	}
 
 	VaultCategoryRepoInterface interface {
