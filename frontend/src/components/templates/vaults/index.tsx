@@ -1,4 +1,12 @@
-import { Container, Flex, Text, SimpleGrid, Box, Tag } from '@chakra-ui/react'
+import {
+  Container,
+  Flex,
+  Text,
+  SimpleGrid,
+  Box,
+  Tag,
+  Button,
+} from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -6,7 +14,7 @@ import { toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { CoinIcon, LockIcon, PlusIcon } from 'components/icons'
+import { CoinIcon, LockIcon, NewIcon } from 'components/icons'
 
 interface IVaultsTemplate {
   loading: boolean
@@ -26,6 +34,13 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Vaults
           </Text>
+          <Button
+            variant="primary"
+            leftIcon={<NewIcon />}
+            onClick={(): void => navigate({ pathname: PathRoute.VAULT_CREATE })}
+          >
+            Create Vault
+          </Button>
         </Flex>
         <Box p={0} maxW="full">
           {loading || !vaults ? (
@@ -97,23 +112,6 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
                     )}
                 </Container>
               ))}
-              <Container
-                variant="primary"
-                display="flex"
-                flexDir="column"
-                onClick={(): void =>
-                  navigate({ pathname: PathRoute.VAULT_CREATE })
-                }
-                fill="gray.650"
-                stroke="gray.650"
-                _dark={{ fill: 'white', stroke: 'white' }}
-                cursor="pointer"
-                justifyContent="center"
-                alignItems="center"
-                bg="none"
-              >
-                <PlusIcon width="10rem" />
-              </Container>
             </SimpleGrid>
           )}
         </Box>

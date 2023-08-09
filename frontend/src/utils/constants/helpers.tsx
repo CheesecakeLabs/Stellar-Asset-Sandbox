@@ -15,3 +15,6 @@ export const freezeHelper =
 
 export const clawbackHelper =
   'Feature explanation, what it does and what will happen lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur'
+
+export const newContractHelper =
+  'Feature explanation, what it does and what will happen lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet consecteur'

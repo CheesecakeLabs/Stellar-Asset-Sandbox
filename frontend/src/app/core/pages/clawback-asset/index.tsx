@@ -1,9 +1,11 @@
 import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useHorizon } from 'hooks/useHorizon'
+import { useVaults } from 'hooks/useVaults'
 import { clawbackHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
@@ -17,20 +19,23 @@ import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
 export const ClawbackAsset: React.FC = () => {
   const { clawback, loading } = useAssets()
+  const { vaults, getVaults } = useVaults()
+  const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
   const location = useLocation()
   const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void> => {
     try {
       const isSuccess = await clawback({
         sponsor_id: 1,
         amount: data.amount,
         code: asset.code,
-        from: data.from,
+        from: wallet ? wallet : data.from,
       })
 
       if (isSuccess) {
@@ -47,6 +52,7 @@ export const ClawbackAsset: React.FC = () => {
         })
         return
       }
+      getAssetData(asset.code, asset.issuer.key.publicKey)
 
       toastError(MessagesError.errorOccurred)
     } catch (error) {
@@ -68,6 +74,14 @@ export const ClawbackAsset: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    getVaults()
+  }, [getVaults])
+
+  useEffect(() => {
+    getAssetData(asset.code, asset.issuer.key.publicKey)
+  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
@@ -78,6 +92,8 @@ export const ClawbackAsset: React.FC = () => {
               onSubmit={onSubmit}
               loading={loading}
               asset={asset}
+              vaults={vaults}
+              assetData={assetData}
             />
           </Flex>
           <VStack>

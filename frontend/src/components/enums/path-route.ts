@@ -20,4 +20,6 @@ export enum PathRoute {
   VAULTS = '/vaults',
   VAULT_CREATE = '/vault-create',
   VAULT_DETAIL = '/vault-detail',
+  CONTRACT_DETAIL = '/contract-detail',
+  CONTRACT_CREATE = '/contract-create',
 }

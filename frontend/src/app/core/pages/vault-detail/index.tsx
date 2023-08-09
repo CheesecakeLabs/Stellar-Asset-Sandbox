@@ -8,6 +8,7 @@ import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 
+import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { VaultDetailTemplate } from 'components/templates/vault-detail'
@@ -18,7 +19,7 @@ export const VaultDetail: React.FC = () => {
   const { id } = useParams()
   const { loading, assets, getAssets, distribute } = useAssets()
   const { vaults, getVaults, vault, getVaultById } = useVaults()
-  const { paymentsData, getPaymentsData } = useHorizon()
+  const { paymentsData, getPaymentsData, loadingHorizon } = useHorizon()
 
   const [selectedAsset, setSelectedAsset] =
     useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -45,7 +46,7 @@ export const VaultDetail: React.FC = () => {
 
         toast({
           title: 'Distribute success!',
-          description: `You distributed ${data.amount} ${selectedAsset.code} to ${data.destination_wallet_id}`,
+          description: `You distributed ${data.amount} ${selectedAsset.code}`,
           status: 'success',
           duration: 9000,
           isClosable: true,
@@ -84,6 +85,11 @@ export const VaultDetail: React.FC = () => {
   }
 
   useEffect(() => {
+    getVaults()
+    getAssets()
+  }, [getAssets, getVaults])
+
+  useEffect(() => {
     if (id) {
       getVaultById(id)
     }
@@ -94,11 +100,6 @@ export const VaultDetail: React.FC = () => {
       getPaymentsData(vault.wallet.key.publicKey)
     }
   }, [getPaymentsData, vault])
-
-  useEffect(() => {
-    getVaults()
-    getAssets()
-  }, [getAssets, getVaults])
 
   return (
     <Flex>
@@ -112,6 +113,7 @@ export const VaultDetail: React.FC = () => {
           payments={paymentsData}
           setSelectedAsset={setSelectedAsset}
           selectedAsset={selectedAsset}
+          loadingHorizon={false}
         />
       </Sidebar>
     </Flex>

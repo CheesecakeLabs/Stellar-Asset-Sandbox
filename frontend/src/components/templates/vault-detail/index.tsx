@@ -22,6 +22,7 @@ interface IVaultDetailTemplate {
     SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
   >
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  loadingHorizon: boolean
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
@@ -33,6 +34,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   vaults,
   payments,
   selectedAsset,
+  loadingHorizon,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
@@ -69,6 +71,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 onSubmit={onSubmit}
                 loading={loading}
                 vaults={filteredVaults}
+                vault={vault}
                 selectedAsset={selectedAsset}
               />
             </Flex>
@@ -77,9 +80,8 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 payments={payments}
                 vaults={vaults}
                 vault={vault}
-                distributorWallet={
-                  selectedAsset?.distributor.key.publicKey || ''
-                }
+                loading={loadingHorizon}
+                assets={assets}
               />
             </Flex>
           </>

@@ -107,6 +107,7 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
 
   const getVaultById = useCallback(
     async (id: string): Promise<void> => {
+      setVault(undefined)
       setLoading(true)
       try {
         const response = await http.get(`vault/${id}`)

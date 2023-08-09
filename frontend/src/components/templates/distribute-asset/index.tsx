@@ -7,9 +7,12 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Text,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+
+import { toCrypto } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { SelectVault } from 'components/molecules/select-vault'
@@ -23,6 +26,7 @@ interface IDistributeAssetTemplate {
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  assetData: Hooks.UseHorizonTypes.IAsset | undefined
 }
 
 export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
@@ -30,6 +34,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
   loading,
   asset,
   vaults,
+  assetData,
 }) => {
   const {
     register,
@@ -69,6 +74,20 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
+
+            <Text
+              color="gray.900"
+              fontWeight="600"
+              fontSize="xs"
+              mt="0.5rem"
+              ms="0.25rem"
+            >
+              {`Circulation supply: ${
+                assetData
+                  ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
+                  : 'loading'
+              }`}
+            </Text>
 
             <Flex justifyContent="flex-end">
               <Button

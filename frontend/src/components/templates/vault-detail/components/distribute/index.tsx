@@ -26,6 +26,7 @@ interface IDistributeVault {
   ): Promise<void>
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vault: Hooks.UseVaultsTypes.IVault | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
 }
 
@@ -33,6 +34,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
   onSubmit,
   loading,
   vaults,
+  vault,
   selectedAsset,
 }) => {
   const {
@@ -42,6 +44,16 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
     setValue,
   } = useForm()
   const [wallet, setWallet] = useState<string | undefined>()
+
+  const getBalance = (): string => {
+    return (
+      vault?.accountData?.balances.find(
+        balance =>
+          balance.asset_code === selectedAsset?.code &&
+          balance.asset_issuer === selectedAsset.issuer.key.publicKey
+      )?.balance || ''
+    )
+  }
 
   return (
     <Flex flexDir="column" w="full">
@@ -76,9 +88,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                 <CoinIcon width="1rem" />
                 <Flex flexDir="column" ms="1rem">
                   <Text fontSize="sm">{selectedAsset.code}</Text>
-                  <Text fontSize="xs">
-                    {toCrypto(Number(selectedAsset.assetData?.amount))}
-                  </Text>
+                  <Text fontSize="xs">{toCrypto(Number(getBalance()))}</Text>
                 </Flex>
               </Flex>
 

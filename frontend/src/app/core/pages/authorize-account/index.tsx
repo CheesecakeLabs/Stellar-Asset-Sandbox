@@ -1,20 +1,25 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
-import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { Flex, useToast, VStack } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { FieldValues, UseFormSetValue } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 
-import { useAssets } from 'hooks/useAssets'
-import { useVaults } from 'hooks/useVaults'
-import { authorizeHelper } from 'utils/constants/helpers'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { AssetActions } from 'components/enums/asset-actions'
-import { PathRoute } from 'components/enums/path-route'
-import { ActionHelper } from 'components/molecules/action-helper'
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
-import { Sidebar } from 'components/organisms/sidebar'
-import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
+
+import { useAssets } from 'hooks/useAssets';
+import { useVaults } from 'hooks/useVaults';
+import { authorizeHelper } from 'utils/constants/helpers';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { AssetActions } from 'components/enums/asset-actions';
+import { PathRoute } from 'components/enums/path-route';
+import { ActionHelper } from 'components/molecules/action-helper';
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
+import { Sidebar } from 'components/organisms/sidebar';
+import { AuthorizeAccountTemplate } from 'components/templates/authorize-account';
+
 
 export const AuthorizeAccount: React.FC = () => {
   const { authorize, loading } = useAssets()
@@ -40,7 +45,7 @@ export const AuthorizeAccount: React.FC = () => {
         setValue('wallet', '')
         toast({
           title: 'Authorize success!',
-          description: `You authorized ${data.wallet}`,
+          description: `You authorized the account`,
           status: 'success',
           duration: 9000,
           isClosable: true,

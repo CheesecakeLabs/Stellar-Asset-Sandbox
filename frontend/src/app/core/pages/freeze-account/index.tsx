@@ -1,9 +1,10 @@
 import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useVaults } from 'hooks/useVaults'
 import { freezeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
@@ -17,6 +18,7 @@ import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
 export const FreezeAccount: React.FC = () => {
   const { updateAuthFlags, loading } = useAssets()
+  const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
   const asset = location.state
@@ -25,11 +27,12 @@ export const FreezeAccount: React.FC = () => {
     data: FieldValues,
     clearFlags: string[],
     setFlags: string[],
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void> => {
     try {
       const isSuccess = await updateAuthFlags({
-        trustor_pk: data.trustor_pk,
+        trustor_pk: wallet ? wallet : data.trustor_pk,
         issuer: asset.issuer.id,
         code: asset.code,
         clear_flags: clearFlags,
@@ -72,6 +75,10 @@ export const FreezeAccount: React.FC = () => {
     })
   }
 
+  useEffect(() => {
+    getVaults()
+  }, [getVaults])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
@@ -82,6 +89,7 @@ export const FreezeAccount: React.FC = () => {
               onSubmit={onSubmit}
               loading={loading}
               asset={asset}
+              vaults={vaults}
             />
           </Flex>
           <VStack>

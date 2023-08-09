@@ -4,6 +4,7 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { distributeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -19,6 +20,7 @@ import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 export const DistributeAsset: React.FC = () => {
   const { distribute, loading } = useAssets()
   const { vaults, getVaults } = useVaults()
+  const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
   const location = useLocation()
   const asset = location.state as Hooks.UseAssetsTypes.IAssetDto
@@ -30,7 +32,7 @@ export const DistributeAsset: React.FC = () => {
   ): Promise<void> => {
     try {
       const isSuccess = await distribute({
-        source_wallet_id: asset.issuer.id,
+        source_wallet_id: asset.distributor.id,
         destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
         asset_id: asset.id.toString(),
         sponsor_id: 1,
@@ -43,12 +45,13 @@ export const DistributeAsset: React.FC = () => {
 
         toast({
           title: 'Distribute success!',
-          description: `You distributed ${data.amount} ${asset.code} to ${data.destination_wallet_id}`,
+          description: `You distributed ${data.amount} ${asset.code}`,
           status: 'success',
           duration: 9000,
           isClosable: true,
           position: 'top-right',
         })
+        getAssetData(asset.code, asset.issuer.key.publicKey)
         return
       }
 
@@ -76,6 +79,10 @@ export const DistributeAsset: React.FC = () => {
     getVaults()
   }, [getVaults])
 
+  useEffect(() => {
+    getAssetData(asset.code, asset.issuer.key.publicKey)
+  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
@@ -87,6 +94,7 @@ export const DistributeAsset: React.FC = () => {
               loading={loading}
               asset={asset}
               vaults={vaults}
+              assetData={assetData}
             />
           </Flex>
           <VStack>

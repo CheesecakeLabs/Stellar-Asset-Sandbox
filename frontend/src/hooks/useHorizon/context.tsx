@@ -1,10 +1,7 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useState } from 'react'
 
-
-
-import axios from 'axios';
-import { MessagesError } from 'utils/constants/messages-error';
-
+import axios from 'axios'
+import { MessagesError } from 'utils/constants/messages-error'
 
 export const HorizonContext = createContext(
   {} as Hooks.UseHorizonTypes.IHorizonContext
@@ -75,6 +72,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     async (
       wallet: string
     ): Promise<Hooks.UseHorizonTypes.IPayment | undefined> => {
+      setPaymentsData([])
       setLoadingHorizon(true)
       try {
         const response = await axios.get(
