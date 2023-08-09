@@ -97,26 +97,27 @@ func (uc *AssetUseCase) RetrieveToml() (string, error) {
 }
 
 func (uc *AssetUseCase) UpdateToml(updatedToml entity.TomlData) (string, error) {
-	// Get old toml data
+	// Get old toml data in the database
 	oldTomlDb, err := uc.tRepo.GetToml()
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - RetrieveToml - uc.repo.GetToml: %w", err)
 	}
 
-	oldTomlData, err := uc.tInt.RetrieveToml(oldTomlDb)
+	oldTomParsed, err := uc.tInt.RetrieveToml(oldTomlDb) // Parse old toml data
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.tInt.GenerateToml: %w", err)
 	}
 
 	// Update old toml data with new data
-	newTomlData := updateTomlData(oldTomlData, updatedToml)
+	newTomlParsed := updateTomlData(oldTomParsed, updatedToml)
 
-	// Generate new toml in the database
-	tomlCreated, err := uc.tInt.GenerateToml(newTomlData, uc.cfg)
+	// Parse the new toml data in a TOML string
+	tomlCreated, err := uc.tInt.GenerateToml(newTomlParsed, uc.cfg)
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - CreateToml - uc.tInt.GenerateToml: %w", err)
 	}
 
+	// Save the new toml data in the database
 	_, err = uc.tRepo.CreateToml(tomlCreated)
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.repo.CreateToml: %w", err)
@@ -144,22 +145,22 @@ func updateTomlData(existing, updated entity.TomlData) entity.TomlData {
 	if updated.HorizonURL != "" {
 		existing.HorizonURL = updated.HorizonURL
 	}
-	// ... update other fields in a similar way
 
-	existing.Accounts = appendIfNotExistsSlice(existing.Accounts, updated.Accounts)
-	existing.Principals = appendIfNotExistsPrincipalSlice(existing.Principals, updated.Principals)
-	existing.Currencies = appendIfNotExistsCurrencySlice(existing.Currencies, updated.Currencies)
-	existing.Validators = appendIfNotExistsValidatorSlice(existing.Validators, updated.Validators)
-	// ... update other slices in a similar way
+	existing.Accounts = appendIfNotExists(existing.Accounts, updated.Accounts, func(item1, item2 string) bool {
+		return item1 == item2
+	})
+	existing.Principals = appendIfNotExistsPrincipal(existing.Principals, updated.Principals)
+	existing.Currencies = appendIfNotExistsCurrency(existing.Currencies, updated.Currencies)
+	existing.Validators = appendIfNotExistsValidator(existing.Validators, updated.Validators)
 
 	return existing
 }
 
-func appendIfNotExistsSlice(existing []string, newItems []string) []string {
+func appendIfNotExists[T any](existing []T, newItems []T, equals func(T, T) bool) []T {
 	for _, newItem := range newItems {
 		found := false
 		for _, item := range existing {
-			if item == newItem {
+			if equals(item, newItem) {
 				found = true
 				break
 			}
@@ -171,50 +172,20 @@ func appendIfNotExistsSlice(existing []string, newItems []string) []string {
 	return existing
 }
 
-func appendIfNotExistsPrincipalSlice(existing []entity.Principal, newItems []entity.Principal) []entity.Principal {
-	for _, newItem := range newItems {
-		found := false
-		for _, item := range existing {
-			if item.Name == newItem.Name {
-				found = true
-				break
-			}
-		}
-		if !found {
-			existing = append(existing, newItem)
-		}
-	}
-	return existing
+func appendIfNotExistsPrincipal(existing []entity.Principal, newItems []entity.Principal) []entity.Principal {
+	return appendIfNotExists(existing, newItems, func(item1, item2 entity.Principal) bool {
+		return item1.Name == item2.Name
+	})
 }
 
-func appendIfNotExistsCurrencySlice(existing []entity.Currency, newItems []entity.Currency) []entity.Currency {
-	for _, newItem := range newItems {
-		found := false
-		for _, item := range existing {
-			if item.Code == newItem.Code {
-				found = true
-				break
-			}
-		}
-		if !found {
-			existing = append(existing, newItem)
-		}
-	}
-	return existing
+func appendIfNotExistsCurrency(existing []entity.Currency, newItems []entity.Currency) []entity.Currency {
+	return appendIfNotExists(existing, newItems, func(item1, item2 entity.Currency) bool {
+		return item1.Code == item2.Code
+	})
 }
 
-func appendIfNotExistsValidatorSlice(existing []entity.Validator, newItems []entity.Validator) []entity.Validator {
-	for _, newItem := range newItems {
-		found := false
-		for _, item := range existing {
-			if item.Alias == newItem.Alias {
-				found = true
-				break
-			}
-		}
-		if !found {
-			existing = append(existing, newItem)
-		}
-	}
-	return existing
+func appendIfNotExistsValidator(existing []entity.Validator, newItems []entity.Validator) []entity.Validator {
+	return appendIfNotExists(existing, newItems, func(item1, item2 entity.Validator) bool {
+		return item1.Alias == item2.Alias
+	})
 }
