@@ -61,6 +61,7 @@ type (
 	TomlInterface interface {
 		GenerateToml(entity.TomlData, config.Horizon) (string, error)
 		RetrieveToml(string) (entity.TomlData, error)
+		AppendTomlData(entity.TomlData, entity.TomlData) (entity.TomlData, error)
 	}
 
 	TomlRepoInterface interface {

@@ -559,6 +559,21 @@ func (m *MockTomlInterface) EXPECT() *MockTomlInterfaceMockRecorder {
 	return m.recorder
 }
 
+// AppendTomlData mocks base method.
+func (m *MockTomlInterface) AppendTomlData(arg0, arg1 entity.TomlData) (entity.TomlData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AppendTomlData", arg0, arg1)
+	ret0, _ := ret[0].(entity.TomlData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AppendTomlData indicates an expected call of AppendTomlData.
+func (mr *MockTomlInterfaceMockRecorder) AppendTomlData(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendTomlData", reflect.TypeOf((*MockTomlInterface)(nil).AppendTomlData), arg0, arg1)
+}
+
 // GenerateToml mocks base method.
 func (m *MockTomlInterface) GenerateToml(arg0 entity.TomlData, arg1 config.Horizon) (string, error) {
 	m.ctrl.T.Helper()
