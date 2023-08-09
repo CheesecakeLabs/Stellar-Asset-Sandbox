@@ -48,6 +48,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/.well-known/stellar.toml": {
+            "get": {
+                "description": "Retrieve a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Retrieve a TOML file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset issuer",
+                        "name": "asset_issuer",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets": {
             "get": {
                 "description": "Get all assets",
@@ -314,7 +352,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.response"
+                            "$ref": "#/definitions/entity.TomlData"
                         }
                     },
                     "400": {
@@ -371,44 +409,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.response"
-                        }
-                    }
-                }
-            }
-        },
-        "/assets/toml/{asset_issuer}": {
-            "get": {
-                "description": "Retrieve a TOML file",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Assets"
-                ],
-                "summary": "Retrieve a TOML file",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Asset issuer",
-                        "name": "asset_issuer",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -663,7 +663,7 @@ const docTemplate = `{
                 "summary": "Create a new vault",
                 "parameters": [
                     {
-                        "description": "Vault info",
+                        "description": "CreateVaultRequest",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -1341,49 +1341,7 @@ const docTemplate = `{
             }
         },
         "v1.CreateAssetRequest": {
-            "type": "object",
-            "required": [
-                "asset_type",
-                "code",
-                "name"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "string",
-                    "example": "1000"
-                },
-                "asset_type": {
-                    "type": "string",
-                    "example": "security_token"
-                },
-                "code": {
-                    "type": "string",
-                    "example": "USDC"
-                },
-                "limit": {
-                    "type": "integer",
-                    "example": 1000
-                },
-                "name": {
-                    "type": "string",
-                    "example": "USDC"
-                },
-                "set_flags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "[\"AUTH_REQUIRED_FLAGS\"",
-                        " \"AUTH_REVOCABLE_FLAGS\"",
-                        "\"AUTH_CLAWBACK_ENABLED\"]"
-                    ]
-                },
-                "sponsor_id": {
-                    "type": "integer",
-                    "example": 2
-                }
-            }
+            "type": "object"
         },
         "v1.CreateVaultCategoryRequest": {
             "type": "object",

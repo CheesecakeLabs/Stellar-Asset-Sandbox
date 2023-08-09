@@ -307,37 +307,6 @@ definitions:
     - from
     type: object
   v1.CreateAssetRequest:
-    properties:
-      amount:
-        example: "1000"
-        type: string
-      asset_type:
-        example: security_token
-        type: string
-      code:
-        example: USDC
-        type: string
-      limit:
-        example: 1000
-        type: integer
-      name:
-        example: USDC
-        type: string
-      set_flags:
-        example:
-        - '["AUTH_REQUIRED_FLAGS"'
-        - ' "AUTH_REVOCABLE_FLAGS"'
-        - '"AUTH_CLAWBACK_ENABLED"]'
-        items:
-          type: string
-        type: array
-      sponsor_id:
-        example: 2
-        type: integer
-    required:
-    - asset_type
-    - code
-    - name
     type: object
   v1.CreateVaultCategoryRequest:
     properties:
@@ -474,6 +443,31 @@ paths:
       summary: Get all vault categories
       tags:
       - Vault category
+  /.well-known/stellar.toml:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a TOML file
+      parameters:
+      - description: Asset issuer
+        in: path
+        name: asset_issuer
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve a TOML file
+      tags:
+      - Assets
   /assets:
     get:
       consumes:
@@ -648,7 +642,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.response'
+            $ref: '#/definitions/entity.TomlData'
         "400":
           description: Bad Request
           schema:
@@ -692,31 +686,6 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Mint an asset
-      tags:
-      - Assets
-  /assets/toml/{asset_issuer}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a TOML file
-      parameters:
-      - description: Asset issuer
-        in: path
-        name: asset_issuer
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.response'
-      summary: Retrieve a TOML file
       tags:
       - Assets
   /assets/transfer:
@@ -874,7 +843,7 @@ paths:
       - application/json
       description: Create and issue a new asset on Stellar
       parameters:
-      - description: Vault info
+      - description: CreateVaultRequest
         in: body
         name: request
         required: true

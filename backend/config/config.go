@@ -43,7 +43,8 @@ type (
 	}
 
 	HTTP struct {
-		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		Port           string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		FrontEndAdress string `env-required:"true" yaml:"front_adress" env:"HTTP_FRONT_ADRESS"`
 	}
 
 	JWT struct {

@@ -77,6 +77,7 @@ require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/Eun/go-hit v0.5.23
 	github.com/bitly/go-notify v0.0.0-20130217044602-0a148b8111d6
+	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
