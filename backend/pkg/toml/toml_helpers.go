@@ -2,7 +2,7 @@ package toml
 
 import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 
-func AppendTomlData(existing, updated entity.TomlData) entity.TomlData {
+func (g *DefaultTomlGenerator) AppendTomlData(existing, updated entity.TomlData) (entity.TomlData, error) {
 	if updated.Version != "" {
 		existing.Version = updated.Version
 	}
@@ -29,7 +29,7 @@ func AppendTomlData(existing, updated entity.TomlData) entity.TomlData {
 	existing.Currencies = appendIfNotExistsCurrency(existing.Currencies, updated.Currencies)
 	existing.Validators = appendIfNotExistsValidator(existing.Validators, updated.Validators)
 
-	return existing
+	return existing, nil
 }
 
 func appendIfNotExists[T any](existing []T, newItems []T, equals func(T, T) bool) []T {
