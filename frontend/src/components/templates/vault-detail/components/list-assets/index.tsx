@@ -70,6 +70,11 @@ export const ListAssets: React.FC<IListAssets> = ({
                   bg={
                     selectedAsset === getAsset(balance) ? 'gray.100' : 'white'
                   }
+                  _dark={
+                    selectedAsset
+                      ? { bg: 'black.600', borderColor: 'black.800' }
+                      : { bg: 'none', borderColor: 'black.800' }
+                  }
                 >
                   <Flex
                     alignItems="center"
@@ -82,7 +87,12 @@ export const ListAssets: React.FC<IListAssets> = ({
                     <Text fontSize="sm">{balance.asset_code}</Text>
                   </Flex>
                   <Flex alignItems="center" gap={2}>
-                    <Text fontSize="xs" fontWeight="700" color="gray.900">
+                    <Text
+                      fontSize="xs"
+                      fontWeight="700"
+                      color="gray.900"
+                      _dark={{ color: 'white' }}
+                    >
                       {toCrypto(Number(balance.balance))}
                     </Text>
                     {!balance.is_authorized && <LockIcon width="1rem" />}

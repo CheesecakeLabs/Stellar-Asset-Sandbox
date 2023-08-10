@@ -38,7 +38,6 @@ export const ContractsDetail: React.FC = () => {
   }
 
   const updatePosition = useCallback((): void => {
-    console.log('entrou')
     if (!pauseProcess) {
       getPosition(setUserPosition, userAccount)
       getYield(setUserYield, userAccount)

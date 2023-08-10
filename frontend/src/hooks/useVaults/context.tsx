@@ -31,10 +31,12 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
       const response = await http.get(`vault/list`)
       const data = response.data
       if (data) {
-        data.forEach(async (vault: Hooks.UseVaultsTypes.IVault) => {
-          const accountData = await getAccountData(vault.wallet.key.publicKey)
-          vault.accountData = accountData
-        })
+        await Promise.all(
+          data.map(async (vault: Hooks.UseVaultsTypes.IVault) => {
+            const accountData = await getAccountData(vault.wallet.key.publicKey)
+            vault.accountData = accountData
+          })
+        )
         setVaults(data)
       }
     } catch (error) {

@@ -13,6 +13,7 @@ export const Vaults: React.FC = () => {
   useEffect(() => {
     getVaults()
   }, [getVaults])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.VAULTS}>
