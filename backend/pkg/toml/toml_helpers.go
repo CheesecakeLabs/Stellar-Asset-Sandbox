@@ -1,35 +1,20 @@
 package toml
 
-import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+import (
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+)
 
-func (g *DefaultTomlGenerator) AppendTomlData(existing, updated entity.TomlData) (entity.TomlData, error) {
-	if updated.Version != "" {
-		existing.Version = updated.Version
-	}
-	if updated.NetworkPassphrase != "" {
-		existing.NetworkPassphrase = updated.NetworkPassphrase
-	}
-	if updated.FederationServer != "" {
-		existing.FederationServer = updated.FederationServer
-	}
-	if updated.TransferServer != "" {
-		existing.TransferServer = updated.TransferServer
-	}
-	if updated.SigningKey != "" {
-		existing.SigningKey = updated.SigningKey
-	}
-	if updated.HorizonURL != "" {
-		existing.HorizonURL = updated.HorizonURL
-	}
+type FieldConfig struct {
+	Field     *string
+	ConfigVal string
+}
 
-	existing.Accounts = appendIfNotExists(existing.Accounts, updated.Accounts, func(item1, item2 string) bool {
-		return item1 == item2
-	})
-	existing.Principals = appendIfNotExistsPrincipal(existing.Principals, updated.Principals)
-	existing.Currencies = appendIfNotExistsCurrency(existing.Currencies, updated.Currencies)
-	existing.Validators = appendIfNotExistsValidator(existing.Validators, updated.Validators)
-
-	return existing, nil
+func updateFieldsIfEmpty(fields []FieldConfig) {
+	for _, field := range fields {
+		if *field.Field == "" {
+			*field.Field = field.ConfigVal
+		}
+	}
 }
 
 func appendIfNotExists[T any](existing []T, newItems []T, equals func(T, T) bool) []T {

@@ -41,6 +41,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
 		h.POST("/generate-toml", r.generateTOML)
+		h.PUT("/update-toml", r.updateTOML)
 	}
 }
 
@@ -648,4 +649,30 @@ func (r *assetsRoutes) retrieveToml(c *gin.Context) {
 	}
 
 	c.Data(http.StatusOK, "text/plain", []byte(tomlContent))
+}
+
+// @Summary Update a TOML file
+// @Description Update a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body entity.TomlData true "TOML info"
+// @Success     200 {object} entity.TomlData
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/update-toml [put]
+func (r *assetsRoutes) updateTOML(c *gin.Context) {
+	var request entity.TomlData
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	toml, err := r.as.UpdateToml(request)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating TOML")
+		return
+	}
+
+	c.Data(http.StatusOK, "application/toml", []byte(toml))
 }

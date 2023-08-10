@@ -109,7 +109,7 @@ func (uc *AssetUseCase) UpdateToml(updatedToml entity.TomlData) (string, error) 
 	}
 
 	// Update old toml data with new data
-	newTomlParsed, err := uc.tInt.AppendTomlData(oldTomParsed, updatedToml)
+	newTomlParsed, err := uc.tInt.UpdateTomlData(oldTomParsed, updatedToml)
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.tInt.GenerateToml: %w", err)
 	}
