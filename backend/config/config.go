@@ -57,6 +57,37 @@ type (
 		PublicNetworkPass  string `env:"PUBLIC_NETWORK_PASSPHRASE"`
 		TestNetworkPass    string `env:"TEST_NETWORK_PASSPHRASE"`
 		StellarTomlVersion string `env:"STELLAR_TOML_VERSION"`
+		HorizonURL         string `env:"HORIZON_URL"`
+		FederationServer   string `env:"FEDERATION_SERVER"`
+		TransferServer     string `env:"TRANSFER_SERVER"`
+		Documentation      Documentation
+		Principals         Principals
+	}
+
+	Documentation struct {
+		OrgName                       string `env:"ORG_NAME"`
+		OrgDBA                        string `env:"ORG_DBA"`
+		OrgURL                        string `env:"ORG_URL"`
+		OrgLogo                       string `env:"ORG_LOGO"`
+		OrgDescription                string `env:"ORG_DESCRIPTION"`
+		OrgPhysicalAddress            string `env:"ORG_PHYSICAL_ADDRESS"`
+		OrgPhysicalAddressAttestation string `env:"ORG_PHYSICAL_ADDRESS_ATTESTATION"`
+		OrgPhoneNumber                string `env:"ORG_PHONE_NUMBER"`
+		OrgPhoneNumberAttestation     string `env:"ORG_PHONE_NUMBER_ATTESTATION"`
+		OrgKeybase                    string `env:"ORG_KEYBASE"`
+		OrgTwitter                    string `env:"ORG_TWITTER"`
+		OrgGithub                     string `env:"ORG_GITHUB"`
+		OrgOfficialEmail              string `env:"ORG_OFFICIAL_EMAIL"`
+	}
+
+	Principals struct {
+		Name                  string `env:"PRINCIPALS_NAME"`
+		Email                 string `env:"PRINCIPALS_EMAIL"`
+		Keybase               string `env:"PRINCIPALS_KEYBASE"`
+		Github                string `env:"PRINCIPALS_GITHUB"`
+		Twitter               string `env:"PRINCIPALS_TWITTER"`
+		IDPhotoHash           string `env:"PRINCIPALS_ID_PHOTO_HASH"`
+		VerificationPhotoHash string `env:"PRINCIPALS_VERIFICATION_PHOTO_HASH"`
 	}
 )
 
