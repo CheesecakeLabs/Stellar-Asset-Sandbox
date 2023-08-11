@@ -17,7 +17,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
 
 export const MintAsset: React.FC = () => {
-  const { mint, loading } = useAssets()
+  const { mint, loadingOperation } = useAssets()
   const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
   const location = useLocation()
@@ -80,7 +80,7 @@ export const MintAsset: React.FC = () => {
             <ManagementBreadcrumb title={'Mint'} />
             <MintAssetTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               assetData={assetData}
             />

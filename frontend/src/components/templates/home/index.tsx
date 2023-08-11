@@ -9,6 +9,7 @@ import {
   Text,
   Td,
   Button,
+  Skeleton,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -16,9 +17,9 @@ import { useNavigate } from 'react-router-dom'
 import { typesAsset } from 'utils/constants/data-constants'
 import { toCrypto } from 'utils/formatter'
 
-import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
+import { Empty } from 'components/molecules/empty'
 
 interface IHomeTemplate {
   loading: boolean
@@ -43,10 +44,10 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
             Forge asset
           </Button>
         </Flex>
-        <Container variant="primary" p={0} maxW="full">
-          {loading || !assets ? (
-            <Loading />
-          ) : (
+        {loading || !assets ? (
+          <Skeleton w="full" h="8rem" />
+        ) : assets && assets.length > 0 ? (
+          <Container variant="primary" p={0} maxW="full">
             <Table w="full">
               <Thead w="full">
                 <Tr>
@@ -150,8 +151,10 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                 ))}
               </Tbody>
             </Table>
-          )}
-        </Container>
+          </Container>
+        ) : (
+          <Empty title="No forged assets" />
+        )}
       </Flex>
     </Flex>
   )

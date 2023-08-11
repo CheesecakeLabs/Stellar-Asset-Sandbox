@@ -1,28 +1,23 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
-import { FieldValues, UseFormSetValue } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
+import { Flex, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect } from 'react'
+import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import { useLocation } from 'react-router-dom'
 
+import { useAssets } from 'hooks/useAssets'
+import { useVaults } from 'hooks/useVaults'
+import { authorizeHelper } from 'utils/constants/helpers'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import { useAssets } from 'hooks/useAssets';
-import { useVaults } from 'hooks/useVaults';
-import { authorizeHelper } from 'utils/constants/helpers';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { AssetActions } from 'components/enums/asset-actions';
-import { PathRoute } from 'components/enums/path-route';
-import { ActionHelper } from 'components/molecules/action-helper';
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
-import { Sidebar } from 'components/organisms/sidebar';
-import { AuthorizeAccountTemplate } from 'components/templates/authorize-account';
-
+import { AssetActions } from 'components/enums/asset-actions'
+import { PathRoute } from 'components/enums/path-route'
+import { ActionHelper } from 'components/molecules/action-helper'
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { Sidebar } from 'components/organisms/sidebar'
+import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
 
 export const AuthorizeAccount: React.FC = () => {
-  const { authorize, loading } = useAssets()
+  const { authorize, loadingOperation } = useAssets()
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
@@ -85,7 +80,7 @@ export const AuthorizeAccount: React.FC = () => {
             <ManagementBreadcrumb title={'Authorize'} />
             <AuthorizeAccountTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               vaults={vaults}
             />

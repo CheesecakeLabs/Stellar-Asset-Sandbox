@@ -12,10 +12,12 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 
+import { STELLAR_EXPERT_TX_URL } from 'utils/constants/constants'
 import { formatDateFull, toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
-import { ReceivedIcon, SendedIcon } from 'components/icons'
+import { LinkIcon, ReceivedIcon, SendedIcon } from 'components/icons'
+import { Empty } from 'components/molecules/empty'
 
 interface IListPayments {
   payments: Hooks.UseHorizonTypes.IPayment[] | undefined
@@ -72,7 +74,7 @@ export const ListPayments: React.FC<IListPayments> = ({
       <Box px="1rem">
         {loading ? (
           <Loading />
-        ) : (
+        ) : payments && payments.length > 0 ? (
           <Table w="full">
             <Thead w="full">
               <Tr>
@@ -119,67 +121,86 @@ export const ListPayments: React.FC<IListPayments> = ({
                 >
                   Date
                 </Th>
+                <Th
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                />
               </Tr>
             </Thead>
             <Tbody>
-              {payments &&
-                payments.map(
-                  payment =>
-                    payment.type === 'payment' && (
-                      <Tr
-                        fill="black"
-                        stroke="black"
-                        _dark={{ fill: 'white', stroke: 'white' }}
+              {payments.map(
+                payment =>
+                  payment.type === 'payment' && (
+                    <Tr
+                      fill="black"
+                      stroke="black"
+                      _dark={{ fill: 'white', stroke: 'white' }}
+                    >
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                        px="1rem"
+                        py={0}
                       >
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800' }}
-                          px="1rem"
-                          py={0}
+                        {isCurrentVault(payment.from) ? (
+                          <SendedIcon width="1.25rem" />
+                        ) : (
+                          <ReceivedIcon width="1.25rem" />
+                        )}
+                      </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                      >
+                        {walletToName(payment.from)}
+                      </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                      >
+                        {walletToName(payment.to)}
+                      </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                      >
+                        {payment.asset_code}
+                      </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800' }}
+                      >
+                        {toCrypto(Number(payment.amount))}
+                      </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800', fill: 'white' }}
+                      >
+                        <Text fontSize="sm">
+                          {formatDateFull(payment.created_at)}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Flex
+                          cursor="pointer"
+                          _dark={{ fill: 'white' }}
+                          onClick={(): Window | null =>
+                            window.open(
+                              `${STELLAR_EXPERT_TX_URL}/${payment.transaction_hash}`,
+                              '_blank'
+                            )
+                          }
                         >
-                          {isCurrentVault(payment.from) ? (
-                            <SendedIcon width="1.25rem" />
-                          ) : (
-                            <ReceivedIcon width="1.25rem" />
-                          )}
-                        </Td>
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800' }}
-                        >
-                          {walletToName(payment.from)}
-                        </Td>
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800' }}
-                        >
-                          {walletToName(payment.to)}
-                        </Td>
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800' }}
-                        >
-                          {payment.asset_code}
-                        </Td>
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800' }}
-                        >
-                          {toCrypto(Number(payment.amount))}
-                        </Td>
-                        <Td
-                          borderColor={'gray.400'}
-                          _dark={{ borderColor: 'black.800', fill: 'white' }}
-                        >
-                          <Text fontSize="sm">
-                            {formatDateFull(payment.created_at)}
-                          </Text>
-                        </Td>
-                      </Tr>
-                    )
-                )}
+                          <LinkIcon />
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  )
+              )}
             </Tbody>
           </Table>
+        ) : (
+          <Empty title={'No transactions in this vault'} hideIcon />
         )}
       </Box>
     </Container>

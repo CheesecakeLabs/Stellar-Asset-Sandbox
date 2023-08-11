@@ -24,17 +24,19 @@ declare namespace Hooks {
     }
 
     interface IVaultsContext {
-      loading: boolean
+      loadingVault: boolean
+      loadingVaults: boolean
+      loadingVaultCategories: boolean
+      creatingVault: boolean
+      creatingVaultCategory: boolean
       vaults: IVault[] | undefined
-      vault: IVault | undefined
-      vaultCategories: IVaultCategory[] | undefined
-      getVaults: () => Promise<void>
-      getVaultCategories: () => Promise<void>
+      getVaults: () => Promise<IVaults[] | undefined>
+      getVaultCategories: () => Promise<IVaultCategory[] | undefined>
       createVault: (vault: IVaultRequest) => Promise<IVault | undefined>
       createVaultCategory: (
         vaultCategory: IVaultCategoryRequest
       ) => Promise<IVaultCategory | undefined>
-      getVaultById: (id: string) => Promise<void>
+      getVaultById: (id: string) => Promise<IVault | undefined>
     }
   }
 }

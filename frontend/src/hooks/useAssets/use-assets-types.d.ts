@@ -77,7 +77,9 @@ declare namespace Hooks {
     }
 
     interface IAssetsContext {
-      loading: boolean
+      loadingOperation: boolean
+      loadingAssets: boolean
+      assets: IAssetDto[] | undefined
       mint: (params: IMintRequest) => Promise<boolean>
       burn: (params: IBurnRequest) => Promise<boolean>
       distribute: (params: IDistributeRequest) => Promise<boolean>
@@ -86,7 +88,6 @@ declare namespace Hooks {
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
       getAssets: () => Promise<void>
-      assets: IAssetDto[] | undefined
     }
   }
 }

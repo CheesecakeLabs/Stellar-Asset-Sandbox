@@ -18,8 +18,6 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
   const [assetData, setAssetData] = useState<Hooks.UseHorizonTypes.IAsset>()
   const [accountData, setAccountData] =
     useState<Hooks.UseHorizonTypes.IAccount>()
-  const [paymentsData, setPaymentsData] =
-    useState<Hooks.UseHorizonTypes.IPayment[]>()
 
   const getAssetData = useCallback(
     async (
@@ -71,8 +69,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
   const getPaymentsData = useCallback(
     async (
       wallet: string
-    ): Promise<Hooks.UseHorizonTypes.IPayment | undefined> => {
-      setPaymentsData([])
+    ): Promise<Hooks.UseHorizonTypes.IPayment[] | undefined> => {
       setLoadingHorizon(true)
       try {
         const response = await axios.get(
@@ -80,8 +77,10 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         )
         const data = response.data?._embedded?.records
         if (data) {
-          setPaymentsData(data)
-          return data
+          return data.filter(
+            (payment: Hooks.UseHorizonTypes.IPayment) =>
+              payment.type === 'payment'
+          )
         }
         return undefined
       } catch (error) {
@@ -102,7 +101,6 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         loadingHorizon,
         assetData,
         accountData,
-        paymentsData,
         getAssetData,
         getAccountData,
         getPaymentsData,

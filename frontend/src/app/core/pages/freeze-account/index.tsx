@@ -17,7 +17,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
 export const FreezeAccount: React.FC = () => {
-  const { updateAuthFlags, loading } = useAssets()
+  const { updateAuthFlags, loadingOperation } = useAssets()
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const location = useLocation()
@@ -87,7 +87,7 @@ export const FreezeAccount: React.FC = () => {
             <ManagementBreadcrumb title={'Freeze'} />
             <FreezeAccountTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               vaults={vaults}
             />

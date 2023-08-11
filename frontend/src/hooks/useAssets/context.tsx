@@ -15,7 +15,8 @@ interface IProps {
 }
 
 export const AssetsProvider: React.FC<IProps> = ({ children }) => {
-  const [loading, setLoading] = useState(false)
+  const [loadingAssets, setLoadingAssets] = useState(true)
+  const [loadingOperation, setLoadingOperation] = useState(false)
   const [assets, setAssets] = useState<
     Hooks.UseAssetsTypes.IAssetDto[] | undefined
   >()
@@ -24,7 +25,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const forge = async (
     params: Hooks.UseAssetsTypes.IAssetRequest
   ): Promise<Hooks.UseAssetsTypes.IAsset | undefined> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets`, params)
       if (response.status === 200) {
@@ -37,14 +38,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const mint = async (
     params: Hooks.UseAssetsTypes.IMintRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/mint`, params)
       return response.status === 200
@@ -54,14 +55,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const burn = async (
     params: Hooks.UseAssetsTypes.IBurnRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/burn`, params)
       return response.status === 200
@@ -71,14 +72,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const distribute = async (
     params: Hooks.UseAssetsTypes.IDistributeRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/transfer`, params)
       return response.status === 200
@@ -88,14 +89,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const authorize = async (
     params: Hooks.UseAssetsTypes.IAuthorizeRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/update-auth-flags`, params)
       return response.status === 200
@@ -105,14 +106,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const updateAuthFlags = async (
     params: Hooks.UseAssetsTypes.IUpdateAuthFlagsRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/update-auth-flags`, params)
       return response.status === 200
@@ -122,14 +123,14 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const clawback = async (
     params: Hooks.UseAssetsTypes.IClawbackRequest
   ): Promise<boolean> => {
-    setLoading(true)
+    setLoadingOperation(true)
     try {
       const response = await http.post(`assets/clawback`, params)
       return response.status === 200
@@ -139,23 +140,25 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingOperation(false)
     }
   }
 
   const getAssets = useCallback(async (): Promise<void> => {
-    setLoading(true)
+    setLoadingAssets(true)
     try {
       const response = await http.get(`assets`)
       const data = response.data
       if (data) {
-        data.forEach(async (asset: Hooks.UseAssetsTypes.IAsset) => {
-          const assetData = await getAssetData(
-            asset.code,
-            asset.issuer.key.publicKey
-          )
-          asset.assetData = assetData
-        })
+        await Promise.all(
+          data.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
+            const assetData = await getAssetData(
+              asset.code,
+              asset.issuer.key.publicKey
+            )
+            asset.assetData = assetData
+          })
+        )
         setAssets(data)
       }
     } catch (error) {
@@ -164,14 +167,15 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
-      setLoading(false)
+      setLoadingAssets(false)
     }
   }, [getAssetData])
 
   return (
     <AssetsContext.Provider
       value={{
-        loading,
+        loadingAssets,
+        loadingOperation,
         mint,
         burn,
         distribute,

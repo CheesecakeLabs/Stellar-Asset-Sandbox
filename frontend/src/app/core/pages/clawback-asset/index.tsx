@@ -18,7 +18,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
 export const ClawbackAsset: React.FC = () => {
-  const { clawback, loading } = useAssets()
+  const { clawback, loadingOperation } = useAssets()
   const { vaults, getVaults } = useVaults()
   const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
@@ -90,7 +90,7 @@ export const ClawbackAsset: React.FC = () => {
             <ManagementBreadcrumb title={'Clawback'} />
             <ClawbackAssetTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               vaults={vaults}
               assetData={assetData}

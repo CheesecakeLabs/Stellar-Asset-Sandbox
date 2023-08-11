@@ -11,7 +11,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { ForgeAssetTemplate } from 'components/templates/forge-asset'
 
 export const ForgeAsset: React.FC = () => {
-  const { forge, loading } = useAssets()
+  const { forge, loadingOperation } = useAssets()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -65,7 +65,7 @@ export const ForgeAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
-        <ForgeAssetTemplate onSubmit={onSubmit} loading={loading} />
+        <ForgeAssetTemplate onSubmit={onSubmit} loading={loadingOperation} />
       </Sidebar>
     </Flex>
   )

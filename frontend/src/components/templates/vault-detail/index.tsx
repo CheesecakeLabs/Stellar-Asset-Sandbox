@@ -1,40 +1,44 @@
-import { Flex, Tag, Text } from '@chakra-ui/react'
+import { Flex, Skeleton, Tag, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { DistributeVault } from './components/distribute'
 import { ListAssets } from './components/list-assets'
 import { ListPayments } from './components/list-payments'
-import { Loading } from 'components/atoms'
+import { LoaderSkeleton } from './components/loader-skeleton'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault | undefined
+  loadingAssets: boolean
+  loadingVaults: boolean
+  loadingOperation: boolean
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  payments: Hooks.UseHorizonTypes.IPayment[] | undefined
+  selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  loadingHorizon: boolean
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void>
-  loading: boolean
-  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
-  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
-  payments: Hooks.UseHorizonTypes.IPayment[] | undefined
   setSelectedAsset: Dispatch<
     SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
   >
-  selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
-  loadingHorizon: boolean
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   vault,
-  onSubmit,
-  setSelectedAsset,
-  loading,
+  loadingAssets,
+  loadingVaults,
+  loadingOperation,
   assets,
   vaults,
   payments,
   selectedAsset,
   loadingHorizon,
+  onSubmit,
+  setSelectedAsset,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
@@ -43,7 +47,9 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW="860px" alignSelf="center" flexDir="column" w="full">
-        {vault ? (
+        {loadingAssets || loadingVaults || !vault ? (
+          <LoaderSkeleton />
+        ) : (
           <>
             <Flex alignItems="center" mb="1.5rem">
               <Text fontSize="2xl" fontWeight="400">
@@ -69,24 +75,26 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
               />
               <DistributeVault
                 onSubmit={onSubmit}
-                loading={loading}
+                loading={loadingOperation}
                 vaults={filteredVaults}
                 vault={vault}
                 selectedAsset={selectedAsset}
               />
             </Flex>
             <Flex mt="1rem" w="full">
-              <ListPayments
-                payments={payments}
-                vaults={vaults}
-                vault={vault}
-                loading={loadingHorizon}
-                assets={assets}
-              />
+              {loadingHorizon ? (
+                <Skeleton height="4rem" w="full" />
+              ) : (
+                <ListPayments
+                  payments={payments}
+                  vaults={vaults}
+                  vault={vault}
+                  loading={loadingHorizon}
+                  assets={assets}
+                />
+              )}
             </Flex>
           </>
-        ) : (
-          <Loading />
         )}
       </Flex>
     </Flex>

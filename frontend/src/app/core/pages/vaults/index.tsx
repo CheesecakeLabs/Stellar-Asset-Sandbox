@@ -8,7 +8,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { VaultsTemplate } from 'components/templates/vaults'
 
 export const Vaults: React.FC = () => {
-  const { loading, getVaults, vaults } = useVaults()
+  const { loadingVaults, getVaults, vaults } = useVaults()
 
   useEffect(() => {
     getVaults()
@@ -17,7 +17,7 @@ export const Vaults: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.VAULTS}>
-        <VaultsTemplate loading={loading} vaults={vaults} />
+        <VaultsTemplate loading={loadingVaults} vaults={vaults} />
       </Sidebar>
     </Flex>
   )

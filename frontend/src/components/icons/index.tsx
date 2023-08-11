@@ -18,6 +18,7 @@ import { ReactComponent as HomeIcon } from './fonts/home.svg'
 import { ReactComponent as InfoIcon } from './fonts/info.svg'
 import { ReactComponent as JoinIcon } from './fonts/join.svg'
 import { ReactComponent as KeyIcon } from './fonts/key.svg'
+import { ReactComponent as LinkIcon } from './fonts/link.svg'
 import { ReactComponent as LoadingIcon } from './fonts/loading.svg'
 import { ReactComponent as LockIcon } from './fonts/lock.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
@@ -80,4 +81,5 @@ export {
   NewIcon,
   KeyIcon,
   EmptyIcon,
+  LinkIcon,
 }

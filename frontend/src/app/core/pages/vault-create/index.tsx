@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
@@ -12,13 +12,14 @@ import { VaultCreateTemplate } from 'components/templates/vault-create'
 
 export const VaultCreate: React.FC = () => {
   const {
-    loading,
-    vaultCategories,
+    creatingVault,
     createVault,
     getVaultCategories,
     createVaultCategory,
   } = useVaults()
   const { assets, getAssets } = useAssets()
+  const [vaultCategories, setVaultCategories] =
+    useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -57,7 +58,9 @@ export const VaultCreate: React.FC = () => {
   }
 
   useEffect(() => {
-    getVaultCategories()
+    getVaultCategories().then(vaultCategories =>
+      setVaultCategories(vaultCategories)
+    )
     getAssets()
   }, [getAssets, getVaultCategories])
 
@@ -77,7 +80,7 @@ export const VaultCreate: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.VAULTS}>
         <VaultCreateTemplate
           onSubmit={onSubmit}
-          loading={loading}
+          loading={creatingVault}
           vaultCategories={vaultCategories}
           createVaultCategory={createVaultCategory}
           assets={assets}

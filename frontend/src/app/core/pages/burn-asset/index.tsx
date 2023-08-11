@@ -17,7 +17,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { BurnAssetTemplate } from 'components/templates/burn-asset'
 
 export const BurnAsset: React.FC = () => {
-  const { burn, loading } = useAssets()
+  const { burn, loadingOperation } = useAssets()
   const { getAssetData, assetData } = useHorizon()
 
   const toast = useToast()
@@ -81,7 +81,7 @@ export const BurnAsset: React.FC = () => {
             <ManagementBreadcrumb title={'Burn'} />
             <BurnAssetTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               assetData={assetData}
             />

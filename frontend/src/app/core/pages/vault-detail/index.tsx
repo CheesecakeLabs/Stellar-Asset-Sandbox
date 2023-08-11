@@ -8,18 +8,21 @@ import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 
-import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { VaultDetailTemplate } from 'components/templates/vault-detail'
 
 export const VaultDetail: React.FC = () => {
+  const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault>()
+  const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayment[]>()
   const toast = useToast()
 
   const { id } = useParams()
-  const { loading, assets, getAssets, distribute } = useAssets()
-  const { vaults, getVaults, vault, getVaultById } = useVaults()
-  const { paymentsData, getPaymentsData, loadingHorizon } = useHorizon()
+  const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
+    useAssets()
+  const { loadingVault, loadingVaults, getVaults, getVaultById } = useVaults()
+  const { loadingHorizon, getPaymentsData } = useHorizon()
 
   const [selectedAsset, setSelectedAsset] =
     useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -58,7 +61,9 @@ export const VaultDetail: React.FC = () => {
         }
 
         if (id) {
-          getVaultById(id)
+          getVaultById(id).then(vault => {
+            setVault(vault)
+          })
         }
 
         return
@@ -85,19 +90,21 @@ export const VaultDetail: React.FC = () => {
   }
 
   useEffect(() => {
-    getVaults()
+    getVaults().then(vaults => setVaults(vaults))
     getAssets()
   }, [getAssets, getVaults])
 
   useEffect(() => {
     if (id) {
-      getVaultById(id)
+      getVaultById(id).then(vault => setVault(vault))
     }
-  }, [getVaultById, id])
+  }, [getVaultById, id, setVault])
 
   useEffect(() => {
     if (vault) {
-      getPaymentsData(vault.wallet.key.publicKey)
+      getPaymentsData(vault.wallet.key.publicKey).then(payments => {
+        setPayments(payments)
+      })
     }
   }, [getPaymentsData, vault])
 
@@ -107,13 +114,15 @@ export const VaultDetail: React.FC = () => {
         <VaultDetailTemplate
           vault={vault}
           onSubmit={onSubmit}
-          loading={loading}
+          loadingAssets={loadingAssets}
+          loadingOperation={loadingOperation}
+          loadingVaults={loadingVault || loadingVaults}
           assets={assets}
           vaults={vaults}
-          payments={paymentsData}
+          payments={payments}
           setSelectedAsset={setSelectedAsset}
           selectedAsset={selectedAsset}
-          loadingHorizon={false}
+          loadingHorizon={loadingHorizon}
         />
       </Sidebar>
     </Flex>

@@ -50,9 +50,10 @@ export const ListAssets: React.FC<IListAssets> = ({
       <Box>
         {vault.accountData &&
           vault.accountData.balances.map(
-            balance =>
+            (balance, index) =>
               balance.asset_code && (
                 <Flex
+                  key={index}
                   justifyContent="space-between"
                   alignItems="center"
                   borderBottom="1px solid"

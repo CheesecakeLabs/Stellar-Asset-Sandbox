@@ -18,7 +18,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
-  const { distribute, loading } = useAssets()
+  const { distribute, loadingOperation } = useAssets()
   const { vaults, getVaults } = useVaults()
   const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
@@ -91,7 +91,7 @@ export const DistributeAsset: React.FC = () => {
             <ManagementBreadcrumb title={'Distribute'} />
             <DistributeAssetTemplate
               onSubmit={onSubmit}
-              loading={loading}
+              loading={loadingOperation}
               asset={asset}
               vaults={vaults}
               assetData={assetData}

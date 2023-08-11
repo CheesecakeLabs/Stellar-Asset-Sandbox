@@ -12,8 +12,8 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
 
 export const ContractsCreate: React.FC = () => {
-  const { forge, loading, assets, getAssets } = useAssets()
-  const { vaults, getVaults } = useVaults()
+  const { forge, loadingAssets, assets, getAssets } = useAssets()
+  const { vaults, getVaults, loadingVaults } = useVaults()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -79,7 +79,7 @@ export const ContractsCreate: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.SOROBAN_SMART_CONTRACTS}>
         <ContractsCreateTemplate
           onSubmit={onSubmit}
-          loading={loading}
+          loading={loadingAssets || loadingVaults}
           vaults={vaults}
           assets={assets}
         />

@@ -102,10 +102,9 @@ declare namespace Hooks {
         assetIssuer: string
       ): Promise<IAsset | undefined>
       getAccountData(wallet: string): Promise<IAccount | undefined>
-      getPaymentsData(wallet: string): Promise<IPayment | undefined>
+      getPaymentsData(wallet: string): Promise<IPayment[] | undefined>
       assetData: IAsset | undefined
       accountData: IAccount | undefined
-      paymentsData: IPayment[] | undefined
     }
   }
 }
