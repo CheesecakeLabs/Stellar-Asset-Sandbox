@@ -40,7 +40,7 @@ declare namespace Hooks {
     }
 
     interface IBurnRequest {
-      id: number
+      id: string
       sponsor_id: number
       code: string
       amount: number
@@ -79,6 +79,7 @@ declare namespace Hooks {
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
+      loadingAsset: boolean
       assets: IAssetDto[] | undefined
       mint: (params: IMintRequest) => Promise<boolean>
       burn: (params: IBurnRequest) => Promise<boolean>
@@ -88,6 +89,7 @@ declare namespace Hooks {
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
       getAssets: () => Promise<void>
+      getAssetById: (id: string) => Promise<IAssetDto | undefined>
     }
   }
 }

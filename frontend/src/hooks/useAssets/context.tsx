@@ -16,6 +16,7 @@ interface IProps {
 
 export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [loadingAssets, setLoadingAssets] = useState(true)
+  const [loadingAsset, setLoadingAsset] = useState(true)
   const [loadingOperation, setLoadingOperation] = useState(false)
   const [assets, setAssets] = useState<
     Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -171,11 +172,39 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [getAssetData])
 
+  const getAssetById = useCallback(
+    async (id: string): Promise<Hooks.UseAssetsTypes.IAssetDto | undefined> => {
+      setLoadingAsset(true)
+      try {
+        const response = await http.get(`assets/${id}`)
+        const asset = response.data
+        if (asset) {
+          const assetData = await getAssetData(
+            asset.code,
+            asset.issuer.key.publicKey
+          )
+          asset.assetData = assetData
+          return asset
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingAsset(false)
+      }
+    },
+    [getAssetData]
+  )
+
   return (
     <AssetsContext.Provider
       value={{
         loadingAssets,
+        loadingAsset,
         loadingOperation,
+        assets,
         mint,
         burn,
         distribute,
@@ -184,7 +213,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         clawback,
         forge,
         getAssets,
-        assets,
+        getAssetById,
       }}
     >
       {children}

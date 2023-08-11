@@ -100,7 +100,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                     borderColor="red"
                     cursor="pointer"
                     onClick={(): void =>
-                      navigate(PathRoute.MINT_ASSET, { state: asset })
+                      navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
                     }
                     fill="black"
                     stroke="black"

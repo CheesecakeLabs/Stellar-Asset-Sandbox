@@ -11,6 +11,7 @@ export enum PathRoute {
   SETTINGS = '/settings',
   PROFILE = '/profile',
   FORGE_ASSET = '/forge-asset',
+  ASSET_HOME = '/asset-management/home',
   MINT_ASSET = '/asset-management/mint',
   BURN_ASSET = '/asset-management/burn',
   DISTRIBUTE_ASSET = '/asset-management/distribute',

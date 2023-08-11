@@ -1,10 +1,9 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
-import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { clawbackHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -18,18 +17,18 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
 export const ClawbackAsset: React.FC = () => {
-  const { clawback, loadingOperation } = useAssets()
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const { clawback, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { id } = useParams()
   const { vaults, getVaults } = useVaults()
-  const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
-  const location = useLocation()
-  const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void> => {
+    if (!asset || !id) return
     try {
       const isSuccess = await clawback({
         sponsor_id: 1,
@@ -52,7 +51,7 @@ export const ClawbackAsset: React.FC = () => {
         })
         return
       }
-      getAssetData(asset.code, asset.issuer.key.publicKey)
+      getAssetById(id).then(asset => setAsset(asset))
 
       toastError(MessagesError.errorOccurred)
     } catch (error) {
@@ -79,8 +78,10 @@ export const ClawbackAsset: React.FC = () => {
   }, [getVaults])
 
   useEffect(() => {
-    getAssetData(asset.code, asset.issuer.key.publicKey)
-  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+    if (id) {
+      getAssetById(id).then(asset => setAsset(asset))
+    }
+  }, [getAssetById, id])
 
   return (
     <Flex>
@@ -88,16 +89,21 @@ export const ClawbackAsset: React.FC = () => {
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Clawback'} />
-            <ClawbackAssetTemplate
-              onSubmit={onSubmit}
-              loading={loadingOperation}
-              asset={asset}
-              vaults={vaults}
-              assetData={assetData}
-            />
+
+            {loadingAsset || !asset ? (
+              <Skeleton h="15rem" />
+            ) : (
+              <ClawbackAssetTemplate
+                onSubmit={onSubmit}
+                loading={loadingOperation}
+                asset={asset}
+                vaults={vaults}
+                assetData={asset.assetData}
+              />
+            )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.CLAWBACK} asset={asset} />
+            <MenuActionsAsset action={AssetActions.CLAWBACK} />
             <ActionHelper
               title={'About Clawback'}
               description={clawbackHelper}

@@ -1,10 +1,9 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
-import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { distributeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -18,18 +17,20 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
-  const { distribute, loadingOperation } = useAssets()
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const { distribute, getAssetById, loadingOperation, loadingAsset } =
+    useAssets()
+  const { id } = useParams()
   const { vaults, getVaults } = useVaults()
-  const { getAssetData, assetData } = useHorizon()
   const toast = useToast()
-  const location = useLocation()
-  const asset = location.state as Hooks.UseAssetsTypes.IAssetDto
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void> => {
+    if (!asset || !id) return
+
     try {
       const isSuccess = await distribute({
         source_wallet_id: asset.distributor.id,
@@ -51,7 +52,7 @@ export const DistributeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetData(asset.code, asset.issuer.key.publicKey)
+        getAssetById(id).then(asset => setAsset(asset))
         return
       }
 
@@ -80,8 +81,10 @@ export const DistributeAsset: React.FC = () => {
   }, [getVaults])
 
   useEffect(() => {
-    getAssetData(asset.code, asset.issuer.key.publicKey)
-  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+    if (id) {
+      getAssetById(id).then(asset => setAsset(asset))
+    }
+  }, [getAssetById, id])
 
   return (
     <Flex>
@@ -89,16 +92,20 @@ export const DistributeAsset: React.FC = () => {
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Distribute'} />
-            <DistributeAssetTemplate
-              onSubmit={onSubmit}
-              loading={loadingOperation}
-              asset={asset}
-              vaults={vaults}
-              assetData={assetData}
-            />
+            {(loadingAsset && !asset) || !asset ? (
+              <Skeleton h="15rem" />
+            ) : (
+              <DistributeAssetTemplate
+                onSubmit={onSubmit}
+                loading={loadingOperation}
+                asset={asset}
+                vaults={vaults}
+                assetData={asset.assetData}
+              />
+            )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.DISTRIBUTE} asset={asset} />
+            <MenuActionsAsset action={AssetActions.DISTRIBUTE} />
             <ActionHelper
               title={'About Distribute'}
               description={distributeHelper}
