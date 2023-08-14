@@ -15,7 +15,7 @@ interface IItemVault {
 export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
   const navigate = useNavigate()
 
-  const tagColors = ['blue.200', 'green', 'red']
+  const tagColors = ['blue_sky', 'purple_powder', 'blue_moonstone']
 
   return (
     <Container

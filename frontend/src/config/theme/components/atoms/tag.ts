@@ -20,12 +20,30 @@ export const Tag = {
         color: 'black.400',
       },
     },
-    blue: {
+    blue_sky: {
       label: {
         padding: '6px 12px',
       },
       container: {
-        bg: 'blue.800',
+        bg: 'blue.100',
+        color: 'white',
+      },
+    },
+    blue_moonstone: {
+      label: {
+        padding: '6px 12px',
+      },
+      container: {
+        bg: 'blue.300',
+        color: 'white',
+      },
+    },
+    purple_powder: {
+      label: {
+        padding: '6px 12px',
+      },
+      container: {
+        bg: 'purple.300',
         color: 'white',
       },
     },
