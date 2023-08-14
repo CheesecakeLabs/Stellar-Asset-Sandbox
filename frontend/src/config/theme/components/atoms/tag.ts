@@ -56,5 +56,14 @@ export const Tag = {
         color: 'white',
       },
     },
+    actived: {
+      label: {
+        padding: '6px 12px',
+      },
+      container: {
+        bg: 'primary.normal',
+        color: 'white',
+      },
+    },
   },
 }

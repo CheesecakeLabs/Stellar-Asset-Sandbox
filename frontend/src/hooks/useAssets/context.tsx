@@ -21,7 +21,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [assets, setAssets] = useState<
     Hooks.UseAssetsTypes.IAssetDto[] | undefined
   >()
-  const { getAssetData } = useHorizon()
+  const { getAssetData, getAccountData } = useHorizon()
 
   const forge = async (
     params: Hooks.UseAssetsTypes.IAssetRequest
@@ -177,13 +177,20 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       setLoadingAsset(true)
       try {
         const response = await http.get(`assets/${id}`)
-        const asset = response.data
+        const asset = response.data as Hooks.UseAssetsTypes.IAssetDto
         if (asset) {
           const assetData = await getAssetData(
             asset.code,
             asset.issuer.key.publicKey
           )
+
+          const distributorAccount = await getAccountData(
+            asset.distributor.key.publicKey
+          )
           asset.assetData = assetData
+          asset.distributorBalance = distributorAccount?.balances.find(
+            balance => balance.asset_code === asset.code
+          )
           return asset
         }
       } catch (error) {
@@ -195,7 +202,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         setLoadingAsset(false)
       }
     },
-    [getAssetData]
+    [getAccountData, getAssetData]
   )
 
   return (

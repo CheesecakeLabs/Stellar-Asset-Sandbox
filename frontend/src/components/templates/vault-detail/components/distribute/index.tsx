@@ -70,7 +70,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
           _dark={{ fill: 'white', stroke: 'white', borderColor: 'black.800' }}
         >
           <Text fontSize="sm" fontWeight="600">
-            Distribute
+            Transfer
           </Text>
         </Flex>
         <Box p="1rem">

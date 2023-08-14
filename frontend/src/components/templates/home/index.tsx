@@ -44,7 +44,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
             Forge asset
           </Button>
         </Flex>
-        {loading || !assets ? (
+        {loading ? (
           <Skeleton w="full" h="8rem" />
         ) : assets && assets.length > 0 ? (
           <Container variant="primary" p={0} maxW="full">

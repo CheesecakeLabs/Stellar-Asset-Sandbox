@@ -18,6 +18,7 @@ declare namespace Hooks {
       asset_type: string
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
+      distributorBalance: Hooks.UseHorizonTypes.IBalance | undefined
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
     }

@@ -105,7 +105,7 @@ export const ContractsDetail: React.FC = () => {
       setPauseProcess(isPremature)
       const isSuccess = await withdraw(
         userAccount,
-        isPremature,
+        true,
         updatePosition()
       )
 

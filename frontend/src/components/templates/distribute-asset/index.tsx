@@ -82,9 +82,11 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
               mt="0.5rem"
               ms="0.25rem"
             >
-              {`Circulation supply: ${
+              {`Main Vault: ${
                 assetData
-                  ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
+                  ? `${toCrypto(Number(asset.distributorBalance?.balance))} ${
+                      asset.code
+                    }`
                   : 'loading'
               }`}
             </Text>
