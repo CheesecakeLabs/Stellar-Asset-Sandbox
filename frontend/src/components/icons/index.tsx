@@ -2,6 +2,7 @@ import { ReactComponent as AddIcon } from './fonts/add.svg'
 import { ReactComponent as AddUserIcon } from './fonts/add_user.svg'
 import { ReactComponent as ApyIcon } from './fonts/apy.svg'
 import { ReactComponent as ArrowRightIcon } from './fonts/arrow_right.svg'
+import { ReactComponent as ArsIcon } from './fonts/ars.svg'
 import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
 import { ReactComponent as BackIcon } from './fonts/back.svg'
 import { ReactComponent as BlockIcon } from './fonts/block.svg'
@@ -37,6 +38,7 @@ import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
 import { ReactComponent as TimeIcon } from './fonts/time.svg'
 import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
+import { ReactComponent as UsdcIcon } from './fonts/usdc.svg'
 import { ReactComponent as VaultIcon } from './fonts/vault.svg'
 import { ReactComponent as WalletIcon } from './fonts/wallet.svg'
 
@@ -82,4 +84,6 @@ export {
   KeyIcon,
   EmptyIcon,
   LinkIcon,
+  ArsIcon,
+  UsdcIcon,
 }

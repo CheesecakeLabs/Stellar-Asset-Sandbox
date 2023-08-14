@@ -1,9 +1,10 @@
 import { Box, Container, Flex, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { ChevronRight, CoinIcon, LockIcon } from 'components/icons'
+import { ChevronRight, LockIcon } from 'components/icons'
 
 interface IListAssets {
   vault: Hooks.UseVaultsTypes.IVault
@@ -84,7 +85,7 @@ export const ListAssets: React.FC<IListAssets> = ({
                     stroke="black"
                     _dark={{ fill: 'white', stroke: 'white' }}
                   >
-                    <CoinIcon width="1.5rem" />
+                    {getCurrencyIcon(balance.asset_code, '1.5rem')}{' '}
                     <Text fontSize="sm">{balance.asset_code}</Text>
                   </Flex>
                   <Flex alignItems="center" gap={2}>

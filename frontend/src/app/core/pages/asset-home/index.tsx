@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
-import { mintHelper } from 'utils/constants/helpers'
+import { assetHomeHelper } from 'utils/constants/helpers'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -38,7 +38,10 @@ export const AssetHome: React.FC = () => {
           </Flex>
           <VStack>
             <MenuActionsAsset action={AssetActions.HOME} />
-            <ActionHelper title={'About Mint'} description={mintHelper} />
+            <ActionHelper
+              title={'About Assets'}
+              description={assetHomeHelper}
+            />
           </VStack>
         </Flex>
       </Sidebar>

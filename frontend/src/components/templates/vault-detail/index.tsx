@@ -44,6 +44,8 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
   )
 
+  const tagColors = ['blue', 'green', 'red']
+
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW="860px" alignSelf="center" flexDir="column" w="full">
@@ -56,7 +58,11 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 {vault.name}
               </Text>
               <Tag
-                variant="blue"
+                variant={
+                  vault.vault_category.id > tagColors.length
+                    ? tagColors[vault.vault_category.id / tagColors.length]
+                    : tagColors[vault.vault_category.id] || 'black'
+                }
                 ms="1rem"
                 textAlign="center"
                 fontSize="xs"

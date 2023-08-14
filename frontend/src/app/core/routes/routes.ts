@@ -1,6 +1,7 @@
 import { PathRoute } from 'components/enums/path-route'
 
 import { AssetHome } from '../pages/asset-home'
+import { AssetManagement } from '../pages/asset-management'
 import { AuthorizeAccount } from '../pages/authorize-account'
 import { BurnAsset } from '../pages/burn-asset'
 import { ClawbackAsset } from '../pages/clawback-asset'
@@ -93,6 +94,11 @@ export const coreRoutes: AppRoute[] = [
   {
     path: `${PathRoute.ASSET_HOME}/:id`,
     component: AssetHome,
+    isPrivate: true,
+  },
+  {
+    path: `${PathRoute.ASSET_MANAGEMENT}`,
+    component: AssetManagement,
     isPrivate: true,
   },
 ]

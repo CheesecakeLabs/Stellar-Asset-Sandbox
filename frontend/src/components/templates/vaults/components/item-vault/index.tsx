@@ -2,10 +2,11 @@ import { Container, Flex, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
-import { CoinIcon, LockIcon } from 'components/icons'
+import { LockIcon } from 'components/icons'
 
 interface IItemVault {
   vault: Hooks.UseVaultsTypes.IVault
@@ -13,6 +14,8 @@ interface IItemVault {
 
 export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
   const navigate = useNavigate()
+
+  const tagColors = ['blue.200', 'green', 'red']
 
   return (
     <Container
@@ -36,7 +39,11 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
       </Text>
       <Flex justifyContent="center">
         <Tag
-          variant="blue"
+          variant={
+            vault.vault_category.id > tagColors.length
+              ? tagColors[vault.vault_category.id / tagColors.length]
+              : tagColors[vault.vault_category.id] || 'black'
+          }
           mt="0.5rem"
           mb="0.75rem"
           textAlign="center"
@@ -62,7 +69,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
                 h="1.5rem"
               >
                 <Flex alignItems="center" gap={2}>
-                  <CoinIcon width="1rem" />
+                  {getCurrencyIcon(balance.asset_code, '1rem')}{' '}
                   <Text fontSize="xs">{balance.asset_code}</Text>
                 </Flex>
                 <Flex alignItems="center" gap={2}>

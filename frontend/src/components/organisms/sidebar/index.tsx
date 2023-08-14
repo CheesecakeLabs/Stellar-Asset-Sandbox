@@ -38,15 +38,20 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Payment Tokens',
+    name: 'Asset Management',
     icon: <PaymentsIcon />,
-    path: `${PathRoute.PAYMENTS_TOKENS}`,
+    path: PathRoute.ASSET_MANAGEMENT,
   },
-  {
-    name: 'Securities Tokens',
-    icon: <SecurityIcon />,
-    path: PathRoute.SECURITIES_TOKENS,
-  },
+  // {
+  //   name: 'Payment Tokens',
+  //   icon: <PaymentsIcon />,
+  //   path: `${PathRoute.PAYMENTS_TOKENS}`,
+  // },
+  // {
+  //   name: 'Securities Tokens',
+  //   icon: <SecurityIcon />,
+  //   path: PathRoute.SECURITIES_TOKENS,
+  // },
   {
     name: 'Soroban Smart Contracts',
     icon: <ContractIcon />,

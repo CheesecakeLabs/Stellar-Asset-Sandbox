@@ -30,7 +30,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
     )
 
     let ops = distributorWallet
-      ? [createOption('Distributor', distributorWallet)]
+      ? [createOption('Banco Central', distributorWallet)]
       : []
     if (listVaults) {
       ops = [...ops, ...listVaults]

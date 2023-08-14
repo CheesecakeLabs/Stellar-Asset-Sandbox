@@ -1,13 +1,16 @@
 import { Container, Flex, SimpleGrid, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
 
-import { STELLAR_EXPERT_ASSET } from 'utils/constants/constants'
+import {
+  STELLAR_EXPERT_ASSET,
+  getCurrencyIcon,
+} from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { InfoCard } from '../contracts-detail/components/info-card'
 import { AccountsChart } from './components/accounts-chart'
-import { CoinIcon, LinkIcon, WalletIcon } from 'components/icons'
+import { LinkIcon, WalletIcon } from 'components/icons'
 
 interface IAssetHomeTemplate {
   loading: boolean
@@ -35,7 +38,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
               stroke="black"
               _dark={{ fill: 'white', stroke: 'white' }}
             >
-              <CoinIcon width="2.5rem" />
+              {getCurrencyIcon(asset.code, '2.5rem')}
             </Flex>
             <Flex
               borderBottom="1px solid"

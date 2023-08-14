@@ -13,10 +13,12 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
+import { toCrypto } from 'utils/formatter'
+
 import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { ArrowRightIcon, CoinIcon, NewIcon } from 'components/icons'
-import { toCrypto } from 'utils/formatter'
+import { ArrowRightIcon, NewIcon } from 'components/icons'
 
 interface IContractsTemplate {
   loading: boolean
@@ -119,7 +121,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
                     >
-                      <CoinIcon width="2rem" />
+                      {getCurrencyIcon(contract.asset.code, '2rem')}
                     </Td>
                     <Td
                       borderColor={'gray.400'}

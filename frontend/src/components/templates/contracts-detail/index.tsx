@@ -2,6 +2,7 @@ import { Box, Flex, SimpleGrid } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
 import { AccountCard } from './components/account-card'
@@ -10,7 +11,7 @@ import { Deposit } from './components/deposit'
 import { InfoCard } from './components/info-card'
 import { Withdraw } from './components/withdraw'
 import { Loading } from 'components/atoms'
-import { ApyIcon, CoinIcon, TimeIcon, WalletIcon } from 'components/icons'
+import { ApyIcon, TimeIcon, WalletIcon } from 'components/icons'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 
 interface IContractsDetailTemplate {
@@ -62,7 +63,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     stroke="black"
                     _dark={{ fill: 'white', stroke: 'white' }}
                   >
-                    <CoinIcon width="1.5rem" />
+                    {getCurrencyIcon(contract.asset.code, '1.5rem')}{' '}
                   </Box>
                 }
                 value={contract.asset.name}

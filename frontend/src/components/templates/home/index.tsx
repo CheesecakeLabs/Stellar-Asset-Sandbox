@@ -14,11 +14,12 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
-import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
+import { ArrowRightIcon, JoinIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
 interface IHomeTemplate {
@@ -110,7 +111,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
                       borderColor={'gray.400'}
                       _dark={{ borderColor: 'black.800' }}
                     >
-                      <CoinIcon width="2rem" />
+                      {getCurrencyIcon(asset.code, '2rem')}{' '}
                     </Td>
                     <Td
                       borderColor={'gray.400'}

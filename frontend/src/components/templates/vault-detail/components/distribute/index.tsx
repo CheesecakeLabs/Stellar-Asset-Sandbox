@@ -13,9 +13,9 @@ import {
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { CoinIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
 
 interface IDistributeVault {
@@ -85,7 +85,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                 stroke="black"
                 _dark={{ fill: 'white', stroke: 'white' }}
               >
-                <CoinIcon width="1rem" />
+                {getCurrencyIcon(selectedAsset.code, '2rem')}{' '}
                 <Flex flexDir="column" ms="1rem">
                   <Text fontSize="sm">{selectedAsset.code}</Text>
                   <Text fontSize="xs">{toCrypto(Number(getBalance()))}</Text>
