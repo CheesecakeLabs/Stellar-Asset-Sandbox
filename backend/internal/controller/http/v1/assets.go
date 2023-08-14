@@ -32,6 +32,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/clawback", r.clawbackAsset)
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
+		h.GET("/:id", r.getAssetById)
 	}
 }
 
@@ -127,18 +128,18 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.CreateAccountOp,
-			Target: issuerPk,
-			Amount: _startingBalance,
-			// Sponsor: sponsor.Key.PublicKey,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  issuerPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
-			Type:   entity.CreateAccountOp,
-			Target: distPk,
-			Amount: _startingBalance,
-			// Sponsor: sponsor.Key.PublicKey,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  distPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
 			Type:    entity.ChangeTrustOp,
@@ -274,6 +275,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
+
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
 		return
@@ -577,6 +579,25 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	assets, err := r.as.GetAll()
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		return
+	}
+
+	c.JSON(http.StatusOK, assets)
+}
+
+// @Summary Get asset by id
+// @Description Get asset by id
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} entity.Asset
+// @Failure     500 {object} response
+// @Router      /asset [get]
+func (r *assetsRoutes) getAssetById(c *gin.Context) {
+	assetId := c.Param("id")
+	assets, err := r.as.GetById(assetId)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error getting asset")
 		return
 	}
 

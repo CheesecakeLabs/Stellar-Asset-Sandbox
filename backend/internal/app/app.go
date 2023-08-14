@@ -67,11 +67,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 		repo.NewVaultRepo(pg),
 		repo.NewWalletRepo(pg),
 	)
+	contractUc := usecase.NewContractUseCase(
+		repo.NewContractRepo(pg),
+	)
 
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(CORSMiddleware())
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc)
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),

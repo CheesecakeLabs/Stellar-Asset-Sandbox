@@ -66,4 +66,10 @@ type (
 		CreateVault(entity.Vault) (entity.Vault, error)
 		GetVaultById(id string) (entity.Vault, error)
 	}
+
+	ContractRepoInterface interface {
+		GetContracts() ([]entity.Contract, error)
+		CreateContract(entity.Contract) (entity.Contract, error)
+		GetContractById(id string) (entity.Contract, error)
+	}
 )
