@@ -17,4 +17,7 @@ export enum PathRoute {
   AUTHORIZE_ACCOUNT = '/asset-management/authorize',
   CLAWBACK_ASSET = '/asset-management/clawback',
   FREEZE_ACCOUNT = '/asset-management/freeze',
+  VAULTS = '/vaults',
+  VAULT_CREATE = '/vault-create',
+  VAULT_DETAIL = '/vault-detail',
 }

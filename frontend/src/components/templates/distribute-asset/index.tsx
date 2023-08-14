@@ -8,24 +8,28 @@ import {
   FormLabel,
   Input,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
+import { SelectVault } from 'components/molecules/select-vault'
 
 interface IDistributeAssetTemplate {
   onSubmit(
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
+  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
 }
 
 export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
   onSubmit,
   loading,
   asset,
+  vaults,
 }) => {
   const {
     register,
@@ -33,6 +37,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
     handleSubmit,
     setValue,
   } = useForm()
+  const [wallet, setWallet] = useState<string | undefined>()
 
   return (
     <Flex flexDir="column" w="full">
@@ -41,20 +46,14 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
         <Box p="1rem">
           <form
             onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue)
+              onSubmit(data, setValue, wallet)
             })}
           >
             <FormControl
               isInvalid={errors?.destination_wallet_id !== undefined}
             >
               <FormLabel>Destination Vault</FormLabel>
-              <Input
-                type="text"
-                placeholder="Wallet"
-                {...register('destination_wallet_id', {
-                  required: true,
-                })}
-              />
+              <SelectVault vaults={vaults} setWallet={setWallet} />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
 
