@@ -7,17 +7,15 @@ import (
 )
 
 func loggingTransactionMiddleware() gin.HandlerFunc {
-	// Handle request
-
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
-
+		// c.Writer.Header().Set("X-Content-Type-Options", "nosniff")
 		c.Next()
-
-		fmt.Printf("%d %s %s\n",
-			c.Writer.Status(),
+		fmt.Printf("%s \n %s \n %s \n ,=%s\n",
 			c.Request.Method,
 			c.Request.RequestURI,
+			c.Request.URL,
+			c.Request.Response.Body,
 		)
+		return
 	}
 }
