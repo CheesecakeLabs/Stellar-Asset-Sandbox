@@ -23,6 +23,11 @@ declare namespace Hooks {
       name: string
     }
 
+    interface IVaultUpdateParams {
+      name: string
+      vault_category_id: number
+    }
+
     interface IVaultsContext {
       loadingVault: boolean
       loadingVaults: boolean
@@ -30,6 +35,7 @@ declare namespace Hooks {
       creatingVault: boolean
       creatingVaultCategory: boolean
       vaults: IVault[] | undefined
+      updatingVault: boolean
       getVaults: () => Promise<IVaults[] | undefined>
       getVaultCategories: () => Promise<IVaultCategory[] | undefined>
       createVault: (vault: IVaultRequest) => Promise<IVault | undefined>
@@ -37,6 +43,7 @@ declare namespace Hooks {
         vaultCategory: IVaultCategoryRequest
       ) => Promise<IVaultCategory | undefined>
       getVaultById: (id: string) => Promise<IVault | undefined>
+      updateVault: (id: number, params: IVaultUpdateParams) => Promise<boolean>
     }
   }
 }

@@ -15,13 +15,24 @@ import { VaultDetailTemplate } from 'components/templates/vault-detail'
 export const VaultDetail: React.FC = () => {
   const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault>()
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [vaultCategories, setVaultCategories] =
+    useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayment[]>()
   const toast = useToast()
 
   const { id } = useParams()
   const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
     useAssets()
-  const { loadingVault, loadingVaults, getVaults, getVaultById } = useVaults()
+  const {
+    loadingVault,
+    loadingVaults,
+    updatingVault,
+    getVaults,
+    getVaultById,
+    getVaultCategories,
+    createVaultCategory,
+    updateVault,
+  } = useVaults()
   const { loadingHorizon, getPaymentsData } = useHorizon()
 
   const [selectedAsset, setSelectedAsset] =
@@ -78,9 +89,48 @@ export const VaultDetail: React.FC = () => {
     }
   }
 
+  const onUpdateVault = async (
+    params: Hooks.UseVaultsTypes.IVaultUpdateParams
+  ): Promise<void> => {
+    try {
+      if (!vault) return
+
+      const isSuccess = await updateVault(vault.id, params)
+
+      if (isSuccess) {
+        toast({
+          title: 'Vault updated!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+
+        if (vault) {
+          getPaymentsData(vault.wallet.key.publicKey)
+        }
+
+        if (id) {
+          getVaultById(id).then(vault => {
+            setVault(vault)
+          })
+        }
+
+        return
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+  }
+
   const toastError = (message: string): void => {
     toast({
-      title: 'Distribute error!',
+      title: 'Error!',
       description: message,
       status: 'error',
       duration: 9000,
@@ -93,6 +143,12 @@ export const VaultDetail: React.FC = () => {
     getVaults().then(vaults => setVaults(vaults))
     getAssets()
   }, [getAssets, getVaults])
+
+  useEffect(() => {
+    getVaultCategories().then(vaultCategories =>
+      setVaultCategories(vaultCategories)
+    )
+  }, [getVaultCategories])
 
   useEffect(() => {
     if (id) {
@@ -113,16 +169,20 @@ export const VaultDetail: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.VAULTS}>
         <VaultDetailTemplate
           vault={vault}
-          onSubmit={onSubmit}
           loadingAssets={loadingAssets}
           loadingOperation={loadingOperation}
           loadingVaults={loadingVault || loadingVaults}
           assets={assets}
           vaults={vaults}
           payments={payments}
-          setSelectedAsset={setSelectedAsset}
           selectedAsset={selectedAsset}
           loadingHorizon={loadingHorizon}
+          vaultCategories={vaultCategories}
+          updatingVault={updatingVault}
+          onSubmit={onSubmit}
+          setSelectedAsset={setSelectedAsset}
+          createVaultCategory={createVaultCategory}
+          onUpdateVault={onUpdateVault}
         />
       </Sidebar>
     </Flex>

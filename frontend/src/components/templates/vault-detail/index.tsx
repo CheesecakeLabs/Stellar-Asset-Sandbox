@@ -1,8 +1,9 @@
-import { Flex, Skeleton, Tag, Text } from '@chakra-ui/react'
+import { Flex, Skeleton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { DistributeVault } from './components/distribute'
+import { Header } from './components/header'
 import { ListAssets } from './components/list-assets'
 import { ListPayments } from './components/list-payments'
 import { LoaderSkeleton } from './components/loader-skeleton'
@@ -17,6 +18,8 @@ interface IVaultDetailTemplate {
   payments: Hooks.UseHorizonTypes.IPayment[] | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   loadingHorizon: boolean
+  updatingVault: boolean
+  vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
@@ -25,6 +28,10 @@ interface IVaultDetailTemplate {
   setSelectedAsset: Dispatch<
     SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
   >
+  createVaultCategory(
+    vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
+  ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
+  onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
@@ -37,14 +44,16 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   payments,
   selectedAsset,
   loadingHorizon,
+  vaultCategories,
+  updatingVault,
+  onUpdateVault,
   onSubmit,
   setSelectedAsset,
+  createVaultCategory,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
   )
-
-  const tagColors = ['blue_sky', 'purple_powder', 'blue_moonstone']
 
   return (
     <Flex flexDir="column" w="full">
@@ -53,25 +62,14 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
           <LoaderSkeleton />
         ) : (
           <>
-            <Flex alignItems="center" mb="1.5rem">
-              <Text fontSize="2xl" fontWeight="400">
-                {vault.name}
-              </Text>
-              <Tag
-                variant={
-                  vault.vault_category.id > tagColors.length
-                    ? tagColors[vault.vault_category.id / tagColors.length]
-                    : tagColors[vault.vault_category.id] || 'black'
-                }
-                ms="1rem"
-                textAlign="center"
-                fontSize="xs"
-                fontWeight="700"
-                w="fit-content"
-              >
-                {vault.vault_category.name}
-              </Tag>
-            </Flex>
+            <Header
+              vault={vault}
+              createVaultCategory={createVaultCategory}
+              vaultCategories={vaultCategories}
+              category={vault.vault_category}
+              onUpdateVault={onUpdateVault}
+              updatingVault={updatingVault}
+            />
             <Flex gap="1rem">
               <ListAssets
                 vault={vault}

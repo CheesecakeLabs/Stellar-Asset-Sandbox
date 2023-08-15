@@ -9,6 +9,7 @@ interface ISelectCategory {
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   setCategorySelected: Dispatch<SetStateAction<IOption | null | undefined>>
+  categorySelected?: IOption | null | undefined
 }
 
 const createOption = (label: string, value: number): IOption => ({
@@ -20,6 +21,7 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
   vaultCategories,
   createVaultCategory,
   setCategorySelected,
+  categorySelected,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [options, setOptions] = useState<IOption[]>([])
@@ -53,6 +55,11 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
       onCreateOption={handleVaultCategory}
       options={options}
       onChange={(newValue): void => setCategorySelected(newValue)}
+      defaultValue={
+        categorySelected
+          ? { value: categorySelected.value, label: categorySelected.label }
+          : undefined
+      }
       styles={{
         control: baseStyles => ({
           ...baseStyles,

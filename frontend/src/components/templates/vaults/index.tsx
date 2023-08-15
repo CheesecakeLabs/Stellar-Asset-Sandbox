@@ -2,6 +2,7 @@ import { Flex, Text, SimpleGrid, Box, Button } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { Filters } from './components/filters'
 import { ItemVault } from './components/item-vault'
 import { LoaderSkeleton } from './components/loader-skeleton'
 import { PathRoute } from 'components/enums/path-route'
@@ -11,18 +12,20 @@ import { Empty } from 'components/molecules/empty'
 interface IVaultsTemplate {
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
 }
 
 export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
   loading,
   vaults,
+  vaultCategories,
 }) => {
   const navigate = useNavigate()
 
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW="860px" alignSelf="center" flexDir="column" w="full">
-        <Flex mb="1.5rem" justifyContent="space-between">
+        <Flex mb="1rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
             Vaults
           </Text>
@@ -35,6 +38,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           </Button>
         </Flex>
         <Box p={0} maxW="full">
+          {vaultCategories && <Filters vaultCategories={vaultCategories} />}
           {loading ? (
             <LoaderSkeleton />
           ) : vaults ? (

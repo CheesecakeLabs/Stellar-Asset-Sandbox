@@ -15,6 +15,7 @@ import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as EmptyIcon } from './fonts/empty.svg'
 import { ReactComponent as EurocIcon } from './fonts/euroc.svg'
 import { ReactComponent as ExplorerIcon } from './fonts/explorer.svg'
+import { ReactComponent as FilterIcon } from './fonts/filter.svg'
 import { ReactComponent as HelpIcon } from './fonts/help.svg'
 import { ReactComponent as HomeIcon } from './fonts/home.svg'
 import { ReactComponent as InfoIcon } from './fonts/info.svg'
@@ -36,6 +37,7 @@ import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SendedIcon } from './fonts/sended.svg'
 import { ReactComponent as SettingsIcon } from './fonts/settings.svg'
+import { ReactComponent as SortIcon } from './fonts/sort.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
 import { ReactComponent as TimeIcon } from './fonts/time.svg'
 import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
@@ -88,4 +90,6 @@ export {
   ArsIcon,
   UsdcIcon,
   EurocIcon,
+  SortIcon,
+  FilterIcon,
 }

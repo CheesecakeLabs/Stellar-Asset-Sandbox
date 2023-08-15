@@ -1,11 +1,16 @@
-import { useToast } from '@chakra-ui/react'
-import { createContext, useCallback, useState } from 'react'
+import { useToast } from '@chakra-ui/react';
+import { createContext, useCallback, useState } from 'react';
 
-import axios from 'axios'
-import { useHorizon } from 'hooks/useHorizon'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { http } from 'interfaces/http'
+
+import axios from 'axios';
+import { useHorizon } from 'hooks/useHorizon';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { http } from 'interfaces/http';
+
 
 export const VaultsContext = createContext(
   {} as Hooks.UseVaultsTypes.IVaultsContext
@@ -21,6 +26,7 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
   const [loadingVaultCategories, setLoadingVaultCategories] = useState(true)
   const [creatingVault, setCreatingVault] = useState(false)
   const [creatingVaultCategory, setCreatingVaultCategory] = useState(false)
+  const [updatingVault, setUpdatingVault] = useState(false)
   const [vaults, setVaults] = useState()
 
   const { getAccountData } = useHorizon()
@@ -147,6 +153,24 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData, toastError]
   )
 
+  const updateVault = async (
+    id: number,
+    params: Hooks.UseVaultsTypes.IVaultUpdateParams
+  ): Promise<boolean> => {
+    setUpdatingVault(true)
+    try {
+      const response = await http.put(`/vault/vault-category/${id}`, params)
+      return response.status === 200
+    } catch (error) {
+      toastError(
+        axios.isAxiosError(error) ? error.message : MessagesError.errorOccurred
+      )
+    } finally {
+      setUpdatingVault(false)
+    }
+    return false
+  }
+
   return (
     <VaultsContext.Provider
       value={{
@@ -156,11 +180,13 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
         loadingVaultCategories,
         creatingVault,
         creatingVaultCategory,
+        updatingVault,
         getVaults,
         getVaultCategories,
         createVault,
         createVaultCategory,
         getVaultById,
+        updateVault,
       }}
     >
       {children}
