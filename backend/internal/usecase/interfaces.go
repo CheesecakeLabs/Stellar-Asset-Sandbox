@@ -65,4 +65,6 @@ type (
 		GetVaults() ([]entity.Vault, error)
 		CreateVault(entity.Vault) (entity.Vault, error)
 	}
+
+	LogTransactionRepoInterface interface{}
 )
