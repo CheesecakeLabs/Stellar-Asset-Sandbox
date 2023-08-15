@@ -616,6 +616,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/vault-asset/{id}": {
+            "put": {
+                "description": "Update a vault by providing the Vault ID and the updated the asset.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Update a vault asset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vault asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateVaultAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault asset information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault asset",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/vault-category": {
             "post": {
                 "description": "Create and issue a new asset on Stellar",
@@ -661,6 +721,66 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault-category/{id}": {
+            "put": {
+                "description": "Update a vault category by providing the Vault Category ID and the updated information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault Category"
+                ],
+                "summary": "Update a vault category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vault Category info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateVaultCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault category information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault category not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault category",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -868,7 +988,7 @@ const docTemplate = `{
         "entity.RolePermissionResponse": {
             "type": "object",
             "properties": {
-                "description": {
+                "action": {
                     "type": "string",
                     "example": "Edit action"
                 },
@@ -1222,6 +1342,34 @@ const docTemplate = `{
                 "trustor_pk": {
                     "type": "string",
                     "example": "2"
+                }
+            }
+        },
+        "v1.UpdateVaultAssetRequest": {
+            "type": "object",
+            "required": [
+                "asset_id"
+            ],
+            "properties": {
+                "asset_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "v1.UpdateVaultCategoryRequest": {
+            "type": "object",
+            "required": [
+                "vault_category_id"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Vault 2"
+                },
+                "vault_category_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

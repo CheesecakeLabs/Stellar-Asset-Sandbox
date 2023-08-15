@@ -110,3 +110,16 @@ func (r VaultRepo) CreateVault(data entity.Vault) (entity.Vault, error) {
 
 	return res, nil
 }
+
+func (r VaultRepo) UpdateVault(data entity.Vault) (entity.Vault, error) {
+	stmt := `UPDATE Vault SET name = $1, vault_category_id = $2 WHERE id = $3 RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Name, data.VaultCategory.Id, data.Id).Scan(&data.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Vault{}, fmt.Errorf("VaultRepo - UpdateVaultCategory - Vault not found")
+		}
+		return entity.Vault{}, fmt.Errorf("VaultRepo - UpdateVaultCategory - db.QueryRow: %w", err)
+	}
+
+	return data, nil
+}
