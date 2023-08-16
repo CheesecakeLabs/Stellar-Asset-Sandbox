@@ -5,4 +5,5 @@ type Vault struct {
 	Name          string        `json:"name" example:"Treasury"`
 	Wallet        Wallet        `json:"wallet"`
 	VaultCategory VaultCategory `json:"vault_category"`
+	Active        int           `json:"active"`
 }

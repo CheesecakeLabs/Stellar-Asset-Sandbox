@@ -1,0 +1,1 @@
+ALTER TABLE Vault DROP COLUMN active;

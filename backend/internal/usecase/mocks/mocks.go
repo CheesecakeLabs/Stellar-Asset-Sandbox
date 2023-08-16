@@ -683,5 +683,20 @@ func (m *MockVaultRepoInterface) UpdateVault(arg0 entity.Vault) (entity.Vault, e
 // UpdateVault indicates an expected call of UpdateVault.
 func (mr *MockVaultRepoInterfaceMockRecorder) UpdateVault(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).UpdateVault), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).DeleteVault), arg0)
+}
+
+// DeleteVault mocks base method.
+func (m *MockVaultRepoInterface) DeleteVault(arg0 entity.Vault) (entity.Vault, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteVault", arg0)
+	ret0, _ := ret[0].(entity.Vault)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteVault indicates an expected call of DeleteVault.
+func (mr *MockVaultRepoInterfaceMockRecorder) DeleteVault(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).DeleteVault), arg0)
 }

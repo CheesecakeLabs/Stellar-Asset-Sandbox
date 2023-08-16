@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
@@ -65,7 +66,13 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 		return
 	}
 
-	vault, err := r.v.GetById(request.VaultId)
+	vaultId, err := strconv.Atoi(request.VaultId)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+
+	vault, err := r.v.GetById(vaultId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "vault not found")
 		return
@@ -118,8 +125,14 @@ func (r *contractRoutes) getAllContracts(c *gin.Context) {
 // @Failure     500 {object} response
 // @Router      / [get]
 func (r *contractRoutes) getContractById(c *gin.Context) {
-	userid := c.Param("id")
-	contract, err := r.v.GetById(userid)
+	idStr := c.Param("id")
+
+	vaultId, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+	contract, err := r.v.GetById(vaultId)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting contract")
 		return

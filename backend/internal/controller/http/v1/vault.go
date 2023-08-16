@@ -29,7 +29,8 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 		h.POST("", r.createVault)
 		h.GET("list", r.getAllVaults)
 		h.PUT("/vault-category/:id", r.updateVaultCategory)
-		h.PUT("vault-asset/:id", r.updateVaultAsset)
+		h.PUT("/vault-asset/:id", r.updateVaultAsset)
+		h.PUT("/vault-delete/:id", r.deleteVault)
 	}
 }
 
@@ -45,7 +46,10 @@ type UpdateVaultCategoryRequest struct {
 }
 
 type UpdateVaultAssetRequest struct {
-	AssetId int `json:"asset_id"   binding:"required"  example:"1"`
+	AssetCode     string `json:"asset_code"   binding:"required"  example:"1"`
+	AssetIssuerPK string `json:"asset_issuer_pk"   binding:"required"  example:"1"`
+	IsAdd         bool   `json:"is_add"   example:"true"`
+	IsRemove      bool   `json:"is_remove"   example:"false"`
 }
 
 // @Summary     Create a new vault
@@ -189,8 +193,14 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 // @Failure     500 {object} response
 // @Router      / [get]
 func (r *vaultRoutes) getVaultById(c *gin.Context) {
-	userid := c.Param("id")
-	vault, err := r.v.GetById(userid)
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+
+	vault, err := r.v.GetById(id)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting vault")
 		return
@@ -271,7 +281,7 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		return
 	}
 
-	var request UpdateVaultAssetRequest
+	var request []UpdateVaultAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -284,16 +294,6 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.GetById(strconv.Itoa(request.AssetId))
-	if err != nil {
-		if err.Error() == "AssetRepo - GetAssetById - Asset not found" {
-			errorResponse(c, http.StatusNotFound, "asset not found")
-			return
-		}
-		errorResponse(c, http.StatusInternalServerError, "error finding asset")
-		return
-	}
-
 	sponsor, err := r.w.Get(_sponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
@@ -302,16 +302,31 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 
 	// Create the the envelope transaction
 	_trustLimit := 0
-	ops := []entity.Operation{
-		{
-			Type:    entity.ChangeTrustOp,
-			Origin:  vault.Wallet.Key.PublicKey,
-			Sponsor: sponsor.Key.PublicKey,
-			Asset: entity.OpAsset{
-				Code:   asset.Code,
-				Issuer: asset.Issuer.Key.PublicKey,
-			}, TrustLimit: &_trustLimit, // Initialize directly as a pointer to int and set 0
-		},
+	ops := []entity.Operation{}
+
+	for _, asset := range request {
+		if asset.IsAdd {
+			ops = append(ops, entity.Operation{
+				Type:    entity.ChangeTrustOp,
+				Sponsor: sponsor.Key.PublicKey,
+				Asset: entity.OpAsset{
+					Code:   asset.AssetCode,
+					Issuer: asset.AssetIssuerPK,
+				},
+				Origin: vault.Wallet.Key.PublicKey,
+			})
+		}
+		if asset.IsRemove {
+			ops = append(ops, entity.Operation{
+				Type:    entity.ChangeTrustOp,
+				Origin:  vault.Wallet.Key.PublicKey,
+				Sponsor: sponsor.Key.PublicKey,
+				Asset: entity.OpAsset{
+					Code:   asset.AssetCode,
+					Issuer: asset.AssetIssuerPK,
+				}, TrustLimit: &_trustLimit, // Initialize directly as a pointer to int and set 0
+			})
+		}
 	}
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
@@ -331,4 +346,47 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, vault)
+}
+
+// @Summary     Update a vault status
+// @Description Update a vault by providing the Vault ID and the updated the status.
+// @Tags  	    Vault
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Vault ID" Format(uuid)
+// @Success     200 {object} entity.Vault "Updated vault status information"
+// @Failure     400 {object} response "Bad Request: Invalid input data"
+// @Failure     404 {object} response "Not Found: Vault not found"
+// @Failure     500 {object} response "Internal Server Error: Failed to update vault status"
+// @Router      /vault-delete/{id} [put]
+func (r *vaultRoutes) deleteVault(c *gin.Context) {
+	// Get the ID of the vault to be updated from the URL parameters
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		return
+	}
+
+	// Find the existing vault by its ID
+	existingVault, err := r.v.GetById(id)
+	if err != nil {
+		if err.Error() == "VaultRepo - GetVaultById - Vault not found" {
+			errorResponse(c, http.StatusNotFound, "vault not found")
+			return
+		}
+		errorResponse(c, http.StatusInternalServerError, "error finding vault")
+		return
+	}
+
+	// Delete the vault data
+	existingVault.Active = 0
+
+	deletedVault, err := r.v.DeleteVault(existingVault)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error delete vault")
+		return
+	}
+
+	c.JSON(http.StatusOK, deletedVault)
 }
