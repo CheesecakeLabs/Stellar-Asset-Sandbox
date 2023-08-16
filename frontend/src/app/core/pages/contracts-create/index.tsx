@@ -20,8 +20,6 @@ export const ContractsCreate: React.FC = () => {
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    walletVault: string | undefined,
-    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
   ): Promise<void> => {
     try {
       const asset = {

@@ -8,7 +8,9 @@ export interface IOption {
 
 interface ISelectAsset {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  selected?: IOption | null
   setAsset: Dispatch<SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>>
+  setSelected?: Dispatch<SetStateAction<IOption | undefined | null>>
 }
 
 const createOption = (
@@ -19,7 +21,12 @@ const createOption = (
   value: value,
 })
 
-export const SelectAsset: React.FC<ISelectAsset> = ({ assets, setAsset }) => {
+export const SelectAsset: React.FC<ISelectAsset> = ({
+  assets,
+  selected,
+  setAsset,
+  setSelected,
+}) => {
   const [options, setOptions] = useState<IOption[]>([])
 
   useEffect(() => {
@@ -32,7 +39,11 @@ export const SelectAsset: React.FC<ISelectAsset> = ({ assets, setAsset }) => {
   return (
     <Select
       options={options}
-      onChange={(newValue): void => setAsset(newValue?.value)}
+      onChange={(newValue): void => {
+        setAsset(newValue?.value), setSelected && setSelected(newValue)
+      }}
+      value={selected}
+      placeholder="Select asset"
       styles={{
         control: baseStyles => ({
           ...baseStyles,

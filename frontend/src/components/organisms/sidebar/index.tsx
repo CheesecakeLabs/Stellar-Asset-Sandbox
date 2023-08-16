@@ -14,7 +14,6 @@ import {
   ExplorerIcon,
   HomeIcon,
   PaymentsIcon,
-  SecurityIcon,
   VaultIcon,
 } from 'components/icons'
 import { SidebarContent } from 'components/molecules'

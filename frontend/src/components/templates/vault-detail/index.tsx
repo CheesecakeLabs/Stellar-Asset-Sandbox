@@ -19,7 +19,9 @@ interface IVaultDetailTemplate {
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   loadingHorizon: boolean
   updatingVault: boolean
+  updatingVaultAssets: boolean
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
+  deletingVault: boolean
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
@@ -32,6 +34,8 @@ interface IVaultDetailTemplate {
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
+  onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
+  onDeleteVault(): Promise<void>
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
@@ -46,10 +50,14 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   loadingHorizon,
   vaultCategories,
   updatingVault,
+  updatingVaultAssets,
+  deletingVault,
   onUpdateVault,
   onSubmit,
   setSelectedAsset,
   createVaultCategory,
+  onUpdateVaultAssets,
+  onDeleteVault,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
@@ -64,18 +72,22 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
           <>
             <Header
               vault={vault}
-              createVaultCategory={createVaultCategory}
               vaultCategories={vaultCategories}
               category={vault.vault_category}
-              onUpdateVault={onUpdateVault}
               updatingVault={updatingVault}
+              createVaultCategory={createVaultCategory}
+              onUpdateVault={onUpdateVault}
+              deletingVault={deletingVault}
+              onDeleteVault={onDeleteVault}
             />
             <Flex gap="1rem">
               <ListAssets
                 vault={vault}
                 assets={assets}
-                setSelectedAsset={setSelectedAsset}
                 selectedAsset={selectedAsset}
+                updatingVaultAssets={updatingVaultAssets}
+                onUpdateVaultAssets={onUpdateVaultAssets}
+                setSelectedAsset={setSelectedAsset}
               />
               <DistributeVault
                 onSubmit={onSubmit}

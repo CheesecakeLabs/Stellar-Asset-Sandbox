@@ -6,6 +6,7 @@ declare namespace Hooks {
       vault_category: IVaultCategory
       wallet: Hooks.UseWalletsTypes.IWallet
       accountData: Hooks.UseHorizonTypes.IAccount | undefined
+      active: 0 | 1
     }
 
     interface IVaultRequest {
@@ -17,15 +18,24 @@ declare namespace Hooks {
     interface IVaultCategory {
       id: number
       name: string
+      theme: string
     }
 
     interface IVaultCategoryRequest {
       name: string
+      theme?: string
     }
 
     interface IVaultUpdateParams {
       name: string
       vault_category_id: number
+    }
+
+    interface IVaultAssetsUpdateParams {
+      asset_code: string
+      asset_issuer_pk: string
+      is_add: boolean
+      is_remove: boolean
     }
 
     interface IVaultsContext {
@@ -36,6 +46,8 @@ declare namespace Hooks {
       creatingVaultCategory: boolean
       vaults: IVault[] | undefined
       updatingVault: boolean
+      updatingVaultAssets: boolean
+      deletingVault: boolean
       getVaults: () => Promise<IVaults[] | undefined>
       getVaultCategories: () => Promise<IVaultCategory[] | undefined>
       createVault: (vault: IVaultRequest) => Promise<IVault | undefined>
@@ -44,6 +56,11 @@ declare namespace Hooks {
       ) => Promise<IVaultCategory | undefined>
       getVaultById: (id: string) => Promise<IVault | undefined>
       updateVault: (id: number, params: IVaultUpdateParams) => Promise<boolean>
+      updateVaultAssets: (
+        id: number,
+        params: IVaultAssetsUpdateParams[]
+      ) => Promise<boolean>
+      deleteVault: (id: number) => Promise<boolean>
     }
   }
 }

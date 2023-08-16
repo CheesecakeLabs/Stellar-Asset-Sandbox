@@ -17,10 +17,7 @@ interface IAssetHomeTemplate {
   asset: Hooks.UseAssetsTypes.IAssetDto
 }
 
-export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
-  loading,
-  asset,
-}) => {
+export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
   const isFlagActive = (status: boolean): string => {
     return status ? 'actived' : 'none'
   }

@@ -1,7 +1,7 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useHorizon } from 'hooks/useHorizon'
@@ -19,6 +19,7 @@ export const VaultDetail: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayment[]>()
   const toast = useToast()
+  const navigate = useNavigate()
 
   const { id } = useParams()
   const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
@@ -27,11 +28,15 @@ export const VaultDetail: React.FC = () => {
     loadingVault,
     loadingVaults,
     updatingVault,
+    updatingVaultAssets,
+    deletingVault,
     getVaults,
     getVaultById,
     getVaultCategories,
     createVaultCategory,
     updateVault,
+    updateVaultAssets,
+    deleteVault,
   } = useVaults()
   const { loadingHorizon, getPaymentsData } = useHorizon()
 
@@ -128,6 +133,108 @@ export const VaultDetail: React.FC = () => {
     }
   }
 
+  const onDeleteVault = async (): Promise<void> => {
+    try {
+      if (!vault) return
+
+      const isSuccess = await deleteVault(vault.id)
+
+      if (isSuccess) {
+        toast({
+          title: 'Vault deleted!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+
+        navigate(PathRoute.VAULTS)
+        return
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+  }
+
+  const onUpdateVaultAssets = async (
+    listEdit: Hooks.UseHorizonTypes.IBalance[]
+  ): Promise<void> => {
+    try {
+      if (!vault) return
+
+      const assetsRemoveds =
+        vault.accountData?.balances
+          .filter(
+            balance =>
+              !listEdit?.some(
+                asset =>
+                  asset.asset_code === balance.asset_code &&
+                  asset.asset_issuer === balance.asset_issuer
+              )
+          )
+          .map(asset => ({
+            asset_code: asset.asset_code,
+            asset_issuer_pk: asset.asset_issuer,
+            is_add: false,
+            is_remove: true,
+          })) || []
+
+      const assetsAdded =
+        listEdit
+          .filter(
+            asset =>
+              !vault.accountData?.balances?.some(
+                balance =>
+                  asset.asset_code === balance.asset_code &&
+                  asset.asset_issuer === balance.asset_issuer
+              )
+          )
+          .map(asset => ({
+            asset_code: asset.asset_code,
+            asset_issuer_pk: asset.asset_issuer,
+            is_add: true,
+            is_remove: false,
+          })) || []
+
+      const isSuccess = await updateVaultAssets(vault.id, [
+        ...assetsRemoveds,
+        ...assetsAdded,
+      ])
+
+      if (isSuccess) {
+        toast({
+          title: 'Vault assets updated!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+
+        setSelectedAsset(undefined)
+
+        if (id) {
+          getVaultById(id).then(vault => {
+            setVault(vault)
+          })
+        }
+
+        return
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+  }
+
   const toastError = (message: string): void => {
     toast({
       title: 'Error!',
@@ -152,9 +259,14 @@ export const VaultDetail: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      getVaultById(id).then(vault => setVault(vault))
+      getVaultById(id).then(vault => {
+        setVault(vault)
+        if (vault?.active === 0) {
+          navigate(PathRoute.VAULTS)
+        }
+      })
     }
-  }, [getVaultById, id, setVault])
+  }, [getVaultById, id, navigate, setVault])
 
   useEffect(() => {
     if (vault) {
@@ -179,10 +291,14 @@ export const VaultDetail: React.FC = () => {
           loadingHorizon={loadingHorizon}
           vaultCategories={vaultCategories}
           updatingVault={updatingVault}
+          updatingVaultAssets={updatingVaultAssets}
+          deletingVault={deletingVault}
           onSubmit={onSubmit}
           setSelectedAsset={setSelectedAsset}
           createVaultCategory={createVaultCategory}
           onUpdateVault={onUpdateVault}
+          onUpdateVaultAssets={onUpdateVaultAssets}
+          onDeleteVault={onDeleteVault}
         />
       </Sidebar>
     </Flex>

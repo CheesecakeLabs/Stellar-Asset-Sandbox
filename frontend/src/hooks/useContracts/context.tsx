@@ -1,16 +1,11 @@
-import { SetStateAction, createContext, useCallback, useState } from 'react';
+import { SetStateAction, createContext, useCallback, useState } from 'react'
 
+import freighter from '@stellar/freighter-api'
+import axios from 'axios'
+import { MessagesError } from 'utils/constants/messages-error'
+import { mockContracts } from 'utils/mockups'
 
-
-import freighter from '@stellar/freighter-api';
-import axios from 'axios';
-import { MessagesError } from 'utils/constants/messages-error';
-import { mockContracts } from 'utils/mockups';
-
-
-
-import * as certificatesOfDeposit from '../../soroban-cod/src';
-
+import * as certificatesOfDeposit from '../../soroban-cod/src'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -34,9 +29,9 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     Hooks.UseContractsTypes.IContract | undefined
   >()
 
-  const createContract = async (
-    params: Hooks.UseContractsTypes.IContractRequest
-  ): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
+  const createContract = async (): Promise<
+    Hooks.UseContractsTypes.IContract | undefined
+  > => {
     setLoading(true)
     try {
       return mockContracts[0]
@@ -64,7 +59,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getContract = useCallback(async (id: string): Promise<void> => {
+  const getContract = useCallback(async (): Promise<void> => {
     setLoading(true)
     try {
       setContract(mockContracts[0])
@@ -83,16 +78,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     address: string,
     updatePosition: void
   ): Promise<boolean> => {
-    console.log(
-      {
-        amount: amount,
-        address: address,
-      },
-      {
-        fee: 10000,
-        secondsToWait: 300,
-      }
-    )
     setIsDepositing(true)
     try {
       await certificatesOfDeposit.deposit(
@@ -111,7 +96,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       updatePosition
       return true
     } catch (error) {
-      console.log(error)
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
       }

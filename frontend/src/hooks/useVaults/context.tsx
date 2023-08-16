@@ -1,16 +1,12 @@
-import { useToast } from '@chakra-ui/react';
-import { createContext, useCallback, useState } from 'react';
+import { useToast } from '@chakra-ui/react'
+import { createContext, useCallback, useState } from 'react'
 
+import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
+import { getVaultCategoryTheme } from 'utils/colors'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import axios from 'axios';
-import { useHorizon } from 'hooks/useHorizon';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { http } from 'interfaces/http';
-
+import { http } from 'interfaces/http'
 
 export const VaultsContext = createContext(
   {} as Hooks.UseVaultsTypes.IVaultsContext
@@ -27,6 +23,8 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
   const [creatingVault, setCreatingVault] = useState(false)
   const [creatingVaultCategory, setCreatingVaultCategory] = useState(false)
   const [updatingVault, setUpdatingVault] = useState(false)
+  const [updatingVaultAssets, setUpdatingVaultAssets] = useState(false)
+  const [deletingVault, setDeletingVault] = useState(false)
   const [vaults, setVaults] = useState()
 
   const { getAccountData } = useHorizon()
@@ -115,6 +113,9 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined> => {
     setCreatingVaultCategory(true)
     try {
+      const categories = await getVaultCategories()
+      params.theme = getVaultCategoryTheme(categories)
+
       const response = await http.post(`vault-category`, params)
       if (response.status === 200) {
         return response.data
@@ -171,6 +172,39 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     return false
   }
 
+  const updateVaultAssets = async (
+    id: number,
+    params: Hooks.UseVaultsTypes.IVaultAssetsUpdateParams[]
+  ): Promise<boolean> => {
+    setUpdatingVaultAssets(true)
+    try {
+      const response = await http.put(`/vault/vault-asset/${id}`, params)
+      return response.status === 200
+    } catch (error) {
+      toastError(
+        axios.isAxiosError(error) ? error.message : MessagesError.errorOccurred
+      )
+    } finally {
+      setUpdatingVaultAssets(false)
+    }
+    return false
+  }
+
+  const deleteVault = async (id: number): Promise<boolean> => {
+    setDeletingVault(true)
+    try {
+      const response = await http.put(`/vault/vault-delete/${id}`)
+      return response.status === 200
+    } catch (error) {
+      toastError(
+        axios.isAxiosError(error) ? error.message : MessagesError.errorOccurred
+      )
+    } finally {
+      setDeletingVault(false)
+    }
+    return false
+  }
+
   return (
     <VaultsContext.Provider
       value={{
@@ -181,12 +215,16 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
         creatingVault,
         creatingVaultCategory,
         updatingVault,
+        updatingVaultAssets,
+        deletingVault,
         getVaults,
         getVaultCategories,
         createVault,
         createVaultCategory,
         getVaultById,
         updateVault,
+        updateVaultAssets,
+        deleteVault,
       }}
     >
       {children}

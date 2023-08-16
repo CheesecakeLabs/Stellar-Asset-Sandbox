@@ -32,11 +32,6 @@ export const ContractsDetail: React.FC = () => {
   const [userDeposit, setUserDeposit] = useState(0)
   const [pauseProcess, setPauseProcess] = useState(false)
 
-  const stroopsToAmount = (units: string): string => {
-    const amount = Number(units) * 0.0000001
-    return amount.toFixed(7)
-  }
-
   const updatePosition = useCallback((): void => {
     if (!pauseProcess) {
       getPosition(setUserPosition, userAccount)
@@ -53,6 +48,7 @@ export const ContractsDetail: React.FC = () => {
     if (userAccount) {
       updatePositionPeriodically()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAccount])
 
   useEffect(() => {

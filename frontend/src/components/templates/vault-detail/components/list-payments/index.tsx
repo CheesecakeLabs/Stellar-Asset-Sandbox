@@ -180,7 +180,10 @@ export const ListPayments: React.FC<IListPayments> = ({
                           {formatDateFull(payment.created_at)}
                         </Text>
                       </Td>
-                      <Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800', fill: 'white' }}
+                      >
                         <Flex
                           cursor="pointer"
                           _dark={{ fill: 'white' }}

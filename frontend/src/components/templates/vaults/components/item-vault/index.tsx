@@ -2,7 +2,7 @@ import { Container, Flex, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { getCurrencyIcon } from 'utils/constants/constants'
+import { getCurrencyIcon, vaultCategoryTheme } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -14,8 +14,6 @@ interface IItemVault {
 
 export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
   const navigate = useNavigate()
-
-  const tagColors = ['blue_sky', 'purple_powder', 'blue_moonstone']
 
   return (
     <Container
@@ -39,11 +37,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
       </Text>
       <Flex justifyContent="center">
         <Tag
-          variant={
-            vault.vault_category.id > tagColors.length
-              ? tagColors[vault.vault_category.id / tagColors.length]
-              : tagColors[vault.vault_category.id] || 'black'
-          }
+          variant={vault.vault_category.theme || vaultCategoryTheme[0]}
           mt="0.5rem"
           mb="0.75rem"
           textAlign="center"

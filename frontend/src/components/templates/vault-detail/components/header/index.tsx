@@ -5,6 +5,17 @@ import {
   FocusLock,
   IconButton,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Popover,
   PopoverArrow,
   PopoverCloseButton,
@@ -17,7 +28,9 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
-import { EditIcon } from 'components/icons'
+import { vaultCategoryTheme } from 'utils/constants/constants'
+
+import { ChevronDownIcon, EditIcon } from 'components/icons'
 import { IOption } from 'components/templates/vault-create'
 import { SelectCategory } from 'components/templates/vault-create/select-category'
 
@@ -26,21 +39,23 @@ interface IHeader {
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   category: Hooks.UseVaultsTypes.IVaultCategory | undefined
   updatingVault: boolean
+  deletingVault: boolean
   createVaultCategory(
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
   onCancel?(): void
+  onDeleteVault(): Promise<void>
 }
 
 const Form: React.FC<IHeader> = ({
-  onCancel,
-  createVaultCategory,
-  onUpdateVault,
   vaultCategories,
   vault,
   category,
   updatingVault,
+  onCancel,
+  createVaultCategory,
+  onUpdateVault,
 }) => {
   const [categorySelected, setCategorySelected] = useState<
     IOption | null | undefined
@@ -94,61 +109,95 @@ export const Header: React.FC<IHeader> = ({
   vaultCategories,
   category,
   updatingVault,
+  deletingVault,
   createVaultCategory,
   onUpdateVault,
+  onDeleteVault,
 }) => {
   const { onOpen, onClose, isOpen } = useDisclosure()
+  const {
+    isOpen: isOpenModal,
+    onOpen: onOpenModal,
+    onClose: onCloseModal,
+  } = useDisclosure()
   const firstFieldRef = React.useRef(null)
-
-  const tagColors = ['blue_sky', 'purple_powder', 'blue_moonstone']
 
   return (
     <>
-      <Flex alignItems="center" mb="1.5rem">
-        <Text fontSize="2xl" fontWeight="400">
-          {vault.name}
-        </Text>
-        <Tag
-          variant={
-            vault.vault_category.id > tagColors.length
-              ? tagColors[vault.vault_category.id / tagColors.length]
-              : tagColors[vault.vault_category.id % 2] || 'black'
-          }
-          ms="1rem"
-          me="0.25rem"
-          textAlign="center"
-          fontSize="xs"
-          fontWeight="700"
-          w="fit-content"
-        >
-          {vault.vault_category.name}
-        </Tag>
-        <Popover
-          isOpen={isOpen}
-          initialFocusRef={firstFieldRef}
-          onOpen={onOpen}
-          onClose={onClose}
-          closeOnBlur={false}
-        >
-          <PopoverTrigger>
-            <IconButton size="sm" icon={<EditIcon />} aria-label="Edit" />
-          </PopoverTrigger>
-          <PopoverContent p={5}>
-            <FocusLock persistentFocus={false}>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <Form
-                onCancel={onClose}
-                createVaultCategory={createVaultCategory}
-                vaultCategories={vaultCategories}
-                vault={vault}
-                category={category}
-                onUpdateVault={onUpdateVault}
-                updatingVault={updatingVault}
-              />
-            </FocusLock>
-          </PopoverContent>
-        </Popover>
+      <Modal isOpen={isOpenModal} onClose={onCloseModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete Vault {vault.name}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Are you sure you want to delete this vault?</ModalBody>
+
+          <ModalFooter>
+            <Button variant="secondary" mr={3} onClick={onCloseModal}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onDeleteVault}
+              isLoading={deletingVault}
+            >
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Flex w="full" justifyContent="space-between">
+        <Flex alignItems="center" mb="1.5rem">
+          <Text fontSize="2xl" fontWeight="400">
+            {vault.name}
+          </Text>
+          <Tag
+            variant={vault.vault_category.theme || vaultCategoryTheme[0]}
+            ms="1rem"
+            me="0.25rem"
+            textAlign="center"
+            fontSize="xs"
+            fontWeight="700"
+            w="fit-content"
+          >
+            {vault.vault_category.name}
+          </Tag>
+          <Popover
+            isOpen={isOpen}
+            initialFocusRef={firstFieldRef}
+            closeOnBlur={false}
+            onOpen={onOpen}
+            onClose={onClose}
+          >
+            <PopoverTrigger>
+              <IconButton size="sm" icon={<EditIcon />} aria-label="Edit" />
+            </PopoverTrigger>
+            <PopoverContent p={5}>
+              <FocusLock persistentFocus={false}>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <Form
+                  vaultCategories={vaultCategories}
+                  vault={vault}
+                  category={category}
+                  updatingVault={updatingVault}
+                  deletingVault={deletingVault}
+                  onCancel={onClose}
+                  createVaultCategory={createVaultCategory}
+                  onDeleteVault={onDeleteVault}
+                  onUpdateVault={onUpdateVault}
+                />
+              </FocusLock>
+            </PopoverContent>
+          </Popover>
+        </Flex>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} fontSize="sm">
+            Actions
+          </MenuButton>
+          <MenuList>
+            <MenuItem onClick={onOpenModal}>Delete Vault</MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </>
   )

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import freighter from "@stellar/freighter-api";
 // working around ESM compatibility issues

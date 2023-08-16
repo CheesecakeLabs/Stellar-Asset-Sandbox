@@ -2,7 +2,7 @@ import { Image } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 
 import arsPng from './../../components/icons/fonts/ars.png'
-import { ArsIcon, CoinIcon, EurocIcon, UsdcIcon } from 'components/icons'
+import { CoinIcon, EurocIcon, UsdcIcon } from 'components/icons'
 
 export const STELLAR_EXPERT_TX_URL =
   'https://stellar.expert/explorer/testnet/tx'
@@ -45,3 +45,12 @@ export const getCurrencyIcon = (
       return <CoinIcon width={width} height={width} />
   }
 }
+
+export const vaultCategoryTheme = [
+  'blue_sky',
+  'purple_powder',
+  'blue_moonstone',
+  'red',
+  'green',
+  'yellow',
+]
