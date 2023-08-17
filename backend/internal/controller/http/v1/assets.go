@@ -131,16 +131,18 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.CreateAccountOp,
-			Target: issuerPk,
-			Amount: _startingBalance,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  issuerPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
-			Type:   entity.CreateAccountOp,
-			Target: distPk,
-			Amount: _startingBalance,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  distPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
 			Type:    entity.ChangeTrustOp,

@@ -35,7 +35,6 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 
 	res := <-channel
 	notify.Stop(msgKey, channel)
-	fmt.Println(res)
 	if notifyData, ok := res.(*entity.NotifyData); ok {
 		switch msg := notifyData.Message.(type) {
 		case entity.EnvelopeResponse:
