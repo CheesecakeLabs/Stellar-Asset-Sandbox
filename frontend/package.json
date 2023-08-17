@@ -76,7 +76,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:dev": "env-cmd -f ./src/config/.env.local npm start",
+    "start:dev": "env-cmd --silent -f ./src/config/.env.local npm start",
     "start:staging": "env-cmd -f ./src/config/.env.staging npm start",
     "build": "react-scripts build",
     "test": "react-scripts test",
