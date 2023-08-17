@@ -1,10 +1,10 @@
-CREATE TABLE TransactionLogTypes(
+CREATE TABLE LogTransactionTypes(
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255)
 );
 
-INSERT INTO TransactionLogTypes (name, description) VALUES
+INSERT INTO LogTransactionTypes (name, description) VALUES
     ('Create Asset', 'Creation of a new asset'),
     ('Mint Asset', 'Increasing the quantity of an existing asset'),
     ('Update Auth Flags', 'Changing permissions or access controls for an asset'),

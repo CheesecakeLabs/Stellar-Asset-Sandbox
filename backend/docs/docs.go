@@ -390,6 +390,154 @@ const docTemplate = `{
                 }
             }
         },
+        "/log_transactions": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs within a specific time range",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get all transactions logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Time range (e.g., last 24 hours, last 7 days, last 30 days)",
+                        "name": "time_range",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/asset/{asset_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific asset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by Asset ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/transaction_type/{transaction_type_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific transaction type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by Transaction Type ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction Type ID",
+                        "name": "transaction_type_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/user/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by User ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
         "/role": {
             "get": {
                 "description": "List role",
@@ -852,6 +1000,39 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.LogTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string",
+                    "example": "100000"
+                },
+                "asset_id": {
+                    "type": "integer",
+                    "example": 1001
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2023-08-10T14:30:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Mint Asset"
+                },
+                "log_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "transaction_type_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
+        },
         "entity.Role": {
             "type": "object",
             "properties": {
@@ -868,7 +1049,7 @@ const docTemplate = `{
         "entity.RolePermissionResponse": {
             "type": "object",
             "properties": {
-                "description": {
+                "action": {
                     "type": "string",
                     "example": "Edit action"
                 },

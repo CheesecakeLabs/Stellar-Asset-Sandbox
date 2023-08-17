@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS TransactionLogTypes;
+DROP TABLE IF EXISTS LogTransactionTypes;

@@ -67,6 +67,10 @@ type (
 	}
 
 	LogTransactionRepoInterface interface {
-		StoreTransactionLog(entity.TransactionLog) (entity.TransactionLog, error)
+		StoreLogTransaction(entity.LogTransaction) error
+		GetLogTransactions(timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByAssetID(assetID int, timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByUserID(userID int, timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByTransactionTypeID(transactionTypeID int, timeRange string) ([]entity.LogTransaction, error)
 	}
 )

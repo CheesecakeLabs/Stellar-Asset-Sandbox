@@ -37,8 +37,6 @@ func CORSMiddleware() gin.HandlerFunc {
 
 // Run creates objects via constructors.
 func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
-	// l := logger.New(cfg.Log.Level)
-
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -67,11 +65,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 		repo.NewVaultRepo(pg),
 		repo.NewWalletRepo(pg),
 	)
+	logUc := usecase.NewLogTransactionUseCase(
+		repo.NewLogTransactionRepo(pg),
+	)
 
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(CORSMiddleware())
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc)
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *logUc)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),
