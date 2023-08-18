@@ -464,6 +464,126 @@ const docTemplate = `{
                 }
             }
         },
+        "/log_transactions/asset/{asset_id}/sum/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of amounts by Asset ID within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for grouping (e.g., '1h'). Default is '1h'",
+                        "name": "time_frame",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sum log transaction for the specified asset",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SumLogTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid time_frame format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/assets/sum/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of amounts for all assets, grouped by a specified time frame (e.g., '1h' for 1 hour)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of amounts for all assets within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for grouping (e.g., '1h'). Default is '1h'",
+                        "name": "time_frame",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of sum log transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.SumLogTransaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid time_frame format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/log_transactions/transaction_type/{transaction_type_id}": {
             "get": {
                 "security": [
@@ -1004,12 +1124,11 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "100000"
+                    "type": "number",
+                    "example": 100000
                 },
-                "asset_id": {
-                    "type": "integer",
-                    "example": 1001
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
                 },
                 "date": {
                     "type": "string",
@@ -1056,6 +1175,32 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Edit"
+                }
+            }
+        },
+        "entity.SumLogTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "example": [
+                        100000
+                    ]
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "date": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "2023-08-10T14:30:00Z"
+                    ]
                 }
             }
         },
@@ -1181,8 +1326,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "1000"
+                    "type": "number",
+                    "example": 1000
                 },
                 "id": {
                     "type": "string",
@@ -1203,8 +1348,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "1000"
+                    "type": "number",
+                    "example": 1000
                 },
                 "code": {
                     "type": "string",
@@ -1229,8 +1374,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "1000"
+                    "type": "number",
+                    "example": 1000
                 },
                 "asset_type": {
                     "type": "string",
@@ -1313,8 +1458,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "1000"
+                    "type": "number",
+                    "example": 1000
                 },
                 "code": {
                     "type": "string",
@@ -1340,8 +1485,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "string",
-                    "example": "12"
+                    "type": "number",
+                    "example": 12
                 },
                 "asset_id": {
                     "type": "string",
