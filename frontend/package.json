@@ -1,0 +1,136 @@
+{
+  "name": "react-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@chakra-ui/react": "^2.5.5",
+    "@chakra-ui/theme-tools": "^2.0.18",
+    "@choc-ui/chakra-autocomplete": "^5.1.9",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@hookform/resolvers": "~2.9.11",
+    "@sentry/react": "^7.43.0",
+    "@sentry/tracing": "^7.43.0",
+    "@stellar/freighter-api": "^1.6.0",
+    "@storybook/react": "~6.5.16",
+    "@types/react-dom": "~18.0.11",
+    "axios": "~1.3.4",
+    "chakra-react-select": "^4.7.0",
+    "chart.js": "^4.3.3",
+    "classnames": "~2.3.2",
+    "env-cmd": "~10.1.0",
+    "enzyme": "~3.11.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-jest-dom": "^4.0.3",
+    "framer-motion": "^10.8.5",
+    "jest-canvas-mock": "~2.4.0",
+    "lodash": "~4.17.21",
+    "miragejs": "^0.1.47",
+    "react": "~18.2.0",
+    "react-apexcharts": "^1.4.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "~18.2.0",
+    "react-feather": "^2.0.10",
+    "react-hook-form": "~7.43.5",
+    "react-intl": "^6.3.2",
+    "react-router-dom": "~6.9.0",
+    "react-scripts": "~5.0.1",
+    "react-select": "^5.7.0",
+    "react-timeago": "^7.1.0",
+    "sass": "~1.59.2",
+    "typescript": "~4.9.5",
+    "web-vitals": "~3.3.0",
+    "yup": "~1.0.2"
+  },
+  "devDependencies": {
+    "@cfaester/enzyme-adapter-react-18": "^0.7.0",
+    "@storybook/addon-a11y": "~6.5.16",
+    "@storybook/addon-actions": "~6.5.16",
+    "@storybook/addon-docs": "~6.5.16",
+    "@storybook/addon-essentials": "~6.5.16",
+    "@storybook/addon-links": "~6.5.16",
+    "@storybook/node-logger": "~6.5.16",
+    "@storybook/preset-create-react-app": "~4.1.2",
+    "@testing-library/jest-dom": "~5.16.5",
+    "@testing-library/react": "~14.0.0",
+    "@testing-library/user-event": "~14.4.3",
+    "@trivago/prettier-plugin-sort-imports": "~4.1.1",
+    "@types/enzyme": "^3.10.12",
+    "@types/jest": "~29.4.1",
+    "@types/lodash": "^4.14.191",
+    "@types/node": "~18.15.3",
+    "@types/node-sass": "^4.11.3",
+    "@types/react": "~18.0.28",
+    "@types/react-router-dom": "~5.3.3",
+    "@types/react-timeago": "^4.1.3",
+    "@types/sinon": "~10.0.13",
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
+    "eslint-import-resolver-typescript": "~3.5.3",
+    "eslint-plugin-prettier": "~4.2.1",
+    "eslint-plugin-react": "~7.32.2",
+    "eslint-plugin-react-hooks": "~4.6.0",
+    "eslint-plugin-testing-library": "^5.10.2",
+    "lint-staged": "~13.2.0",
+    "msw": "~1.1.0",
+    "prettier": "~2.8.4",
+    "react-select-event": "~5.5.1",
+    "sinon": "~15.0.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:dev": "env-cmd --silent -f ./src/config/.env.local npm start",
+    "start:staging": "env-cmd -f ./src/config/.env.staging npm start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:coverage": "npm run test -- --coverage --watchAll=false",
+    "eject": "react-scripts eject",
+    "lint:staged": "lint-staged",
+    "lint": "eslint --ext .ts,.tsx src/",
+    "prettier": "prettier --write src/**/*.{js,jsx,ts,tsx,json,css,scss,md}",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write",
+      "lint --check"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/index.tsx",
+      "src/app/core/**/*.tsx",
+      "src/app/core/**/**/*.tsx",
+      "src/components/**/**/index.tsx"
+    ],
+    "coverageReporters": [
+      "json",
+      "text"
+    ]
+  }
+}

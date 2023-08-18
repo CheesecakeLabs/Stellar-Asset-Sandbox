@@ -1,0 +1,927 @@
+definitions:
+  entity.Asset:
+    properties:
+      amount:
+        example: 1000000
+        type: integer
+      asset_type:
+        type: string
+      code:
+        example: USDC
+        type: string
+      distributor:
+        $ref: '#/definitions/entity.Wallet'
+      id:
+        example: 1
+        type: integer
+      issuer:
+        $ref: '#/definitions/entity.Wallet'
+      name:
+        example: USD Coin
+        type: string
+    type: object
+  entity.Key:
+    properties:
+      id:
+        example: 1
+        type: integer
+      publicKey:
+        example: GCK...
+        type: string
+      walletId:
+        example: 1
+        type: integer
+      weight:
+        example: 3
+        type: integer
+    type: object
+  entity.Role:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
+  entity.RolePermissionResponse:
+    properties:
+      action:
+        example: Edit action
+        type: string
+      name:
+        example: Edit
+        type: string
+    type: object
+  entity.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role_id:
+        type: integer
+      token:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entity.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.UserRole:
+    properties:
+      id_role:
+        type: string
+      id_user:
+        type: string
+    type: object
+  entity.Vault:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      vault_category:
+        $ref: '#/definitions/entity.VaultCategory'
+      wallet:
+        $ref: '#/definitions/entity.Wallet'
+    type: object
+  entity.VaultCategory:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+    type: object
+  entity.Wallet:
+    properties:
+      funded:
+        type: boolean
+      id:
+        example: 1
+        type: integer
+      key:
+        $ref: '#/definitions/entity.Key'
+      type:
+        example: sponsor
+        type: string
+    type: object
+  v1.BurnAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      id:
+        example: "001"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - id
+    type: object
+  v1.ClawbackAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      from:
+        example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - from
+    type: object
+  v1.CreateAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      asset_type:
+        example: security_token
+        type: string
+      code:
+        example: USDC
+        type: string
+      limit:
+        example: 1000
+        type: integer
+      name:
+        example: USDC
+        type: string
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED_FLAGS"'
+        - ' "AUTH_REVOCABLE_FLAGS"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - asset_type
+    - code
+    - name
+    type: object
+  v1.CreateVaultCategoryRequest:
+    properties:
+      name:
+        example: Treasury
+        type: string
+    required:
+    - name
+    type: object
+  v1.CreateVaultRequest:
+    type: object
+  v1.CreateWalletRequest:
+    properties:
+      type:
+        example: sponsor
+        type: string
+    required:
+    - type
+    type: object
+  v1.FundWalletRequest:
+    properties:
+      id:
+        example: 1
+        type: integer
+    required:
+    - id
+    type: object
+  v1.MintAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      id:
+        example: "12"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - id
+    type: object
+  v1.TransferAssetRequest:
+    properties:
+      amount:
+        example: "12"
+        type: string
+      asset_id:
+        example: "12"
+        type: string
+      destination_wallet_pk:
+        example: GABCD....
+        type: string
+      source_wallet_id:
+        example: 1
+        type: integer
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - asset_id
+    - destination_wallet_pk
+    - source_wallet_id
+    type: object
+  v1.UpdateAuthFlagsRequest:
+    properties:
+      clear_flags:
+        example:
+        - '["TRUST_LINE_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      code:
+        example: USDC
+        type: string
+      issuer:
+        example: 2
+        type: integer
+      set_flags:
+        example:
+        - '["TRUST_LINE_AUTHORIZED"'
+        - ' "TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES"'
+        - '"TRUST_LINE_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      trustor_id:
+        example: 2
+        type: integer
+      trustor_pk:
+        example: "2"
+        type: string
+    required:
+    - code
+    - issuer
+    type: object
+  v1.UpdateVaultAssetRequest:
+    properties:
+      asset_id:
+        example: 1
+        type: integer
+    required:
+    - asset_id
+    type: object
+  v1.UpdateVaultCategoryRequest:
+    properties:
+      name:
+        example: Vault 2
+        type: string
+      vault_category_id:
+        example: 1
+        type: integer
+    required:
+    - vault_category_id
+    type: object
+  v1.response:
+    properties:
+      error:
+        example: message
+        type: string
+    type: object
+  v1.userResponse:
+    properties:
+      user:
+        $ref: '#/definitions/entity.User'
+    type: object
+info:
+  contact: {}
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Get all vault categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.VaultCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all vault categories
+      tags:
+      - Vault category
+  /assets:
+    get:
+      consumes:
+      - application/json
+      description: Get all assets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Asset'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all assets
+      tags:
+      - Assets
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new asset
+      tags:
+      - Assets
+  /assets/auth-flags:
+    post:
+      consumes:
+      - application/json
+      description: Update the authorization flags of a trust line on Stellar
+      parameters:
+      - description: Authorization flags
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateAuthFlagsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update authorization flags of a trust line
+      tags:
+      - Assets
+  /assets/burn:
+    post:
+      consumes:
+      - application/json
+      description: Burn an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.BurnAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Burn an asset
+      tags:
+      - Assets
+  /assets/clawback:
+    post:
+      consumes:
+      - application/json
+      description: Clawback an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ClawbackAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Clawback an asset
+      tags:
+      - Assets
+  /assets/mint:
+    post:
+      consumes:
+      - application/json
+      description: Mint an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.MintAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Mint an asset
+      tags:
+      - Assets
+  /assets/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer an asset between wallets on Stellar
+      parameters:
+      - description: Transfer info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TransferAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Transfer an asset
+      tags:
+      - Assets
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
+  /role-permission/permissions:
+    get:
+      consumes:
+      - application/json
+      description: Role permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.RolePermissionResponse'
+            type: array
+      summary: Role permissions
+      tags:
+      - RolePermissions
+  /user/create:
+    post:
+      consumes:
+      - application/json
+      description: Edit users role
+      operationId: editUsersRole
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserRole'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Edit users role
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentication User
+      operationId: autentication
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.userResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Autentication User
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout User
+      operationId: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.userResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Logout User
+      tags:
+      - user
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get PRofile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserResponse'
+      summary: GET Profile
+      tags:
+      - user
+  /vault:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Vault info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault
+      tags:
+      - Vault
+  /vault-asset/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the asset.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault asset information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault asset'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault asset
+      tags:
+      - Vault
+  /vault-category:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.VaultCategory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault category
+      tags:
+      - Vault Category
+  /vault-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault category by providing the Vault Category ID and
+        the updated information.
+      parameters:
+      - description: Vault Category ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault category information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault category not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault category'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault category
+      tags:
+      - Vault Category
+  /wallets:
+    get:
+      consumes:
+      - application/json
+      description: List wallets by type
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Wallet'
+            type: array
+      summary: List
+      tags:
+      - Wallets
+    post:
+      consumes:
+      - application/json
+      description: Create a new wallet
+      parameters:
+      - description: Set up wallet
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create
+      tags:
+      - Wallets
+  /wallets/fund/:
+    post:
+      consumes:
+      - application/json
+      description: Fund a wallet with Friendbot
+      parameters:
+      - description: Wallet id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.FundWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Wallet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Fund Wallet
+      tags:
+      - Wallets
+swagger: "2.0"

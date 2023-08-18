@@ -1,0 +1,77 @@
+package usecase
+
+import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+
+// mockgen -source=internal/usecase/interfaces.go -destination=internal/usecase/mocks/mocks.go -package=mocks
+
+type (
+	// UserRepo -.
+	UserRepo interface {
+		GetUser(email string) (entity.User, error)
+		CreateUser(user entity.User) error
+		UpdateToken(id string, token string) error
+		ValidateToken(token string) error
+		GetUserByToken(token string) (entity.User, error)
+		GetAllUsers() ([]entity.UserResponse, error)
+		EditUsersRole(id_user string, id_role string) error
+		GetProfile(token string) (entity.UserResponse, error)
+	}
+
+	// User -.
+	User interface {
+		Detail(email string) (entity.User, error)
+		CreateUser(user entity.User) error
+		Autentication(name string, password string) (User, error)
+	}
+
+	// Wallet -.
+	WalletRepoInterface interface {
+		GetWallet(int) (entity.Wallet, error)
+		GetWallets(string) ([]entity.Wallet, error)
+		CreateWallet(entity.Wallet) (entity.Wallet, error)
+		CreateWalletWithKey(entity.Wallet) (entity.Wallet, error)
+		UpdateWallet(entity.Wallet) (entity.Wallet, error)
+		GetKeyByWallet(int) (entity.Key, error)
+		CreateKey(entity.Key) (entity.Key, error)
+	}
+
+	// Asset -.
+	AssetRepoInterface interface {
+		GetAsset(int) (entity.Asset, error)
+		GetAssets() ([]entity.Asset, error)
+		GetAssetByCode(string) (entity.Asset, error)
+		CreateAsset(entity.Asset) (entity.Asset, error)
+		GetAssetById(string) (entity.Asset, error)
+	}
+
+	// Role -.
+	RoleRepoInterface interface {
+		GetRoles() ([]entity.Role, error)
+	}
+
+	// Role Permission-.
+	RolePermissionRepoInterface interface {
+		Validate(action string, roleId int) (bool, error)
+		GetRolePermissions(token string) ([]entity.RolePermissionResponse, error)
+	}
+
+	VaultCategoryRepoInterface interface {
+		GetVaultCategories() ([]entity.VaultCategory, error)
+		GetVaultCategoryById(id int) (entity.VaultCategory, error)
+		CreateVaultCategory(entity.VaultCategory) (entity.VaultCategory, error)
+	}
+
+	VaultRepoInterface interface {
+		GetVaults() ([]entity.Vault, error)
+		CreateVault(entity.Vault) (entity.Vault, error)
+		UpdateVault(entity.Vault) (entity.Vault, error)
+		GetVaultById(id int) (entity.Vault, error)
+		DeleteVault(entity.Vault) (entity.Vault, error)
+	}
+
+	ContractRepoInterface interface {
+		GetContracts() ([]entity.Contract, error)
+		CreateContract(entity.Contract) (entity.Contract, error)
+		GetContractById(id string) (entity.Contract, error)
+	}
+)
