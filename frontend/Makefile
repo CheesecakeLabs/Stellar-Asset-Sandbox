@@ -1,5 +1,5 @@
 #!make
-
+# TODO: fix legacy peer dependencies errors to remove `legacy-peer-deps` 
 
 help:
 	@echo "Usage: make [build|start|start_dev|test|storybook|build_storybook|lint|format_code"
@@ -26,7 +26,7 @@ clean_install:
 	npm ci --production
 
 clean_install_dev:
-	npm ci
+	npm ci --legacy-peer-deps
 
 build: setup
 	npm run build
