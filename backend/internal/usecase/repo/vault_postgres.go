@@ -19,14 +19,15 @@ func NewVaultRepo(pg *postgres.Postgres) VaultRepo {
 func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 	query := `
 		SELECT 
-			v.id AS vault_id, v.name AS vault_name,
-			vc.id AS vault_category_id, vc.name as vault_category_name,
+			v.id AS vault_id, v.name AS vault_name, v.active AS vault_active,
+			vc.id AS vault_category_id, vc.name as vault_category_name, vc.theme as vault_category_theme,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
 		FROM vault v
 		JOIN vaultcategory vc ON v.vault_category_id = vc.id
 		JOIN wallet w ON v.wallet_id = w.id
-		JOIN key wk ON w.id = wk.wallet_id;
+		JOIN key wk ON w.id = wk.wallet_id
+		WHERE v.active = 1;
 	`
 
 	rows, err := r.Db.Query(query)
@@ -43,8 +44,8 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 		var wallet entity.Wallet
 
 		err := rows.Scan(
-			&vault.Id, &vault.Name,
-			&vaultCategory.Id, &vaultCategory.Name,
+			&vault.Id, &vault.Name, &vault.Active,
+			&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
 		)
@@ -64,8 +65,8 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 func (r VaultRepo) GetVaultById(id int) (entity.Vault, error) {
 	query := `
 		SELECT 
-			v.id AS vault_id, v.name AS vault_name,
-			vc.id AS vault_category_id, vc.name as vault_category_name,
+			v.id AS vault_id, v.name AS vault_name, v.active as vault_active,
+			vc.id AS vault_category_id, vc.name as vault_category_name, vc.theme as vault_category_theme,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
 		FROM vault v
@@ -82,8 +83,8 @@ func (r VaultRepo) GetVaultById(id int) (entity.Vault, error) {
 	var wallet entity.Wallet
 
 	err := row.Scan(
-		&vault.Id, &vault.Name,
-		&vaultCategory.Id, &vaultCategory.Name,
+		&vault.Id, &vault.Name, &vault.Active,
+		&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme,
 		&wallet.Id, &wallet.Type, &wallet.Funded,
 		&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
 	)
@@ -119,6 +120,19 @@ func (r VaultRepo) UpdateVault(data entity.Vault) (entity.Vault, error) {
 			return entity.Vault{}, fmt.Errorf("VaultRepo - UpdateVaultCategory - Vault not found")
 		}
 		return entity.Vault{}, fmt.Errorf("VaultRepo - UpdateVaultCategory - db.QueryRow: %w", err)
+	}
+
+	return data, nil
+}
+
+func (r VaultRepo) DeleteVault(data entity.Vault) (entity.Vault, error) {
+	stmt := `UPDATE Vault SET active = $1 WHERE id = $2 RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Active, data.Id).Scan(&data.Id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Vault{}, fmt.Errorf("VaultRepo - DeleteVault - Vault not found")
+		}
+		return entity.Vault{}, fmt.Errorf("VaultRepo - DeleteVault - db.QueryRow: %w", err)
 	}
 
 	return data, nil

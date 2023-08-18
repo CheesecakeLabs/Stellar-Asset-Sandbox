@@ -17,7 +17,7 @@ func NewVaultCategoryRepo(pg *postgres.Postgres) VaultCategoryRepo {
 }
 
 func (r VaultCategoryRepo) GetVaultCategories() ([]entity.VaultCategory, error) {
-	query := `SELECT id, name FROM VaultCategory`
+	query := `SELECT id, name, theme FROM VaultCategory`
 
 	rows, err := r.Db.Query(query)
 	if err != nil {
@@ -30,7 +30,7 @@ func (r VaultCategoryRepo) GetVaultCategories() ([]entity.VaultCategory, error) 
 	for rows.Next() {
 		var vaultCategory entity.VaultCategory
 
-		err := rows.Scan(&vaultCategory.Id, &vaultCategory.Name)
+		err := rows.Scan(&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme)
 		if err != nil {
 			return nil, fmt.Errorf("VaultCategoryRepo - GetVaultCategories - row.Scan: %w", err)
 		}
@@ -42,13 +42,13 @@ func (r VaultCategoryRepo) GetVaultCategories() ([]entity.VaultCategory, error) 
 }
 
 func (r VaultCategoryRepo) GetVaultCategoryById(id int) (entity.VaultCategory, error) {
-	query := `SELECT id, name FROM VaultCategory WHERE id = $1`
+	query := `SELECT id, name, theme FROM VaultCategory WHERE id = $1`
 
 	row := r.Db.QueryRow(query, id)
 
 	var vaultCategory entity.VaultCategory
 
-	err := row.Scan(&vaultCategory.Id, &vaultCategory.Name)
+	err := row.Scan(&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.VaultCategory{}, fmt.Errorf("VaultCategoryRepo - GetVaultCategoryById - Vault category not found")
@@ -61,8 +61,8 @@ func (r VaultCategoryRepo) GetVaultCategoryById(id int) (entity.VaultCategory, e
 
 func (r VaultCategoryRepo) CreateVaultCategory(data entity.VaultCategory) (entity.VaultCategory, error) {
 	res := data
-	stmt := `INSERT INTO VaultCategory (name) VALUES ($1) RETURNING id;`
-	err := r.Db.QueryRow(stmt, data.Name).Scan(&res.Id)
+	stmt := `INSERT INTO VaultCategory (name, theme) VALUES ($1, $2) RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Name, data.Theme).Scan(&res.Id)
 	if err != nil {
 		return entity.VaultCategory{}, fmt.Errorf("VaultCategoryRepo - VaultCategory - db.QueryRow: %w", err)
 	}

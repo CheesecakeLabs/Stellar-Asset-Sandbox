@@ -42,19 +42,28 @@ func (uc *VaultUseCase) GetAll() ([]entity.Vault, error) {
 	return vault, nil
 }
 
-func (uc *VaultUseCase) GetById(id int) (entity.Vault, error) {
-	vault, err := uc.vRepo.GetVaultById(id)
+func (uc *VaultUseCase) UpdateVault(data entity.Vault) (entity.Vault, error) {
+	vault, err := uc.vRepo.UpdateVault(data)
 	if err != nil {
-		return entity.Vault{}, fmt.Errorf("VaultUseCase - GetAll - uc.repo.GetVault: %w", err)
+		return entity.Vault{}, fmt.Errorf("VaultUseCase - UpdateVault - uc.repo.UpdateVault: %w", err)
 	}
 
 	return vault, nil
 }
 
-func (uc *VaultUseCase) UpdateVault(data entity.Vault) (entity.Vault, error) {
-	vault, err := uc.vRepo.UpdateVault(data)
+func (uc *VaultUseCase) GetById(id int) (entity.Vault, error) {
+	asset, err := uc.vRepo.GetVaultById(id)
 	if err != nil {
-		return entity.Vault{}, fmt.Errorf("VaultUseCase - UpdateVault - uc.repo.UpdateVault: %w", err)
+		return entity.Vault{}, fmt.Errorf("VaultUseCase - Get - uc.repo.GetVaultById: %w", err)
+	}
+
+	return asset, nil
+}
+
+func (uc *VaultUseCase) DeleteVault(data entity.Vault) (entity.Vault, error) {
+	vault, err := uc.vRepo.DeleteVault(data)
+	if err != nil {
+		return entity.Vault{}, fmt.Errorf("VaultUseCase - DeleteVault - uc.repo.DeleteVault: %w", err)
 	}
 
 	return vault, nil
