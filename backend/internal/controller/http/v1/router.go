@@ -3,6 +3,7 @@ package v1
 import (
 	"net/http"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,22 @@ import (
 
 	docs "github.com/CheesecakeLabs/token-factory-v2/backend/docs"
 )
+
+func CORSMiddleware(cfg config.HTTP) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", cfg.FrontEndAdress)
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, HEAD, PATCH, OPTIONS, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
 
 // Swagger spec:
 // @title       Token Factory API
@@ -28,21 +45,21 @@ func NewRouter(
 	vaultCategoryUc usecase.VaultCategoryUseCase,
 	vaultUc usecase.VaultUseCase,
 	contractUc usecase.ContractUseCase,
+	cfg config.HTTP,
 ) {
-	// Options
+	// Messenger
+	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv)
+	// Options Gin
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
-
 	// Swagger
 	docs.SwaggerInfo.BasePath = "/v1"
 	handler.GET("v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
-
 	// Routers
+	handler.Use(CORSMiddleware(cfg)) // Alow only frontend origin
 	groupV1 := handler.Group("/v1")
-	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv)
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController)
