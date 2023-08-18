@@ -1,0 +1,206 @@
+name: KMS - CI/CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      run-type:
+        description: 'Run type'
+        required: true
+        default: 'Deploy'
+        type: choice
+        options:
+        - Code-Quality
+        - Deploy
+  pull_request:
+    types: 
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - 'stellar-kms/**'
+      - '.gitmodules'
+
+defaults:
+  run:
+    working-directory: stellar-kms
+
+jobs:
+  set-outputs:
+    name: Set outputs
+    runs-on: ubuntu-latest
+    outputs:
+      version_number: ${{ steps.set-outputs.outputs.version_number }}
+      submodule_commit: ${{ steps.set-outputs.outputs.submodule_commit }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create SSH key to pull submodule
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.KMS_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+
+      - name: Pull submodule
+        run: git submodule update --init --recursive ./
+
+      - name: Set outputs for next jobs
+        id: set-outputs
+        shell: bash
+        run: |
+          cd ..
+          submodule_commit=$(git submodule status stellar-kms | sed 's/\(.*\) stellar-kms.*/\1/' | sed 's/ //g' | sed 's/-//g')
+          echo "submodule_commit=$submodule_commit" >> $GITHUB_OUTPUT
+          tag=$(git tag --points-at $submodule_commit)
+          echo "version_number=${{ github.sha }}" >> $GITHUB_OUTPUT
+          if [ -n "$tag" ]; then echo "version_number=$tag" | sed 's|=v|=|' >> $GITHUB_OUTPUT; fi
+          
+      - name: Show Job details
+        shell: bash
+        run: |
+          echo "Version number: " ${{ steps.set-outputs.outputs.version_number }}
+          echo "Submodule commit: " ${{ steps.set-outputs.outputs.submodule_commit }}
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.20"]  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create SSH key to pull submodule
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.KMS_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+
+      - name: Pull submodule
+        run: git submodule update --init --recursive ./
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+          check-latest: true
+          cache-dependency-path: stellar-kms/go.sum
+
+      # TODO: fix lint errors to remove `args: --issues-exit-code=0` to break the pipeline when lint errors are found
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: stellar-kms/
+          args: --issues-exit-code=0
+
+      - name: Run tests
+        run: |
+          go test ./...
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create SSH key to pull submodule
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.KMS_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+
+      - name: Pull submodule
+        run: git submodule update --init --recursive ./
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: stellar-kms/
+          platforms: linux/amd64
+          target: remote
+          push: false
+          tags: build:1.0.0
+          outputs: type=docker,dest=/tmp/docker_image.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        if: inputs.run-type == 'Deploy'
+        with:
+          retention-days: 1
+          name: docker_image
+          path: /tmp/docker_image.tar
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: ['code-quality', 'build']
+    if: needs.code-quality.result == 'success' && needs.build.result == 'success' && inputs.run-type == 'Deploy'
+    environment: Production
+    env:
+      ECR_REPOSITORY: ${{ vars.resource_base_name }}-tfv2-kms
+      ECS_CLUSTER_NAME: ${{ vars.resource_base_name }}
+      ECS_SERVICE_NAME: ${{ vars.resource_base_name }}-tfv2-kms
+      ECS_CONTAINER_NAME: ${{ vars.resource_base_name }}-tfv2-kms
+      ECS_TASK_NAME: ${{ vars.resource_base_name }}-tfv2-kms
+      IMAGE_TAG: ${{ github.sha }}
+    permissions:
+      contents: 'read'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        
+      - name: Set image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: echo "IMAGE=$(echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG )" >> $GITHUB_ENV
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docker_image
+          path: /tmp
+
+      - name: Load, tag and push Docker image
+        run: |
+          docker load --input /tmp/docker_image.tar
+          docker tag build:1.0.0 ${{ env.IMAGE }}
+          docker image ls -a
+          docker push ${{ env.IMAGE }}
+          
+      - name: Download ECS task definition
+        run: |
+          aws ecs describe-task-definition --task-definition $ECS_TASK_NAME --query taskDefinition > task-definition.json
+          cat task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: stellar-kms/task-definition.json
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ env.IMAGE }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE_NAME }}
+          cluster: ${{ env.ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
