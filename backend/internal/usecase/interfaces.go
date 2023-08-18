@@ -64,5 +64,14 @@ type (
 	VaultRepoInterface interface {
 		GetVaults() ([]entity.Vault, error)
 		CreateVault(entity.Vault) (entity.Vault, error)
+		UpdateVault(entity.Vault) (entity.Vault, error)
+		GetVaultById(id int) (entity.Vault, error)
+		DeleteVault(entity.Vault) (entity.Vault, error)
+	}
+
+	ContractRepoInterface interface {
+		GetContracts() ([]entity.Contract, error)
+		CreateContract(entity.Contract) (entity.Contract, error)
+		GetContractById(id string) (entity.Contract, error)
 	}
 )

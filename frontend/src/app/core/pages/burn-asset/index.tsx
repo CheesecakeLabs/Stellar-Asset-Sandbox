@@ -1,30 +1,32 @@
-import { Flex, useToast, Text } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
-import { useHorizon } from 'hooks/useHorizon'
+import { burnHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
+import { ActionHelper } from 'components/molecules/action-helper'
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
 import { BurnAssetTemplate } from 'components/templates/burn-asset'
 
 export const BurnAsset: React.FC = () => {
-  const { burn, loading } = useAssets()
-  const { getAssetData, assetData } = useHorizon()
-
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const { burn, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { id } = useParams()
   const toast = useToast()
-  const location = useLocation()
-  const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
+    if (!asset || !id) return
+
     try {
       const isSuccess = await burn({
         id: asset.id.toString(),
@@ -43,7 +45,7 @@ export const BurnAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetData(asset.code, asset.issuer.key.publicKey)
+        getAssetById(id).then(asset => setAsset(asset))
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -56,8 +58,10 @@ export const BurnAsset: React.FC = () => {
   }
 
   useEffect(() => {
-    getAssetData(asset.code, asset.issuer.key.publicKey)
-  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+    if (id) {
+      getAssetById(id).then(asset => setAsset(asset))
+    }
+  }, [getAssetById, id])
 
   const toastError = (message: string): void => {
     toast({
@@ -75,17 +79,22 @@ export const BurnAsset: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.HOME}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
-            <Text fontSize="2xl" fontWeight="400" h="3.5rem">
-              Asset Management
-            </Text>
-            <BurnAssetTemplate
-              onSubmit={onSubmit}
-              loading={loading}
-              asset={asset}
-              assetData={assetData}
-            />
+            <ManagementBreadcrumb title={'Burn'} />
+            {(loadingAsset && !asset) || !asset ? (
+              <Skeleton h="15rem" />
+            ) : (
+              <BurnAssetTemplate
+                onSubmit={onSubmit}
+                loading={loadingOperation}
+                asset={asset}
+                assetData={asset.assetData}
+              />
+            )}
           </Flex>
-          <MenuActionsAsset action={AssetActions.BURN} asset={asset} />
+          <VStack>
+            <MenuActionsAsset action={AssetActions.BURN} />
+            <ActionHelper title={'About Burn'} description={burnHelper} />
+          </VStack>
         </Flex>
       </Sidebar>
     </Flex>

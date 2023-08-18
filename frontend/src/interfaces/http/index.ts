@@ -11,12 +11,10 @@ const http = axios.create({
 
 http.interceptors.request.use(
   config => {
-      axios.defaults.headers.common['Connection'] = null;
       const token = Authentication.getToken()
     if (token && config.headers) {
       config.headers.Authorization = `${token}`
     }
-    config.headers.Connection = "close"
     return Promise.resolve(config)
   },
   error => {

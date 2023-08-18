@@ -1,4 +1,5 @@
 export enum AssetActions {
+  HOME = 'Home',
   MINT = 'Mint',
   BURN = 'Burn',
   DISTRIBUTE = 'Distribute',

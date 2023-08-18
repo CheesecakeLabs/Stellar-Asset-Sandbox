@@ -46,7 +46,7 @@ definitions:
     type: object
   entity.RolePermissionResponse:
     properties:
-      description:
+      action:
         example: Edit action
         type: string
       name:
@@ -295,6 +295,25 @@ definitions:
     required:
     - code
     - issuer
+    type: object
+  v1.UpdateVaultAssetRequest:
+    properties:
+      asset_id:
+        example: 1
+        type: integer
+    required:
+    - asset_id
+    type: object
+  v1.UpdateVaultCategoryRequest:
+    properties:
+      name:
+        example: Vault 2
+        type: string
+      vault_category_id:
+        example: 1
+        type: integer
+    required:
+    - vault_category_id
     type: object
   v1.response:
     properties:
@@ -704,6 +723,46 @@ paths:
       summary: Create a new vault
       tags:
       - Vault
+  /vault-asset/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the asset.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault asset information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault asset'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault asset
+      tags:
+      - Vault
   /vault-category:
     post:
       consumes:
@@ -736,6 +795,47 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Create a new vault category
+      tags:
+      - Vault Category
+  /vault-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault category by providing the Vault Category ID and
+        the updated information.
+      parameters:
+      - description: Vault Category ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault category information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault category not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault category'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault category
       tags:
       - Vault Category
   /wallets:

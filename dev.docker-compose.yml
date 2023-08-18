@@ -25,6 +25,24 @@ services:
       timeout: 3s
       retries: 3
 
+  tfv2_frontend:
+    profiles: ["all", "frontend"]
+    container_name: tfv2_frontend
+    build:
+      context: ./frontend
+      target: local
+      args:
+        REACT_APP_API_URL: ${FRONTEND_REACT_APP_API_URL:-http://localhost:8080}
+        REACT_APP_SENTRY_DSN: ${SENTRY_DSN:-https://examplePublicKey@o0.ingest.sentry.io/0}
+    environment:
+      REACT_APP_API_URL: ${FRONTEND_REACT_APP_API_URL:-http://localhost:8080}
+      REACT_APP_SENTRY_DSN: ${SENTRY_DSN:-https://examplePublicKey@o0.ingest.sentry.io/0}
+    volumes:
+      - ./frontend/:/app
+      - node_modules_tfv2_frontend:/app/node_modules
+    ports:
+      - 3000:3000
+
   backend:
     platform: linux/amd64
     profiles: ["all", "tests"]
@@ -225,3 +243,4 @@ services:
 
 volumes:
   postgres:
+  node_modules_tfv2_frontend:
