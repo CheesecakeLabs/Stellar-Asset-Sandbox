@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	logtransaction "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/log_transaction"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
@@ -237,12 +236,16 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "error to parse user id")
 	}
 
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
-		Amount:            request.Amount,
+		Amount:            amount,
 		TransactionTypeID: entity.CreateAsset,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.CreateAsset, asset.Code, asset.Name, nil, nil),
+		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")
@@ -325,12 +328,16 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "error to parse user id")
 	}
 
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
-		Amount:            request.Amount,
+		Amount:            amount,
 		TransactionTypeID: entity.MintAsset,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.MintAsset, asset.Code, request.Amount, nil, nil),
+		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")
@@ -414,12 +421,16 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "error to parse user id")
 	}
 
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
 		TransactionTypeID: entity.BurnAsset,
-		Amount:            request.Amount,
+		Amount:            amount,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.BurnAsset, asset.Code, request.Amount, nil, nil),
+		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")
@@ -511,12 +522,16 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "error to parse user id")
 	}
 
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
-		Amount:            request.Amount,
+		Amount:            amount,
 		TransactionTypeID: entity.TransferAsset,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.TransferAsset, asset.Code, request.Amount, nil, nil),
+		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")
@@ -565,7 +580,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 			Type:    entity.ClawbackOp,
 			Target:  asset.Issuer.Key.PublicKey,
 			Origin:  request.From,
-			Amount:  request.Amount,
+			Amount:  fmt.Sprintf("%v", request.Amount),
 			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
@@ -602,12 +617,16 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "error to parse user id")
 	}
 
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
 		TransactionTypeID: entity.ClawbackAsset,
-		Amount:            request.Amount,
+		Amount:            amount,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.ClawbackAsset, asset.Code, request.Amount, nil, nil),
+		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")
@@ -702,7 +721,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		Asset:             asset,
 		TransactionTypeID: entity.UpdateAuthFlags,
 		UserID:            userID,
-		Description:       logtransaction.CreateLogDescription(entity.UpdateAuthFlags, asset.Code, "", request.SetFlags, request.ClearFlags),
+		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction")

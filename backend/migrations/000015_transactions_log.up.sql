@@ -3,7 +3,7 @@ CREATE TABLE LogTransactions (
     user_id INT REFERENCES UserAccount(id),
     transaction_type_id INTEGER REFERENCES LogTransactionTypes(id),
     asset_id INTEGER REFERENCES Asset(id),
-    amount VARCHAR(64),
+    amount FLOAT,
     date TIMESTAMPTZ DEFAULT now(),
     description VARCHAR(255)
 );

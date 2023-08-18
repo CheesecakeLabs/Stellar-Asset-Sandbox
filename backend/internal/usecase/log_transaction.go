@@ -1,6 +1,10 @@
 package usecase
 
-import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+import (
+	"time"
+
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+)
 
 type LogTransactionUseCase struct {
 	lRepo LogTransactionRepoInterface
@@ -48,4 +52,20 @@ func (l *LogTransactionUseCase) GetLogTransactionsByTransactionTypeID(transactio
 		return nil, err
 	}
 	return logTransactions, nil
+}
+
+func (l *LogTransactionUseCase) SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error) {
+	sum, err := l.lRepo.SumLogTransactions(timeRange, timeFrame)
+	if err != nil {
+		return []entity.SumLogTransaction{}, err
+	}
+	return sum, nil
+}
+
+func (l *LogTransactionUseCase) SumLogTransactionsByAssetID(assetID int, timeRange string, duration time.Duration) (entity.SumLogTransaction, error) {
+	sum, err := l.lRepo.SumLogTransactionsByAssetID(assetID, timeRange, duration)
+	if err != nil {
+		return entity.SumLogTransaction{}, err
+	}
+	return sum, nil
 }
