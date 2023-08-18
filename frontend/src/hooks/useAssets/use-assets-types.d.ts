@@ -18,6 +18,7 @@ declare namespace Hooks {
       asset_type: string
       issuer: Hooks.UseWalletsTypes.IWallet
       distributor: Hooks.UseWalletsTypes.IWallet
+      distributorBalance: Hooks.UseHorizonTypes.IBalance | undefined
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
     }
@@ -40,7 +41,7 @@ declare namespace Hooks {
     }
 
     interface IBurnRequest {
-      id: number
+      id: string
       sponsor_id: number
       code: string
       amount: number
@@ -77,7 +78,10 @@ declare namespace Hooks {
     }
 
     interface IAssetsContext {
-      loading: boolean
+      loadingOperation: boolean
+      loadingAssets: boolean
+      loadingAsset: boolean
+      assets: IAssetDto[] | undefined
       mint: (params: IMintRequest) => Promise<boolean>
       burn: (params: IBurnRequest) => Promise<boolean>
       distribute: (params: IDistributeRequest) => Promise<boolean>
@@ -86,7 +90,7 @@ declare namespace Hooks {
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
       getAssets: () => Promise<void>
-      assets: IAssetDto[] | undefined
+      getAssetById: (id: string) => Promise<IAssetDto | undefined>
     }
   }
 }

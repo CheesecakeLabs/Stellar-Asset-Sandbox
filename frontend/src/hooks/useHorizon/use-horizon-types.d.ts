@@ -84,13 +84,13 @@ declare namespace Hooks {
 
     interface IBalance {
       balance: string
-      limit: string
-      buying_liabilities: string
-      selling_liabilities: string
-      last_modified_ledger: number
+      limit?: string
+      buying_liabilities?: string
+      selling_liabilities?: string
+      last_modified_ledger?: number
       is_authorized: boolean
-      is_authorized_to_maintain_liabilities: true
-      asset_type: string
+      is_authorized_to_maintain_liabilities?: true
+      asset_type?: string
       asset_code: string
       asset_issuer: string
     }
@@ -102,10 +102,9 @@ declare namespace Hooks {
         assetIssuer: string
       ): Promise<IAsset | undefined>
       getAccountData(wallet: string): Promise<IAccount | undefined>
-      getPaymentsData(wallet: string): Promise<IPayment | undefined>
+      getPaymentsData(wallet: string): Promise<IPayment[] | undefined>
       assetData: IAsset | undefined
       accountData: IAccount | undefined
-      paymentsData: IPayment[] | undefined
     }
   }
 }

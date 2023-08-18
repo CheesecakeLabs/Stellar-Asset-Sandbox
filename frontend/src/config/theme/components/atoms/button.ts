@@ -69,5 +69,21 @@ export const Button = {
       stroke: 'white',
       color: 'white',
     },
+    delete: {
+      background: 'none',
+      color: 'red.500',
+      border: '1px solid',
+      borderColor: 'red.500',
+      height: '1.5rem',
+      fontWeight: '500',
+      fontSize: 'xs',
+      px: '0.5rem',
+      borderRadius: '0.25rem',
+      _loading: {
+        _hover: {
+          bg: 'red.500',
+        },
+      },
+    },
   },
 }

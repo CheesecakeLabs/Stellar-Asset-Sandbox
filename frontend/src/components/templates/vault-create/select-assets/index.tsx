@@ -1,7 +1,7 @@
 import { Text, Flex, Switch } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
-import { CoinIcon } from 'components/icons'
+import { getCurrencyIcon } from 'utils/constants/constants'
 
 interface ISelectAssets {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -33,7 +33,7 @@ export const SelectAssets: React.FC<ISelectAssets> = ({
             _dark={{ fill: 'white', stroke: 'white' }}
             alignItems="center"
           >
-            <CoinIcon width="1.5rem" />
+            {getCurrencyIcon(asset.code, '1.5rem')}{' '}
             <Text fontWeight="600" fontSize="sm">
               {asset.name}
             </Text>

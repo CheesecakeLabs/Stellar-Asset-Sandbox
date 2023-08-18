@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 
 import { AssetsProvider } from './useAssets/context'
 import { AuthProvider } from './useAuth/context'
+import { ContractsProvider } from './useContracts/context'
 import { HorizonProvider } from './useHorizon/context'
 import { VaultsProvider } from './useVaults/context'
 
@@ -14,7 +15,9 @@ export const AppProvider: React.FC<IProps> = ({ children }) => {
     <AuthProvider>
       <HorizonProvider>
         <AssetsProvider>
-          <VaultsProvider>{children}</VaultsProvider>
+          <VaultsProvider>
+            <ContractsProvider>{children}</ContractsProvider>
+          </VaultsProvider>
         </AssetsProvider>
       </HorizonProvider>
     </AuthProvider>

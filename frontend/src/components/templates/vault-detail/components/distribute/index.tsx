@@ -13,9 +13,10 @@ import {
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { CoinIcon } from 'components/icons'
+import { LockIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
 
 interface IDistributeVault {
@@ -26,6 +27,7 @@ interface IDistributeVault {
   ): Promise<void>
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vault: Hooks.UseVaultsTypes.IVault | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
 }
 
@@ -33,6 +35,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
   onSubmit,
   loading,
   vaults,
+  vault,
   selectedAsset,
 }) => {
   const {
@@ -42,6 +45,26 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
     setValue,
   } = useForm()
   const [wallet, setWallet] = useState<string | undefined>()
+
+  const getBalance = (): string => {
+    return (
+      vault?.accountData?.balances.find(
+        balance =>
+          balance.asset_code === selectedAsset?.code &&
+          balance.asset_issuer === selectedAsset.issuer.key.publicKey
+      )?.balance || ''
+    )
+  }
+
+  const isAuthorized = (): boolean => {
+    return (
+      vault?.accountData?.balances.find(
+        balance =>
+          balance.asset_code === selectedAsset?.code &&
+          balance.asset_issuer === selectedAsset.issuer.key.publicKey
+      )?.is_authorized || false
+    )
+  }
 
   return (
     <Flex flexDir="column" w="full">
@@ -58,7 +81,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
           _dark={{ fill: 'white', stroke: 'white', borderColor: 'black.800' }}
         >
           <Text fontSize="sm" fontWeight="600">
-            Distribute
+            Transfer
           </Text>
         </Flex>
         <Box p="1rem">
@@ -73,47 +96,61 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                 stroke="black"
                 _dark={{ fill: 'white', stroke: 'white' }}
               >
-                <CoinIcon width="1rem" />
+                {getCurrencyIcon(selectedAsset.code, '2rem')}{' '}
                 <Flex flexDir="column" ms="1rem">
                   <Text fontSize="sm">{selectedAsset.code}</Text>
-                  <Text fontSize="xs">
-                    {toCrypto(Number(selectedAsset.assetData?.amount))}
-                  </Text>
+                  <Text fontSize="xs">{toCrypto(Number(getBalance()))}</Text>
                 </Flex>
               </Flex>
 
-              <FormControl mt="1.5rem">
-                <FormLabel>Destination Vault</FormLabel>
-                <SelectVault
-                  vaults={vaults}
-                  setWallet={setWallet}
-                  distributorWallet={selectedAsset.distributor.key.publicKey}
-                />
-              </FormControl>
+              {isAuthorized() ? (
+                <>
+                  <FormControl mt="1.5rem">
+                    <FormLabel>Destination Vault</FormLabel>
+                    <SelectVault
+                      vaults={vaults}
+                      setWallet={setWallet}
+                      distributorWallet={
+                        selectedAsset.distributor.key.publicKey
+                      }
+                    />
+                  </FormControl>
 
-              <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
-                <FormLabel>Amount</FormLabel>
-                <Input
-                  type="number"
-                  placeholder="Amount"
-                  autoComplete="off"
-                  {...register('amount', {
-                    required: true,
-                  })}
-                />
-                <FormErrorMessage>Required</FormErrorMessage>
-              </FormControl>
+                  <FormControl
+                    isInvalid={errors?.amount !== undefined}
+                    mt="1.5rem"
+                  >
+                    <FormLabel>Amount</FormLabel>
+                    <Input
+                      isDisabled={!isAuthorized()}
+                      type="number"
+                      placeholder="Amount"
+                      autoComplete="off"
+                      {...register('amount', {
+                        required: true,
+                      })}
+                    />
+                    <FormErrorMessage>Required</FormErrorMessage>
+                  </FormControl>
 
-              <Flex justifyContent="flex-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  mt="1.5rem"
-                  isLoading={loading}
-                >
-                  Distribute asset
-                </Button>
-              </Flex>
+                  <Flex justifyContent="flex-end">
+                    <Button
+                      isDisabled={!isAuthorized()}
+                      type="submit"
+                      variant="primary"
+                      mt="1.5rem"
+                      isLoading={loading}
+                    >
+                      Distribute asset
+                    </Button>
+                  </Flex>
+                </>
+              ) : (
+                <VStack py="2rem">
+                  <LockIcon />
+                  <Text>Locked Balance!</Text>
+                </VStack>
+              )}
             </form>
           ) : (
             <VStack minH="4rem" justifyContent="center">

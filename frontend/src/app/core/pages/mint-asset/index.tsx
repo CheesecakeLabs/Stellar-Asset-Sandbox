@@ -1,10 +1,9 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
-import { useHorizon } from 'hooks/useHorizon'
 import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
@@ -17,16 +16,17 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
 
 export const MintAsset: React.FC = () => {
-  const { mint, loading } = useAssets()
-  const { getAssetData, assetData } = useHorizon()
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { id } = useParams()
   const toast = useToast()
-  const location = useLocation()
-  const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
+    if (!asset || !id) return
+
     try {
       const isSuccess = await mint({
         id: asset.id.toString(),
@@ -45,7 +45,7 @@ export const MintAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetData(asset.code, asset.issuer.key.publicKey)
+        getAssetById(id).then(asset => setAsset(asset))
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -58,8 +58,10 @@ export const MintAsset: React.FC = () => {
   }
 
   useEffect(() => {
-    getAssetData(asset.code, asset.issuer.key.publicKey)
-  }, [asset.code, asset.issuer.key.publicKey, getAssetData])
+    if (id) {
+      getAssetById(id).then(asset => setAsset(asset))
+    }
+  }, [getAssetById, id])
 
   const toastError = (message: string): void => {
     toast({
@@ -78,15 +80,19 @@ export const MintAsset: React.FC = () => {
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
-            <MintAssetTemplate
-              onSubmit={onSubmit}
-              loading={loading}
-              asset={asset}
-              assetData={assetData}
-            />
+            {(loadingAsset && !asset) || !asset ? (
+              <Skeleton h="15rem" />
+            ) : (
+              <MintAssetTemplate
+                onSubmit={onSubmit}
+                loading={loadingOperation}
+                asset={asset}
+                assetData={asset.assetData}
+              />
+            )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.MINT} asset={asset} />
+            <MenuActionsAsset action={AssetActions.MINT} />
             <ActionHelper title={'About Mint'} description={mintHelper} />
           </VStack>
         </Flex>

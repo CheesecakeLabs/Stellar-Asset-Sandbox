@@ -1,7 +1,7 @@
-import { Flex, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
@@ -17,17 +17,20 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
 
 export const AuthorizeAccount: React.FC = () => {
-  const { authorize, loading } = useAssets()
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const { authorize, getAssetById, loadingOperation, loadingAsset } =
+    useAssets()
+  const { id } = useParams()
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
-  const location = useLocation()
-  const asset = location.state
 
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void> => {
+    if (!asset || !id) return
+
     try {
       const isSuccess = await authorize({
         trustor_pk: wallet ? wallet : data.wallet,
@@ -40,12 +43,13 @@ export const AuthorizeAccount: React.FC = () => {
         setValue('wallet', '')
         toast({
           title: 'Authorize success!',
-          description: `You authorized ${data.wallet}`,
+          description: `You authorized the account`,
           status: 'success',
           duration: 9000,
           isClosable: true,
           position: 'top-right',
         })
+        getAssetById(id).then(asset => setAsset(asset))
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -69,6 +73,12 @@ export const AuthorizeAccount: React.FC = () => {
   }
 
   useEffect(() => {
+    if (id) {
+      getAssetById(id).then(asset => setAsset(asset))
+    }
+  }, [getAssetById, id])
+
+  useEffect(() => {
     getVaults()
   }, [getVaults])
 
@@ -78,15 +88,19 @@ export const AuthorizeAccount: React.FC = () => {
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="584px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Authorize'} />
-            <AuthorizeAccountTemplate
-              onSubmit={onSubmit}
-              loading={loading}
-              asset={asset}
-              vaults={vaults}
-            />
+            {(loadingAsset && !asset) || !asset ? (
+              <Skeleton h="15rem" />
+            ) : (
+              <AuthorizeAccountTemplate
+                onSubmit={onSubmit}
+                loading={loadingOperation}
+                asset={asset}
+                vaults={vaults}
+              />
+            )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.AUTHORIZE} asset={asset} />
+            <MenuActionsAsset action={AssetActions.AUTHORIZE} />
             <ActionHelper
               title={'About Authorize'}
               description={authorizeHelper}

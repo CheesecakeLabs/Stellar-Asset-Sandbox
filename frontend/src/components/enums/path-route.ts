@@ -11,6 +11,7 @@ export enum PathRoute {
   SETTINGS = '/settings',
   PROFILE = '/profile',
   FORGE_ASSET = '/forge-asset',
+  ASSET_HOME = '/asset-management/home',
   MINT_ASSET = '/asset-management/mint',
   BURN_ASSET = '/asset-management/burn',
   DISTRIBUTE_ASSET = '/asset-management/distribute',
@@ -20,4 +21,7 @@ export enum PathRoute {
   VAULTS = '/vaults',
   VAULT_CREATE = '/vault-create',
   VAULT_DETAIL = '/vault-detail',
+  CONTRACT_DETAIL = '/contract-detail',
+  CONTRACT_CREATE = '/contract-create',
+  ASSET_MANAGEMENT = '/asset-management',
 }

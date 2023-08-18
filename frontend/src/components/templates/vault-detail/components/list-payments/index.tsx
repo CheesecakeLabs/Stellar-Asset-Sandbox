@@ -12,26 +12,31 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 
+import { STELLAR_EXPERT_TX_URL } from 'utils/constants/constants'
 import { formatDateFull, toCrypto } from 'utils/formatter'
 
-import { ReceivedIcon, SendedIcon } from 'components/icons'
+import { Loading } from 'components/atoms'
+import { LinkIcon, ReceivedIcon, SendedIcon } from 'components/icons'
+import { Empty } from 'components/molecules/empty'
 
 interface IListPayments {
   payments: Hooks.UseHorizonTypes.IPayment[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vault: Hooks.UseVaultsTypes.IVault | undefined
-  distributorWallet: string
+  loading: boolean
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
 }
 
 export const ListPayments: React.FC<IListPayments> = ({
   payments,
   vaults,
   vault,
-  distributorWallet,
+  loading,
+  assets,
 }) => {
   const walletToName = (publicKey: string): string => {
-    if (publicKey === distributorWallet) {
-      return 'Distributor'
+    if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
+      return 'Banco Central'
     }
     return (
       vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||
@@ -67,57 +72,63 @@ export const ListPayments: React.FC<IListPayments> = ({
         </Text>
       </Flex>
       <Box px="1rem">
-        <Table w="full">
-          <Thead w="full">
-            <Tr>
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-                w="2rem"
-                p={0}
-              />
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-              >
-                From
-              </Th>
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-              >
-                To
-              </Th>
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-              >
-                Asset
-              </Th>
+        {loading ? (
+          <Loading />
+        ) : payments && payments.length > 0 ? (
+          <Table w="full">
+            <Thead w="full">
+              <Tr>
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                  w="2rem"
+                  p={0}
+                />
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                >
+                  From
+                </Th>
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                >
+                  To
+                </Th>
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                >
+                  Asset
+                </Th>
 
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-              >
-                Amount
-              </Th>
-              <Th
-                color={'gray.700'}
-                borderColor={'gray.400'}
-                _dark={{ borderColor: 'black.800' }}
-              >
-                Date
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {payments &&
-              payments.map(
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                >
+                  Amount
+                </Th>
+                <Th
+                  color={'gray.700'}
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                >
+                  Date
+                </Th>
+                <Th
+                  borderColor={'gray.400'}
+                  _dark={{ borderColor: 'black.800' }}
+                />
+              </Tr>
+            </Thead>
+            <Tbody>
+              {payments.map(
                 payment =>
                   payment.type === 'payment' && (
                     <Tr
@@ -169,11 +180,31 @@ export const ListPayments: React.FC<IListPayments> = ({
                           {formatDateFull(payment.created_at)}
                         </Text>
                       </Td>
+                      <Td
+                        borderColor={'gray.400'}
+                        _dark={{ borderColor: 'black.800', fill: 'white' }}
+                      >
+                        <Flex
+                          cursor="pointer"
+                          _dark={{ fill: 'white' }}
+                          onClick={(): Window | null =>
+                            window.open(
+                              `${STELLAR_EXPERT_TX_URL}/${payment.transaction_hash}`,
+                              '_blank'
+                            )
+                          }
+                        >
+                          <LinkIcon />
+                        </Flex>
+                      </Td>
                     </Tr>
                   )
               )}
-          </Tbody>
-        </Table>
+            </Tbody>
+          </Table>
+        ) : (
+          <Empty title={'No transactions in this vault'} hideIcon />
+        )}
       </Box>
     </Container>
   )

@@ -5,7 +5,7 @@ export const toCurrency = (value: number): string => {
 
 export const toCrypto = (value?: number, prefix?: string): string => {
   const moneyFormatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 3,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 7,
   })
   const formatted = moneyFormatter.format(value || 0)
@@ -41,4 +41,11 @@ export const formatDateFull = (date: string): string => {
   })
 
   return formattedDate
+}
+
+export const formatAccount = (account: string): string => {
+  return `${account.substring(0, 4)}...${account.substring(
+    account.length - 4,
+    account.length
+  )}`
 }

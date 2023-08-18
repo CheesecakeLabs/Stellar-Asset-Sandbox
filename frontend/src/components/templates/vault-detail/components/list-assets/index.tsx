@@ -1,33 +1,67 @@
-import { Box, Container, Flex, Text } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction } from 'react'
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  IconButton,
+  Text,
+} from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 
-import { toCrypto } from 'utils/formatter'
+import { AddIcon, EditIcon } from 'components/icons'
+import { IOption, SelectAsset } from 'components/molecules/select-asset'
 
-import { ChevronRight, CoinIcon, LockIcon } from 'components/icons'
+import { ItemAsset } from '../item-asset'
 
 interface IListAssets {
   vault: Hooks.UseVaultsTypes.IVault
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  updatingVaultAssets: boolean
   setSelectedAsset: Dispatch<
     SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
   >
-  selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
 }
 
 export const ListAssets: React.FC<IListAssets> = ({
   vault,
-  setSelectedAsset,
   assets,
   selectedAsset,
+  updatingVaultAssets,
+  setSelectedAsset,
+  onUpdateVaultAssets,
 }) => {
-  const getAsset = (
-    assetData: Hooks.UseHorizonTypes.IBalance
-  ): Hooks.UseAssetsTypes.IAssetDto | undefined => {
-    return assets?.find(
-      asset =>
-        asset.code === assetData.asset_code &&
-        asset.issuer.key.publicKey === assetData.asset_issuer
-    )
+  const [isEditing, setIsEditing] = useState(false)
+  const [listEdit, setListEdit] = useState<
+    Hooks.UseHorizonTypes.IBalance[] | undefined
+  >(vault.accountData?.balances)
+  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [selected, setSelected] = useState<IOption | null>()
+
+  const removeAsset = (
+    balanceSelected: Hooks.UseHorizonTypes.IBalance
+  ): void => {
+    setListEdit(listEdit?.filter(balance => balance !== balanceSelected))
+  }
+
+  const addAsset = (): void => {
+    if (listEdit && asset) {
+      setSelected(null)
+      setListEdit([
+        ...listEdit,
+        {
+          balance: '0',
+          is_authorized: true,
+          asset_code: asset?.code,
+          asset_issuer: asset?.issuer.key.publicKey,
+        },
+      ])
+    }
+  }
+
+  const onSave = (): void => {
+    onUpdateVaultAssets(listEdit || [])
   }
 
   return (
@@ -46,53 +80,97 @@ export const ListAssets: React.FC<IListAssets> = ({
         <Text fontSize="sm" fontWeight="600">
           Assets
         </Text>
+        {isEditing ? (
+          <Flex gap={2}>
+            <Button
+              variant="secondary"
+              onClick={(): void => {
+                setIsEditing(false)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onSave}
+              isLoading={updatingVaultAssets}
+            >
+              Save
+            </Button>
+          </Flex>
+        ) : (
+          <IconButton
+            icon={<EditIcon width="16px" />}
+            aria-label="Edit"
+            onClick={(): void => {
+              setListEdit(vault.accountData?.balances)
+              setIsEditing(true)
+            }}
+          />
+        )}
       </Flex>
       <Box>
-        {vault.accountData &&
-          vault.accountData.balances.map(
-            balance =>
-              balance.asset_code && (
-                <Flex
-                  justifyContent="space-between"
-                  alignItems="center"
-                  borderBottom="1px solid"
-                  borderColor="gray.100"
-                  h="3.5rem"
-                  px="1rem"
-                  cursor="pointer"
-                  onClick={(): void => {
-                    if (selectedAsset === getAsset(balance)) {
-                      setSelectedAsset(undefined)
-                      return
-                    }
-                    setSelectedAsset(getAsset(balance))
-                  }}
-                  bg={
-                    selectedAsset === getAsset(balance) ? 'gray.100' : 'white'
-                  }
-                >
-                  <Flex
-                    alignItems="center"
-                    gap={3}
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
-                  >
-                    <CoinIcon width="1.5rem" />
-                    <Text fontSize="sm">{balance.asset_code}</Text>
-                  </Flex>
-                  <Flex alignItems="center" gap={2}>
-                    <Text fontSize="xs" fontWeight="700" color="gray.900">
-                      {toCrypto(Number(balance.balance))}
-                    </Text>
-                    {!balance.is_authorized && <LockIcon width="1rem" />}
-                    <Flex ms="0.5rem" fill="gray.650" _dark={{ fill: 'white' }}>
-                      <ChevronRight />
-                    </Flex>
-                  </Flex>
+        {isEditing
+          ? listEdit &&
+            listEdit.map(
+              (balance, index) =>
+                balance.asset_code && (
+                  <ItemAsset
+                    key={index}
+                    balance={balance}
+                    assets={assets}
+                    setSelectedAsset={setSelectedAsset}
+                    selectedAsset={selectedAsset}
+                    isEditing={isEditing}
+                    removeAsset={removeAsset}
+                  />
+                )
+            )
+          : vault.accountData &&
+            vault.accountData.balances.map(
+              (balance, index) =>
+                balance.asset_code && (
+                  <ItemAsset
+                    key={index}
+                    balance={balance}
+                    assets={assets}
+                    setSelectedAsset={setSelectedAsset}
+                    selectedAsset={selectedAsset}
+                    isEditing={isEditing}
+                    removeAsset={removeAsset}
+                  />
+                )
+            )}
+        {isEditing && (
+          <Flex p="1rem" w="full" maxW="full" alignItems="center" gap={3}>
+            <Box w="full">
+              <SelectAsset
+                assets={assets?.filter(
+                  asset =>
+                    !listEdit?.some(
+                      balance => asset.code === balance.asset_code
+                    )
+                )}
+                setAsset={setAsset}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </Box>
+            <Button
+              variant="primary"
+              onClick={addAsset}
+              fill="white"
+              isDisabled={!selected}
+              leftIcon={
+                <Flex w="1rem" justifyContent="center">
+                  <AddIcon />
                 </Flex>
-              )
-          )}
+              }
+            >
+              Add
+            </Button>
+          </Flex>
+        )}
       </Box>
     </Container>
   )
