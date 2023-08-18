@@ -6,7 +6,6 @@ export enum PathRoute {
   PAYMENTS_TOKENS = '/payments-tokens',
   SECURITIES_TOKENS = '/securities-tokens',
   SOROBAN_SMART_CONTRACTS = '/soroban-smart-contracts',
-  ASSETS_DASHBOARD = '/assets-dashboard',
   BLOCKCHAIN_EXPLORER = '/blockchain-explorer',
   SETTINGS = '/settings',
   PROFILE = '/profile',
@@ -24,4 +23,5 @@ export enum PathRoute {
   CONTRACT_DETAIL = '/contract-detail',
   CONTRACT_CREATE = '/contract-create',
   ASSET_MANAGEMENT = '/asset-management',
+  DASHBOARDS = '/dashboards',
 }

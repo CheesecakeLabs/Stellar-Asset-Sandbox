@@ -10,6 +10,8 @@ import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { InfoCard } from '../contracts-detail/components/info-card'
 import { AccountsChart } from './components/accounts-chart'
+import { ChartPayments } from './components/chart-payments'
+import { ChartSupply } from './components/chart-supply'
 import { LinkIcon, WalletIcon } from 'components/icons'
 
 interface IAssetHomeTemplate {
@@ -141,19 +143,21 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
         </Flex>
       </Container>
 
+      <Flex flexDir="row" w="full" gap={3} mt="1rem">
+        <InfoCard
+          title={`Total Supply`}
+          icon={<WalletIcon />}
+          value={toCrypto(Number(asset.assetData?.amount || 0))}
+        />
+        <InfoCard
+          title={`Main Vault`}
+          icon={<WalletIcon />}
+          value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
+        />
+      </Flex>
+
+      <ChartPayments label={'Chart'} isDarkMode={undefined} />
       <SimpleGrid columns={{ md: 2, sm: 1 }} mt="1rem" gap={3}>
-        <Flex flexDir="column" w="full" gap={3}>
-          <InfoCard
-            title={`Total Supply`}
-            icon={<WalletIcon />}
-            value={toCrypto(Number(asset.assetData?.amount || 0))}
-          />
-          <InfoCard
-            title={`Main Vault`}
-            icon={<WalletIcon />}
-            value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
-          />
-        </Flex>
         <AccountsChart
           authorized={asset.assetData?.accounts.authorized || 0}
           unauthorized={
@@ -162,6 +166,8 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
           }
         />
       </SimpleGrid>
+
+      <ChartSupply label={'Chart'} isDarkMode={undefined} />
     </Flex>
   )
 }

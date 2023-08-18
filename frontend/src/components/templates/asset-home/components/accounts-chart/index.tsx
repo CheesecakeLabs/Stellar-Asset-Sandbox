@@ -1,15 +1,10 @@
-import { Container, Text, Flex } from '@chakra-ui/react';
-import React from 'react';
-import { Pie } from 'react-chartjs-2';
+import { Container, Text, Flex, Box, Progress } from '@chakra-ui/react'
+import React from 'react'
+import { Pie } from 'react-chartjs-2'
 
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 
-
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-
-
-
-import { HelpIcon } from 'components/icons';
-
+import { HelpIcon } from 'components/icons'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -24,6 +19,11 @@ export const AccountsChart: React.FC<IAccountsChart> = ({
 }) => {
   const data = {
     labels: ['Authorized', 'Unauthorized'],
+    legend: {
+      labels: {
+        display: false,
+      },
+    },
     datasets: [
       {
         label: 'accounts',
@@ -31,6 +31,25 @@ export const AccountsChart: React.FC<IAccountsChart> = ({
         backgroundColor: ['#55efc4', '#ff7675'],
       },
     ],
+    options: {
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+    },
+  }
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
   }
 
   return (
