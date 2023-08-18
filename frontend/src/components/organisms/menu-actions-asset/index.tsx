@@ -23,7 +23,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
   const { id } = useParams()
 
   return (
-    <Flex maxW="290px" flexDir="column" w="full">
+    <Flex w="290px" flexDir="column">
       <Flex h="3.5rem" alignItems="center">
         <Text fontSize="md" fontWeight="400">
           Actions

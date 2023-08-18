@@ -16,6 +16,7 @@ import { toCrypto } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
+import { ChartSupply } from 'components/molecules/chart-supply'
 
 interface IBurnAssetTemplate {
   onSubmit(
@@ -101,6 +102,7 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
           </form>
         </Box>
       </Container>
+      <ChartSupply />
     </Flex>
   )
 }

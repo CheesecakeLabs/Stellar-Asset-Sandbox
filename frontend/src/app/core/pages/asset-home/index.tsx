@@ -28,7 +28,7 @@ export const AssetHome: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
-          <Flex maxW="584px" flexDir="column" w="full">
+          <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />

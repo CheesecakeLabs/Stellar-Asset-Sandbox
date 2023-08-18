@@ -3,6 +3,6 @@ export const FormLabel = {
     fontSize: 'sm',
     fontWeight: '500',
     lineHeight: '2xl',
-    color: 'gray.900',
+    color: 'black.600',
   },
 }

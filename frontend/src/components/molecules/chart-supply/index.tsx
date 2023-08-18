@@ -1,5 +1,5 @@
 import { Container, Flex, Text } from '@chakra-ui/react'
-import { FunctionComponent, useState } from 'react'
+import { FunctionComponent } from 'react'
 import { Line } from 'react-chartjs-2'
 
 import { faker } from '@faker-js/faker'
@@ -16,11 +16,6 @@ import {
 
 import { HelpIcon } from 'components/icons'
 
-export interface IChartGeneralProps {
-  label: string
-  isDarkMode: boolean | undefined
-}
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -31,14 +26,7 @@ ChartJS.register(
   Legend
 )
 
-const ChartSupply: FunctionComponent<IChartGeneralProps> = ({
-  label,
-  isDarkMode,
-}) => {
-  const [optionFilter, setOptionFilter] = useState<'MONTH' | 'YEAR' | 'ALL'>(
-    'MONTH'
-  )
-
+const ChartSupply: FunctionComponent = () => {
   const options = {
     responsive: true,
     plugins: {
@@ -104,12 +92,7 @@ const ChartSupply: FunctionComponent<IChartGeneralProps> = ({
       mt="1rem"
     >
       <Flex justifyContent="space-between" mb="1.25rem">
-        <Text
-          fontSize="xs"
-          fontWeight="600"
-          color="gray.650"
-          _dark={{ color: 'white' }}
-        >
+        <Text fontSize="xs" fontWeight="600">
           Total Supply and Main vault
         </Text>
         <Flex>

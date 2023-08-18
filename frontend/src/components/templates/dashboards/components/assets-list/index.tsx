@@ -23,12 +23,7 @@ export const AssetsList: React.FC<IAssetsList> = () => {
       mt="1rem"
     >
       <Flex justifyContent="space-between" mb="1.25rem">
-        <Text
-          fontSize="xs"
-          fontWeight="600"
-          color="gray.650"
-          _dark={{ color: 'white' }}
-        >
+        <Text fontSize="xs" fontWeight="600">
           Assets
         </Text>
         <Flex>

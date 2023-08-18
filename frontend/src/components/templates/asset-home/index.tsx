@@ -1,4 +1,4 @@
-import { Container, Flex, SimpleGrid, Tag, Text } from '@chakra-ui/react'
+import { Container, Flex, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
 
 import {
@@ -9,9 +9,7 @@ import { typesAsset } from 'utils/constants/data-constants'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { InfoCard } from '../contracts-detail/components/info-card'
-import { AccountsChart } from './components/accounts-chart'
 import { ChartPayments } from './components/chart-payments'
-import { ChartSupply } from './components/chart-supply'
 import { LinkIcon, WalletIcon } from 'components/icons'
 
 interface IAssetHomeTemplate {
@@ -20,10 +18,6 @@ interface IAssetHomeTemplate {
 }
 
 export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
-  const isFlagActive = (status: boolean): string => {
-    return status ? 'actived' : 'none'
-  }
-
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="1rem">
@@ -65,7 +59,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
                   <LinkIcon />
                 </Flex>
               </Flex>
-              <Text fontSize="sm" color="gray.650" mr="0.5rem">
+              <Text fontSize="sm" mr="0.5rem">
                 {typesAsset.find(type => type.id === asset.asset_type)?.name ||
                   ''}
               </Text>
@@ -75,13 +69,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
           <Flex ms="4rem" flexDir="column">
             <Flex>
               <Flex flexDir="column">
-                <Text
-                  fontSize="xs"
-                  fontWeight="700"
-                  color="gray.650"
-                  mb="0.25rem"
-                  _dark={{ color: 'white' }}
-                >
+                <Text fontSize="xs" fontWeight="700" mb="0.25rem">
                   Issuer
                 </Text>
                 <Text fontSize="sm">
@@ -90,13 +78,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
               </Flex>
 
               <Flex flexDir="column" ms="1.5rem">
-                <Text
-                  fontSize="xs"
-                  fontWeight="700"
-                  color="gray.650"
-                  mb="0.25rem"
-                  _dark={{ color: 'white' }}
-                >
+                <Text fontSize="xs" fontWeight="700" mb="0.25rem">
                   Distributor
                 </Text>
                 <Text fontSize="sm">
@@ -106,37 +88,19 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
             </Flex>
 
             <Flex flexDir="column" mt="1rem">
-              <Text
-                fontSize="xs"
-                fontWeight="700"
-                color="gray.650"
-                mb="0.5rem"
-                _dark={{ color: 'white' }}
-              >
+              <Text fontSize="xs" fontWeight="700" mb="0.5rem">
                 Flags
               </Text>
               <Flex gap={2}>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_required || false
-                  )}
-                >
-                  Authorize Required
-                </Tag>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_clawback_enabled || false
-                  )}
-                >
-                  Clawback enabled
-                </Tag>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_revocable || false
-                  )}
-                >
-                  Freeze enabled
-                </Tag>
+                {asset.assetData?.flags.auth_required && (
+                  <Tag variant={'actived'}>Authorize Required</Tag>
+                )}
+                {asset.assetData?.flags.auth_clawback_enabled && (
+                  <Tag variant={'actived'}>Clawback enabled</Tag>
+                )}
+                {asset.assetData?.flags.auth_revocable && (
+                  <Tag variant={'actived'}>Freeze enabled</Tag>
+                )}
               </Flex>
             </Flex>
           </Flex>
@@ -157,17 +121,6 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
       </Flex>
 
       <ChartPayments label={'Chart'} isDarkMode={undefined} />
-      <SimpleGrid columns={{ md: 2, sm: 1 }} mt="1rem" gap={3}>
-        <AccountsChart
-          authorized={asset.assetData?.accounts.authorized || 0}
-          unauthorized={
-            (asset.assetData?.accounts.authorized_to_maintain_liabilities ||
-              0) + (asset.assetData?.accounts.unauthorized || 0)
-          }
-        />
-      </SimpleGrid>
-
-      <ChartSupply label={'Chart'} isDarkMode={undefined} />
     </Flex>
   )
 }

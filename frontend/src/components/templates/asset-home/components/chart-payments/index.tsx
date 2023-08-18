@@ -116,8 +116,6 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
         <Text
           fontSize="xs"
           fontWeight="600"
-          color="gray.650"
-          _dark={{ color: 'white' }}
         >
           Payments timeline
         </Text>

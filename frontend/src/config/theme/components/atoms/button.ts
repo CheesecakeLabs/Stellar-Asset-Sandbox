@@ -48,7 +48,7 @@ export const Button = {
       borderRadius: 'none',
       fill: 'gray.650',
       stroke: 'gray.650',
-      color: 'gray.650',
+      color: 'black.900',
       _dark: {
         fill: 'white',
         stroke: 'white',

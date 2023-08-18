@@ -40,7 +40,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="840px" alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Forge asset
         </Text>
@@ -50,7 +50,13 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             {errorSubmit}
           </Alert>
         )}
-        <Container variant="primary" justifyContent="center" p="2rem">
+        <Container
+          variant="primary"
+          justifyContent="center"
+          p="2rem"
+          w="full"
+          maxW="full"
+        >
           <form
             onSubmit={handleSubmit(data => {
               onSubmit(data, setValue)
@@ -150,14 +156,16 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               </Flex>
             </FormControl>
 
-            <Button
-              type="submit"
-              variant="primary"
-              mt="1.5rem"
-              isLoading={loading}
-            >
-              Forge asset
-            </Button>
+            <Flex justifyContent="flex-end">
+              <Button
+                type="submit"
+                variant="primary"
+                mt="1.5rem"
+                isLoading={loading}
+              >
+                Forge asset
+              </Button>
+            </Flex>
           </form>
         </Container>
       </Flex>
