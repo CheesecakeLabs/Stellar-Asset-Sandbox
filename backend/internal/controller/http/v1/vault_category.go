@@ -25,7 +25,8 @@ func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger,
 }
 
 type CreateVaultCategoryRequest struct {
-	Name string `json:"name"       binding:"required"  example:"Treasury"`
+	Name  string `json:"name"       binding:"required"  example:"Treasury"`
+	Theme string `json:"theme"      example:"blue"`
 }
 
 // @Summary     Create a new vault category
@@ -49,7 +50,8 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 	}
 
 	vaultCategory := entity.VaultCategory{
-		Name: request.Name,
+		Name:  request.Name,
+		Theme: &request.Theme,
 	}
 
 	vaultCategory, err = r.vc.Create(vaultCategory)

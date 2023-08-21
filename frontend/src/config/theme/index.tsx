@@ -83,7 +83,9 @@ const theme = extendTheme({
     },
     blue: {
       50: '#E5F8FF',
+      100: '#7EC4CF',
       200: '#80DEFF',
+      300: '#52B2CF',
       500: '#00ABE6',
       800: '#19AECF',
     },
@@ -105,6 +107,7 @@ const theme = extendTheme({
     },
     purple: {
       200: '#F5F2FF',
+      300: '#9CADCE',
       500: '#AA99EC',
     },
   },

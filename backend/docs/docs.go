@@ -48,6 +48,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/asset": {
+            "get": {
+                "description": "Get asset by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Get asset by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets": {
             "get": {
                 "description": "Get all assets",
@@ -367,6 +396,58 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contract": {
+            "post": {
+                "description": "Create new contract",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Create a new contract",
+                "parameters": [
+                    {
+                        "description": "Contract info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateContractRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Contract"
                         }
                     },
                     "400": {
@@ -884,6 +965,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/vault-asset/{id}": {
+            "put": {
+                "description": "Update a vault by providing the Vault ID and the updated the asset.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Update a vault asset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vault asset info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateVaultAssetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault asset information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault asset",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/vault-category": {
             "post": {
                 "description": "Create and issue a new asset on Stellar",
@@ -929,6 +1070,117 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault-category/{id}": {
+            "put": {
+                "description": "Update a vault category by providing the Vault Category ID and the updated information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault Category"
+                ],
+                "summary": "Update a vault category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault Category ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vault Category info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateVaultCategoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault category information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault category not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault category",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault-delete/{id}": {
+            "put": {
+                "description": "Update a vault by providing the Vault ID and the updated the status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Update a vault status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault status information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault status",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -1096,6 +1348,43 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "USD Coin"
+                }
+            }
+        },
+        "entity.Contract": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "min_deposit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Smart Contract"
+                },
+                "penalty_rate": {
+                    "type": "integer"
+                },
+                "term": {
+                    "type": "integer"
+                },
+                "vault": {
+                    "$ref": "#/definitions/entity.Vault"
+                },
+                "yield_rate": {
+                    "type": "integer"
                 }
             }
         },
@@ -1270,6 +1559,9 @@ const docTemplate = `{
         "entity.Vault": {
             "type": "object",
             "properties": {
+                "active": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -1296,6 +1588,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
@@ -1326,8 +1622,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "number",
-                    "example": 1000
+                    "type": "string",
+                    "example": "1000"
                 },
                 "id": {
                     "type": "string",
@@ -1348,8 +1644,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "number",
-                    "example": 1000
+                    "type": "string",
+                    "example": "1000"
                 },
                 "code": {
                     "type": "string",
@@ -1374,8 +1670,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "number",
-                    "example": 1000
+                    "type": "string",
+                    "example": "1000"
                 },
                 "asset_type": {
                     "type": "string",
@@ -1410,6 +1706,53 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.CreateContractRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "asset_id",
+                "min_deposit",
+                "name",
+                "penalty_rate",
+                "term",
+                "vault_id",
+                "yield_rate"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "GSDSC..."
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "min_deposit": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                },
+                "penalty_rate": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "term": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "vault_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "yield_rate": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "v1.CreateVaultCategoryRequest": {
             "type": "object",
             "required": [
@@ -1419,6 +1762,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
@@ -1458,8 +1805,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "number",
-                    "example": 1000
+                    "type": "string",
+                    "example": "1000"
                 },
                 "code": {
                     "type": "string",
@@ -1485,8 +1832,8 @@ const docTemplate = `{
             ],
             "properties": {
                 "amount": {
-                    "type": "number",
-                    "example": 12
+                    "type": "string",
+                    "example": "12"
                 },
                 "asset_id": {
                     "type": "string",
@@ -1548,6 +1895,47 @@ const docTemplate = `{
                 "trustor_pk": {
                     "type": "string",
                     "example": "2"
+                }
+            }
+        },
+        "v1.UpdateVaultAssetRequest": {
+            "type": "object",
+            "required": [
+                "asset_code",
+                "asset_issuer_pk"
+            ],
+            "properties": {
+                "asset_code": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "asset_issuer_pk": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "is_add": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "is_remove": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "v1.UpdateVaultCategoryRequest": {
+            "type": "object",
+            "required": [
+                "vault_category_id"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Vault 2"
+                },
+                "vault_category_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

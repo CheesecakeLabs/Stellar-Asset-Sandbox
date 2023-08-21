@@ -20,6 +20,31 @@ definitions:
         example: USD Coin
         type: string
     type: object
+  entity.Contract:
+    properties:
+      address:
+        type: string
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      min_deposit:
+        type: integer
+      name:
+        example: Smart Contract
+        type: string
+      penalty_rate:
+        type: integer
+      term:
+        type: integer
+      vault:
+        $ref: '#/definitions/entity.Vault'
+      yield_rate:
+        type: integer
+    type: object
   entity.Key:
     properties:
       id:
@@ -136,6 +161,8 @@ definitions:
     type: object
   entity.Vault:
     properties:
+      active:
+        type: integer
       id:
         example: 1
         type: integer
@@ -155,6 +182,9 @@ definitions:
       name:
         example: Treasury
         type: string
+      theme:
+        example: blue
+        type: string
     type: object
   entity.Wallet:
     properties:
@@ -172,8 +202,8 @@ definitions:
   v1.BurnAssetRequest:
     properties:
       amount:
-        example: 1000
-        type: number
+        example: "1000"
+        type: string
       id:
         example: "001"
         type: string
@@ -187,8 +217,8 @@ definitions:
   v1.ClawbackAssetRequest:
     properties:
       amount:
-        example: 1000
-        type: number
+        example: "1000"
+        type: string
       code:
         example: USDC
         type: string
@@ -206,8 +236,8 @@ definitions:
   v1.CreateAssetRequest:
     properties:
       amount:
-        example: 1000
-        type: number
+        example: "1000"
+        type: string
       asset_type:
         example: security_token
         type: string
@@ -236,10 +266,49 @@ definitions:
     - code
     - name
     type: object
+  v1.CreateContractRequest:
+    properties:
+      address:
+        example: GSDSC...
+        type: string
+      asset_id:
+        example: "1"
+        type: string
+      min_deposit:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      penalty_rate:
+        example: 1
+        type: integer
+      term:
+        example: 1
+        type: integer
+      vault_id:
+        example: "1"
+        type: string
+      yield_rate:
+        example: 1
+        type: integer
+    required:
+    - address
+    - asset_id
+    - min_deposit
+    - name
+    - penalty_rate
+    - term
+    - vault_id
+    - yield_rate
+    type: object
   v1.CreateVaultCategoryRequest:
     properties:
       name:
         example: Treasury
+        type: string
+      theme:
+        example: blue
         type: string
     required:
     - name
@@ -265,8 +334,8 @@ definitions:
   v1.MintAssetRequest:
     properties:
       amount:
-        example: 1000
-        type: number
+        example: "1000"
+        type: string
       code:
         example: USDC
         type: string
@@ -284,8 +353,8 @@ definitions:
   v1.TransferAssetRequest:
     properties:
       amount:
-        example: 12
-        type: number
+        example: "12"
+        type: string
       asset_id:
         example: "12"
         type: string
@@ -336,6 +405,35 @@ definitions:
     - code
     - issuer
     type: object
+  v1.UpdateVaultAssetRequest:
+    properties:
+      asset_code:
+        example: "1"
+        type: string
+      asset_issuer_pk:
+        example: "1"
+        type: string
+      is_add:
+        example: true
+        type: boolean
+      is_remove:
+        example: false
+        type: boolean
+    required:
+    - asset_code
+    - asset_issuer_pk
+    type: object
+  v1.UpdateVaultCategoryRequest:
+    properties:
+      name:
+        example: Vault 2
+        type: string
+      vault_category_id:
+        example: 1
+        type: integer
+    required:
+    - vault_category_id
+    type: object
   v1.response:
     properties:
       error:
@@ -371,6 +469,25 @@ paths:
       summary: Get all vault categories
       tags:
       - Vault category
+  /asset:
+    get:
+      consumes:
+      - application/json
+      description: Get asset by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get asset by id
+      tags:
+      - Assets
   /assets:
     get:
       consumes:
@@ -595,6 +712,40 @@ paths:
       summary: Transfer an asset
       tags:
       - Assets
+  /contract:
+    post:
+      consumes:
+      - application/json
+      description: Create new contract
+      parameters:
+      - description: Contract info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Contract'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new contract
+      tags:
+      - Contract
   /log_transactions:
     get:
       consumes:
@@ -915,6 +1066,46 @@ paths:
       summary: Create a new vault
       tags:
       - Vault
+  /vault-asset/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the asset.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault asset information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault asset'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault asset
+      tags:
+      - Vault
   /vault-category:
     post:
       consumes:
@@ -949,6 +1140,81 @@ paths:
       summary: Create a new vault category
       tags:
       - Vault Category
+  /vault-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault category by providing the Vault Category ID and
+        the updated information.
+      parameters:
+      - description: Vault Category ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault category information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault category not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault category'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault category
+      tags:
+      - Vault Category
+  /vault-delete/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the status.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault status information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault status'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault status
+      tags:
+      - Vault
   /wallets:
     get:
       consumes:

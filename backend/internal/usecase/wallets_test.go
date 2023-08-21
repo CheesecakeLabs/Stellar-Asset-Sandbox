@@ -19,9 +19,11 @@ type testWallet struct {
 	err  error
 }
 
-var dbError = errors.New("database error")
-var walletDbError = errors.New("wallet database error")
-var keyDbError = errors.New("key database error")
+var (
+	dbError       = errors.New("database error")
+	walletDbError = errors.New("wallet database error")
+	keyDbError    = errors.New("key database error")
+)
 
 func wallet(t *testing.T) (*usecase.WalletUseCase, *mocks.MockWalletRepoInterface) {
 	t.Helper()
@@ -94,7 +96,6 @@ func TestWalletUseCaseList(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestWalletUseCasGet(t *testing.T) {
@@ -155,7 +156,6 @@ func TestWalletUseCasGet(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestWalletUseCaseCreate(t *testing.T) {
@@ -223,7 +223,6 @@ func TestWalletUseCaseCreate(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestWalletUseCaseUpdate(t *testing.T) {
@@ -278,5 +277,4 @@ func TestWalletUseCaseUpdate(t *testing.T) {
 			}
 		})
 	}
-
 }
