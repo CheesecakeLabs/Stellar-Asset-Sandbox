@@ -34,7 +34,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
           variant={
             action === AssetActions.HOME ? 'menuButtonSelected' : 'menuButton'
           }
-          borderTopRadius="0.5rem"
+          borderTopRadius="0.25rem"
           leftIcon={
             <Flex w="1rem" justifyContent="center">
               <HomeIcon />
@@ -132,7 +132,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({ action }) => {
               ? 'menuButtonSelected'
               : 'menuButton'
           }
-          borderBottomRadius="0.5rem"
+          borderBottomRadius="0.25rem"
           leftIcon={
             <Flex w="1rem" justifyContent="center">
               <BackIcon />
