@@ -36,18 +36,18 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 	res := <-channel
 	notify.Stop(msgKey, channel)
 
-	if notifyData, ok := res.(*entity.NotifyData); ok {
-		switch msg := notifyData.Message.(type) {
-		case entity.EnvelopeResponse:
-			if msg.StatusCode != 200 {
-				return nil, fmt.Errorf("sendMessage - error response: %v", msg)
-			}
-			return notifyData, nil
+	// if notifyData, ok := res.(*entity.NotifyData); ok {
+	// 	switch msg := notifyData.Message.(type) {
+	// 	case entity.EnvelopeResponse:
+	// 		if msg.StatusCode != 200 {
+	// 			return nil, fmt.Errorf("sendMessage - error response: %v", msg)
+	// 		}
+	// 		return notifyData, nil
 
-		default:
-			return notifyData, nil
-		}
-	}
+	// 	default:
+	// 		return notifyData, nil
+	// 	}
+	// }
 
 	return res.(*entity.NotifyData), nil
 }
