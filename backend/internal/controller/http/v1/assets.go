@@ -180,18 +180,13 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		})
 	}
 
-	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-		return
-	}
-	_, ok = res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
 		return
 	}
 
@@ -270,19 +265,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
 		return
 	}
 
@@ -335,7 +324,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
@@ -343,12 +332,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
-	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -408,20 +392,13 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset transferred"})
@@ -475,20 +452,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset clawed back"})
@@ -547,7 +517,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		return
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
@@ -555,12 +525,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
-	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})

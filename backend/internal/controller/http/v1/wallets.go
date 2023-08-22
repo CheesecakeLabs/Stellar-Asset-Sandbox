@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -12,11 +11,12 @@ import (
 type walletsRoutes struct {
 	w usecase.WalletUseCase
 	m HTTPControllerMessenger
+	a usecase.AuthUseCase
 }
 
-func newWalletsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPControllerMessenger) {
-	r := &walletsRoutes{w, m}
-	h := handler.Group("/wallets")
+func newWalletsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
+	r := &walletsRoutes{w, m, a}
+	h := handler.Group("/wallets").Use(Auth(a.ValidateToken()))
 	{
 		h.GET("", r.list)
 		h.POST("", r.create)
@@ -113,7 +113,6 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 
 	wallet, err := r.w.Get(request.Id)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse(c, http.StatusNotFound, "wallet not found", err)
 		return
 	}
@@ -142,7 +141,6 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 	wallet.Funded = true
 	wallet, err = r.w.Update(wallet)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}

@@ -5,12 +5,18 @@ import (
 )
 
 type response struct {
-	Error string `json:"error" example:"message"`
+	Message string `json:"message"`
+	Error   string `json:"error,omitempty"`
 }
 
 func errorResponse(c *gin.Context, code int, msg string, err error) {
-	c.AbortWithStatusJSON(code, gin.H{
-		"message": msg,
-		"error":   err,
-	})
+	var errorMsg string
+	if err != nil {
+		errorMsg = err.Error()
+	}
+	resp := response{
+		Message: msg,
+		Error:   errorMsg,
+	}
+	c.AbortWithStatusJSON(code, resp)
 }
