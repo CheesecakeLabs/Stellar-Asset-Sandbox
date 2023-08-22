@@ -14,10 +14,16 @@ import { LinkIcon, WalletIcon } from 'components/icons'
 
 interface IAssetHomeTemplate {
   loading: boolean
+  loadingChart: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
+  paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
 }
 
-export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
+export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
+  asset,
+  loadingChart,
+  paymentsAsset,
+}) => {
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="1rem">
@@ -120,7 +126,10 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
         />
       </Flex>
 
-      <ChartPayments label={'Chart'} isDarkMode={undefined} />
+      <ChartPayments
+        loadingChart={loadingChart}
+        paymentsAsset={paymentsAsset}
+      />
     </Flex>
   )
 }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useDashboards } from 'hooks/useDashboards'
 import { assetHomeHelper } from 'utils/constants/helpers'
 
 import { AssetActions } from 'components/enums/asset-actions'
@@ -15,7 +16,10 @@ import { AssetHomeTemplate } from 'components/templates/asset-home'
 
 export const AssetHome: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [paymentsAsset, setPaymentsAsset] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
   const { loadingAsset, getAssetById } = useAssets()
+  const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { id } = useParams()
 
   useEffect(() => {
@@ -23,6 +27,14 @@ export const AssetHome: React.FC = () => {
       getAssetById(id).then(asset => setAsset(asset))
     }
   }, [getAssetById, id])
+
+  useEffect(() => {
+    if (id) {
+      getPaymentsByAssetId(id).then(paymentsAsset =>
+        setPaymentsAsset(paymentsAsset)
+      )
+    }
+  }, [getPaymentsByAssetId, id])
 
   return (
     <Flex>
@@ -33,7 +45,12 @@ export const AssetHome: React.FC = () => {
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
-              <AssetHomeTemplate loading={loadingAsset} asset={asset} />
+              <AssetHomeTemplate
+                loading={loadingAsset}
+                asset={asset}
+                loadingChart={loadingChart}
+                paymentsAsset={paymentsAsset}
+              />
             )}
           </Flex>
           <VStack>

@@ -1,9 +1,7 @@
 import { Container, Flex, Text } from '@chakra-ui/react'
 import { FunctionComponent, useState } from 'react'
-import { Bar, Line } from 'react-chartjs-2'
 import { Chart } from 'react-chartjs-2'
 
-import { faker } from '@faker-js/faker'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,8 +17,8 @@ import {
 import { HelpIcon } from 'components/icons'
 
 export interface IChartPayments {
-  label: string
-  isDarkMode: boolean | undefined
+  loadingChart: boolean
+  paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
 }
 
 ChartJS.register(
@@ -35,8 +33,8 @@ ChartJS.register(
 )
 
 const ChartPayments: FunctionComponent<IChartPayments> = ({
-  label,
-  isDarkMode,
+  loadingChart,
+  paymentsAsset,
 }) => {
   const [optionFilter, setOptionFilter] = useState<'MONTH' | 'YEAR' | 'ALL'>(
     'MONTH'
@@ -55,45 +53,18 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
   }
 
   const data = {
-    labels: [
-      '10 Mar',
-      '11 Mar',
-      '12 Mar',
-      '13 Mar',
-      '14 Mar',
-      '15 Mar',
-      '16 Mar',
-      '17 Mar',
-    ],
+    labels: paymentsAsset?.date,
     datasets: [
       {
         label: 'Amount',
-        data: [
-          '10 Mar',
-          '11 Mar',
-          '12 Mar',
-          '13 Mar',
-          '14 Mar',
-          '15 Mar',
-          '16 Mar',
-          '17 Mar',
-        ].map(() => faker.datatype.number({ min: 0, max: 1000 })),
+        data: paymentsAsset?.amount,
         borderColor: 'rgb(56,147,138)',
         backgroundColor: 'rgba(56,147,138,0.5)',
         order: 1,
       },
       {
         label: 'Volume',
-        data: [
-          '10 Mar',
-          '11 Mar',
-          '12 Mar',
-          '13 Mar',
-          '14 Mar',
-          '15 Mar',
-          '16 Mar',
-          '17 Mar',
-        ].map(() => faker.datatype.number({ min: 0, max: 1000 })),
+        data: paymentsAsset?.quantity,
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         type: 'line' as never,
@@ -113,10 +84,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       my="1rem"
     >
       <Flex justifyContent="space-between" mb="1.25rem">
-        <Text
-          fontSize="xs"
-          fontWeight="600"
-        >
+        <Text fontSize="xs" fontWeight="600">
           Payments timeline
         </Text>
         <Flex>

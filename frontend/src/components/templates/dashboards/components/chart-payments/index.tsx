@@ -2,48 +2,37 @@ import { Text, Container, Flex, Box } from '@chakra-ui/react'
 import React from 'react'
 import Chart from 'react-apexcharts'
 
+import { getChartLabels } from 'utils/constants/dashboards'
+
 import { HelpIcon } from 'components/icons'
 
 interface IChartPayments {
-  height?: number
-  label: string
+  loadingChart: boolean
+  paymentsAssets: Hooks.UseDashboardsTypes.IAsset[]
 }
 
-export const ChartPayments: React.FC<IChartPayments> = ({
-  height = 188,
-  label,
-}) => {
-  const series = [
-    {
-      name: 'USDC',
-      data: [10, 20, 50, 230, 1239],
-    },
-    {
-      name: 'EURC',
-      data: [423, 2154, 1500, 234, 1045],
-    },
-    {
-      name: 'FIFO',
-      data: [53, 342, 725, 945, 440],
-    },
-  ]
+export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
+  const series = paymentsAssets.map(paymentsAsset => ({
+    name: paymentsAsset.asset.code,
+    data: getChartLabels('24h').map(label => {
+      const index = paymentsAsset.date.findIndex(
+        date => new Date(date).getHours().toString() === label
+      )
+      return index > -1 ? paymentsAsset.amount[index] : 0
+    }),
+  }))
 
   const options = {
     chart: {
       id: 'area',
     },
     xaxis: {
-      categories: [
-        '10 Mar',
-        '11 Mar',
-        '12 Mar',
-        '13 Mar',
-        '14 Mar',
-        '15 Mar',
-        '16 Mar',
-      ],
+      categories: getChartLabels('24h'),
       labels: {
         show: true,
+        formatter: function (value: string): string {
+          return `${value}h`
+        },
       },
     },
     yaxis: {
