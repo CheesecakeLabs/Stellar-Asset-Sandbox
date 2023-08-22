@@ -6,6 +6,7 @@ import { ReactComponent as ArsIcon } from './fonts/ars.svg'
 import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
 import { ReactComponent as BackIcon } from './fonts/back.svg'
 import { ReactComponent as BlockIcon } from './fonts/block.svg'
+import { ReactComponent as BrazilIcon } from './fonts/brazil_flag.svg'
 import { ReactComponent as BurnIcon } from './fonts/burn.svg'
 import { ReactComponent as ChevronDownIcon } from './fonts/chevron_down.svg'
 import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
@@ -94,4 +95,5 @@ export {
   SortIcon,
   FilterIcon,
   ChevronDownIcon,
+  BrazilIcon,
 }

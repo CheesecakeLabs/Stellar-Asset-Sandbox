@@ -28,7 +28,7 @@ export const BalanceChart: React.FC<IBalanceChart> = ({
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Balance
+          Balance in the Main Vault 
         </Text>
         <Flex>
           <HelpIcon />
@@ -37,11 +37,11 @@ export const BalanceChart: React.FC<IBalanceChart> = ({
 
       <Flex flexDir="column" gap={2} mb="1rem">
         <Text textAlign="center">
-          {`${toCrypto(supply - mainVault)} ${assetCode}`} /{' '}
+          {`${toCrypto(mainVault)} ${assetCode}`} /{' '}
           {`${toCrypto(supply)} ${assetCode}`}
         </Text>
         <Progress
-          value={supply !== 0 ? ((supply - mainVault) / supply) * 100 : 0}
+          value={supply !== 0 ? ((mainVault) / supply) * 100 : 0}
           h="1rem"
           borderRadius="0.5rem"
           colorScheme="purple"
