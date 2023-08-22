@@ -45,7 +45,7 @@ func (r *logTransactionsRoutes) getLogTransactions(c *gin.Context) {
 
 	logTransactions, err := r.l.GetLogTransactions(timeRange)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
@@ -67,13 +67,13 @@ func (r *logTransactionsRoutes) getLogTransactionsByAssetID(c *gin.Context) {
 
 	assetID, err := strconv.Atoi(assetIDStr)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByAssetID(assetID, timeRange)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
@@ -95,13 +95,13 @@ func (r *logTransactionsRoutes) getLogTransactionsByUserID(c *gin.Context) {
 
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid user ID: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid user ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByUserID(userID, timeRange)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
@@ -123,13 +123,13 @@ func (r *logTransactionsRoutes) getLogTransactionsByTransactionTypeID(c *gin.Con
 
 	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByTransactionTypeID(transactionTypeID, timeRange)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
@@ -156,19 +156,19 @@ func (r *logTransactionsRoutes) sumAmountsByAssetID(c *gin.Context) {
 
 	duration, err := time.ParseDuration(timeFrame)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format")
+		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format", err)
 		return
 	}
 
 	assetID, err := strconv.Atoi(assetIDStr)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	sum, err := r.l.SumLogTransactionsByAssetID(assetID, timeRange, duration)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
@@ -193,13 +193,13 @@ func (r *logTransactionsRoutes) sumAmountsForAllAssets(c *gin.Context) {
 
 	duration, err := time.ParseDuration(timeFrame)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format")
+		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format", err)
 		return
 	}
 
 	sum, err := r.l.SumLogTransactions(timeRange, duration)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()))
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
 
