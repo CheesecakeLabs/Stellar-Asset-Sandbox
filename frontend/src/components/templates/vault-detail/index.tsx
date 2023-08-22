@@ -7,6 +7,7 @@ import { Header } from './components/header'
 import { ListAssets } from './components/list-assets'
 import { ListPayments } from './components/list-payments'
 import { LoaderSkeleton } from './components/loader-skeleton'
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault | undefined
@@ -65,7 +66,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="860px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         {loadingAssets || loadingVaults || !vault ? (
           <LoaderSkeleton />
         ) : (

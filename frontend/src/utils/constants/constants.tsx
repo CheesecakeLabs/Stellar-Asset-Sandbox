@@ -10,6 +10,8 @@ export const STELLAR_EXPERT_TX_URL =
 export const STELLAR_EXPERT_ASSET =
   'https://stellar.expert/explorer/testnet/asset'
 
+export const STELLAR_EXPERT_URL = 'https://stellar.expert/explorer/testnet'
+
 export const getCurrencyIcon = (
   assetCode: string,
   width = '1.5rem'

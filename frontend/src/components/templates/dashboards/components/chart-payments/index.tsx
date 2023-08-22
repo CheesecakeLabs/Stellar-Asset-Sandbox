@@ -69,7 +69,7 @@ export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Supply over time
+          Payments timeline
         </Text>
         <Flex>
           <HelpIcon />

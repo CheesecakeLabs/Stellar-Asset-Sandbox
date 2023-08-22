@@ -14,7 +14,7 @@ import {
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-import { AccountsChart } from './components/accounts-chart'
+import { AccountsChart } from '../../molecules/accounts-chart'
 import { AssetHeader } from 'components/atoms'
 
 import { SelectVault } from '../../molecules/select-vault'

@@ -1,6 +1,7 @@
 import { Flex } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 
+import { useAssets } from 'hooks/useAssets'
 import { useDashboards } from 'hooks/useDashboards'
 import { useVaults } from 'hooks/useVaults'
 
@@ -14,8 +15,10 @@ export const Dashboards: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const [paymentsAssets, setPaymentsAssets] =
     useState<Hooks.UseDashboardsTypes.IAsset[]>()
+
   const { loadingVaults, getVaults, getVaultCategories } = useVaults()
   const { loadingChart, getPayments } = useDashboards()
+  const { loadingAssets, getAssets, assets } = useAssets()
 
   useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
@@ -31,6 +34,10 @@ export const Dashboards: React.FC = () => {
     getPayments().then(paymentsAssets => setPaymentsAssets(paymentsAssets))
   }, [getPayments])
 
+  useEffect(() => {
+    getAssets()
+  }, [getAssets])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.DASHBOARDS}>
@@ -40,6 +47,8 @@ export const Dashboards: React.FC = () => {
           paymentsAssets={paymentsAssets}
           vaults={vaults}
           vaultCategories={vaultCategories}
+          assets={assets}
+          loadingAssets={loadingAssets}
         />
       </Sidebar>
     </Flex>

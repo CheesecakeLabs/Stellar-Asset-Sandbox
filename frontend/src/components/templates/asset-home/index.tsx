@@ -126,10 +126,12 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
         />
       </Flex>
 
-      <ChartPayments
-        loadingChart={loadingChart}
-        paymentsAsset={paymentsAsset}
-      />
+      {paymentsAsset && (
+        <ChartPayments
+          loadingChart={loadingChart}
+          paymentsAsset={paymentsAsset}
+        />
+      )}
     </Flex>
   )
 }

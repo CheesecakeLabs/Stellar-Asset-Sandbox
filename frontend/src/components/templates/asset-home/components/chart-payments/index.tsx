@@ -1,77 +1,82 @@
-import { Container, Flex, Text } from '@chakra-ui/react'
+import { Box, Container, Flex, Text } from '@chakra-ui/react'
 import { FunctionComponent, useState } from 'react'
-import { Chart } from 'react-chartjs-2'
+import Chart from 'react-apexcharts'
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-} from 'chart.js'
+import { getChartLabels } from 'utils/constants/dashboards'
 
 import { HelpIcon } from 'components/icons'
 
 export interface IChartPayments {
   loadingChart: boolean
-  paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
+  paymentsAsset: Hooks.UseDashboardsTypes.IAsset
 }
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-)
-
 const ChartPayments: FunctionComponent<IChartPayments> = ({
-  loadingChart,
   paymentsAsset,
 }) => {
-  const [optionFilter, setOptionFilter] = useState<'MONTH' | 'YEAR' | 'ALL'>(
-    'MONTH'
-  )
-
   const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: false,
+    chart: {
+      id: 'line',
+    },
+    stroke: {
+      width: [0, 4],
+    },
+    dataLabels: {
+      enabled: true,
+      enabledOnSeries: [1],
+    },
+    labels: getChartLabels('24h'),
+    xaxis: {
+      categories: getChartLabels('24h'),
+      labels: {
+        show: true,
+        formatter: function (value: string): string {
+          return `${value}h`
+        },
       },
     },
-  }
-
-  const data = {
-    labels: paymentsAsset?.date,
-    datasets: [
+    yaxis: [
       {
-        label: 'Amount',
-        data: paymentsAsset?.amount,
-        borderColor: 'rgb(56,147,138)',
-        backgroundColor: 'rgba(56,147,138,0.5)',
-        order: 1,
+        title: {
+          text: 'Volume',
+        },
       },
       {
-        label: 'Volume',
-        data: paymentsAsset?.quantity,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        type: 'line' as never,
-        order: 0,
+        opposite: true,
+        title: {
+          text: 'Payments',
+        },
+        formatter: function (value: string): string {
+          return `${value}h`
+        },
       },
     ],
   }
+
+  const series = [
+    {
+      name: 'Volume',
+      type: 'column',
+      data: getChartLabels('24h').map(label => {
+        const index =
+          paymentsAsset.date?.findIndex(
+            date => new Date(date).getHours().toString() === label
+          ) || -1
+        return index > -1 ? paymentsAsset.amount[index] : 0
+      }),
+    },
+    {
+      name: 'Payments',
+      type: 'line',
+      data: getChartLabels('24h').map(label => {
+        const index =
+          paymentsAsset.date?.findIndex(
+            date => new Date(date).getHours().toString() === label
+          ) || -1
+        return index > -1 ? paymentsAsset.quantity[index] : 0
+      }),
+    },
+  ]
 
   return (
     <Container
@@ -91,9 +96,9 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
           <HelpIcon />
         </Flex>
       </Flex>
-      <Flex>
-        <Chart type="bar" options={options} data={data} />
-      </Flex>
+      <Box>
+        <Chart options={options} series={series} type="area" width="100%" />
+      </Box>
     </Container>
   )
 }

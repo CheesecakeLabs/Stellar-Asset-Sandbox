@@ -36,7 +36,7 @@ export const ListPayments: React.FC<IListPayments> = ({
 }) => {
   const walletToName = (publicKey: string): string => {
     if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
-      return 'Banco Central'
+      return 'Asset Issuer'
     }
     return (
       vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||

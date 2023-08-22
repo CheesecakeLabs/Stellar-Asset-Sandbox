@@ -1,6 +1,8 @@
 import { Box, Flex, Text } from '@chakra-ui/react'
 import React from 'react'
 
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+
 import { AssetsList } from './components/assets-list'
 import { ChartPayments } from './components/chart-payments'
 
@@ -10,15 +12,19 @@ interface IDashboardsTemplate {
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   loadingChart: boolean
   paymentsAssets: Hooks.UseDashboardsTypes.IAsset[] | undefined
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  loadingAssets: boolean
 }
 
 export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
   loadingChart,
   paymentsAssets,
+  assets,
+  loadingAssets,
 }) => {
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="1024px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex>
           <Text fontSize="2xl" fontWeight="400">
             Dashboards
@@ -33,7 +39,7 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
               />
             )}
           </Box>
-          <AssetsList />
+          <AssetsList assets={assets} loadingAssets={loadingAssets} />
         </Flex>
       </Flex>
     </Flex>
