@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	_startingBalance = "1000"
+	_startingBalance = "4"
 	_sponsorId       = 1
 )
 
@@ -32,6 +32,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/clawback", r.clawbackAsset)
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
+		h.GET("/:id", r.getAssetById)
 	}
 }
 
@@ -42,7 +43,7 @@ type CreateAssetRequest struct {
 	Code      string   `json:"code"       binding:"required"  example:"USDC"`
 	Limit     *int     `json:"limit"         example:"1000"`
 	Amount    string   `json:"amount"        example:"1000"`
-	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
 }
 
 type BurnAssetRequest struct {
@@ -74,11 +75,12 @@ type TransferAssetRequest struct {
 }
 
 type UpdateAuthFlagsRequest struct {
-	TrustorId  int      `json:"trustor_id"       binding:"required"  example:"2"`
+	TrustorId  int      `json:"trustor_id"  example:"2"`
 	Issuer     int      `json:"issuer"       binding:"required"  example:"2"`
 	Code       string   `json:"code"       binding:"required"  example:"USDC"`
-	SetFlags   []string `json:"set_flags"   example:"[\"AUTH_REQUIRED\", \"AUTH_REVOCABLE\",\"AUTH_CLAWBACK_ENABLED\"]"`
-	ClearFlags []string `json:"clear_flags"  example:"[\"AUTH_IMMUTABLE\"]"`
+	SetFlags   []string `json:"set_flags"   example:"[\"TRUST_LINE_AUTHORIZED\", \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\",\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
+	ClearFlags []string `json:"clear_flags"  example:"[\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
+	TrustorPK  string   `json:"trustor_pk"   example:"2"`
 }
 
 // @Summary     Create a new asset
@@ -126,16 +128,18 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.CreateAccountOp,
-			Target: issuerPk,
-			Amount: _startingBalance,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  issuerPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
-			Type:   entity.CreateAccountOp,
-			Target: distPk,
-			Amount: _startingBalance,
-			Origin: sponsor.Key.PublicKey,
+			Type:    entity.CreateAccountOp,
+			Target:  distPk,
+			Amount:  _startingBalance,
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
 		},
 		{
 			Type:    entity.ChangeTrustOp,
@@ -165,7 +169,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	if request.SetFlags != nil {
 		ops = append(ops, entity.Operation{
-			Type:    entity.SetTrustLineFlagsOp,
+			Type:    entity.SetOptionsOp,
 			Trustor: distPk,
 			Asset: entity.OpAsset{
 				Issuer: issuerPk,
@@ -178,7 +182,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, distPk},
+		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
@@ -249,7 +253,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	asset, err := r.as.Get(request.Code)
+	asset, err := r.as.GetById(request.Id)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
@@ -271,6 +275,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
+
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
 		return
@@ -391,7 +396,6 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		errorResponse(c, http.StatusNotFound, "asset not found")
 		return
 	}
-
 	ops := []entity.Operation{
 		{
 			Type:   entity.PaymentOp,
@@ -446,7 +450,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	if sponsorID == 0 {
 		sponsorID = _sponsorId
 	}
-	_, err := r.w.Get(request.SponsorId)
+	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
 		return
@@ -460,10 +464,11 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 
 	ops := []entity.Operation{
 		{
-			Type:   entity.ClawbackOp,
-			Origin: asset.Issuer.Key.PublicKey,
-			Target: request.From,
-			Amount: request.Amount,
+			Type:    entity.ClawbackOp,
+			Target:  asset.Issuer.Key.PublicKey,
+			Origin:  request.From,
+			Amount:  request.Amount,
+			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
 				Issuer: asset.Issuer.Key.PublicKey,
@@ -472,8 +477,8 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
-		MainSource: asset.Issuer.Key.PublicKey,
-		PublicKeys: []string{asset.Issuer.Key.PublicKey},
+		MainSource: sponsor.Key.PublicKey,
+		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
@@ -514,10 +519,15 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		return
 	}
 
-	trustor, err := r.w.Get(request.TrustorId)
-	if err != nil {
-		errorResponse(c, http.StatusNotFound, "trustor wallet not found")
-		return
+	var trustor entity.Wallet
+	if request.TrustorId != 0 {
+		trustor, err = r.w.Get(request.TrustorId)
+		if err != nil {
+			errorResponse(c, http.StatusNotFound, "trustor wallet not found")
+			return
+		}
+	} else if request.TrustorPK != "" {
+		trustor.Key.PublicKey = request.TrustorPK
 	}
 
 	op := entity.Operation{
@@ -532,9 +542,15 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		Origin:     asset.Issuer.Key.PublicKey,
 	}
 
+	sponsor, err := r.w.Get(_sponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		return
+	}
+
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
-		MainSource: asset.Issuer.Key.PublicKey,
-		PublicKeys: []string{asset.Issuer.Key.PublicKey},
+		MainSource: sponsor.Key.PublicKey,
+		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {
@@ -563,6 +579,25 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	assets, err := r.as.GetAll()
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		return
+	}
+
+	c.JSON(http.StatusOK, assets)
+}
+
+// @Summary Get asset by id
+// @Description Get asset by id
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} entity.Asset
+// @Failure     500 {object} response
+// @Router      /asset [get]
+func (r *assetsRoutes) getAssetById(c *gin.Context) {
+	assetId := c.Param("id")
+	assets, err := r.as.GetById(assetId)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error getting asset")
 		return
 	}
 

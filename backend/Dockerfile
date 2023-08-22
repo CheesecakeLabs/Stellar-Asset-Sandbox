@@ -15,7 +15,9 @@ ENTRYPOINT CompileDaemon -build="go build -tags musl -o /build/app" -command="/b
 FROM base as builder
 RUN go build -tags musl main.go
 
-FROM alpine:3.17 AS remote
+FROM scratch AS remote
 WORKDIR /app
 COPY --from=builder /workspace/main .
+COPY --from=builder /lib/ld-musl-x86_64.so.1 /lib/ld-musl-x86_64.so.1
+COPY --from=base /workspace/migrations ./migrations
 ENTRYPOINT ["./main"]

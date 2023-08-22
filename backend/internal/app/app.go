@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -18,23 +19,9 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
 )
 
-func CORSMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
-        c.Header("Access-Control-Allow-Credentials", "true")
-        c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-        c.Header("Access-Control-Allow-Methods", "GET, POST, HEAD, PATCH, OPTIONS, PUT")
-        if c.Request.Method == "OPTIONS" {
-            c.AbortWithStatus(204)
-            return
-        }
-        c.Next()
-    }
-}
-
 // Run creates objects via constructors.
 func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
-	//l := logger.New(cfg.Log.Level)
+	// l := logger.New(cfg.Log.Level)
 
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
@@ -57,12 +44,25 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 		repo.NewRolePermissionRepo(pg),
 		*userUc,
 	)
+	vaultCategoryUc := usecase.NewVaultCategoryUseCase(
+		repo.NewVaultCategoryRepo(pg),
+	)
+	vaultUc := usecase.NewVaultUseCase(
+		repo.NewVaultRepo(pg),
+		repo.NewWalletRepo(pg),
+	)
+	contractUc := usecase.NewContractUseCase(
+		repo.NewContractRepo(pg),
+	)
 
 	// HTTP Server
-	handler := gin.New()
-	handler.Use(CORSMiddleware())
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc)
-	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
+	handler := gin.Default()
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, cfg.HTTP)
+	httpServer := httpserver.New(handler,
+		httpserver.Port(cfg.HTTP.Port),
+		httpserver.ReadTimeout(60*time.Second),
+		httpserver.WriteTimeout(60*time.Second),
+	)
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
