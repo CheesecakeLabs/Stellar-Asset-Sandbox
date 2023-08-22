@@ -3,6 +3,7 @@ package v1
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -39,11 +40,15 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 	if notifyData, ok := res.(*entity.NotifyData); ok {
 		switch msg := notifyData.Message.(type) {
 		case entity.EnvelopeResponse:
-			if msg.StatusCode != 200 {
-				return nil, fmt.Errorf("sendMessage - error response: %v", msg)
+			if msg.Error != nil {
+				errorDetails := msg.Error.(map[string]interface{})
+				errorDetailsJSON, err := json.Marshal(errorDetails)
+				if err != nil {
+					return notifyData, fmt.Errorf("error marshaling error details: %v", err)
+				}
+				return notifyData, fmt.Errorf(string(errorDetailsJSON))
 			}
 			return notifyData, nil
-
 		default:
 			return notifyData, nil
 		}
