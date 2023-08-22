@@ -11,9 +11,10 @@ type LogTransaction struct {
 }
 
 type SumLogTransaction struct {
-	Asset  Asset     `json:"asset"`
-	Amount []float64 `json:"amount" example:"100000"`
-	Date   []string  `json:"date" example:"2023-08-10T14:30:00Z"`
+	Asset    Asset     `json:"asset"`
+	Amount   []float64 `json:"amount" example:"100000"`
+	Date     []string  `json:"date" example:"2023-08-10T14:30:00Z"`
+	Quantity []int     `json:"quantity" example:"1"`
 }
 
 const (
