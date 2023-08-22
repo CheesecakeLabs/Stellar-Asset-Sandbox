@@ -36,6 +36,35 @@
                 }
             }
         },
+        "/asset": {
+            "get": {
+                "description": "Get asset by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Get asset by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets": {
             "get": {
                 "description": "Get all assets",
@@ -355,6 +384,58 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contract": {
+            "post": {
+                "description": "Create new contract",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Create a new contract",
+                "parameters": [
+                    {
+                        "description": "Contract info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateContractRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Contract"
                         }
                     },
                     "400": {
@@ -776,6 +857,57 @@
                 }
             }
         },
+        "/vault-delete/{id}": {
+            "put": {
+                "description": "Update a vault by providing the Vault ID and the updated the status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Update a vault status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault status information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault status",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/wallets": {
             "get": {
                 "description": "List wallets by type",
@@ -939,6 +1071,43 @@
                 }
             }
         },
+        "entity.Contract": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "min_deposit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Smart Contract"
+                },
+                "penalty_rate": {
+                    "type": "integer"
+                },
+                "term": {
+                    "type": "integer"
+                },
+                "vault": {
+                    "$ref": "#/definitions/entity.Vault"
+                },
+                "yield_rate": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.Key": {
             "type": "object",
             "properties": {
@@ -1052,6 +1221,9 @@
         "entity.Vault": {
             "type": "object",
             "properties": {
+                "active": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -1078,6 +1250,10 @@
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
@@ -1192,6 +1368,53 @@
                 }
             }
         },
+        "v1.CreateContractRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "asset_id",
+                "min_deposit",
+                "name",
+                "penalty_rate",
+                "term",
+                "vault_id",
+                "yield_rate"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "GSDSC..."
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "min_deposit": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                },
+                "penalty_rate": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "term": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "vault_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "yield_rate": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "v1.CreateVaultCategoryRequest": {
             "type": "object",
             "required": [
@@ -1201,6 +1424,10 @@
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
@@ -1336,12 +1563,25 @@
         "v1.UpdateVaultAssetRequest": {
             "type": "object",
             "required": [
-                "asset_id"
+                "asset_code",
+                "asset_issuer_pk"
             ],
             "properties": {
-                "asset_id": {
-                    "type": "integer",
-                    "example": 1
+                "asset_code": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "asset_issuer_pk": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "is_add": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "is_remove": {
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },
@@ -1365,8 +1605,10 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string",
-                    "example": "message"
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },

@@ -39,7 +39,7 @@ func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 func GenerateJWT(user entity.User, jwtSecretKey string) (tokenString string, err error) {
 	expirationTime := time.Now().Add(1440 * time.Minute)
 	claims := &JWTClaim{
-		ID:    user.ID, // TODO
+		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
 		StandardClaims: jwt.StandardClaims{

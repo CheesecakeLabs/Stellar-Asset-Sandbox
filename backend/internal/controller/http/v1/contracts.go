@@ -19,7 +19,8 @@ type contractRoutes struct {
 }
 
 func newContractRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, c usecase.ContractUseCase, v usecase.VaultUseCase,
-	as usecase.AssetUseCase) {
+	as usecase.AssetUseCase,
+) {
 	r := &contractRoutes{m, a, c, v, as}
 	h := handler.Group("/contract").Use(Auth(r.a.ValidateToken()))
 	{
@@ -56,25 +57,25 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.AssetId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
 	vaultId, err := strconv.Atoi(request.VaultId)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 
 	vault, err := r.v.GetById(vaultId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "vault not found")
+		errorResponse(c, http.StatusNotFound, "vault not found", err)
 		return
 	}
 
@@ -91,7 +92,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 
 	contract, err = r.c.Create(contract)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, fmt.Sprintf("error: %s", err.Error()))
+		errorResponse(c, http.StatusNotFound, fmt.Sprintf("error: %s", err.Error()), err)
 		return
 	}
 
@@ -109,7 +110,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 func (r *contractRoutes) getAllContracts(c *gin.Context) {
 	contract, err := r.v.GetAll()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting contract")
+		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
 	}
 
@@ -129,12 +130,12 @@ func (r *contractRoutes) getContractById(c *gin.Context) {
 
 	vaultId, err := strconv.Atoi(idStr)
 	if err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid vault ID")
+		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 	contract, err := r.v.GetById(vaultId)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting contract")
+		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
 	}
 

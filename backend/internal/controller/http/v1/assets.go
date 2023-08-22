@@ -97,7 +97,7 @@ type UpdateAuthFlagsRequest struct {
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -108,19 +108,19 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 2})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "kms messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "kms messaging problems", err)
 		return
 	}
 
 	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
 	if !ok || len(kpRes.PublicKeys) != 2 {
-		errorResponse(c, http.StatusInternalServerError, "unexpected kms response")
+		errorResponse(c, http.StatusInternalServerError, "unexpected kms response", err)
 		return
 	}
 	issuerPk := kpRes.PublicKeys[0]
@@ -180,18 +180,13 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		})
 	}
 
-	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-	_, ok = res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 
@@ -218,7 +213,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 	asset, err = r.as.Create(asset)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "database problems")
+		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
 
@@ -239,7 +234,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	var request MintAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -249,13 +244,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 	_, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -270,20 +265,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
-
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 
@@ -304,13 +292,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	var request BurnAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -320,7 +308,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -336,20 +324,15 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
-	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -371,13 +354,13 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	var request TransferAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	sourceWallet, err := r.w.Get(request.SourceWalletID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "source wallet not found")
+		errorResponse(c, http.StatusNotFound, "source wallet not found", err)
 		return
 	}
 
@@ -387,13 +370,13 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.AssetID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -409,20 +392,13 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
-		return
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset transferred"})
@@ -442,7 +418,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	var request ClawbackAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -452,13 +428,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -476,20 +452,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
-		return
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset clawed back"})
@@ -509,13 +478,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	var request UpdateAuthFlagsRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -523,7 +492,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	if request.TrustorId != 0 {
 		trustor, err = r.w.Get(request.TrustorId)
 		if err != nil {
-			errorResponse(c, http.StatusNotFound, "trustor wallet not found")
+			errorResponse(c, http.StatusNotFound, "trustor wallet not found", err)
 			return
 		}
 	} else if request.TrustorPK != "" {
@@ -544,24 +513,19 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 
 	sponsor, err := r.w.Get(_sponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
-	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})
@@ -578,7 +542,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	assets, err := r.as.GetAll()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		errorResponse(c, http.StatusInternalServerError, "error getting assets", err)
 		return
 	}
 
@@ -597,7 +561,7 @@ func (r *assetsRoutes) getAssetById(c *gin.Context) {
 	assetId := c.Param("id")
 	assets, err := r.as.GetById(assetId)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting asset")
+		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
 		return
 	}
 
