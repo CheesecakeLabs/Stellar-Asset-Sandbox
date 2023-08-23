@@ -9,6 +9,7 @@ import { assetHomeHelper } from 'utils/constants/helpers'
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
 import { ActionHelper } from 'components/molecules/action-helper'
+import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -18,6 +19,8 @@ export const AssetHome: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+
   const { loadingAsset, getAssetById } = useAssets()
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { id } = useParams()
@@ -30,11 +33,11 @@ export const AssetHome: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      getPaymentsByAssetId(id).then(paymentsAsset =>
+      getPaymentsByAssetId(id, 0, chartPeriod).then(paymentsAsset =>
         setPaymentsAsset(paymentsAsset)
       )
     }
-  }, [getPaymentsByAssetId, id])
+  }, [chartPeriod, getPaymentsByAssetId, id])
 
   return (
     <Flex>
@@ -50,6 +53,8 @@ export const AssetHome: React.FC = () => {
                 asset={asset}
                 loadingChart={loadingChart}
                 paymentsAsset={paymentsAsset}
+                chartPeriod={chartPeriod}
+                setChartPeriod={setChartPeriod}
               />
             )}
           </Flex>

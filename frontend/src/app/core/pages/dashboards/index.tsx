@@ -6,6 +6,7 @@ import { useDashboards } from 'hooks/useDashboards'
 import { useVaults } from 'hooks/useVaults'
 
 import { PathRoute } from 'components/enums/path-route'
+import { TChartPeriod } from 'components/molecules/chart-period'
 import { Sidebar } from 'components/organisms/sidebar'
 import { DashboardsTemplate } from 'components/templates/dashboards'
 
@@ -15,6 +16,7 @@ export const Dashboards: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const [paymentsAssets, setPaymentsAssets] =
     useState<Hooks.UseDashboardsTypes.IAsset[]>()
+  const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
 
   const { loadingVaults, getVaults, getVaultCategories } = useVaults()
   const { loadingChart, getPayments } = useDashboards()
@@ -31,8 +33,10 @@ export const Dashboards: React.FC = () => {
   }, [getVaultCategories])
 
   useEffect(() => {
-    getPayments().then(paymentsAssets => setPaymentsAssets(paymentsAssets))
-  }, [getPayments])
+    getPayments(chartPeriod).then(paymentsAssets =>
+      setPaymentsAssets(paymentsAssets)
+    )
+  }, [chartPeriod, getPayments])
 
   useEffect(() => {
     getAssets()
@@ -49,6 +53,8 @@ export const Dashboards: React.FC = () => {
           vaultCategories={vaultCategories}
           assets={assets}
           loadingAssets={loadingAssets}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
         />
       </Sidebar>
     </Flex>

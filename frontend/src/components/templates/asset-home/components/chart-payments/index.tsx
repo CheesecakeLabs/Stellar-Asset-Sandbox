@@ -1,19 +1,31 @@
-import { Box, Container, Flex, Text, useColorMode } from '@chakra-ui/react'
-import { FunctionComponent } from 'react'
+import {
+  Box,
+  Container,
+  Flex,
+  Skeleton,
+  Text,
+  useColorMode,
+} from '@chakra-ui/react'
+import { Dispatch, FunctionComponent, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
 
-import { getChartLabels } from 'utils/constants/dashboards'
+import { getChartLabels, isEqualLabel } from 'utils/constants/dashboards'
 import { toCrypto } from 'utils/formatter'
 
-import { HelpIcon } from 'components/icons'
+import { ChartPeriod, TChartPeriod } from 'components/molecules/chart-period'
 
 export interface IChartPayments {
   loadingChart: boolean
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 const ChartPayments: FunctionComponent<IChartPayments> = ({
   paymentsAsset,
+  chartPeriod,
+  loadingChart,
+  setChartPeriod,
 }) => {
   const { colorMode } = useColorMode()
 
@@ -47,13 +59,13 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       enabled: true,
       enabledOnSeries: [1],
     },
-    labels: getChartLabels('24h'),
+    labels: getChartLabels(chartPeriod),
     xaxis: {
-      categories: getChartLabels('24h'),
+      categories: getChartLabels(chartPeriod),
       labels: {
         show: true,
         formatter: function (value: string): string {
-          return `${value}h`
+          return `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
         },
       },
     },
@@ -86,10 +98,10 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
     {
       name: 'Volume',
       type: 'column',
-      data: getChartLabels('24h').map(label => {
+      data: getChartLabels(chartPeriod).map(label => {
         if (!paymentsAsset.date) return 0
-        const index = paymentsAsset.date?.findIndex(
-          date => new Date(date).getHours().toString() === label
+        const index = paymentsAsset.date?.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
         )
         return index > -1 ? paymentsAsset.amount[index] : 0
       }),
@@ -97,10 +109,10 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
     {
       name: 'Payments',
       type: 'line',
-      data: getChartLabels('24h').map(label => {
+      data: getChartLabels(chartPeriod).map(label => {
         if (!paymentsAsset.date) return 0
-        const index = paymentsAsset.date?.findIndex(
-          date => new Date(date).getHours().toString() === label
+        const index = paymentsAsset.date?.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
         )
         return index > -1 ? paymentsAsset.quantity[index] : null
       }),
@@ -122,11 +134,21 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
           Payments timeline
         </Text>
         <Flex>
-          <HelpIcon />
+          <ChartPeriod period={chartPeriod} setPeriod={setChartPeriod} />
         </Flex>
       </Flex>
       <Box>
-        <Chart options={options} series={series} type="area" width="100%" />
+        {loadingChart ? (
+          <Skeleton h="20rem" w="full" />
+        ) : (
+          <Chart
+            options={options}
+            series={series}
+            type="area"
+            width="100%"
+            height="320px"
+          />
+        )}
       </Box>
     </Container>
   )

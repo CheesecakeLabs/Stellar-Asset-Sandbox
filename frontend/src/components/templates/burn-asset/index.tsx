@@ -9,14 +9,15 @@ import {
   Input,
   Text,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { toCrypto } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
-import { ChartSupply } from 'components/molecules/chart-supply'
+import { ChartMintBurn } from 'components/molecules/chart-mint-burn'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IBurnAssetTemplate {
   onSubmit(
@@ -26,13 +27,23 @@ interface IBurnAssetTemplate {
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   assetData: Hooks.UseHorizonTypes.IAsset | undefined
+  mintOperations: Hooks.UseDashboardsTypes.IAsset | undefined
+  burnOperations: Hooks.UseDashboardsTypes.IAsset | undefined
+  loadingChart: boolean
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
   onSubmit,
+  setChartPeriod,
   loading,
   asset,
   assetData,
+  chartPeriod,
+  mintOperations,
+  burnOperations,
+  loadingChart,
 }) => {
   const {
     register,
@@ -102,7 +113,15 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
           </form>
         </Box>
       </Container>
-      <ChartSupply />
+      {mintOperations && burnOperations && (
+        <ChartMintBurn
+          loadingChart={loadingChart}
+          mintOperations={mintOperations}
+          burnOperations={burnOperations}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
+        />
+      )}
     </Flex>
   )
 }

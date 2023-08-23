@@ -1,10 +1,11 @@
 import { Box, Flex, Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { AssetsList } from './components/assets-list'
 import { ChartPayments } from './components/chart-payments'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IDashboardsTemplate {
   loading: boolean
@@ -14,6 +15,8 @@ interface IDashboardsTemplate {
   paymentsAssets: Hooks.UseDashboardsTypes.IAsset[] | undefined
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   loadingAssets: boolean
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
@@ -21,6 +24,8 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
   paymentsAssets,
   assets,
   loadingAssets,
+  chartPeriod,
+  setChartPeriod,
 }) => {
   return (
     <Flex flexDir="column" w="full">
@@ -36,6 +41,8 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
               <ChartPayments
                 loadingChart={loadingChart}
                 paymentsAssets={paymentsAssets}
+                chartPeriod={chartPeriod}
+                setChartPeriod={setChartPeriod}
               />
             )}
           </Box>

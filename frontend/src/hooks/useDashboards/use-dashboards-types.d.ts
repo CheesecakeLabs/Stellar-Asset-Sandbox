@@ -38,9 +38,13 @@ declare namespace Hooks {
     interface IDashboardsContext {
       loadingChart: boolean
       getPaymentsByAssetId(
-        assetId: string
+        assetId: string,
+        transactionId?: number,
+        period?: TChartPeriod
       ): Promise<Hooks.UseDashboardsTypes.IAsset | undefined>
-      getPayments(): Promise<Hooks.UseDashboardsTypes.IAsset[] | undefined>
+      getPayments(
+        period?: TChartPeriod
+      ): Promise<Hooks.UseDashboardsTypes.IAsset[] | undefined>
     }
   }
 }

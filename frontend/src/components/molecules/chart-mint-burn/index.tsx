@@ -1,48 +1,60 @@
 import {
-  Text,
+  Box,
   Container,
   Flex,
-  Box,
-  useColorMode,
   Skeleton,
+  Text,
+  useColorMode,
 } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
 
 import { getChartLabels, isEqualLabel } from 'utils/constants/dashboards'
 import { toCrypto } from 'utils/formatter'
 
-import { ChartPeriod, TChartPeriod } from 'components/molecules/chart-period'
+import { ChartPeriod, TChartPeriod } from '../chart-period'
 
-interface IChartPayments {
+interface IChartMintBurn {
   loadingChart: boolean
-  paymentsAssets: Hooks.UseDashboardsTypes.IAsset[]
+  mintOperations: Hooks.UseDashboardsTypes.IAsset
+  burnOperations: Hooks.UseDashboardsTypes.IAsset
   chartPeriod: TChartPeriod
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
-export const ChartPayments: React.FC<IChartPayments> = ({
-  paymentsAssets,
-
+export const ChartMintBurn: React.FC<IChartMintBurn> = ({
+  mintOperations,
+  burnOperations,
   chartPeriod,
   loadingChart,
   setChartPeriod,
 }) => {
   const { colorMode } = useColorMode()
 
-  const series = paymentsAssets.map(paymentsAsset => ({
-    name: paymentsAsset.asset.code,
-    data: getChartLabels(chartPeriod).map(label => {
-      const index = paymentsAsset.date.findIndex(date =>
-        isEqualLabel(chartPeriod, date, label)
-      )
-      return index > -1 ? paymentsAsset.amount[index] : 0
-    }),
-  }))
+  const series = [
+    {
+      name: 'Mint',
+      data: getChartLabels(chartPeriod).map(label => {
+        const index = mintOperations.date?.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
+        )
+        return index > -1 ? mintOperations.amount[index] : 0
+      }),
+    },
+    {
+      name: 'Burn',
+      data: getChartLabels(chartPeriod).map(label => {
+        const index = burnOperations.date?.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
+        )
+        return index > -1 ? burnOperations.amount[index] : 0
+      }),
+    },
+  ]
 
   const options = {
     chart: {
-      id: 'area',
+      id: 'line',
       foreColor: colorMode === 'dark' ? 'white' : 'black',
       toolbar: {
         show: true,
@@ -57,6 +69,9 @@ export const ChartPayments: React.FC<IChartPayments> = ({
           pan: false,
           reset: true,
         },
+      },
+      stroke: {
+        curve: 'smooth',
       },
     },
     tooltip: {
@@ -82,18 +97,6 @@ export const ChartPayments: React.FC<IChartPayments> = ({
     dataLabels: {
       enabled: false,
     },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.5,
-        opacityTo: 0.4,
-        stops: [0, 90, 100],
-      },
-    },
-    stroke: {
-      width: 2,
-    },
   }
 
   return (
@@ -108,7 +111,7 @@ export const ChartPayments: React.FC<IChartPayments> = ({
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Payments timeline
+          Mint/Burn timeline
         </Text>
         <Flex>
           <ChartPeriod period={chartPeriod} setPeriod={setChartPeriod} />
@@ -121,9 +124,9 @@ export const ChartPayments: React.FC<IChartPayments> = ({
           <Chart
             options={options}
             series={series}
-            type="area"
+            type="line"
             width="100%"
-            height="240px"
+            height="320px"
           />
         )}
       </Box>

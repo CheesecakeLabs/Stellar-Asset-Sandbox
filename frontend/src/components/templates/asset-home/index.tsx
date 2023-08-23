@@ -1,5 +1,5 @@
 import { Container, Flex, Tag, Text } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 import {
   STELLAR_EXPERT_ASSET,
@@ -11,18 +11,23 @@ import { formatAccount, toCrypto } from 'utils/formatter'
 import { InfoCard } from '../contracts-detail/components/info-card'
 import { ChartPayments } from './components/chart-payments'
 import { LinkIcon, WalletIcon } from 'components/icons'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IAssetHomeTemplate {
   loading: boolean
   loadingChart: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
   asset,
   loadingChart,
   paymentsAsset,
+  chartPeriod,
+  setChartPeriod,
 }) => {
   return (
     <Flex flexDir="column" w="full">
@@ -130,6 +135,8 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
         <ChartPayments
           loadingChart={loadingChart}
           paymentsAsset={paymentsAsset}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
         />
       )}
     </Flex>

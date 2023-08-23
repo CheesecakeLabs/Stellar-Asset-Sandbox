@@ -4,12 +4,14 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useDashboards } from 'hooks/useDashboards'
 import { burnHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
 import { ActionHelper } from 'components/molecules/action-helper'
+import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -17,7 +19,14 @@ import { BurnAssetTemplate } from 'components/templates/burn-asset'
 
 export const BurnAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [mintOperations, setMintOperations] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [burnOperations, setBurnOperations] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+
   const { burn, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { loadingChart, getPaymentsByAssetId } = useDashboards()
   const { id } = useParams()
   const toast = useToast()
 
@@ -63,6 +72,22 @@ export const BurnAsset: React.FC = () => {
     }
   }, [getAssetById, id])
 
+  useEffect(() => {
+    if (id) {
+      getPaymentsByAssetId(id, 2, chartPeriod).then(paymentsAsset => {
+        setMintOperations(paymentsAsset)
+      })
+    }
+  }, [chartPeriod, getPaymentsByAssetId, id])
+
+  useEffect(() => {
+    if (id) {
+      getPaymentsByAssetId(id, 5, chartPeriod).then(paymentsAsset => {
+        setBurnOperations(paymentsAsset)
+      })
+    }
+  }, [chartPeriod, getPaymentsByAssetId, id])
+
   const toastError = (message: string): void => {
     toast({
       title: 'Burn error!',
@@ -85,9 +110,14 @@ export const BurnAsset: React.FC = () => {
             ) : (
               <BurnAssetTemplate
                 onSubmit={onSubmit}
+                setChartPeriod={setChartPeriod}
                 loading={loadingOperation}
                 asset={asset}
                 assetData={asset.assetData}
+                mintOperations={mintOperations}
+                burnOperations={burnOperations}
+                loadingChart={loadingChart}
+                chartPeriod={chartPeriod}
               />
             )}
           </Flex>
