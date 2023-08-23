@@ -55,6 +55,12 @@ export const BurnAsset: React.FC = () => {
           position: 'top-right',
         })
         getAssetById(id).then(asset => setAsset(asset))
+        getPaymentsByAssetId(id, 2, chartPeriod).then(paymentsAsset => {
+          setMintOperations(paymentsAsset)
+        })
+        getPaymentsByAssetId(id, 5, chartPeriod).then(paymentsAsset => {
+          setBurnOperations(paymentsAsset)
+        })
         return
       }
       toastError(MessagesError.errorOccurred)

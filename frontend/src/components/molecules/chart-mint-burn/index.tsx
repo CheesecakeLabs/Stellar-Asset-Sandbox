@@ -20,6 +20,7 @@ interface IChartMintBurn {
   burnOperations: Hooks.UseDashboardsTypes.IAsset
   chartPeriod: TChartPeriod
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
+  assetCode: string
 }
 
 export const ChartMintBurn: React.FC<IChartMintBurn> = ({
@@ -28,6 +29,7 @@ export const ChartMintBurn: React.FC<IChartMintBurn> = ({
   chartPeriod,
   loadingChart,
   setChartPeriod,
+  assetCode,
 }) => {
   const { colorMode } = useColorMode()
 
@@ -74,6 +76,7 @@ export const ChartMintBurn: React.FC<IChartMintBurn> = ({
         curve: 'smooth',
       },
     },
+    colors: ['#195a63', '#f55025'],
     tooltip: {
       theme: colorMode,
     },
@@ -90,7 +93,7 @@ export const ChartMintBurn: React.FC<IChartMintBurn> = ({
       labels: {
         show: true,
         formatter: function (value: number): string {
-          return `${toCrypto(value)}`
+          return `${toCrypto(value)} ${assetCode}`
         },
       },
     },

@@ -1,21 +1,26 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { FieldValues, UseFormSetValue } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
-import { useAssets } from 'hooks/useAssets'
-import { useDashboards } from 'hooks/useDashboards'
-import { mintHelper } from 'utils/constants/helpers'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { AssetActions } from 'components/enums/asset-actions'
-import { PathRoute } from 'components/enums/path-route'
-import { ActionHelper } from 'components/molecules/action-helper'
-import { TChartPeriod } from 'components/molecules/chart-period'
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
-import { Sidebar } from 'components/organisms/sidebar'
-import { MintAssetTemplate } from 'components/templates/mint-asset'
+
+import { useAssets } from 'hooks/useAssets';
+import { useDashboards } from 'hooks/useDashboards';
+import { mintHelper } from 'utils/constants/helpers';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { AssetActions } from 'components/enums/asset-actions';
+import { PathRoute } from 'components/enums/path-route';
+import { ActionHelper } from 'components/molecules/action-helper';
+import { TChartPeriod } from 'components/molecules/chart-period';
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
+import { Sidebar } from 'components/organisms/sidebar';
+import { MintAssetTemplate } from 'components/templates/mint-asset';
+
 
 export const MintAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -55,6 +60,12 @@ export const MintAsset: React.FC = () => {
           position: 'top-right',
         })
         getAssetById(id).then(asset => setAsset(asset))
+        getPaymentsByAssetId(id, 2, chartPeriod).then(paymentsAsset => {
+          setMintOperations(paymentsAsset)
+        })
+        getPaymentsByAssetId(id, 5, chartPeriod).then(paymentsAsset => {
+          setBurnOperations(paymentsAsset)
+        })
         return
       }
       toastError(MessagesError.errorOccurred)

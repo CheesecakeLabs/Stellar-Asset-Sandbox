@@ -120,6 +120,7 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
           burnOperations={burnOperations}
           chartPeriod={chartPeriod}
           setChartPeriod={setChartPeriod}
+          assetCode={asset.code}
         />
       )}
     </Flex>

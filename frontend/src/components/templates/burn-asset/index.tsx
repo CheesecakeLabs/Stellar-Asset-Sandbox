@@ -120,6 +120,7 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
           burnOperations={burnOperations}
           chartPeriod={chartPeriod}
           setChartPeriod={setChartPeriod}
+          assetCode={asset.code}
         />
       )}
     </Flex>
