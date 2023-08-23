@@ -12,6 +12,18 @@ Cheesecake Stellar Token Factory - V2 is a multifaceted system, designed to enab
 - **Starlabs:** A specialized Stellar service, integrated as a git submodule and written in Go, to further enrich the platform's capabilities.
 - **KMS:** The CKL Key Management Service (KMS), also a git submodule in Go, safeguarding the security of cryptographic keys and other sensitive data.
 
+**API Documentation**
+
+The backend is equipped with Swagger documentation to provide an interactive interface for understanding and testing the API endpoints.
+
+### Accessing the Swagger UI:
+
+You can access the Swagger interface by navigating to:
+
+[http://localhost:8080/v1/swagger/index.html](http://localhost:8080/v1/swagger/index.html)
+
+Here, you'll find detailed information about each API route, including required parameters, request/response formats, and the ability to test the endpoints directly from the browser.
+
 ### Topics
 
 Further details on the various functionalities, system requirements, and guides to set up and use the Cheesecake Stellar Token Factory - V2 can be found in the following sections:
