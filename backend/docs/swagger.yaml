@@ -60,6 +60,29 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.LogTransaction:
+    properties:
+      amount:
+        example: 100000
+        type: number
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      date:
+        example: "2023-08-10T14:30:00Z"
+        type: string
+      description:
+        example: Mint Asset
+        type: string
+      log_id:
+        example: 1
+        type: integer
+      transaction_type_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 42
+        type: integer
+    type: object
   entity.Role:
     properties:
       id:
@@ -77,6 +100,23 @@ definitions:
       name:
         example: Edit
         type: string
+    type: object
+  entity.SumLogTransaction:
+    properties:
+      amount:
+        example:
+        - 100000
+        items:
+          type: number
+        type: array
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      date:
+        example:
+        - "2023-08-10T14:30:00Z"
+        items:
+          type: string
+        type: array
     type: object
   entity.User:
     properties:
@@ -707,6 +747,184 @@ paths:
       summary: Create a new contract
       tags:
       - Contract
+  /log_transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs within a specific time range
+      parameters:
+      - description: Time range (e.g., last 24 hours, last 7 days, last 30 days)
+        in: query
+        name: time_range
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all transactions logs
+      tags:
+      - Log Transactions
+  /log_transactions/asset/{asset_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Asset ID
+      tags:
+      - Log Transactions
+  /log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for a specific asset, grouped by a specified
+        time frame (e.g., '1h' for 1 hour) and a specific transaction type
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      - description: Transaction type ID (e.g., '0' for all transactions, '1' for
+          type create asset '2' for mint asset)
+        in: path
+        name: transaction_type_id
+        required: true
+        type: string
+      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
+        in: path
+        name: time_frame
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sum log transaction for the specified asset
+          schema:
+            $ref: '#/definitions/entity.SumLogTransaction'
+        "400":
+          description: invalid transaction type
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts by Asset ID within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/assets/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for all assets, grouped by a specified time
+        frame (e.g., '1h' for 1 hour)
+      parameters:
+      - description: Time range for the query (e.g., '24h')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for grouping (e.g., '1h'). Default is '1h'
+        in: query
+        name: time_frame
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Array of sum log transactions
+          schema:
+            items:
+              $ref: '#/definitions/entity.SumLogTransaction'
+            type: array
+        "400":
+          description: Invalid time_frame format
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts for all assets within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/transaction_type/{transaction_type_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific transaction type
+      parameters:
+      - description: Transaction Type ID
+        in: path
+        name: transaction_type_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Transaction Type ID
+      tags:
+      - Log Transactions
+  /log_transactions/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by User ID
+      tags:
+      - Log Transactions
   /role:
     get:
       consumes:

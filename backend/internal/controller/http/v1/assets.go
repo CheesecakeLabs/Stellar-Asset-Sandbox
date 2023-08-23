@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
@@ -19,10 +20,11 @@ type assetsRoutes struct {
 	as usecase.AssetUseCase
 	m  HTTPControllerMessenger
 	a  usecase.AuthUseCase
+	l  usecase.LogTransactionUseCase
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
-	r := &assetsRoutes{w, as, m, a}
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
+	r := &assetsRoutes{w, as, m, a, l}
 	h := handler.Group("/assets").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllAssets)
@@ -217,6 +219,34 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.CreateAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
+	}
+
 	c.JSON(http.StatusOK, asset)
 }
 
@@ -272,6 +302,34 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.MintAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -333,6 +391,34 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.BurnAsset,
+		Amount:            amount,
+		UserID:            userID,
+		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -401,6 +487,34 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 	}
 
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.TransferAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "asset transferred"})
 }
 
@@ -443,7 +557,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 			Type:    entity.ClawbackOp,
 			Target:  asset.Issuer.Key.PublicKey,
 			Origin:  request.From,
-			Amount:  request.Amount,
+			Amount:  fmt.Sprintf("%v", request.Amount),
 			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
@@ -459,6 +573,34 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.ClawbackAsset,
+		Amount:            amount,
+		UserID:            userID,
+		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset clawed back"})
@@ -526,6 +668,29 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.UpdateAuthFlags,
+		UserID:            userID,
+		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "authorization flags updated"})

@@ -1,5 +1,7 @@
 package usecase
 
+import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+
 // Auth Use Case
 type AuthUseCase struct {
 	repo         UserRepo
@@ -28,4 +30,12 @@ func (uc *AuthUseCase) ValidateToken() string {
 		return ""
 	}
 	return uc.jwtSecretKey
+}
+
+func (uc *AuthUseCase) GetUserByToken(token string) (entity.User, error) {
+	user, err := uc.repo.GetUserByToken(token)
+	if err != nil {
+		return entity.User{}, err
+	}
+	return user, nil
 }
