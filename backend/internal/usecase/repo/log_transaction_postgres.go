@@ -55,8 +55,9 @@ func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRan
 
 	baseQuery := `
         SELECT
-            a.id, a.name, a.code, a.asset_type, SUM(lt.amount), COUNT(lt.amount) as quantity,
-            DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame
+            a.id, a.name, a.code, a.asset_type, SUM(lt.amount),
+            DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame,
+			COUNT(lt.amount) as quantity
         FROM logtransactions AS lt
         JOIN asset AS a ON lt.asset_id = a.id
 	`
