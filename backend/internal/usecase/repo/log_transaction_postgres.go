@@ -44,7 +44,7 @@ func (repo *LogTransactionRepo) GetLogTransactionsByTransactionTypeID(transactio
 	return getLogTransactions(repo, timeRange, "WHERE transaction_type_id = $2")
 }
 
-func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransaction, error) {
+func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error) {
 	dateFilter, err := getDateFilter(timeRange)
 	if err != nil {
 		return entity.SumLogTransaction{}, err
@@ -53,18 +53,33 @@ func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRan
 	timeFrameUnit := getTimeFrame(timeFrame)
 	timeFrameSeconds := timeFrame.Seconds()
 
-	query := `
+	baseQuery := `
         SELECT 
             a.id, a.name, a.code, a.asset_type, SUM(lt.amount), 
             DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame
         FROM logtransactions AS lt
         JOIN asset AS a ON lt.asset_id = a.id
-        WHERE lt.date >= $1 AND lt.asset_id = $2
-        GROUP BY a.id, dateFrame
-        ORDER BY a.id, dateFrame;
-    `
+	`
 
-	rows, err := repo.Db.Query(query, dateFilter, assetID, timeFrameUnit, timeFrameSeconds)
+	var whereClause string
+	var queryArgs []interface{}
+
+	if transactionType == 0 {
+		whereClause = "WHERE lt.date >= $1 AND lt.asset_id = $2"
+		queryArgs = append(queryArgs, dateFilter, assetID, timeFrameUnit, timeFrameSeconds)
+	} else {
+		whereClause = "WHERE lt.date >= $1 AND lt.asset_id = $2 AND lt.transaction_type_id = $5"
+		queryArgs = append(queryArgs, dateFilter, assetID, timeFrameUnit, timeFrameSeconds, transactionType)
+	}
+
+	groupAndOrderClause := `
+        GROUP BY a.id, dateFrame 
+        ORDER BY a.id, dateFrame;
+	`
+
+	query := baseQuery + whereClause + groupAndOrderClause
+
+	rows, err := repo.Db.Query(query, queryArgs...)
 	if err != nil {
 		return entity.SumLogTransaction{}, err
 	}
@@ -198,7 +213,7 @@ func getDateFilter(timeRange string) (time.Time, error) {
 		if value == 1 {
 			return time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location()), nil
 		}
-		// For other values, adjust the date accordingly.
+
 		targetDate := currentTime.AddDate(0, 0, -value+1)
 		return time.Date(targetDate.Year(), targetDate.Month(), targetDate.Day(), 0, 0, 0, 0, targetDate.Location()), nil
 	default:

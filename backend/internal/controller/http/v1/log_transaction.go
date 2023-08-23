@@ -26,7 +26,7 @@ func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase,
 		h.GET("/assets/:asset_id/:time_range", r.getLogTransactionsByAssetID)
 		h.GET("/user/:user_id/:time_range", r.getLogTransactionsByUserID)
 		h.GET("/transaction_type/:transaction_type_id/:time_range", r.getLogTransactionsByTransactionTypeID)
-		h.GET("/assets/:asset_id/sum/:time_range/:time_frame", r.sumAmountsByAssetID)
+		h.GET("/assets/:asset_id/type/:transaction_type_id/sum/:time_range/:time_frame", r.sumAmountsByAssetID)
 		h.GET("/assets/sum/:time_range/:time_frame", r.sumAmountsForAllAssets)
 	}
 }
@@ -142,6 +142,7 @@ func (r *logTransactionsRoutes) getLogTransactionsByTransactionTypeID(c *gin.Con
 // @Accept json
 // @Produce json
 // @Param asset_id path int true "Asset ID"
+// @Param transaction_type path string true "Transaction type (e,g, '0', '1')"
 // @Param time_range path string true "Time range for the query (e.g., '24h', "7d")"
 // @Param time_frame path string false "Time frame for the query (e.g., '1h')".
 // @Security ApiKeyAuth
@@ -151,9 +152,20 @@ func (r *logTransactionsRoutes) getLogTransactionsByTransactionTypeID(c *gin.Con
 // @Router /log_transactions/asset/{asset_id}/sum/{time_range}/{time_frame} [get]
 func (r *logTransactionsRoutes) sumAmountsByAssetID(c *gin.Context) {
 	assetIDStr := c.Param("asset_id")
+	transactionTypeStr := c.Param("transaction_type_id")
 	timeRange := c.Param("time_range")
 	timeFrame := c.Param("time_frame")
 
+	if transactionTypeStr == "" {
+		transactionTypeStr = "0"
+	}
+
+	// Convert transactionTypeStr to integer
+	transactionType, err := strconv.Atoi(transactionTypeStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid transaction type: %s", err.Error()), err)
+		return
+	}
 	duration, err := time.ParseDuration(timeFrame)
 	if err != nil {
 		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format", err)
@@ -166,7 +178,7 @@ func (r *logTransactionsRoutes) sumAmountsByAssetID(c *gin.Context) {
 		return
 	}
 
-	sum, err := r.l.SumLogTransactionsByAssetID(assetID, timeRange, duration)
+	sum, err := r.l.SumLogTransactionsByAssetID(assetID, timeRange, duration, transactionType)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return

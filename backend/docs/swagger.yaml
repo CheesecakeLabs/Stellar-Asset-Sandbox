@@ -805,6 +805,11 @@ paths:
         name: asset_id
         required: true
         type: integer
+      - description: Transaction type (e,g, '0', '1')
+        in: path
+        name: transaction_type
+        required: true
+        type: string
       - description: 'Time range for the query (e.g., ''24h'', '
         in: path
         name: time_range

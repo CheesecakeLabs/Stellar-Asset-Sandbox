@@ -85,7 +85,7 @@ type (
 		GetLogTransactionsByAssetID(assetID int, timeRange string) ([]entity.LogTransaction, error)
 		GetLogTransactionsByUserID(userID int, timeRange string) ([]entity.LogTransaction, error)
 		GetLogTransactionsByTransactionTypeID(transactionTypeID int, timeRange string) ([]entity.LogTransaction, error)
-		SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransaction, error)
+		SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error)
 		SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error)
 	}
 )

@@ -62,8 +62,8 @@ func (l *LogTransactionUseCase) SumLogTransactions(timeRange string, timeFrame t
 	return sum, nil
 }
 
-func (l *LogTransactionUseCase) SumLogTransactionsByAssetID(assetID int, timeRange string, duration time.Duration) (entity.SumLogTransaction, error) {
-	sum, err := l.lRepo.SumLogTransactionsByAssetID(assetID, timeRange, duration)
+func (l *LogTransactionUseCase) SumLogTransactionsByAssetID(assetID int, timeRange string, duration time.Duration, transactionType int) (entity.SumLogTransaction, error) {
+	sum, err := l.lRepo.SumLogTransactionsByAssetID(assetID, timeRange, duration, transactionType)
 	if err != nil {
 		return entity.SumLogTransaction{}, err
 	}

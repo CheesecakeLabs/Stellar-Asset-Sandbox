@@ -573,6 +573,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Transaction type (e,g, '0', '1')",
+                        "name": "transaction_type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Time range for the query (e.g., '24h', ",
                         "name": "time_range",
                         "in": "path",
