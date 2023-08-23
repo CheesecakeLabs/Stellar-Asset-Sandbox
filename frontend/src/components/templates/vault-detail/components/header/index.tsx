@@ -171,7 +171,7 @@ export const Header: React.FC<IHeader> = ({
             <PopoverTrigger>
               <IconButton size="sm" icon={<EditIcon />} aria-label="Edit" />
             </PopoverTrigger>
-            <PopoverContent p={5} bg="black.700">
+            <PopoverContent p={5} _dark={{ bg: 'black.700' }}>
               <FocusLock persistentFocus={false}>
                 <PopoverArrow />
                 <PopoverCloseButton />
