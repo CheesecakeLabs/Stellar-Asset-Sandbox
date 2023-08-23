@@ -53,7 +53,7 @@ func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRan
 	timeFrameUnit := getTimeFrame(timeFrame)
 
 	query := `
-		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.amount), DATE_TRUNC($3, lt.date) as dateFrame
+		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.amount), DATE_TRUNC($3, lt.date) as dateFrame, COUNT(lt.amount) as quantity
 		FROM logtransactions AS lt
 		JOIN asset AS a ON lt.asset_id = a.id
 		WHERE lt.date >= $1 AND lt.asset_id = $2
@@ -71,14 +71,16 @@ func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRan
 	for rows.Next() {
 		var asset entity.Asset
 		var amount float64
+		var quantity int
 		var date string
-		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &amount, &date)
+		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &amount, &date, &quantity)
 		if err != nil {
 			return entity.SumLogTransaction{}, err
 		}
 
 		sumLogTransaction.Asset = asset
 		sumLogTransaction.Amount = append(sumLogTransaction.Amount, amount)
+		sumLogTransaction.Quantity = append(sumLogTransaction.Quantity, quantity)
 		sumLogTransaction.Date = append(sumLogTransaction.Date, date)
 		sumLogTransaction.Asset.Amount += int(amount)
 	}
