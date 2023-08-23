@@ -5,7 +5,7 @@ import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
 import { mockContracts } from 'utils/mockups'
 
-import * as certificatesOfDeposit from '../../soroban-cod/src'
+import * as certificatesOfDeposit from '../../soroban'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext

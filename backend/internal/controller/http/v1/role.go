@@ -33,7 +33,7 @@ func newRoleRoutes(handler *gin.RouterGroup, roleUseCase usecase.RoleUseCase, me
 func (r *role) list(c *gin.Context) {
 	roles, err := r.roleUseCase.List()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 	c.JSON(http.StatusOK, roles)
 }

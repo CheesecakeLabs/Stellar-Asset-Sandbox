@@ -63,7 +63,7 @@ func NewRouter(
 	groupV1 := handler.Group("/v1")
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
-		newWalletsRoutes(groupV1, walletUseCase, messengerController)
+		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase)
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)

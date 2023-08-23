@@ -1943,8 +1943,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string",
-                    "example": "message"
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },
