@@ -3,6 +3,7 @@ import React from 'react'
 import Chart from 'react-apexcharts'
 
 import { getChartLabels } from 'utils/constants/dashboards'
+import { toCrypto } from 'utils/formatter'
 
 import { HelpIcon } from 'components/icons'
 
@@ -25,6 +26,20 @@ export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
   const options = {
     chart: {
       id: 'area',
+      toolbar: {
+        show: true,
+        offsetX: 0,
+        offsetY: 0,
+        tools: {
+          download: false,
+          selection: false,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: false,
+          reset: true,
+        },
+      },
     },
     xaxis: {
       categories: getChartLabels('24h'),
@@ -38,6 +53,9 @@ export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
     yaxis: {
       labels: {
         show: true,
+        formatter: function (value: number): string {
+          return `${toCrypto(value)}`
+        },
       },
     },
     dataLabels: {
