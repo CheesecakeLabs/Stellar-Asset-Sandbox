@@ -545,75 +545,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/log_transactions/asset/{asset_id}/sum/{time_range}/{time_frame}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Log Transactions"
-                ],
-                "summary": "Get sum of amounts by Asset ID within a specific time frame",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Asset ID",
-                        "name": "asset_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Transaction type (e,g, '0', '1')",
-                        "name": "transaction_type",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Time range for the query (e.g., '24h', ",
-                        "name": "time_range",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Time frame for the query (e.g., '1h')",
-                        "name": "time_frame",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Sum log transaction for the specified asset",
-                        "schema": {
-                            "$ref": "#/definitions/entity.SumLogTransaction"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid time_frame format",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/log_transactions/assets/sum/{time_range}/{time_frame}": {
             "get": {
                 "security": [
@@ -659,6 +590,76 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid time_frame format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour) and a specific transaction type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of amounts by Asset ID within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction type ID (e.g., '0' for all transactions, '1' for type create asset '2' for mint asset)",
+                        "name": "transaction_type_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h' or '1d' '7d' '30d')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for the query (e.g., '1h' '2h' '24h' '36h')",
+                        "name": "time_frame",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sum log transaction for the specified asset",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SumLogTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid transaction type",
                         "schema": {
                             "type": "string"
                         }
