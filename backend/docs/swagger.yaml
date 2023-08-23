@@ -805,13 +805,13 @@ paths:
         name: asset_id
         required: true
         type: integer
-      - description: Time range for the query (e.g., '24h')
+      - description: 'Time range for the query (e.g., ''24h'', '
         in: path
         name: time_range
         required: true
         type: string
-      - description: Time frame for grouping (e.g., '1h'). Default is '1h'
-        in: query
+      - description: Time frame for the query (e.g., '1h')
+        in: path
         name: time_frame
         type: string
       produces:

@@ -573,16 +573,16 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Time range for the query (e.g., '24h')",
+                        "description": "Time range for the query (e.g., '24h', ",
                         "name": "time_range",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
-                        "description": "Time frame for grouping (e.g., '1h'). Default is '1h'",
+                        "description": "Time frame for the query (e.g., '1h')",
                         "name": "time_frame",
-                        "in": "query"
+                        "in": "path"
                     }
                 ],
                 "responses": {

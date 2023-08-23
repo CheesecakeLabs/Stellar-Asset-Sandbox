@@ -222,13 +222,13 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -243,7 +243,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -308,13 +308,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -329,7 +329,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -396,13 +396,13 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -417,7 +417,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -490,13 +490,13 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -511,7 +511,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -578,13 +578,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -599,7 +599,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -673,13 +673,13 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "user not found")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
@@ -689,7 +689,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
 	})
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "error to create log transaction")
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
