@@ -44,24 +44,42 @@ func (repo *LogTransactionRepo) GetLogTransactionsByTransactionTypeID(transactio
 	return getLogTransactions(repo, timeRange, "WHERE transaction_type_id = $2")
 }
 
-func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransaction, error) {
+func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error) {
 	dateFilter, err := getDateFilter(timeRange)
 	if err != nil {
 		return entity.SumLogTransaction{}, err
 	}
 
 	timeFrameUnit := getTimeFrame(timeFrame)
+	timeFrameSeconds := timeFrame.Seconds()
 
-	query := `
-		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.amount), DATE_TRUNC($3, lt.date) as dateFrame, COUNT(lt.amount) as quantity
-		FROM logtransactions AS lt
-		JOIN asset AS a ON lt.asset_id = a.id
-		WHERE lt.date >= $1 AND lt.asset_id = $2
-		GROUP BY a.id, dateFrame
-		ORDER BY a.id, dateFrame
+	baseQuery := `
+        SELECT
+            a.id, a.name, a.code, a.asset_type, SUM(lt.amount), COUNT(lt.amount) as quantity,
+            DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame
+        FROM logtransactions AS lt
+        JOIN asset AS a ON lt.asset_id = a.id
 	`
 
-	rows, err := repo.Db.Query(query, dateFilter, assetID, timeFrameUnit)
+	var whereClause string
+	var queryArgs []interface{}
+
+	if transactionType == 0 {
+		whereClause = "WHERE lt.date >= $1 AND lt.asset_id = $2"
+		queryArgs = append(queryArgs, dateFilter, assetID, timeFrameUnit, timeFrameSeconds)
+	} else {
+		whereClause = "WHERE lt.date >= $1 AND lt.asset_id = $2 AND lt.transaction_type_id = $5"
+		queryArgs = append(queryArgs, dateFilter, assetID, timeFrameUnit, timeFrameSeconds, transactionType)
+	}
+
+	groupAndOrderClause := `
+        GROUP BY a.id, dateFrame
+        ORDER BY a.id, dateFrame;
+	`
+
+	query := baseQuery + whereClause + groupAndOrderClause
+
+	rows, err := repo.Db.Query(query, queryArgs...)
 	if err != nil {
 		return entity.SumLogTransaction{}, err
 	}
@@ -91,21 +109,24 @@ func (repo *LogTransactionRepo) SumLogTransactionsByAssetID(assetID int, timeRan
 func (repo *LogTransactionRepo) SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error) {
 	dateFilter, err := getDateFilter(timeRange)
 	if err != nil {
-		return nil, err
+		return []entity.SumLogTransaction{}, err
 	}
 
 	timeFrameUnit := getTimeFrame(timeFrame)
+	timeFrameSeconds := timeFrame.Seconds()
 
 	query := `
-		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.amount), DATE_TRUNC($2, lt.date) as dateFrame
-		FROM logtransactions AS lt
-		JOIN asset AS a ON lt.asset_id = a.id
-		WHERE lt.date >= $1
-		GROUP BY a.id, dateFrame
-		ORDER BY a.id, dateFrame
-	`
+        SELECT
+            a.id, a.name, a.code, a.asset_type, SUM(lt.amount),
+            DATE_TRUNC($2, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$3) * $3) as dateFrame
+        FROM logtransactions AS lt
+        JOIN asset AS a ON lt.asset_id = a.id
+        WHERE lt.date >= $1
+        GROUP BY a.id, dateFrame
+        ORDER BY a.id, dateFrame;
+    `
 
-	rows, err := repo.Db.Query(query, dateFilter, timeFrameUnit)
+	rows, err := repo.Db.Query(query, dateFilter, timeFrameUnit, timeFrameSeconds)
 	if err != nil {
 		return nil, err
 	}
@@ -185,17 +206,21 @@ func getDateFilter(timeRange string) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("invalid numeric value in time range: %s", err.Error())
 	}
 
-	var duration time.Duration
+	currentTime := time.Now()
 	switch unit {
 	case 'h':
-		duration = time.Duration(-value) * time.Hour
+		return currentTime.Add(time.Duration(-value) * time.Hour), nil
 	case 'd':
-		duration = time.Duration(-value) * 24 * time.Hour
+		// If value is 1, return the start of the current day.
+		if value == 1 {
+			return time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, currentTime.Location()), nil
+		}
+
+		targetDate := currentTime.AddDate(0, 0, -value+1)
+		return time.Date(targetDate.Year(), targetDate.Month(), targetDate.Day(), 0, 0, 0, 0, targetDate.Location()), nil
 	default:
 		return time.Time{}, fmt.Errorf("invalid time unit in time range")
 	}
-
-	return time.Now().Add(duration), nil
 }
 
 func getTimeFrame(timeFrame time.Duration) string {

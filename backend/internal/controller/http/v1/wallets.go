@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -12,11 +11,12 @@ import (
 type walletsRoutes struct {
 	w usecase.WalletUseCase
 	m HTTPControllerMessenger
+	a usecase.AuthUseCase
 }
 
-func newWalletsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPControllerMessenger) {
-	r := &walletsRoutes{w, m}
-	h := handler.Group("/wallets")
+func newWalletsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
+	r := &walletsRoutes{w, m, a}
+	h := handler.Group("/wallets").Use(Auth(a.ValidateToken()))
 	{
 		h.GET("", r.list)
 		h.POST("", r.create)
@@ -38,7 +38,7 @@ func (r *walletsRoutes) list(c *gin.Context) {
 
 	wallets, err := r.w.List(walletType)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 
 	c.JSON(http.StatusOK, wallets)
@@ -61,13 +61,13 @@ type CreateWalletRequest struct {
 func (r *walletsRoutes) create(c *gin.Context) {
 	var request CreateWalletRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid request body")
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
 		return
 	}
 
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 1})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (r *walletsRoutes) create(c *gin.Context) {
 		},
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}
 
@@ -107,19 +107,18 @@ type FundWalletRequest struct {
 func (r *walletsRoutes) fundWallet(c *gin.Context) {
 	var request FundWalletRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid request body: %x")
+		errorResponse(c, http.StatusBadRequest, "invalid request body: %x", err)
 		return
 	}
 
 	wallet, err := r.w.Get(request.Id)
 	if err != nil {
-		fmt.Println(err)
-		errorResponse(c, http.StatusNotFound, "wallet not found")
+		errorResponse(c, http.StatusNotFound, "wallet not found", err)
 		return
 	}
 
 	if wallet.Funded {
-		errorResponse(c, http.StatusBadRequest, "wallet is already funded")
+		errorResponse(c, http.StatusBadRequest, "wallet is already funded", err)
 		return
 	}
 
@@ -129,21 +128,20 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 		Account: wallet.Key.PublicKey,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
 	}
 
 	fundRes := res.Message.(entity.HorizonResponse)
 
 	if fundRes.StatusCode != 200 {
-		errorResponse(c, http.StatusInternalServerError, "friendbot error")
+		errorResponse(c, http.StatusInternalServerError, "friendbot error", err)
 		return
 	}
 
 	wallet.Funded = true
 	wallet, err = r.w.Update(wallet)
 	if err != nil {
-		fmt.Println(err)
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}
 

@@ -437,7 +437,8 @@ definitions:
   v1.response:
     properties:
       error:
-        example: message
+        type: string
+      message:
         type: string
     type: object
   v1.userResponse:
@@ -804,13 +805,18 @@ paths:
         name: asset_id
         required: true
         type: integer
-      - description: Time range for the query (e.g., '24h')
+      - description: Transaction type (e,g, '0', '1')
+        in: path
+        name: transaction_type
+        required: true
+        type: string
+      - description: 'Time range for the query (e.g., ''24h'', '
         in: path
         name: time_range
         required: true
         type: string
-      - description: Time frame for grouping (e.g., '1h'). Default is '1h'
-        in: query
+      - description: Time frame for the query (e.g., '1h')
+        in: path
         name: time_frame
         type: string
       produces:
