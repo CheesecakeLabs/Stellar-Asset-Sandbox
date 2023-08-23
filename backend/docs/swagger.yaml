@@ -793,31 +793,33 @@ paths:
       summary: Get transactions logs by Asset ID
       tags:
       - Log Transactions
-  /log_transactions/asset/{asset_id}/sum/{time_range}/{time_frame}:
+  /log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}:
     get:
       consumes:
       - application/json
       description: Get sum of amounts for a specific asset, grouped by a specified
-        time frame (e.g., '1h' for 1 hour)
+        time frame (e.g., '1h' for 1 hour) and a specific transaction type
       parameters:
       - description: Asset ID
         in: path
         name: asset_id
         required: true
         type: integer
-      - description: Transaction type (e,g, '0', '1')
+      - description: Transaction type ID (e.g., '0' for all transactions, '1' for
+          type create asset '2' for mint asset)
         in: path
-        name: transaction_type
+        name: transaction_type_id
         required: true
         type: string
-      - description: 'Time range for the query (e.g., ''24h'', '
+      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
         in: path
         name: time_range
         required: true
         type: string
-      - description: Time frame for the query (e.g., '1h')
+      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
         in: path
         name: time_frame
+        required: true
         type: string
       produces:
       - application/json
@@ -827,7 +829,7 @@ paths:
           schema:
             $ref: '#/definitions/entity.SumLogTransaction'
         "400":
-          description: Invalid time_frame format
+          description: invalid transaction type
           schema:
             type: string
         "500":

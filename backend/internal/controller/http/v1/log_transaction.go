@@ -137,19 +137,19 @@ func (r *logTransactionsRoutes) getLogTransactionsByTransactionTypeID(c *gin.Con
 }
 
 // @Summary Get sum of amounts by Asset ID within a specific time frame
-// @Description Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour)
+// @Description Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour) and a specific transaction type
 // @Tags Log Transactions
 // @Accept json
 // @Produce json
 // @Param asset_id path int true "Asset ID"
-// @Param transaction_type path string true "Transaction type (e,g, '0', '1')"
-// @Param time_range path string true "Time range for the query (e.g., '24h', "7d")"
-// @Param time_frame path string false "Time frame for the query (e.g., '1h')".
+// @Param transaction_type_id path string true "Transaction type ID (e.g., '0' for all transactions, '1' for type create asset '2' for mint asset)"
+// @Param time_range path string true "Time range for the query (e.g., '24h' or '1d' '7d' '30d')"
+// @Param time_frame path string true "Time frame for the query (e.g., '1h' '2h' '24h' '36h')"
 // @Security ApiKeyAuth
 // @Success 200 {object} entity.SumLogTransaction "Sum log transaction for the specified asset"
-// @Failure 400 {string} string "Invalid time_frame format"
+// @Failure 400 {string} string "invalid transaction type"
 // @Failure 500 {string} string "Internal server error"
-// @Router /log_transactions/asset/{asset_id}/sum/{time_range}/{time_frame} [get]
+// @Router /log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame} [get]
 func (r *logTransactionsRoutes) sumAmountsByAssetID(c *gin.Context) {
 	assetIDStr := c.Param("asset_id")
 	transactionTypeStr := c.Param("transaction_type_id")
