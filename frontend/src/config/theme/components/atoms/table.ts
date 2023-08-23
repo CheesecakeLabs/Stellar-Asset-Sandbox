@@ -24,6 +24,11 @@ export const Table = {
         },
         _hover: {
           bg: 'gray.100',
+          _dark: {
+            _hover: {
+              bg: 'black.800',
+            },
+          },
         },
       },
     },

@@ -54,9 +54,9 @@ export const ItemAsset: React.FC<IItemAsset> = ({
       }}
       bg={selectedAsset === getAsset(balance) ? 'gray.100' : 'white'}
       _dark={
-        selectedAsset
+        selectedAsset === getAsset(balance)
           ? { bg: 'black.600', borderColor: 'black.800' }
-          : { bg: 'none', borderColor: 'black.800' }
+          : { bg: 'black.700', borderColor: 'black.800' }
       }
     >
       <Flex

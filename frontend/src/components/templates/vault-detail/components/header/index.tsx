@@ -61,7 +61,7 @@ const Form: React.FC<IHeader> = ({
     IOption | null | undefined
   >(category && { label: category?.name, value: category?.id })
 
-  const [name, setName] = useState<string | undefined>(category?.name)
+  const [name, setName] = useState<string | undefined>(vault.name)
 
   const onSubmit = (): void => {
     if (!name || !categorySelected) return
@@ -171,7 +171,7 @@ export const Header: React.FC<IHeader> = ({
             <PopoverTrigger>
               <IconButton size="sm" icon={<EditIcon />} aria-label="Edit" />
             </PopoverTrigger>
-            <PopoverContent p={5}>
+            <PopoverContent p={5} bg="black.700">
               <FocusLock persistentFocus={false}>
                 <PopoverArrow />
                 <PopoverCloseButton />
@@ -191,7 +191,12 @@ export const Header: React.FC<IHeader> = ({
           </Popover>
         </Flex>
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} fontSize="sm">
+          <MenuButton
+            as={Button}
+            rightIcon={<ChevronDownIcon />}
+            fontSize="sm"
+            _dark={{ fill: 'white' }}
+          >
             Actions
           </MenuButton>
           <MenuList>

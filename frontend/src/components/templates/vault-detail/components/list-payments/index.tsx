@@ -77,113 +77,37 @@ export const ListPayments: React.FC<IListPayments> = ({
         ) : payments && payments.length > 0 ? (
           <Table w="full">
             <Thead w="full">
-              <Tr>
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                  w="2rem"
-                  p={0}
-                />
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                >
-                  From
-                </Th>
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                >
-                  To
-                </Th>
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                >
-                  Asset
-                </Th>
+              <Th w="2rem" p={0} />
+              <Th>From</Th>
+              <Th>To</Th>
+              <Th>Asset</Th>
 
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                >
-                  Amount
-                </Th>
-                <Th
-                  color={'gray.700'}
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                >
-                  Date
-                </Th>
-                <Th
-                  borderColor={'gray.400'}
-                  _dark={{ borderColor: 'black.800' }}
-                />
-              </Tr>
+              <Th>Amount</Th>
+              <Th>Date</Th>
+              <Th />
             </Thead>
             <Tbody>
               {payments.map(
                 payment =>
                   payment.type === 'payment' && (
-                    <Tr
-                      fill="black"
-                      stroke="black"
-                      _dark={{ fill: 'white', stroke: 'white' }}
-                    >
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800' }}
-                        px="1rem"
-                        py={0}
-                      >
+                    <Tr>
+                      <Td px="1rem" py={0}>
                         {isCurrentVault(payment.from) ? (
                           <SendedIcon width="1.25rem" />
                         ) : (
                           <ReceivedIcon width="1.25rem" />
                         )}
                       </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800' }}
-                      >
-                        {walletToName(payment.from)}
-                      </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800' }}
-                      >
-                        {walletToName(payment.to)}
-                      </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800' }}
-                      >
-                        {payment.asset_code}
-                      </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800' }}
-                      >
-                        {toCrypto(Number(payment.amount))}
-                      </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800', fill: 'white' }}
-                      >
+                      <Td>{walletToName(payment.from)}</Td>
+                      <Td>{walletToName(payment.to)}</Td>
+                      <Td>{payment.asset_code}</Td>
+                      <Td>{toCrypto(Number(payment.amount))}</Td>
+                      <Td>
                         <Text fontSize="sm">
                           {formatDateFull(payment.created_at)}
                         </Text>
                       </Td>
-                      <Td
-                        borderColor={'gray.400'}
-                        _dark={{ borderColor: 'black.800', fill: 'white' }}
-                      >
+                      <Td>
                         <Flex
                           cursor="pointer"
                           _dark={{ fill: 'white' }}

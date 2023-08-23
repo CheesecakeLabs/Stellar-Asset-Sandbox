@@ -1,12 +1,8 @@
-import { Container, Text, Flex } from '@chakra-ui/react'
+import { Container, Text, Flex, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 import Chart from 'react-apexcharts'
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-
 import { HelpIcon } from 'components/icons'
-
-ChartJS.register(ArcElement, Tooltip, Legend)
 
 interface IAccountsChart {
   authorized: number
@@ -17,11 +13,14 @@ export const AccountsChart: React.FC<IAccountsChart> = ({
   authorized,
   unauthorized,
 }) => {
+  const { colorMode } = useColorMode()
+
   const series = [unauthorized, authorized]
 
   const options = {
     chart: {
       id: 'donut',
+      foreColor: colorMode === 'dark' ? 'white' : 'black',
     },
     labels: ['Unauthorized', 'Authorized'],
     colors: ['#f55025', '#195a63'],

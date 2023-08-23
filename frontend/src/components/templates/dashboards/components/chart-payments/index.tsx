@@ -1,4 +1,4 @@
-import { Text, Container, Flex, Box } from '@chakra-ui/react'
+import { Text, Container, Flex, Box, useColorMode } from '@chakra-ui/react'
 import React from 'react'
 import Chart from 'react-apexcharts'
 
@@ -13,6 +13,8 @@ interface IChartPayments {
 }
 
 export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
+  const { colorMode } = useColorMode()
+
   const series = paymentsAssets.map(paymentsAsset => ({
     name: paymentsAsset.asset.code,
     data: getChartLabels('24h').map(label => {
@@ -26,6 +28,7 @@ export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
   const options = {
     chart: {
       id: 'area',
+      foreColor: colorMode === 'dark' ? 'white' : 'black',
       toolbar: {
         show: true,
         offsetX: 0,
@@ -40,6 +43,9 @@ export const ChartPayments: React.FC<IChartPayments> = ({ paymentsAssets }) => {
           reset: true,
         },
       },
+    },
+    tooltip: {
+      theme: colorMode,
     },
     xaxis: {
       categories: getChartLabels('24h'),
