@@ -1,31 +1,29 @@
 package integration_test
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"testing"
 	"time"
-
-	. "github.com/Eun/go-hit"
 )
 
+type errrorResponse struct {
+	Message string `json:"message"`
+	Error   string `json:"error,omitempty"`
+}
+
 const (
-	// Attempts connection
-	host       = "backend:8080"
+	host       = "localhost:8080"
 	healthPath = "http://" + host + "/healthz"
 	attempts   = 20
 
 	// HTTP REST
 	basePath = "http://" + host + "/v1"
-
-	// Kafka
-	kafkaHost     = "kafka:9092"
-	consumerTopic = "consumer_topic"
-	producerTopic = "producer_topic"
 )
 
-func TestMain(t *testing.M) {
+func TestMain(m *testing.M) {
 	err := healthCheck(attempts)
 	if err != nil {
 		log.Fatalf("Integration tests: host %s is not available: %s", host, err)
@@ -33,25 +31,34 @@ func TestMain(t *testing.M) {
 
 	log.Printf("Integration tests: host %s is available", host)
 
-	code := t.Run()
+	code := m.Run()
 	os.Exit(code)
 }
 
 func healthCheck(attempts int) error {
-	var err error
+	client := &http.Client{}
 
 	for attempts > 0 {
-		err = Do(Get(healthPath), Expect().Status().Equal(http.StatusOK))
-		if err == nil {
+		req, err := http.NewRequest(http.MethodGet, healthPath, nil)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.Do(req)
+		if err == nil && resp.StatusCode == http.StatusOK {
 			return nil
 		}
 
-		log.Printf("Integration tests: url %s is not available, attempts left: %d", healthPath, attempts)
+		if err != nil {
+			log.Printf("Integration tests: error connecting to %s: %s", healthPath, err)
+		} else {
+			log.Printf("Integration tests: url %s returned status %d, attempts left: %d", healthPath, resp.StatusCode, attempts)
+		}
 
 		time.Sleep(time.Second)
 
 		attempts--
 	}
 
-	return err
+	return fmt.Errorf("Integration tests: failed to connect to %s after %d attempts", healthPath, attempts)
 }

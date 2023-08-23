@@ -1,17 +1,18 @@
-version: "3.7"
+version: "3.8"
 
 services:
   postgres:
+    image: postgres:latest
     container_name: postgres
-    profiles: ["all", "starlabs", "tests", "kafka"]
-    image: postgres
     environment:
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
-      PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
+      - ./infrastructure/init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -21,9 +22,9 @@ services:
           "CMD-SHELL",
           "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
         ]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   tfv2_frontend:
     profiles: ["all", "frontend"]
@@ -45,7 +46,7 @@ services:
 
   backend:
     platform: linux/amd64
-    profiles: ["all", "tests"]
+    profiles: ["all", "tests", "backend"]
     container_name: token-factory-v2
     build:
       context: ./backend
@@ -55,13 +56,30 @@ services:
       - "8080:8080"
     volumes:
       - ./:/go/src/CheesecakeLabs/token-factory-v2/backend
+    environment:
+      PG_HOST: ${PG_HOST:-postgres}
+      PG_PORT: ${PG_PORT:-5432}
+      PG_USER: ${PG_USER:-postgres}
+      PG_PASSWORD: ${PG_PASSWORD:-password}
+      PG_DB_NAME: ${PG_DATABASE:-backend}
+      KAFKA_CLIENT_GROUP_ID: ${KAFKA_CLIENT_GROUP_ID:-starlabs}
+      KAFKA_CLIENT_BROKERS: ${KAFKA_CLIENT_BROKERS:-kafka1:19092}
+      KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KAFKA_CREATE_KP_CONSUMER_TOPICS:-generateKeypair}
+      KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KAFKA_CREATE_KP_PRODUCER_TOPIC:-generatedKeypairs}
+      KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-createEnvelope}
+      KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
+      KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
+      KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
+      HTTP_PORT: ${HTTP_PORT:-8080}
+      HTTP_FRONTEND_URL: ${HTTP_FRONTEND_URL:-http://localhost:3000}
+      JTW_SECRET_KEY: ${JTW_SECRET_KEY:-keyosid}
     depends_on:
       postgres:
         condition: service_healthy
 
   stellar-kms:
     platform: linux/amd64
-    profiles: ["all", "starlabs", "tests"]
+    profiles: ["all", "starlabs", "tests", "backend"]
     container_name: kms
     build:
       context: ./stellar-kms
@@ -89,7 +107,7 @@ services:
         condition: service_healthy
 
   zoo1:
-    profiles: ["all", "starlabs", "tests", "kafka"]
+    profiles: ["all", "starlabs", "tests", "kafka", "backend"]
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zoo1
     container_name: zoo1
@@ -101,7 +119,7 @@ services:
       ZOOKEEPER_SERVERS: zoo1:2888:3888
 
   kafka1:
-    profiles: ["all", "starlabs", "tests", "kafka"]
+    profiles: ["all", "starlabs", "tests", "kafka", "backend"]
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka1
     container_name: kafka1
@@ -132,43 +150,21 @@ services:
       timeout: 10s
       retries: 20
 
-  #Kafka - Schema Registry#
-  schema_registry:
-    profiles: ["all", "kafka", "starlabs", "kms"]
-    image: confluentinc/cp-schema-registry:7.1.2
-    container_name: schema_registry
-    ports:
-      - "8085:8085"
-    environment:
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
-      SCHEMA_REGISTRY_HOST_NAME: schema_registry
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zoo1:2181
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,OPTIONS"
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092
-    healthcheck:
-      start_period: 10s
-      interval: 10s
-      retries: 20
-      test: curl --user superUser:superUser --fail --silent --insecure http://schema_registry:8085/subjects --output /dev/null || exit 1
-    depends_on:
-      kafka1:
-        condition: service_healthy
-
   #Kafka - Init#
   kafka_init:
-    profiles: ["all", "kafka", "starlabs", "kms"]
+    profiles: ["all", "kafka", "starlabs", "kms", "backend", "tests"]
     image: confluentinc/cp-kafka:7.1.2
     container_name: kafka_init
     entrypoint: ["/bin/sh", "-c"]
     environment:
-      KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KAFKA_CREATE_KP_PRODUCER_TOPIC:-generateKeypair}
-      KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KAFKA_CREATE_KP_CONSUMER_TOPICS:-generatedKeypairs}
-      KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-createEnvelope}
-      KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
-      KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
-      KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
-
+      KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KAFKA_CREATE_KP_PRODUCER_TOPIC:-generatedKeypairs}
+      KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KAFKA_CREATE_KP_CONSUMER_TOPICS:-generateKeypair}
+      KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-signEnvelope}
+      KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-createEnvelope}
+      KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonResponse}
+      KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonRequest}
+      KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-signedEnvelopes}
+      KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-submitResponse}
     depends_on:
       kafka1:
         condition: service_healthy
@@ -182,12 +178,14 @@ services:
       kafka-topics --create --topic $$KAFKA_ENVELOPE_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
-      kafka1 cub kafka-ready -b kafka1:129092 1 20
+      kafka-topics --create --topic $$KAFKA_SUBMIT_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_SUBMIT_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      cub kafka-ready -b kafka1:19092 1 20
       "
 
   # Kafka - UI#
   kafka_ui:
-    profiles: ["all", "kafka", "starlabs", "kms"]
+    profiles: ["all", "kafka", "starlabs", "kms", "backend"]
     image: provectuslabs/kafka-ui
     container_name: kafka_ui
     ports:
@@ -207,7 +205,7 @@ services:
   #Starlabs Service#
   starlabs:
     platform: linux/amd64
-    profiles: ["all", "starlabs", "tests"]
+    profiles: ["all", "starlabs", "tests", "backend"]
     container_name: starlabs
     build:
       context: ./starlabs
@@ -230,11 +228,11 @@ services:
 
   integration:
     profiles: ["tests"]
+    container_name: integration
     platform: linux/amd64
     build:
       context: ./backend
       dockerfile: integration-test/Dockerfile
-    container_name: integration
     image: integration
     depends_on:
       - backend

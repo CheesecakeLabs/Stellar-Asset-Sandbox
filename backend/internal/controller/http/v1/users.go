@@ -69,25 +69,25 @@ func (r *usersRoutes) detail(c *gin.Context) {
 func (r *usersRoutes) createUser(c *gin.Context) {
 	var user entity.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		// r.l.Error(err, "http - v1 - create")
-		// errorResponse(c, http.StatusBadRequest, "invalid request body")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		c.Abort()
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	if user.Password == "" {
+		errorResponse(c, http.StatusBadRequest, "password is required", nil)
 		return
 	}
 
 	tokenString, err := GenerateJWT(user, r.a.ValidateToken())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		c.Abort()
+		errorResponse(c, http.StatusBadRequest, "error to generate the JWT", err)
 		return
 	}
 	user.Token = tokenString
 
-	if err := r.t.CreateUser(user); err != nil {
-		// r.l.Error(err, "http - v1 - create")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		c.Abort()
+	err = r.t.CreateUser(user)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}
 
@@ -106,17 +106,13 @@ func (r *usersRoutes) createUser(c *gin.Context) {
 func (r *usersRoutes) autentication(c *gin.Context) {
 	var user entity.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		// r.l.Error(err, "http - v1 - create")
 		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
-		fmt.Println(err)
 		return
 	}
 	// check if user exists and password is correct
 	user, err := r.t.Autentication(user.Email, user.Password)
 	if err != nil {
-		// r.l.Error(err, "http - v1 - create")
-		errorResponse(c, http.StatusInternalServerError, "database problems", err)
-		fmt.Println(err)
+		errorResponse(c, http.StatusUnauthorized, "database problems", err)
 		return
 	}
 	tokenString, err := GenerateJWT(user, r.a.ValidateToken())

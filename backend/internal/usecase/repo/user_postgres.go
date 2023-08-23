@@ -44,8 +44,7 @@ func (r UserRepo) CreateUser(user entity.User) error {
 	stmt := `INSERT INTO UserAccount (name, password, role_id, email, token) VALUES ($1, $2, $3, $4, $5)`
 	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId, user.Email, user.Token)
 	if err != nil {
-		panic(err)
-		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
 	}
 	fmt.Println("User created successfully")
 	return nil
@@ -99,7 +98,6 @@ func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
 			 ORDER BY u.name ASC`
 
 	rows, err := r.Db.Query(stmt)
-
 	if err != nil {
 		return nil, fmt.Errorf("UserRepo - GetAllUsers - db.Query: %w", err)
 	}
