@@ -103,7 +103,7 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 - **`createEnvelope`**:
 
   - **Purpose**: Deals with transaction envelope creation requests.
-  - **Usage**: This topic may contain specific transaction details like payment operations, account merges, or asset issuances.
+  - **Usage**: This topic processes messages with details of transactions such as source, operations, and sponsor, in order to generate an envelope.
 
 - **`horizonRequest`**:
   - **Purpose**: Manages any request destined for the Stellar Horizon server.
