@@ -114,7 +114,7 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 - **`horizonResponse`**:
 
   - **Purpose**: Conveys responses from the Stellar Horizon server.
-  - **Usage**: It relays data from fetched accounts, transaction submission outcomes, and all other responses from Horizon.
+  - **Usage**: It relays data from fetched accounts and all other responses from Horizon.
 
 - **`submitResponse`**:
   - **Purpose**: Reports the outcome of transactions submitted to the Stellar network.
