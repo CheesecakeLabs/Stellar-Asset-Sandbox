@@ -4,12 +4,14 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useDashboards } from 'hooks/useDashboards'
 import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
 import { ActionHelper } from 'components/molecules/action-helper'
+import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -17,7 +19,14 @@ import { MintAssetTemplate } from 'components/templates/mint-asset'
 
 export const MintAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [mintOperations, setMintOperations] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [burnOperations, setBurnOperations] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+
   const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { loadingChart, getPaymentsByAssetId } = useDashboards()
   const { id } = useParams()
   const toast = useToast()
 
@@ -46,6 +55,12 @@ export const MintAsset: React.FC = () => {
           position: 'top-right',
         })
         getAssetById(id).then(asset => setAsset(asset))
+        getPaymentsByAssetId(id, 2, chartPeriod).then(paymentsAsset => {
+          setMintOperations(paymentsAsset)
+        })
+        getPaymentsByAssetId(id, 5, chartPeriod).then(paymentsAsset => {
+          setBurnOperations(paymentsAsset)
+        })
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -63,6 +78,22 @@ export const MintAsset: React.FC = () => {
     }
   }, [getAssetById, id])
 
+  useEffect(() => {
+    if (id) {
+      getPaymentsByAssetId(id, 2, chartPeriod).then(paymentsAsset => {
+        setMintOperations(paymentsAsset)
+      })
+    }
+  }, [chartPeriod, getPaymentsByAssetId, id])
+
+  useEffect(() => {
+    if (id) {
+      getPaymentsByAssetId(id, 5, chartPeriod).then(paymentsAsset => {
+        setBurnOperations(paymentsAsset)
+      })
+    }
+  }, [chartPeriod, getPaymentsByAssetId, id])
+
   const toastError = (message: string): void => {
     toast({
       title: 'Mint error!',
@@ -78,16 +109,21 @@ export const MintAsset: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
-          <Flex maxW="584px" flexDir="column" w="full">
+          <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
               <MintAssetTemplate
                 onSubmit={onSubmit}
+                setChartPeriod={setChartPeriod}
                 loading={loadingOperation}
                 asset={asset}
                 assetData={asset.assetData}
+                mintOperations={mintOperations}
+                burnOperations={burnOperations}
+                loadingChart={loadingChart}
+                chartPeriod={chartPeriod}
               />
             )}
           </Flex>

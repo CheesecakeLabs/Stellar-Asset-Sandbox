@@ -41,7 +41,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
           </Text>
         </Flex>
         <Box p="1rem">
-          <Text fontSize="sm" color="gray.650" _dark={{ color: 'white' }}>
+          <Text fontSize="sm">
             Some explanation text, what it does and what will happen lorem ipsum
             dolor sit amet consecteur lorem ipsum dolor sit amet consec teur
             lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet
@@ -64,13 +64,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
             })}
           >
             <Flex justifyContent="space-between" alignItems="center" mt="2rem">
-              <Text
-                fontSize="xs"
-                fontWeight="600"
-                ms="0.25rem"
-                color="gray.650"
-                _dark={{ color: 'white' }}
-              >
+              <Text fontSize="xs" fontWeight="600" ms="0.25rem">
                 {`Available balance: ${toCrypto(withdrawValue)}`}
               </Text>
 

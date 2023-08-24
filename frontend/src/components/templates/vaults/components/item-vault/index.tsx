@@ -30,8 +30,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
         textAlign="center"
         fontSize="md"
         fontWeight="700"
-        color="gray.900"
-        _dark={{ borderColor: 'black.800' }}
+        _dark={{ borderColor: 'black.800', color: 'white' }}
       >
         {vault.name}
       </Text>
@@ -50,7 +49,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
       </Flex>
 
       {vault.accountData &&
-        vault.accountData.balances.map(
+        vault.accountData.balances.slice(0, 3).map(
           (balance, index) =>
             balance.asset_code && (
               <Flex
@@ -60,14 +59,14 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
                 stroke="black"
                 _dark={{ fill: 'white', stroke: 'white' }}
                 alignItems="center"
-                h="1.5rem"
+                h="1.75rem"
               >
                 <Flex alignItems="center" gap={2}>
                   {getCurrencyIcon(balance.asset_code, '1rem')}{' '}
-                  <Text fontSize="xs">{balance.asset_code}</Text>
+                  <Text fontSize="sm">{balance.asset_code}</Text>
                 </Flex>
                 <Flex alignItems="center" gap={2}>
-                  <Text fontSize="xs">{toCrypto(Number(balance.balance))}</Text>
+                  <Text fontSize="sm">{toCrypto(Number(balance.balance))}</Text>
                   {!balance.is_authorized && <LockIcon width="0.75rem" />}
                 </Flex>
               </Flex>

@@ -65,7 +65,26 @@ declare namespace Hooks {
       paging_token: string
     }
 
-    interface IPayment {
+    interface IPayments {
+      _embedded: {
+        records: IPaymentItem[]
+      }
+      _links: {
+        next: {
+          href: string
+          results: number
+        }
+        prev: {
+          href: string
+          results: number
+        }
+        self: {
+          href: string
+        }
+      }
+    }
+
+    interface IPaymentItem {
       id: string
       paging_token: string
       transaction_successful: true
@@ -102,7 +121,10 @@ declare namespace Hooks {
         assetIssuer: string
       ): Promise<IAsset | undefined>
       getAccountData(wallet: string): Promise<IAccount | undefined>
-      getPaymentsData(wallet: string): Promise<IPayment[] | undefined>
+      getPaymentsData(
+        wallet?: string,
+        link?: string
+      ): Promise<IPayments | undefined>
       assetData: IAsset | undefined
       accountData: IAccount | undefined
     }

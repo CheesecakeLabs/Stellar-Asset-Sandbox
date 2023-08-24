@@ -17,7 +17,9 @@ export const VaultDetail: React.FC = () => {
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
   const [vaultCategories, setVaultCategories] =
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
-  const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayment[]>()
+  const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayments>()
+  const [historyNavPayments, setHistoryNavPayments] = useState<string[]>([])
+
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -73,7 +75,9 @@ export const VaultDetail: React.FC = () => {
         })
 
         if (vault) {
-          getPaymentsData(vault.wallet.key.publicKey)
+          getPaymentsData(vault.wallet.key.publicKey).then(payments => {
+            setPayments(payments)
+          })
         }
 
         if (id) {
@@ -112,7 +116,9 @@ export const VaultDetail: React.FC = () => {
         })
 
         if (vault) {
-          getPaymentsData(vault.wallet.key.publicKey)
+          getPaymentsData(vault.wallet.key.publicKey).then(payments => {
+            setPayments(payments)
+          })
         }
 
         if (id) {
@@ -276,6 +282,27 @@ export const VaultDetail: React.FC = () => {
     }
   }, [getPaymentsData, vault])
 
+  const getPaymentsDataByLink = (action: 'prev' | 'next'): void => {
+    const link =
+      action === 'next'
+        ? payments?._links.next.href
+        : historyNavPayments[historyNavPayments.length - 1]
+    if (link) {
+      getPaymentsData(undefined, link).then(paymentsData => {
+        if (action === 'prev') {
+          setHistoryNavPayments(previous => previous.slice(0, -1))
+        }
+        if (action === 'next') {
+          setHistoryNavPayments(previous => [
+            ...previous,
+            payments?._links.self.href || '',
+          ])
+        }
+        setPayments(paymentsData)
+      })
+    }
+  }
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.VAULTS}>
@@ -293,12 +320,14 @@ export const VaultDetail: React.FC = () => {
           updatingVault={updatingVault}
           updatingVaultAssets={updatingVaultAssets}
           deletingVault={deletingVault}
+          isPrevDisabled={historyNavPayments.length === 0}
           onSubmit={onSubmit}
           setSelectedAsset={setSelectedAsset}
           createVaultCategory={createVaultCategory}
           onUpdateVault={onUpdateVault}
           onUpdateVaultAssets={onUpdateVaultAssets}
           onDeleteVault={onDeleteVault}
+          getPaymentsDataByLink={getPaymentsDataByLink}
         />
       </Sidebar>
     </Flex>

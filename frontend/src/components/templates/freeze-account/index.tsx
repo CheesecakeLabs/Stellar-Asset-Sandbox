@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
+import { AccountsChart } from 'components/molecules/accounts-chart'
 import { SelectVault } from 'components/molecules/select-vault'
 
 interface IFreezeAccountTemplate {
@@ -126,6 +127,14 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
           </Flex>
         </Box>
       </Container>
+
+      <AccountsChart
+        authorized={asset.assetData?.accounts.authorized || 0}
+        unauthorized={
+          (asset.assetData?.accounts.authorized_to_maintain_liabilities || 0) +
+          (asset.assetData?.accounts.unauthorized || 0)
+        }
+      />
     </Flex>
   )
 }

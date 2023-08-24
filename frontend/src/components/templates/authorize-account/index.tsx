@@ -14,6 +14,7 @@ import {
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
+import { AccountsChart } from '../../molecules/accounts-chart'
 import { AssetHeader } from 'components/atoms'
 
 import { SelectVault } from '../../molecules/select-vault'
@@ -102,6 +103,14 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
           </form>
         </Box>
       </Container>
+
+      <AccountsChart
+        authorized={asset.assetData?.accounts.authorized || 0}
+        unauthorized={
+          (asset.assetData?.accounts.authorized_to_maintain_liabilities || 0) +
+          (asset.assetData?.accounts.unauthorized || 0)
+        }
+      />
     </Flex>
   )
 }

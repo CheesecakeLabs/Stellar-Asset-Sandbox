@@ -14,6 +14,7 @@ import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { toCrypto } from 'utils/formatter'
 
+import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
 import { SelectVault } from 'components/molecules/select-vault'
 
@@ -104,6 +105,12 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
           </form>
         </Box>
       </Container>
+
+      <BalanceChart
+        supply={Number(asset.assetData?.amount || 0)}
+        mainVault={Number(asset.distributorBalance?.balance || 0)}
+        assetCode={asset.code}
+      />
     </Flex>
   )
 }

@@ -1,6 +1,9 @@
-import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react';
 
-import { inputAnatomy } from '@chakra-ui/anatomy'
+
+
+import { inputAnatomy } from '@chakra-ui/anatomy';
+
 
 const { definePartsStyle, defineMultiStyleConfig } =
   createMultiStyleConfigHelpers(inputAnatomy.keys)
@@ -17,10 +20,9 @@ const sizes = {
 
 const baseStyle = definePartsStyle({
   sizes: {
-    height: '50px',
+    height: '60px',
   },
   field: {
-    border: '1px solid #EEEDEF',
     borderRadius: '0.25rem',
     color: 'black',
     _placeholder: { color: 'gray.900' },

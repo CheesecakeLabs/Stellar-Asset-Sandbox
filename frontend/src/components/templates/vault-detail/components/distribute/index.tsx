@@ -154,12 +154,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
             </form>
           ) : (
             <VStack minH="4rem" justifyContent="center">
-              <Text
-                color="gray.650"
-                fontSize="sm"
-                fontWeight="700"
-                _dark={{ color: 'white' }}
-              >
+              <Text fontSize="sm" fontWeight="700">
                 Select the asset
               </Text>
             </VStack>

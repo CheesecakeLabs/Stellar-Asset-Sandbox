@@ -41,16 +41,6 @@ const linkItems: ILinkItemProps[] = [
     icon: <PaymentsIcon />,
     path: PathRoute.ASSET_MANAGEMENT,
   },
-  // {
-  //   name: 'Payment Tokens',
-  //   icon: <PaymentsIcon />,
-  //   path: `${PathRoute.PAYMENTS_TOKENS}`,
-  // },
-  // {
-  //   name: 'Securities Tokens',
-  //   icon: <SecurityIcon />,
-  //   path: PathRoute.SECURITIES_TOKENS,
-  // },
   {
     name: 'Soroban Smart Contracts',
     icon: <ContractIcon />,
@@ -64,7 +54,7 @@ const linkItems: ILinkItemProps[] = [
   {
     name: 'Assets Dashboard',
     icon: <DashboardIcon />,
-    path: PathRoute.ASSETS_DASHBOARD,
+    path: PathRoute.DASHBOARDS,
   },
   {
     name: 'Blockchain Explorer',

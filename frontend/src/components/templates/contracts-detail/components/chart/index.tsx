@@ -22,9 +22,7 @@ export const Chart: React.FC<IChart> = ({ title, value }) => {
         <HelpIcon />
       </Flex>
       <Flex flexDir="column" alignItems="center">
-        <Text fontSize="xs" color="gray.650" _dark={{ color: 'white' }}>
-          {title}
-        </Text>
+        <Text fontSize="xs">{title}</Text>
         <Text fontSize="2xl" mt="0.25rem">
           {value}
         </Text>

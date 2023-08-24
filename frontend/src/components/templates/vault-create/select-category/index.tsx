@@ -1,3 +1,4 @@
+import { useColorMode } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import CreatableSelect from 'react-select/creatable'
 
@@ -25,6 +26,8 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [options, setOptions] = useState<IOption[]>([])
+
+  const { colorMode } = useColorMode()
 
   const handleVaultCategory = (inputValue: string): void => {
     setIsLoading(true)
@@ -65,6 +68,29 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
           ...baseStyles,
           borderColor: 'gray.400',
           fontSize: '14px',
+          backgroundColor: 'none',
+          color: colorMode === 'dark' ? 'white' : 'black',
+        }),
+        menuList: base => ({
+          ...base,
+          backgroundColor: colorMode === 'dark' ? '#303448' : undefined,
+        }),
+        option: (styles, { isFocused, isSelected }) => ({
+          ...styles,
+          color: colorMode === 'dark' ? 'white' : 'black',
+          background: isFocused
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : undefined
+            : isSelected
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : undefined
+            : undefined,
+        }),
+        singleValue: provided => ({
+          ...provided,
+          color: colorMode === 'dark' ? 'white' : 'black',
         }),
       }}
     />

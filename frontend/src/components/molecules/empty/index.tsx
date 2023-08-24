@@ -21,7 +21,6 @@ export const Empty: React.FC<IEmpty> = ({ title, hideIcon = false }) => {
       <Text
         fontWeight="700"
         fontSize="sm"
-        color="gray.650"
         _dark={{ color: 'white' }}
       >
         {title}
