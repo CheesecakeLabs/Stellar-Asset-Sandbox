@@ -34,3 +34,28 @@ func TestSendMessage(t *testing.T) {
 
 	require.EqualValues(t, mockResponse, actualData)
 }
+
+func TestCreateLogDescription(t *testing.T) {
+	tests := []struct {
+		name        string
+		transaction int
+		assetCode   string
+		setFlags    []string
+		clearFlags  []string
+		expected    string
+	}{
+		{"Test Mint Asset", entity.MintAsset, "USDC", nil, nil, "Operation: Mint | Asset Code: USDC"},
+		{"Test Burn Asset", entity.BurnAsset, "USDC", nil, nil, "Operation: Burn | Asset Code: USDC"},
+		{"Test Update Auth Flags", entity.UpdateAuthFlags, "USDC", []string{"flag1"}, []string{"flag2"}, "Operation: Update Auth Flags | Asset Code: USDC | Set Flags: flag1 | Clear Flags: flag2"},
+		{"Test Unrecognized Transaction", 999, "USDC", nil, nil, "Unrecognized transaction type"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := createLogDescription(tt.transaction, tt.assetCode, tt.setFlags, tt.clearFlags)
+			if actual != tt.expected {
+				t.Errorf("expected: %v, actual: %v", tt.expected, actual)
+			}
+		})
+	}
+}

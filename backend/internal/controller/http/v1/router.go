@@ -45,6 +45,7 @@ func NewRouter(
 	vaultCategoryUc usecase.VaultCategoryUseCase,
 	vaultUc usecase.VaultUseCase,
 	contractUc usecase.ContractUseCase,
+	logUc usecase.LogTransactionUseCase,
 	cfg config.HTTP,
 ) {
 	// Messenger
@@ -63,11 +64,12 @@ func NewRouter(
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase)
-		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase)
+		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
 		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc)
 		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase)
 		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase)
+		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase)
 	}
 }
