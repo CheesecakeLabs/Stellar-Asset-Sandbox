@@ -88,7 +88,6 @@ func TestUserLoginSuccess(t *testing.T) {
 	assert.Equal(t, _user.RoleId, loginResponse.User.RoleId)
 	assert.NotEmpty(t, loginResponse.User.Token)
 	_user.Token = loginResponse.User.Token
-	t.Log("token", _user.Token)
 }
 
 func TestCreateUserFailedUserAlreadyInDatabase(t *testing.T) {
