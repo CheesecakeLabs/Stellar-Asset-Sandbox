@@ -10,7 +10,7 @@ The version 2 architecture leverages a blend of cutting-edge technologies to off
 - **UI for Apache Kafka:** An intuitive open-source web UI that provides detailed monitoring and management functions for Apache Kafka clusters.
 - **Frontend:** A sleek and interactive React Web application offering a front-facing user interface.
 - **Backend:** A Golang backend handling the business logic, encompassing everything from API endpoints to core Stellar token functionalities.
-- **Starlabs:** A specialized Stellar service, integrated as a git submodule and written in Go, to further enrich the platform's capabilities.
+- **Starlabs**: A specialized service dedicated to Stellar, integrated as a git submodule and written in Go. Starlabs centralizes the logic for interacting with the Stellar network, streamlining and enriching the platform's capabilities with Stellar-specific functionalities. Its integration ensures efficient and consistent communication with the Stellar network across the platform.
 - **KMS:** The CKL Key Management Service (KMS), also a git submodule in Go, safeguarding the security of cryptographic keys and other sensitive data.
 
 ### Topics
@@ -68,7 +68,6 @@ You can access the Swagger interface by navigating to:
 [http://localhost:8080/v1/swagger/index.html](http://localhost:8080/v1/swagger/index.html)
 
 Here, you'll find detailed information about each API route, including required parameters, request/response formats, and the ability to test the endpoints directly from the browser.
-The Kafka Topics section you've provided gives a detailed flow between various components using Kafka topics. However, to make it more structured and improve readability, you can consider the following improvements:
 
 ### **Kafka Topics & Communication Flows**
 
@@ -86,6 +85,17 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
   - **Purpose**: Announces the generation of a new key pair.
   - **Usage**: Once a key pair is produced and saved in secure storage, it's dispatched to this topic.
 
+#### **Backend to Starlabs**:
+
+- **`createEnvelope`**:
+
+  - **Purpose**: Deals with transaction envelope creation requests.
+  - **Usage**: This topic processes messages with details of transactions such as source, operations, and sponsor, in order to generate an envelope.
+
+- **`horizonRequest`**:
+  - **Purpose**: Manages any GET request destined for the Stellar Horizon server.
+  - **Usage**: Typical requests include fetching account or transaction details.
+
 #### **Starlabs to KMS**:
 
 - **`signEnvelope`**:
@@ -97,17 +107,6 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 - **`signedEnvelopes`**:
   - **Purpose**: Sends a signed transaction envelope.
   - **Usage**: Services, particularly those monitoring or processing signed envelopes, subscribe to this topic.
-
-#### **Backend to Starlabs**:
-
-- **`createEnvelope`**:
-
-  - **Purpose**: Deals with transaction envelope creation requests.
-  - **Usage**: This topic processes messages with details of transactions such as source, operations, and sponsor, in order to generate an envelope.
-
-- **`horizonRequest`**:
-  - **Purpose**: Manages any GET request destined for the Stellar Horizon server.
-  - **Usage**: Typical requests include fetching account or transaction details.
 
 #### **Starlabs to Backend**:
 
