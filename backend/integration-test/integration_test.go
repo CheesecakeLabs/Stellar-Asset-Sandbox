@@ -28,7 +28,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("Integration tests: host %s is not available: %s", host, err)
 	}
-
 	log.Printf("Integration tests: host %s is available", host)
 
 	code := m.Run()
