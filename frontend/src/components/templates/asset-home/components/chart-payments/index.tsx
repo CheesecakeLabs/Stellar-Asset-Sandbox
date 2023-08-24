@@ -139,7 +139,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       </Flex>
       <Box>
         {loadingChart ? (
-          <Skeleton h="20rem" w="full" />
+          <Skeleton h="22rem" w="full" />
         ) : (
           <Chart
             options={options}

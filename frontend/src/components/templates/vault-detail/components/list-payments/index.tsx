@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   Flex,
   Table,
@@ -16,15 +17,23 @@ import { STELLAR_EXPERT_TX_URL } from 'utils/constants/constants'
 import { formatDateFull, toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
-import { LinkIcon, ReceivedIcon, SendedIcon } from 'components/icons'
+import {
+  LinkIcon,
+  NavLeftIcon,
+  NavRightIcon,
+  ReceivedIcon,
+  SendedIcon,
+} from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
 interface IListPayments {
-  payments: Hooks.UseHorizonTypes.IPayment[] | undefined
+  payments: Hooks.UseHorizonTypes.IPayments | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vault: Hooks.UseVaultsTypes.IVault | undefined
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  isPrevDisabled: boolean
+  getPaymentsDataByLink(link: 'prev' | 'next'): void
 }
 
 export const ListPayments: React.FC<IListPayments> = ({
@@ -33,6 +42,8 @@ export const ListPayments: React.FC<IListPayments> = ({
   vault,
   loading,
   assets,
+  isPrevDisabled,
+  getPaymentsDataByLink,
 }) => {
   const walletToName = (publicKey: string): string => {
     if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
@@ -74,7 +85,8 @@ export const ListPayments: React.FC<IListPayments> = ({
       <Box px="1rem">
         {loading ? (
           <Loading />
-        ) : payments && payments.length > 0 ? (
+        ) : payments?._embedded.records &&
+          payments._embedded.records.length > 0 ? (
           <Table w="full">
             <Thead w="full">
               <Th w="2rem" p={0} />
@@ -87,7 +99,7 @@ export const ListPayments: React.FC<IListPayments> = ({
               <Th />
             </Thead>
             <Tbody>
-              {payments.map(
+              {payments._embedded.records.map(
                 payment =>
                   payment.type === 'payment' && (
                     <Tr>
@@ -130,6 +142,44 @@ export const ListPayments: React.FC<IListPayments> = ({
           <Empty title={'No transactions in this vault'} hideIcon />
         )}
       </Box>
+      <Flex justifyContent="flex-end">
+        <Button
+          variant={'menuButton'}
+          border="0"
+          w="min-content"
+          leftIcon={
+            <Flex w="1rem" justifyContent="center">
+              <NavLeftIcon />
+            </Flex>
+          }
+          isDisabled={isPrevDisabled}
+          onClick={(): void => {
+            if (payments?._links.prev.href) {
+              getPaymentsDataByLink('prev')
+            }
+          }}
+        >
+          Previous
+        </Button>
+        <Button
+          variant={'menuButton'}
+          border="0"
+          w="min-content"
+          rightIcon={
+            <Flex w="1rem" justifyContent="center">
+              <NavRightIcon />
+            </Flex>
+          }
+          isDisabled={payments?._links.next.results === 0}
+          onClick={(): void => {
+            if (payments?._links.next.href) {
+              getPaymentsDataByLink('next')
+            }
+          }}
+        >
+          Next
+        </Button>
+      </Flex>
     </Container>
   )
 }

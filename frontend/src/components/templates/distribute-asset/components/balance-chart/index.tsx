@@ -42,9 +42,9 @@ export const BalanceChart: React.FC<IBalanceChart> = ({
         </Text>
         <Progress
           value={supply !== 0 ? ((mainVault) / supply) * 100 : 0}
-          h="1rem"
+          h="0.75rem"
           borderRadius="0.5rem"
-          colorScheme="purple"
+          fill="red"
         />
       </Flex>
     </Container>

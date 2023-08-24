@@ -30,6 +30,8 @@ import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuDotsIcon } from './fonts/menu_dots.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
 import { ReactComponent as MoonIcon } from './fonts/moon.svg'
+import { ReactComponent as NavLeftIcon } from './fonts/navigate_left.svg'
+import { ReactComponent as NavRightIcon } from './fonts/navigate_right.svg'
 import { ReactComponent as NewIcon } from './fonts/new.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
 import { ReactComponent as PlusIcon } from './fonts/plus.svg'
@@ -96,4 +98,6 @@ export {
   FilterIcon,
   ChevronDownIcon,
   BrazilIcon,
+  NavLeftIcon,
+  NavRightIcon,
 }

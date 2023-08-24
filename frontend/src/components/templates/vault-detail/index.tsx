@@ -2,12 +2,13 @@ import { Flex, Skeleton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+
 import { DistributeVault } from './components/distribute'
 import { Header } from './components/header'
 import { ListAssets } from './components/list-assets'
 import { ListPayments } from './components/list-payments'
 import { LoaderSkeleton } from './components/loader-skeleton'
-import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault | undefined
@@ -16,13 +17,14 @@ interface IVaultDetailTemplate {
   loadingOperation: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
-  payments: Hooks.UseHorizonTypes.IPayment[] | undefined
+  payments: Hooks.UseHorizonTypes.IPayments | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   loadingHorizon: boolean
   updatingVault: boolean
   updatingVaultAssets: boolean
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   deletingVault: boolean
+  isPrevDisabled: boolean
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
@@ -37,6 +39,7 @@ interface IVaultDetailTemplate {
   onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
   onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
   onDeleteVault(): Promise<void>
+  getPaymentsDataByLink(link: 'prev' | 'next'): void
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
@@ -53,12 +56,14 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   updatingVault,
   updatingVaultAssets,
   deletingVault,
+  isPrevDisabled,
   onUpdateVault,
   onSubmit,
   setSelectedAsset,
   createVaultCategory,
   onUpdateVaultAssets,
   onDeleteVault,
+  getPaymentsDataByLink,
 }) => {
   const filteredVaults = vaults?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
@@ -108,6 +113,8 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                   vault={vault}
                   loading={loadingHorizon}
                   assets={assets}
+                  isPrevDisabled={isPrevDisabled}
+                  getPaymentsDataByLink={getPaymentsDataByLink}
                 />
               )}
             </Flex>
