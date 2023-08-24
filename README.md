@@ -84,7 +84,7 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 
 - **`generatedKeypairs`**:
   - **Purpose**: Announces the generation of a new key pair.
-  - **Usage**: Once a key pair is produced, it's dispatched to this topic allowing subscribers to process new key pairs for secure storage or any subsequent activities.
+  - **Usage**: Once a key pair is produced and saved in secure storage, it's dispatched to this topic.
 
 #### **Starlabs to KMS**:
 
