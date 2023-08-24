@@ -95,7 +95,7 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 #### **KMS to Starlabs**:
 
 - **`signedEnvelopes`**:
-  - **Purpose**: Communicates the status of a successfully signed transaction envelope.
+  - **Purpose**: Sends a signed transaction envelope.
   - **Usage**: Services, particularly those monitoring or processing signed envelopes, subscribe to this topic.
 
 #### **Backend to Starlabs**:
