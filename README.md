@@ -107,7 +107,7 @@ Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for faci
 
 - **`horizonRequest`**:
   - **Purpose**: Manages any GET request destined for the Stellar Horizon server.
-  - **Usage**: Typical requests include fetching account details or initiating transactions.
+  - **Usage**: Typical requests include fetching account or transaction details.
 
 #### **Starlabs to Backend**:
 
