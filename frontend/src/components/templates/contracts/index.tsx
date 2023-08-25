@@ -14,6 +14,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
@@ -33,7 +34,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="840px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
             Certificate of Deposits
@@ -54,56 +55,13 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
           ) : (
             <Table w="full">
               <Thead w="full">
-                <Tr>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="2rem"
-                    p={0}
-                  />
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Asset
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Contract
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    APY
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Term
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Minimum Deposit
-                  </Th>
-                  <Th
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="2rem"
-                    p={0}
-                  />
-                </Tr>
+                <Th w="2rem" p={0} />
+                <Th>Asset</Th>
+                <Th>Contract</Th>
+                <Th>APY</Th>
+                <Th>Term</Th>
+                <Th>Minimum Deposit</Th>
+                <Th w="2rem" p={0} />
               </Thead>
               <Tbody>
                 {contracts.map(contract => (
@@ -113,52 +71,14 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                     onClick={(): void => {
                       navigate(`${PathRoute.CONTRACT_DETAIL}/${contract.id}`)
                     }}
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
                   >
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {getCurrencyIcon(contract.asset.code, '2rem')}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {contract.asset.code}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      Contract
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {`${contract.yield_rate}%`}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {`${contract.term}s`}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {toCrypto(contract.min_deposit)}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800', fill: 'white' }}
-                      w="2rem"
-                      p={0}
-                    >
+                    <Td>{getCurrencyIcon(contract.asset.code, '2rem')}</Td>
+                    <Td>{contract.asset.code}</Td>
+                    <Td>Contract</Td>
+                    <Td>{`${contract.yield_rate}%`}</Td>
+                    <Td>{`${contract.term}s`}</Td>
+                    <Td>{toCrypto(contract.min_deposit)}</Td>
+                    <Td w="2rem" p={0}>
                       <ArrowRightIcon width="12px" />
                     </Td>
                   </Tr>

@@ -8,6 +8,7 @@ import { ClawbackAsset } from '../pages/clawback-asset'
 import { Contracts } from '../pages/contracts'
 import { ContractsCreate } from '../pages/contracts-create'
 import { ContractsDetail } from '../pages/contracts-detail'
+import { Dashboards } from '../pages/dashboards'
 import { DistributeAsset } from '../pages/distribute-asset'
 import { ForgeAsset } from '../pages/forge-asset'
 import { FreezeAccount } from '../pages/freeze-account'
@@ -97,8 +98,13 @@ export const coreRoutes: AppRoute[] = [
     isPrivate: true,
   },
   {
-    path: `${PathRoute.ASSET_MANAGEMENT}`,
+    path: PathRoute.ASSET_MANAGEMENT,
     component: AssetManagement,
+    isPrivate: true,
+  },
+  {
+    path: PathRoute.DASHBOARDS,
+    component: Dashboards,
     isPrivate: true,
   },
 ]

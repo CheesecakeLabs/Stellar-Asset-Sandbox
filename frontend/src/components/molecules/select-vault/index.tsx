@@ -1,3 +1,4 @@
+import { useColorMode } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import Select from 'react-select'
 
@@ -22,6 +23,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
   setWallet,
   distributorWallet,
 }) => {
+  const { colorMode } = useColorMode()
   const [options, setOptions] = useState<IOption[] | []>([])
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
     )
 
     let ops = distributorWallet
-      ? [createOption('Banco Central', distributorWallet)]
+      ? [createOption('Asset Issuer', distributorWallet)]
       : []
     if (listVaults) {
       ops = [...ops, ...listVaults]
@@ -48,6 +50,29 @@ export const SelectVault: React.FC<ISelectVault> = ({
           ...baseStyles,
           borderColor: 'gray.400',
           fontSize: '14px',
+          backgroundColor: 'none',
+          color: colorMode === 'dark' ? 'white' : 'black',
+        }),
+        menuList: base => ({
+          ...base,
+          backgroundColor: colorMode === 'dark' ? '#303448' : undefined,
+        }),
+        option: (styles, { isFocused, isSelected }) => ({
+          ...styles,
+          color: colorMode === 'dark' ? 'white' : 'black',
+          background: isFocused
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : undefined
+            : isSelected
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : undefined
+            : undefined,
+        }),
+        singleValue: provided => ({
+          ...provided,
+          color: colorMode === 'dark' ? 'white' : 'black',
         }),
       }}
     />

@@ -54,9 +54,9 @@ export const ItemAsset: React.FC<IItemAsset> = ({
       }}
       bg={selectedAsset === getAsset(balance) ? 'gray.100' : 'white'}
       _dark={
-        selectedAsset
+        selectedAsset === getAsset(balance)
           ? { bg: 'black.600', borderColor: 'black.800' }
-          : { bg: 'none', borderColor: 'black.800' }
+          : { bg: 'black.700', borderColor: 'black.800' }
       }
     >
       <Flex
@@ -69,7 +69,7 @@ export const ItemAsset: React.FC<IItemAsset> = ({
         {getCurrencyIcon(balance.asset_code, '1.5rem')}{' '}
         <Text fontSize="sm">{balance.asset_code}</Text>
       </Flex>
-      <Flex alignItems="center" gap={2}>
+      <Flex alignItems="center" gap={2} _dark={{ fill: 'white' }}>
         <Text
           fontSize="xs"
           fontWeight="700"

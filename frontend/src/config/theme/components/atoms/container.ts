@@ -4,7 +4,7 @@ export const Container = {
       backgroundColor: 'white',
       border: '1px solid',
       borderColor: 'gray.600',
-      borderRadius: '0.5rem',
+      borderRadius: '0.25rem',
       p: '1.5rem',
       flexDir: 'column',
       m: '0',

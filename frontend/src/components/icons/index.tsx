@@ -6,6 +6,7 @@ import { ReactComponent as ArsIcon } from './fonts/ars.svg'
 import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
 import { ReactComponent as BackIcon } from './fonts/back.svg'
 import { ReactComponent as BlockIcon } from './fonts/block.svg'
+import { ReactComponent as BrazilIcon } from './fonts/brazil_flag.svg'
 import { ReactComponent as BurnIcon } from './fonts/burn.svg'
 import { ReactComponent as ChevronDownIcon } from './fonts/chevron_down.svg'
 import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
@@ -29,6 +30,8 @@ import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuDotsIcon } from './fonts/menu_dots.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
 import { ReactComponent as MoonIcon } from './fonts/moon.svg'
+import { ReactComponent as NavLeftIcon } from './fonts/navigate_left.svg'
+import { ReactComponent as NavRightIcon } from './fonts/navigate_right.svg'
 import { ReactComponent as NewIcon } from './fonts/new.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
 import { ReactComponent as PlusIcon } from './fonts/plus.svg'
@@ -94,4 +97,7 @@ export {
   SortIcon,
   FilterIcon,
   ChevronDownIcon,
+  BrazilIcon,
+  NavLeftIcon,
+  NavRightIcon,
 }

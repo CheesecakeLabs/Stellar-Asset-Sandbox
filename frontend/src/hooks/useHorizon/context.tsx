@@ -68,19 +68,31 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
 
   const getPaymentsData = useCallback(
     async (
-      wallet: string
-    ): Promise<Hooks.UseHorizonTypes.IPayment[] | undefined> => {
+      wallet?: string,
+      link?: string
+    ): Promise<Hooks.UseHorizonTypes.IPayments | undefined> => {
       setLoadingHorizon(true)
       try {
         const response = await axios.get(
-          `${BASE_URL}/accounts/${wallet}/payments?order=desc`
+          link ? link : `${BASE_URL}/accounts/${wallet}/payments?order=desc`
         )
-        const data = response.data?._embedded?.records
+        const data = response.data as Hooks.UseHorizonTypes.IPayments
         if (data) {
-          return data.filter(
-            (payment: Hooks.UseHorizonTypes.IPayment) =>
-              payment.type === 'payment'
-          )
+          data._embedded.records =
+            data?._embedded?.records.filter(
+              (payment: Hooks.UseHorizonTypes.IPaymentItem) =>
+                payment.type === 'payment'
+            ) || []
+
+          const resultNext = await axios.get(data._links.next.href)
+
+          data._links.next.results =
+            resultNext.data?._embedded?.records.filter(
+              (payment: Hooks.UseHorizonTypes.IPaymentItem) =>
+                payment.type === 'payment'
+            ).length || 0
+
+          return data
         }
         return undefined
       } catch (error) {

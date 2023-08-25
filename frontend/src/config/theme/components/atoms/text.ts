@@ -1,5 +1,15 @@
 export const Text = {
-  defaultProps: {
-    colorScheme: 'black',
+  baseStyle: {
+    color: 'black.900',
+    fontSize: { md: 'md', sm: 'sm' },
+    _dark: {
+      color: 'white',
+    },
+  },
+  variants: {
+    secondary: {
+      color: 'gray.650',
+      fontSize: { md: 'sm', sm: 'xs' },
+    },
   },
 }

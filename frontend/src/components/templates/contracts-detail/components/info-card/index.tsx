@@ -20,12 +20,7 @@ export const InfoCard: React.FC<IInfoCard> = ({ title, icon, value }) => {
       maxW="full"
     >
       <Flex justifyContent="space-between" mb="1.25rem">
-        <Text
-          fontSize="xs"
-          fontWeight="600"
-          color="gray.650"
-          _dark={{ color: 'white' }}
-        >
+        <Text fontSize="xs" fontWeight="600">
           {title}
         </Text>
         <Flex>
