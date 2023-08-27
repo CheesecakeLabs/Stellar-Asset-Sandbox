@@ -37,14 +37,12 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
         </Flex>
         <Flex>
           <Box w="full" mr="1rem">
-            {paymentsAssets && (
-              <ChartPayments
-                loadingChart={loadingChart}
-                paymentsAssets={paymentsAssets}
-                chartPeriod={chartPeriod}
-                setChartPeriod={setChartPeriod}
-              />
-            )}
+            <ChartPayments
+              loadingChart={loadingChart}
+              paymentsAssets={paymentsAssets}
+              chartPeriod={chartPeriod}
+              setChartPeriod={setChartPeriod}
+            />
           </Box>
           <AssetsList assets={assets} loadingAssets={loadingAssets} />
         </Flex>
