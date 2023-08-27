@@ -9,6 +9,8 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+
 import { Loading } from 'components/atoms'
 import { EditIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
@@ -47,11 +49,16 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
         />
       )}
       <Flex flexDir="column" w="full">
-        <Flex maxW="584px" alignSelf="center" flexDir="column" w="full">
+        <Flex
+          maxW={MAX_PAGE_WIDTH}
+          alignSelf="center"
+          flexDir="column"
+          w="full"
+        >
           <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
             Profile
           </Text>
-          <Container variant="primary">
+          <Container variant="primary" maxW="full">
             {loading && !profile ? (
               <Loading />
             ) : (
@@ -62,12 +69,8 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                   py="1rem"
                   alignItems="center"
                 >
-                  <Text fontSize="sm" w="50%">
-                    Name
-                  </Text>
-                  <Text fontSize="sm" fontWeight="400">
-                    {profile?.name}
-                  </Text>
+                  <Text w="50%">Name</Text>
+                  <Text fontWeight="400">{profile?.name}</Text>
                 </Flex>
                 <Flex
                   borderBottom="1px solid"
@@ -75,12 +78,8 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                   py="1rem"
                   alignItems="center"
                 >
-                  <Text fontSize="sm" w="50%">
-                    Email
-                  </Text>
-                  <Text fontSize="sm" fontWeight="400">
-                    {profile?.email}
-                  </Text>
+                  <Text w="50%">Email</Text>
+                  <Text fontWeight="400">{profile?.email}</Text>
                 </Flex>
                 <Flex
                   borderBottom="1px solid"
@@ -88,17 +87,13 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                   py="1rem"
                   alignItems="center"
                 >
-                  <Text fontSize="sm" w="50%">
-                    Role
-                  </Text>
+                  <Text w="50%">Role</Text>
                   <Flex
                     justifyContent="space-between"
                     w="50%"
                     alignItems="center"
                   >
-                    <Text fontSize="sm" fontWeight="400">
-                      {profile?.role}
-                    </Text>
+                    <Text fontWeight="400">{profile?.role}</Text>
                     <IconButton
                       variant="icon"
                       icon={<EditIcon />}
@@ -107,15 +102,8 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                     />
                   </Flex>
                 </Flex>
-                <Flex
-                  borderBottom="1px solid"
-                  borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
-                  py="1rem"
-                  alignItems="center"
-                >
-                  <Text fontSize="sm" w="50%">
-                    Sign out of account
-                  </Text>
+                <Flex pt="1rem" alignItems="center">
+                  <Text w="50%">Sign out of account</Text>
                   <Button
                     variant="primary"
                     w="max-content"

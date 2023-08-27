@@ -26,6 +26,7 @@ import { ReactComponent as KeyIcon } from './fonts/key.svg'
 import { ReactComponent as LinkIcon } from './fonts/link.svg'
 import { ReactComponent as LoadingIcon } from './fonts/loading.svg'
 import { ReactComponent as LockIcon } from './fonts/lock.svg'
+import { ReactComponent as MembersIcon } from './fonts/members.svg'
 import { ReactComponent as MenuIcon } from './fonts/menu.svg'
 import { ReactComponent as MenuDotsIcon } from './fonts/menu_dots.svg'
 import { ReactComponent as MenuLineIcon } from './fonts/menu_line.svg'
@@ -34,6 +35,7 @@ import { ReactComponent as NavLeftIcon } from './fonts/navigate_left.svg'
 import { ReactComponent as NavRightIcon } from './fonts/navigate_right.svg'
 import { ReactComponent as NewIcon } from './fonts/new.svg'
 import { ReactComponent as PaymentsIcon } from './fonts/payments.svg'
+import { ReactComponent as PermissionsIcon } from './fonts/permissions.svg'
 import { ReactComponent as PlusIcon } from './fonts/plus.svg'
 import { ReactComponent as ProfileIcon } from './fonts/profile.svg'
 import { ReactComponent as ReceivedIcon } from './fonts/received.svg'
@@ -100,4 +102,6 @@ export {
   BrazilIcon,
   NavLeftIcon,
   NavRightIcon,
+  MembersIcon,
+  PermissionsIcon,
 }

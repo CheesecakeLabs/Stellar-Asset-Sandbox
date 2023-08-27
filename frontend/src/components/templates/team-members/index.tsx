@@ -6,7 +6,6 @@ import {
   Text,
   Th,
   Thead,
-  Tr,
 } from '@chakra-ui/react'
 import React from 'react'
 
@@ -27,7 +26,7 @@ interface ISettingsTemplate {
   permissions: Hooks.UseAuthTypes.IPermission[] | undefined
 }
 
-export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
+export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
   users,
   loading,
   handleEditRole,
@@ -68,40 +67,11 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
           ) : (
             <Table w="full">
               <Thead w="full">
-                <Tr>
-                  <Th
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  />
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Member
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Role
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Last active
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="1rem"
-                    p={0}
-                  ></Th>
-                </Tr>
+                <Th>ID</Th>
+                <Th>Member</Th>
+                <Th>Role</Th>
+                <Th>Email</Th>
+                <Th w="1rem" p={0}></Th>
               </Thead>
               <Tbody>
                 {users.map(user => (

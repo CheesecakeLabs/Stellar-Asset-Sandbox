@@ -84,7 +84,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         <NavItem
           key={'Settings'}
           icon={<SettingsIcon />}
-          path={PathRoute.SETTINGS}
+          path={PathRoute.TEAM_MEMBERS}
           highlightMenu={highlightMenu}
         >
           Settings
