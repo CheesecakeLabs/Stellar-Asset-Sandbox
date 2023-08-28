@@ -12,7 +12,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
       - postgres:/data/postgres
-      - ./infrastructure/init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     restart: unless-stopped

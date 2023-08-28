@@ -71,7 +71,7 @@ func (r UserRepo) ValidateToken(token string) error {
 
 	defer rows.Close()
 
-	// Check if any row was returned
+	// Check if rows is empty
 	if !rows.Next() {
 		return errors.New("UserRepo - ValidateToken - no user found for token")
 	}

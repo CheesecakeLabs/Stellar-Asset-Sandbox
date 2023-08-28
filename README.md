@@ -1,21 +1,20 @@
 # Cheesecake Stellar Token Factory - V2
 
-Cheesecake Stellar Token Factory - V2 is a multifaceted system, designed to enable the creation, management of Stellar-based tokens.
-The version 2 architecture leverages a blend of cutting-edge technologies to offer a scalable, secure, and user-friendly solution.
+The Cheesecake Stellar Token Factory - V2 is a comprehensive system designed for the creation and management of Stellar-based tokens. Its second version architecture combines advanced technologies to deliver a scalable, secure, and user-friendly platform.
 
 ## Components
 
-- **Postgres:** Utilized as the primary relational database for all structured data management needs.
-- **Apache Kafka:** Deployed as a distributed event store to enable real-time data processing and insights.
-- **UI for Apache Kafka:** An intuitive open-source web UI that provides detailed monitoring and management functions for Apache Kafka clusters.
-- **Frontend:** A sleek and interactive React Web application offering a front-facing user interface.
-- **Backend:** A Golang backend handling the business logic, encompassing everything from API endpoints to core Stellar token functionalities.
-- **Starlabs**: A specialized service dedicated to Stellar, integrated as a git submodule and written in Go. Starlabs centralizes the logic for interacting with the Stellar network, streamlining and enriching the platform's capabilities with Stellar-specific functionalities. Its integration ensures efficient and consistent communication with the Stellar network across the platform.
-- **KMS:** The CKL Key Management Service (KMS), also a git submodule in Go, safeguarding the security of cryptographic keys and other sensitive data.
+- **Postgres:** Our primary relational database for structured data management.
+- **Apache Kafka:** A distributed event store for real-time data processing and insights.
+- **UI for Apache Kafka:** An open-source web UI offering in-depth monitoring and management capabilities for Apache Kafka clusters.
+- **Frontend:** An interactive React Web application for a user-friendly experience.
+- **Backend:** A Golang backend that manages business logic, ranging from API endpoints to core Stellar token functions.
+- **Starlabs**: An exclusive Stellar service, integrated as a git submodule and written in Go. It centralizes Stellar network interactions, enhancing platform capabilities and ensuring consistent communication.
+- **KMS:** The CKL Key Management Service (KMS) safeguards cryptographic keys and other sensitive data.
 
 ### Topics
 
-Further details on the various functionalities, system requirements, and guides to set up and use the Cheesecake Stellar Token Factory - V2 can be found in the following sections:
+For further details on functionalities, system requirements, and setup guides, refer to:
 
 - [Development Environment with Makefile](#development-environment-with-makefile)
 - [API Documentation](#api-documentation)
@@ -23,7 +22,7 @@ Further details on the various functionalities, system requirements, and guides 
 
 ## Development Environment with Makefile
 
-The Makefile included in the project simplifies the development environment management using Docker Compose, providing a collection of easy-to-use commands tailored for the Cheesecake Stellar Token Factory - V2 development workflow.
+Our Makefile, in conjunction with Docker Compose, offers a set of commands to simplify the development workflow.
 
 ### Build and Start All Services
 
@@ -33,88 +32,86 @@ make dev-up-all
 
 ### Build and Start Individual Services
 
-You can build and start individual services by appending the service name to `make dev-up-starlabs`. For example:
+Invoke individual services using `make dev-up-[service-name]`:
 
 - Starlabs: `make dev-up-starlabs`
-- Tests: `make dev-up-tests`
+- Tests: `make dev-up-tests` (Note: This command will execute tests and then exit.)
 - Kafka: `make dev-up-kafka`
 - Backend: `make dev-up-backend`
 - Frontend: `make dev-up-frontend`
 
-### Stop All Services (Development Backend)
+### Stop All Services
 
 ```bash
 make dev-stop
 ```
 
-### Stop and Remove Volumes (Development Backend)
+### Reset Development Environment
 
-**Warning**: This command will delete all data in your development environment.
+**Warning**: This action deletes all data in the development environment.
 
 ```bash
 make dev-destroy
 ```
 
-These commands streamline the process of building, starting, and managing the development environment, allowing developers to concentrate on coding. Customize the `dev.docker-compose.yml` file to adapt the configuration of the Docker containers to your specific requirements.
+Modify the `dev.docker-compose.yml` file to adjust the Docker container configurations to your preferences.
+
+> **Note**: Ensure the `dev-env.sh` script is executable: `chmod +x dev-env.sh`.
 
 ### **API Documentation**
 
-The backend is equipped with Swagger documentation to provide an interactive interface for understanding and testing the API endpoints.
+The backend features Swagger documentation for an interactive overview and testing of the API endpoints.
 
-#### Accessing the Swagger UI:
+#### Access the Swagger UI:
 
-You can access the Swagger interface by navigating to:
-
-[http://localhost:8080/v1/swagger/index.html](http://localhost:8080/v1/swagger/index.html)
-
-Here, you'll find detailed information about each API route, including required parameters, request/response formats, and the ability to test the endpoints directly from the browser.
+Navigate to [http://localhost:8080/v1/swagger/index.html](http://localhost:8080/v1/swagger/index.html) for detailed insights into each API route.
 
 ### **Kafka Topics & Communication Flows**
 
-Apache Kafka is instrumental in "Cheesecake Stellar Token Factory - V2" for facilitating asynchronous data processing and streamlining communication between various components. The following elucidates the primary Kafka topics and the flow of communication between associated services:
+Apache Kafka plays a vital role in the Cheesecake Stellar Token Factory - V2 by enabling asynchronous data processing and efficient communication among components. Below are key Kafka topics and their communication pathways:
 
 #### **Backend to Stellar KMS**:
 
 - **`generateKeypair`**:
-  - **Purpose**: Handles requests to generate a new Stellar key pair.
-  - **Usage**: Whenever a component or service needs a new key pair, a message is produced to this topic.
+  - **Purpose**: Generate a new Stellar key pair.
+  - **Usage**: Triggered when a new key pair is required.
 
 #### **Stellar KMS to Backend**:
 
 - **`generatedKeypairs`**:
-  - **Purpose**: Announces the generation of a new key pair.
-  - **Usage**: Once a key pair is produced and saved in secure storage, it's dispatched to this topic.
+  - **Purpose**: Announce a newly generated key pair.
+  - **Usage**: Used after a key pair is stored securely.
 
 #### **Backend to Starlabs**:
 
 - **`createEnvelope`**:
 
-  - **Purpose**: Deals with transaction envelope creation requests.
-  - **Usage**: This topic processes messages with details of transactions such as source, operations, and sponsor, in order to generate an envelope.
+  - **Purpose**: Handle transaction envelope creation.
+  - **Usage**: Process messages detailing transactions for envelope generation.
 
 - **`horizonRequest`**:
-  - **Purpose**: Manages any GET request destined for the Stellar Horizon server.
-  - **Usage**: Typical requests include fetching account or transaction details.
+  - **Purpose**: Manage GET requests to the Stellar Horizon server.
+  - **Usage**: Fetch account or transaction details.
 
 #### **Starlabs to KMS**:
 
 - **`signEnvelope`**:
-  - **Purpose**: Manages signing requests for transaction envelopes.
-  - **Usage**: It receives the unsigned transaction envelope with the pertinent details needed for the signing process.
+  - **Purpose**: Handle transaction envelope signing requests.
+  - **Usage**: Process unsigned transaction envelopes awaiting signatures.
 
 #### **KMS to Starlabs**:
 
 - **`signedEnvelopes`**:
-  - **Purpose**: Sends a signed transaction envelope.
-  - **Usage**: Services, particularly those monitoring or processing signed envelopes, subscribe to this topic.
+  - **Purpose**: Communicate signed transaction envelopes.
+  - **Usage**: Services monitoring signed envelopes use this topic.
 
 #### **Starlabs to Backend**:
 
 - **`horizonResponse`**:
 
-  - **Purpose**: Conveys responses from the Stellar Horizon server.
-  - **Usage**: It relays data from fetched accounts and all other responses from Horizon.
+  - **Purpose**: Relay Stellar Horizon server responses.
+  - **Usage**: Communicate fetched account data and other Horizon responses.
 
 - **`submitResponse`**:
-  - **Purpose**: Reports the outcome of transactions submitted to the Stellar network.
-  - **Usage**: After submitting a transaction to the Stellar network, this topic communicates the result, be it a success or a failure.
+  - **Purpose**: Report transaction results from the Stellar network.
+  - **Usage**: Communicate transaction results.

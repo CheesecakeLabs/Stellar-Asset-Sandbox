@@ -112,7 +112,7 @@ func TestCreateUserFailedUserAlreadyInDatabase(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
 	// Parsing the response into an expected structure
-	var response errrorResponse
+	var response errorResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	assert.NoError(t, err)
 
@@ -150,7 +150,7 @@ func TestCreateUserFailedPasswordIsEmpty(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode) // Adjust the status code as per your application's behavior
 
 	// Parsing the response into an expected structure
-	var response errrorResponse
+	var response errorResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	assert.NoError(t, err)
 
@@ -185,7 +185,7 @@ func TestUserLoginFailed(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 
 	// Parse and verify the response body
-	var response errrorResponse
+	var response errorResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.Equal(t, "database problems", response.Message)
