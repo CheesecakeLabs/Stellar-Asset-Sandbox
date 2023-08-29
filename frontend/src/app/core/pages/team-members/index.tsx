@@ -14,12 +14,12 @@ export const TeamMembers: React.FC = () => {
     getAllUsers,
     editUsersRole,
     getRoles,
-    getPermissions,
+    getUserPermissions,
     users,
     loading,
     roles,
     loadingRoles,
-    permissions,
+    userPermissions,
   } = useAuth()
 
   const handleEditRole = async (
@@ -37,12 +37,12 @@ export const TeamMembers: React.FC = () => {
   useEffect(() => {
     getAllUsers()
     getRoles()
-    getPermissions()
-  }, [getAllUsers, getRoles, getPermissions])
+    getUserPermissions()
+  }, [getAllUsers, getRoles, getUserPermissions])
 
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.TEAM_MEMBERS}>
+      <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
             <TeamMembersTemplate
@@ -51,7 +51,7 @@ export const TeamMembers: React.FC = () => {
               handleEditRole={handleEditRole}
               roles={roles}
               loadingRoles={loadingRoles}
-              permissions={permissions}
+              permissions={userPermissions}
             />
           </Flex>
           <VStack>

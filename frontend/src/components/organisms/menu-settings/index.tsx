@@ -1,10 +1,13 @@
-import { Button, Container, Text, Flex } from '@chakra-ui/react'
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Button, Container, Text, Flex } from '@chakra-ui/react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { PathRoute } from 'components/enums/path-route'
-import { SettingsOptions } from 'components/enums/settings-options'
-import { MembersIcon, PermissionsIcon } from 'components/icons'
+
+
+import { PathRoute } from 'components/enums/path-route';
+import { SettingsOptions } from 'components/enums/settings-options';
+import { MembersIcon, PermissionsIcon, RoleIcon } from 'components/icons';
+
 
 interface IMenuSettings {
   option: SettingsOptions
@@ -34,18 +37,17 @@ export const MenuSettings: React.FC<IMenuSettings> = ({ option }) => {
             </Flex>
           }
           onClick={(): void => {
-            navigate(`${PathRoute.TEAM_MEMBERS}`)
+            navigate(`${PathRoute.SETTINGS}`)
           }}
         >
           Team members
         </Button>
         <Button
           variant={
-            option === SettingsOptions.PERMISSIONS
+            option === SettingsOptions.ROLE_PERMISSIONS
               ? 'menuButtonSelected'
               : 'menuButton'
           }
-          borderBottomRadius="0.25rem"
           leftIcon={
             <Flex w="1rem" justifyContent="center">
               <PermissionsIcon />
@@ -55,7 +57,25 @@ export const MenuSettings: React.FC<IMenuSettings> = ({ option }) => {
             navigate(`${PathRoute.PERMISSIONS}`)
           }}
         >
-          Permissions
+          Role Permissions
+        </Button>
+        <Button
+          variant={
+            option === SettingsOptions.ROLES_MANAGE
+              ? 'menuButtonSelected'
+              : 'menuButton'
+          }
+          borderBottomRadius="0.25rem"
+          leftIcon={
+            <Flex w="1rem" justifyContent="center">
+              <RoleIcon />
+            </Flex>
+          }
+          onClick={(): void => {
+            navigate(`${PathRoute.ROLES_MANAGE}`)
+          }}
+        >
+          Roles
         </Button>
       </Container>
     </Flex>

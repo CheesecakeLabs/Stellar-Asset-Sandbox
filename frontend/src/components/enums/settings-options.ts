@@ -1,4 +1,5 @@
 export enum SettingsOptions {
   TEAM_MEMBERS = 'Team members',
-  PERMISSIONS = 'Permissions',
+  ROLE_PERMISSIONS = 'Role permissions',
+  ROLES_MANAGE = 'Roles',
 }

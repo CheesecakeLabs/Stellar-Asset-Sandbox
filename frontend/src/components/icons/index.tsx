@@ -13,6 +13,7 @@ import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
 import { ReactComponent as CoinIcon } from './fonts/coin.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
+import { ReactComponent as DeleteIcon } from './fonts/delete.svg'
 import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as EmptyIcon } from './fonts/empty.svg'
 import { ReactComponent as EurocIcon } from './fonts/euroc.svg'
@@ -39,6 +40,7 @@ import { ReactComponent as PermissionsIcon } from './fonts/permissions.svg'
 import { ReactComponent as PlusIcon } from './fonts/plus.svg'
 import { ReactComponent as ProfileIcon } from './fonts/profile.svg'
 import { ReactComponent as ReceivedIcon } from './fonts/received.svg'
+import { ReactComponent as RoleIcon } from './fonts/role.svg'
 import { ReactComponent as SearchIcon } from './fonts/search.svg'
 import { ReactComponent as SecurityIcon } from './fonts/security.svg'
 import { ReactComponent as SendedIcon } from './fonts/sended.svg'
@@ -104,4 +106,6 @@ export {
   NavRightIcon,
   MembersIcon,
   PermissionsIcon,
+  DeleteIcon,
+  RoleIcon,
 }

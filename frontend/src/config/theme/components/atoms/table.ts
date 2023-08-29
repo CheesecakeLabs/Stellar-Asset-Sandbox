@@ -34,6 +34,7 @@ export const Table = {
     },
     list: {
       th: {
+        borderBottom: '1px solid',
         borderColor: 'gray.400',
         _dark: { borderColor: 'black.800' },
         color: 'gray.700',
@@ -41,6 +42,7 @@ export const Table = {
       td: {
         color: 'black.900',
         fontSize: { md: 'md', sm: 'sm' },
+        borderBottom: '1px solid',
         borderColor: 'gray.400',
         _dark: { borderColor: 'black.800', color: 'white' },
       },
