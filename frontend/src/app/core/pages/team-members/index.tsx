@@ -20,6 +20,7 @@ export const TeamMembers: React.FC = () => {
     roles,
     loadingRoles,
     userPermissions,
+    loadingUserPermissions,
   } = useAuth()
 
   const handleEditRole = async (
@@ -47,7 +48,7 @@ export const TeamMembers: React.FC = () => {
           <Flex maxW="966px" flexDir="column" w="full">
             <TeamMembersTemplate
               users={users}
-              loading={loading}
+              loading={loading || loadingUserPermissions}
               handleEditRole={handleEditRole}
               roles={roles}
               loadingRoles={loadingRoles}

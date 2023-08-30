@@ -86,6 +86,7 @@ declare namespace Hooks {
       creatingRole: boolean
       updatingRole: boolean
       deletingRole: boolean
+      loadingUserPermissions: boolean
     }
   }
 }

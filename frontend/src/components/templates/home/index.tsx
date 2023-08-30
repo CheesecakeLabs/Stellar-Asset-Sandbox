@@ -15,12 +15,14 @@ import {
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { havePermission } from 'utils'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
 import {
   ArrowRightIcon,
   AuthorizeIcon,
@@ -33,9 +35,14 @@ import { Empty } from 'components/molecules/empty'
 interface IHomeTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 }
 
-export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
+export const HomeTemplate: React.FC<IHomeTemplate> = ({
+  loading,
+  assets,
+  userPermissions,
+}) => {
   const navigate = useNavigate()
 
   return (
@@ -45,13 +52,17 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
           <Text fontSize="2xl" fontWeight="400">
             Asset Management
           </Text>
-          <Button
-            variant="primary"
-            leftIcon={<JoinIcon fill="white" />}
-            onClick={(): void => navigate({ pathname: PathRoute.FORGE_ASSET })}
-          >
-            Forge asset
-          </Button>
+          {havePermission(Permissions.CREATE_ASSET, userPermissions) && (
+            <Button
+              variant="primary"
+              leftIcon={<JoinIcon fill="white" />}
+              onClick={(): void =>
+                navigate({ pathname: PathRoute.FORGE_ASSET })
+              }
+            >
+              Forge asset
+            </Button>
+          )}
         </Flex>
         {loading ? (
           <Skeleton w="full" h="8rem" />

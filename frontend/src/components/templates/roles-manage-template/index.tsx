@@ -42,9 +42,9 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
     <>
       <ModalRoleManage
         isOpen={isOpen}
-        onClose={onClose}
         loading={updatingRole || creatingRole}
         isUpdate={false}
+        onClose={onClose}
         handleRole={handleRole}
       />
       <Flex flexDir="column" w="full">

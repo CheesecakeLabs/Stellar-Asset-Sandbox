@@ -1,15 +1,10 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useState } from 'react'
 
+import axios from 'axios'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import axios from 'axios';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import Authentication from 'app/auth/services/auth';
-import { http } from 'interfaces/http';
-
+import Authentication from 'app/auth/services/auth'
+import { http } from 'interfaces/http'
 
 export const AuthContext = createContext({} as Hooks.UseAuthTypes.IAuthContext)
 
@@ -22,6 +17,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Authentication.getUser()
   )
   const [loading, setLoading] = useState(false)
+  const [loadingUserPermissions, setLoadingUserPermissions] = useState(true)
   const [updatingRolesPermissions, setUpdatingRolesPermissions] =
     useState(false)
   const [loadingRoles, setLoadingRoles] = useState(true)
@@ -183,7 +179,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   }, [])
 
   const getUserPermissions = useCallback(async (): Promise<void> => {
-    setLoading(true)
+    setLoadingUserPermissions(true)
     try {
       const response = await http.get(`role-permissions/user-permissions`)
       const data = response.data
@@ -193,7 +189,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     } catch (error) {
       return
     } finally {
-      setLoading(false)
+      setLoadingUserPermissions(false)
     }
   }, [])
 
@@ -367,6 +363,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         creatingRole,
         updatingRole,
         deletingRole,
+        loadingUserPermissions
       }}
     >
       {children}
