@@ -2,6 +2,7 @@ import { Flex, Skeleton } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
+import { havePermission } from 'utils'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { DistributeVault } from './components/distribute'
@@ -9,6 +10,7 @@ import { Header } from './components/header'
 import { ListAssets } from './components/list-assets'
 import { ListPayments } from './components/list-payments'
 import { LoaderSkeleton } from './components/loader-skeleton'
+import { Permissions } from 'components/enums/permissions'
 
 interface IVaultDetailTemplate {
   vault: Hooks.UseVaultsTypes.IVault | undefined
@@ -25,8 +27,10 @@ interface IVaultDetailTemplate {
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   deletingVault: boolean
   isPrevDisabled: boolean
+  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  loadingUserPermissions: boolean
   onSubmit(
-    data: FieldValues,
+    amount: string,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void>
@@ -57,6 +61,8 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   updatingVaultAssets,
   deletingVault,
   isPrevDisabled,
+  userPermissions,
+  loadingUserPermissions,
   onUpdateVault,
   onSubmit,
   setSelectedAsset,
@@ -72,7 +78,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        {loadingAssets || loadingVaults || !vault ? (
+        {loadingAssets || loadingVaults || !vault || loadingUserPermissions ? (
           <LoaderSkeleton />
         ) : (
           <>
@@ -81,9 +87,9 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
               vaultCategories={vaultCategories}
               category={vault.vault_category}
               updatingVault={updatingVault}
+              deletingVault={deletingVault}
               createVaultCategory={createVaultCategory}
               onUpdateVault={onUpdateVault}
-              deletingVault={deletingVault}
               onDeleteVault={onDeleteVault}
             />
             <Flex gap="1rem">
@@ -95,13 +101,23 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 onUpdateVaultAssets={onUpdateVaultAssets}
                 setSelectedAsset={setSelectedAsset}
               />
-              <DistributeVault
-                onSubmit={onSubmit}
-                loading={loadingOperation}
-                vaults={filteredVaults}
-                vault={vault}
-                selectedAsset={selectedAsset}
-              />
+              {(havePermission(
+                Permissions.MOVE_BALANCES_VAULTS,
+                userPermissions
+              ) ||
+                havePermission(
+                  Permissions.MOVE_BALANCES_EXTERNAL_ACCOUNTS,
+                  userPermissions
+                )) && (
+                <DistributeVault
+                  onSubmit={onSubmit}
+                  loading={loadingOperation}
+                  vaults={filteredVaults}
+                  vault={vault}
+                  selectedAsset={selectedAsset}
+                  userPermissions={userPermissions}
+                />
+              )}
             </Flex>
             <Flex mt="1rem" w="full">
               {loadingHorizon ? (

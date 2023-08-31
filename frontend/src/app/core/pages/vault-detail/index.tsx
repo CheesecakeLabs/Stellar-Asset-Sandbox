@@ -4,6 +4,7 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
 import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -26,6 +27,8 @@ export const VaultDetail: React.FC = () => {
   const { id } = useParams()
   const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
     useAssets()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
   const {
     loadingVault,
     loadingVaults,
@@ -46,19 +49,19 @@ export const VaultDetail: React.FC = () => {
     useState<Hooks.UseAssetsTypes.IAssetDto>()
 
   const onSubmit = async (
-    data: FieldValues,
+    amount: string,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void> => {
     try {
-      if (!selectedAsset) return
+      if (!selectedAsset || !wallet) return
 
       const isSuccess = await distribute({
         source_wallet_id: vault?.wallet.id,
-        destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
+        destination_wallet_pk: wallet,
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
-        amount: data.amount,
+        amount: amount,
       })
 
       if (isSuccess) {
@@ -67,7 +70,7 @@ export const VaultDetail: React.FC = () => {
 
         toast({
           title: 'Distribute success!',
-          description: `You distributed ${data.amount} ${selectedAsset.code}`,
+          description: `You distributed ${amount} ${selectedAsset.code}`,
           status: 'success',
           duration: 9000,
           isClosable: true,
@@ -282,6 +285,10 @@ export const VaultDetail: React.FC = () => {
     }
   }, [getPaymentsData, vault])
 
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
   const getPaymentsDataByLink = (action: 'prev' | 'next'): void => {
     const link =
       action === 'next'
@@ -321,6 +328,8 @@ export const VaultDetail: React.FC = () => {
           updatingVaultAssets={updatingVaultAssets}
           deletingVault={deletingVault}
           isPrevDisabled={historyNavPayments.length === 0}
+          loadingUserPermissions={loadingUserPermissions}
+          userPermissions={userPermissions}
           onSubmit={onSubmit}
           setSelectedAsset={setSelectedAsset}
           createVaultCategory={createVaultCategory}

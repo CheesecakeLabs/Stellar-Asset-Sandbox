@@ -7,4 +7,6 @@ export enum Permissions {
   FREEZE_ACCOUNT = 'update-auth-flags',
   DISTRIBUTE_ASSET = 'transfer',
   AUTHORIZE_ASSET = 'authorize',
+  MOVE_BALANCES_VAULTS = 'move-balances-vaults',
+  MOVE_BALANCES_EXTERNAL_ACCOUNTS = 'move-balances-external-accounts',
 }

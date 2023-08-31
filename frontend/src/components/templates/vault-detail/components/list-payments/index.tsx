@@ -87,22 +87,22 @@ export const ListPayments: React.FC<IListPayments> = ({
           <Loading />
         ) : payments?._embedded.records &&
           payments._embedded.records.length > 0 ? (
-          <Table w="full">
+          <Table w="full" variant="list">
             <Thead w="full">
-              <Th w="2rem" p={0} />
+              <Tr><Th w="2rem" p={0} />
               <Th>From</Th>
               <Th>To</Th>
               <Th>Asset</Th>
 
               <Th>Amount</Th>
               <Th>Date</Th>
-              <Th />
+              <Th /></Tr>
             </Thead>
             <Tbody>
               {payments._embedded.records.map(
-                payment =>
+                (payment, index) =>
                   payment.type === 'payment' && (
-                    <Tr>
+                    <Tr key={index}>
                       <Td px="1rem" py={0}>
                         {isCurrentVault(payment.from) ? (
                           <SendedIcon width="1.25rem" />
