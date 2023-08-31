@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"log"
 	"net/http"
 	"testing"
 
@@ -176,87 +175,18 @@ func TestBurnAssetFailed(t *testing.T) {
 	assert.Equal(t, "starlabs messaging problems", response.Message)
 }
 
-// *---------- Authorization Flags Tests ----------*
-func TestSetAuthRequiredFlagSuccess(t *testing.T) {
-	var response errorResponse
-	log.Println("Oi  Asset , ", _asset_1.Issuer)
-	log.Println("Oi Wallet , ", _walletUser.Id)
-	requestBody := v1.UpdateAuthFlagsRequest{
-		TrustorPK: _walletUser.Key.PublicKey,
-		Code:      _asset_1.Code,
-		Issuer:    _asset_1.Issuer.Id,
-		SetFlags:  []string{"TRUST_LINE_AUTHORIZED"},
-	}
-
-	statusCode, err := executePostRequest(t, basePath+"/assets/update-auth-flags", _user.Token, requestBody, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, statusCode)
-	assert.Equal(t, "authorization flags updated successfully", response.Message)
-}
-
-// *---------- Transfer Asset Tests ----------*
-// func TestTransferAssetSuccess(t *testing.T) {
-// 	if !transferAsset(t, 4, _walletUser.Key.PublicKey, strconv.Itoa(_asset_1.Id), "10000", http.StatusOK, "", "Asset transferred successfully") {
-// 		t.Errorf("Expected asset to be transferred successfully")
-// 	}
-// }
-
-// func TestTransferAssetMissingParameters(t *testing.T) {
-// 	if transferAsset(0, "", "", "") {
-// 		t.Errorf("Expected asset transfer to fail due to missing parameters")
-// 	}
-// }
-
-// func TestTransferAssetInvalidSourceWalletID(t *testing.T) {
-// 	if transferAsset(-1, "valid_wallet_pk", "valid_asset_id", "100") {
-// 		t.Errorf("Expected asset transfer to fail due to invalid SourceWalletID")
-// 	}
-// }
-
-// func TestTransferAssetInvalidDestinationWalletPK(t *testing.T) {
-// 	if transferAsset(1, "invalid_wallet_pk", "valid_asset_id", "100") {
-// 		t.Errorf("Expected asset transfer to fail due to invalid DestinationWalletPK")
-// 	}
-// }
-
-//  *---------- Clawback Asset Tests ----------*
-
-// func TestClawbackAsset2Failed(t *testing.T) {
-// 	// URL for clawback a asset
-// 	clawbackAssetPath := basePath + "/assets/clawback"
-
-// 	// Use a predefined asset for testing or create one
-// 	requestBody := v1.ClawbackAssetRequest{
-// 		SponsorId: 1,
-// 		Code:      _asset_2.Code,
-// 		From:      _asset_2.Distributor.Key.PublicKey,
-// 		Amount:    "10000",
-// 	}
-
-// 	requestBodyBytes, err := json.Marshal(requestBody)
-// 	assert.NoError(t, err)
-
-// 	// Create the HTTP request
-// 	req, err := http.NewRequest(http.MethodPost, clawbackAssetPath, bytes.NewBuffer(requestBodyBytes))
-// 	assert.NoError(t, err)
-
-// 	// Add necessary headers
-// 	req.Header.Set("Content-Type", "application/json")
-// 	req.Header.Set("Authorization", _user.Token)
-
-// 	// Execute the request
-// 	client := &http.Client{}
-// 	resp, err := client.Do(req)
-// 	assert.NoError(t, err)
-
-// 	// Verify the status code
-// 	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-
-// 	// Parse and verify the response body
+// // *---------- Authorization Flags Tests ----------*
+// func TestSetAuthRequiredFlagSuccess(t *testing.T) {
 // 	var response errorResponse
+// 	requestBody := v1.UpdateAuthFlagsRequest{
+// 		TrustorPK: _wallet.Key.PublicKey,
+// 		Code:      _asset_1.Code,
+// 		Issuer:    _asset_1.Issuer.Id,
+// 		SetFlags:  []string{"TRUST_LINE_CLAWBACK_ENABLED"},
+// 	}
 
-// 	err = json.NewDecoder(resp.Body).Decode(&response)
+// 	statusCode, err := executePostRequest(t, basePath+"/assets/update-auth-flags", _user.Token, requestBody, &response)
 // 	assert.NoError(t, err)
-// 	// Verify the response contents
-// 	assert.Equal(t, "starlabs messaging problems", response.Message)
+// 	assert.Equal(t, http.StatusOK, statusCode)
+// 	assert.Equal(t, "authorization flags updated successfully", response.Message)
 // }

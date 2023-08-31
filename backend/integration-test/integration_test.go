@@ -15,7 +15,7 @@ type errorResponse struct {
 }
 
 const (
-	host       = "localhost:8080"
+	host       = "backend:8080"
 	healthPath = "http://" + host + "/healthz"
 	attempts   = 20
 
