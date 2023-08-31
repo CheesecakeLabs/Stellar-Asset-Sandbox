@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
@@ -19,10 +20,11 @@ type assetsRoutes struct {
 	as usecase.AssetUseCase
 	m  HTTPControllerMessenger
 	a  usecase.AuthUseCase
+	l  usecase.LogTransactionUseCase
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase) {
-	r := &assetsRoutes{w, as, m, a}
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
+	r := &assetsRoutes{w, as, m, a, l}
 	h := handler.Group("/assets").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllAssets)
@@ -97,7 +99,7 @@ type UpdateAuthFlagsRequest struct {
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -108,19 +110,19 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 2})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "kms messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "kms messaging problems", err)
 		return
 	}
 
 	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
 	if !ok || len(kpRes.PublicKeys) != 2 {
-		errorResponse(c, http.StatusInternalServerError, "unexpected kms response")
+		errorResponse(c, http.StatusInternalServerError, "unexpected kms response", err)
 		return
 	}
 	issuerPk := kpRes.PublicKeys[0]
@@ -180,18 +182,13 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		})
 	}
 
-	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
-		return
-	}
-	_, ok = res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 
@@ -218,7 +215,35 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 	asset, err = r.as.Create(asset)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "database problems")
+		errorResponse(c, http.StatusNotFound, "database problems", err)
+		return
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.CreateAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -239,7 +264,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	var request MintAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -249,13 +274,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 	_, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -270,20 +295,41 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
-
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.MintAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -304,13 +350,13 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	var request BurnAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -320,7 +366,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -336,19 +382,42 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
+
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.BurnAsset,
+		Amount:            amount,
+		UserID:            userID,
+		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -371,13 +440,13 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	var request TransferAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	sourceWallet, err := r.w.Get(request.SourceWalletID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "source wallet not found")
+		errorResponse(c, http.StatusNotFound, "source wallet not found", err)
 		return
 	}
 
@@ -387,13 +456,13 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.AssetID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 	ops := []entity.Operation{
@@ -409,19 +478,40 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		Amount:            amount,
+		TransactionTypeID: entity.TransferAsset,
+		UserID:            userID,
+		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -442,7 +532,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	var request ClawbackAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -452,13 +542,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -467,7 +557,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 			Type:    entity.ClawbackOp,
 			Target:  asset.Issuer.Key.PublicKey,
 			Origin:  request.From,
-			Amount:  request.Amount,
+			Amount:  fmt.Sprintf("%v", request.Amount),
 			Sponsor: sponsor.Key.PublicKey,
 			Asset: entity.OpAsset{
 				Code:   request.Code,
@@ -476,19 +566,40 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		},
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	amount, err := strconv.ParseFloat(request.Amount, 64)
+	if err != nil {
+		amount = 0
+	}
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.ClawbackAsset,
+		Amount:            amount,
+		UserID:            userID,
+		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -509,13 +620,13 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	var request UpdateAuthFlagsRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "asset not found")
+		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
@@ -523,7 +634,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	if request.TrustorId != 0 {
 		trustor, err = r.w.Get(request.TrustorId)
 		if err != nil {
-			errorResponse(c, http.StatusNotFound, "trustor wallet not found")
+			errorResponse(c, http.StatusNotFound, "trustor wallet not found", err)
 			return
 		}
 	} else if request.TrustorPK != "" {
@@ -544,23 +655,41 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 
 	sponsor, err := r.w.Get(_sponsorId)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "sponsor wallet not found")
+		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
-	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems")
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
+
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
-	_, ok := res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response")
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+	}
+
+	err = r.l.CreateLogTransaction(entity.LogTransaction{
+		Asset:             asset,
+		TransactionTypeID: entity.UpdateAuthFlags,
+		UserID:            userID,
+		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
+	})
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
 
@@ -578,7 +707,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	assets, err := r.as.GetAll()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting assets")
+		errorResponse(c, http.StatusInternalServerError, "error getting assets", err)
 		return
 	}
 
@@ -597,7 +726,7 @@ func (r *assetsRoutes) getAssetById(c *gin.Context) {
 	assetId := c.Param("id")
 	assets, err := r.as.GetById(assetId)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting asset")
+		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
 		return
 	}
 

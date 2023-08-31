@@ -99,7 +99,6 @@ func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
 			 ORDER BY u.name ASC`
 
 	rows, err := r.Db.Query(stmt)
-
 	if err != nil {
 		return nil, fmt.Errorf("UserRepo - GetAllUsers - db.Query: %w", err)
 	}

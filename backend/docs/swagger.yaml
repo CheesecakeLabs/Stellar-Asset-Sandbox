@@ -20,6 +20,31 @@ definitions:
         example: USD Coin
         type: string
     type: object
+  entity.Contract:
+    properties:
+      address:
+        type: string
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      min_deposit:
+        type: integer
+      name:
+        example: Smart Contract
+        type: string
+      penalty_rate:
+        type: integer
+      term:
+        type: integer
+      vault:
+        $ref: '#/definitions/entity.Vault'
+      yield_rate:
+        type: integer
+    type: object
   entity.Key:
     properties:
       id:
@@ -33,6 +58,29 @@ definitions:
         type: integer
       weight:
         example: 3
+        type: integer
+    type: object
+  entity.LogTransaction:
+    properties:
+      amount:
+        example: 100000
+        type: number
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      date:
+        example: "2023-08-10T14:30:00Z"
+        type: string
+      description:
+        example: Mint Asset
+        type: string
+      log_id:
+        example: 1
+        type: integer
+      transaction_type_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 42
         type: integer
     type: object
   entity.Role:
@@ -52,6 +100,23 @@ definitions:
       name:
         example: Edit
         type: string
+    type: object
+  entity.SumLogTransaction:
+    properties:
+      amount:
+        example:
+        - 100000
+        items:
+          type: number
+        type: array
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      date:
+        example:
+        - "2023-08-10T14:30:00Z"
+        items:
+          type: string
+        type: array
     type: object
   entity.User:
     properties:
@@ -96,6 +161,8 @@ definitions:
     type: object
   entity.Vault:
     properties:
+      active:
+        type: integer
       id:
         example: 1
         type: integer
@@ -114,6 +181,9 @@ definitions:
         type: integer
       name:
         example: Treasury
+        type: string
+      theme:
+        example: blue
         type: string
     type: object
   entity.Wallet:
@@ -196,10 +266,49 @@ definitions:
     - code
     - name
     type: object
+  v1.CreateContractRequest:
+    properties:
+      address:
+        example: GSDSC...
+        type: string
+      asset_id:
+        example: "1"
+        type: string
+      min_deposit:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      penalty_rate:
+        example: 1
+        type: integer
+      term:
+        example: 1
+        type: integer
+      vault_id:
+        example: "1"
+        type: string
+      yield_rate:
+        example: 1
+        type: integer
+    required:
+    - address
+    - asset_id
+    - min_deposit
+    - name
+    - penalty_rate
+    - term
+    - vault_id
+    - yield_rate
+    type: object
   v1.CreateVaultCategoryRequest:
     properties:
       name:
         example: Treasury
+        type: string
+      theme:
+        example: blue
         type: string
     required:
     - name
@@ -298,11 +407,21 @@ definitions:
     type: object
   v1.UpdateVaultAssetRequest:
     properties:
-      asset_id:
-        example: 1
-        type: integer
+      asset_code:
+        example: "1"
+        type: string
+      asset_issuer_pk:
+        example: "1"
+        type: string
+      is_add:
+        example: true
+        type: boolean
+      is_remove:
+        example: false
+        type: boolean
     required:
-    - asset_id
+    - asset_code
+    - asset_issuer_pk
     type: object
   v1.UpdateVaultCategoryRequest:
     properties:
@@ -318,7 +437,8 @@ definitions:
   v1.response:
     properties:
       error:
-        example: message
+        type: string
+      message:
         type: string
     type: object
   v1.userResponse:
@@ -350,6 +470,25 @@ paths:
       summary: Get all vault categories
       tags:
       - Vault category
+  /asset:
+    get:
+      consumes:
+      - application/json
+      description: Get asset by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get asset by id
+      tags:
+      - Assets
   /assets:
     get:
       consumes:
@@ -574,6 +713,218 @@ paths:
       summary: Transfer an asset
       tags:
       - Assets
+  /contract:
+    post:
+      consumes:
+      - application/json
+      description: Create new contract
+      parameters:
+      - description: Contract info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Contract'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new contract
+      tags:
+      - Contract
+  /log_transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs within a specific time range
+      parameters:
+      - description: Time range (e.g., last 24 hours, last 7 days, last 30 days)
+        in: query
+        name: time_range
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all transactions logs
+      tags:
+      - Log Transactions
+  /log_transactions/asset/{asset_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Asset ID
+      tags:
+      - Log Transactions
+  /log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for a specific asset, grouped by a specified
+        time frame (e.g., '1h' for 1 hour) and a specific transaction type
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      - description: Transaction type ID (e.g., '0' for all transactions, '1' for
+          type create asset '2' for mint asset)
+        in: path
+        name: transaction_type_id
+        required: true
+        type: string
+      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
+        in: path
+        name: time_frame
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sum log transaction for the specified asset
+          schema:
+            $ref: '#/definitions/entity.SumLogTransaction'
+        "400":
+          description: invalid transaction type
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts by Asset ID within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/assets/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for all assets, grouped by a specified time
+        frame (e.g., '1h' for 1 hour)
+      parameters:
+      - description: Time range for the query (e.g., '24h')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for grouping (e.g., '1h'). Default is '1h'
+        in: query
+        name: time_frame
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Array of sum log transactions
+          schema:
+            items:
+              $ref: '#/definitions/entity.SumLogTransaction'
+            type: array
+        "400":
+          description: Invalid time_frame format
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts for all assets within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/transaction_type/{transaction_type_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific transaction type
+      parameters:
+      - description: Transaction Type ID
+        in: path
+        name: transaction_type_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Transaction Type ID
+      tags:
+      - Log Transactions
+  /log_transactions/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by User ID
+      tags:
+      - Log Transactions
   /role:
     get:
       consumes:
@@ -838,6 +1189,40 @@ paths:
       summary: Update a vault category
       tags:
       - Vault Category
+  /vault-delete/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the status.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault status information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault status'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault status
+      tags:
+      - Vault
   /wallets:
     get:
       consumes:

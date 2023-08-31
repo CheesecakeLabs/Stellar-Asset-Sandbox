@@ -39,9 +39,10 @@ type (
 	}
 
 	EnvelopeResponse struct {
-		Id         int    `json:"id"`
-		Hash       string `json:"hash"`
-		StatusCode int    `json:"statusCode"`
+		Id         int         `json:"id"`
+		Hash       string      `json:"hash"`
+		StatusCode int         `json:"statusCode"`
+		Error      interface{} `json:"error"`
 	}
 
 	Operation struct {
