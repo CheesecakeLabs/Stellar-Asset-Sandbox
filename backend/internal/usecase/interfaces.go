@@ -46,6 +46,8 @@ type (
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 		GetAssetById(string) (entity.Asset, error)
+		StoreAssetImage(string, []byte) error
+		GetAssetImage(string) ([]byte, error)
 	}
 
 	// Role -.

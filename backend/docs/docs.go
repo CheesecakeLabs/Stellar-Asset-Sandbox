@@ -419,6 +419,92 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/{id}/image": {
+            "post": {
+                "description": "Upload an image for a specific asset by ID",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Upload image for an asset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Asset Image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/{id}/image.png": {
+            "get": {
+                "description": "Fetch the image of a specified asset using its ID",
+                "produces": [
+                    "image/png"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Retrieve asset image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/contract": {
             "post": {
                 "description": "Create new contract",
@@ -1350,6 +1436,12 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "image": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "issuer": {
                     "$ref": "#/definitions/entity.Wallet"
                 },
@@ -1497,6 +1589,15 @@ const docTemplate = `{
                     },
                     "example": [
                         "2023-08-10T14:30:00Z"
+                    ]
+                },
+                "quantity": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1
                     ]
                 }
             }
@@ -1688,6 +1789,10 @@ const docTemplate = `{
                 "code": {
                     "type": "string",
                     "example": "USDC"
+                },
+                "image": {
+                    "type": "string",
+                    "example": "iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."
                 },
                 "limit": {
                     "type": "integer",

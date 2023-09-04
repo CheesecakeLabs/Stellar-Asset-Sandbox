@@ -14,6 +14,10 @@ definitions:
       id:
         example: 1
         type: integer
+      image:
+        items:
+          type: integer
+        type: array
       issuer:
         $ref: '#/definitions/entity.Wallet'
       name:
@@ -116,6 +120,12 @@ definitions:
         - "2023-08-10T14:30:00Z"
         items:
           type: string
+        type: array
+      quantity:
+        example:
+        - 1
+        items:
+          type: integer
         type: array
     type: object
   entity.User:
@@ -243,6 +253,9 @@ definitions:
         type: string
       code:
         example: USDC
+        type: string
+      image:
+        example: iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///...
         type: string
       limit:
         example: 1000
@@ -541,6 +554,63 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Create a new asset
+      tags:
+      - Assets
+  /assets/{id}/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image for a specific asset by ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Asset Image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Upload image for an asset
+      tags:
+      - Assets
+  /assets/{id}/image.png:
+    get:
+      description: Fetch the image of a specified asset using its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve asset image
       tags:
       - Assets
   /assets/auth-flags:
