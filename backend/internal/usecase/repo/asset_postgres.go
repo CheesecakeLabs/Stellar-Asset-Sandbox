@@ -46,7 +46,8 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 		JOIN wallet d ON a.distributor_id = d.id
 		JOIN key dk ON d.id = dk.wallet_id
 		JOIN wallet i ON a.issuer_id = i.id
-		JOIN key ik ON i.id = ik.wallet_id;
+		JOIN key ik ON i.id = ik.wallet_id
+		ORDER BY a.name;
 	`
 
 	rows, err := r.Db.Query(query)

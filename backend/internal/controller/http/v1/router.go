@@ -58,6 +58,8 @@ func NewRouter(
 	rolePermissionUc usecase.RolePermissionUseCase,
 	vaultCategoryUc usecase.VaultCategoryUseCase,
 	vaultUc usecase.VaultUseCase,
+	contractUc usecase.ContractUseCase,
+	logUc usecase.LogTransactionUseCase,
 	cfg config.HTTP,
 ) {
 	// Messenger
@@ -72,18 +74,21 @@ func NewRouter(
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 	// Routers
 	handler.Use(CORSMiddleware(cfg)) // Alow only frontend origin
+	handler.Use(CORSMiddleware(cfg)) // Alow only frontend origin
 	groupV1 := handler.Group("/v1")
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
-		newWalletsRoutes(groupV1, walletUseCase, messengerController)
-		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase)
+		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase)
+		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 		newRoleRoutes(groupV1, roleUseCase, messengerController)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController)
 		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc)
 		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase)
+		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase)
+		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase)
 	}
 
 	// Toml Route
 	handler.Use(CORSMiddlewareAllowAllOrigins()) // Allow all origins for the toml
-	newAssetTomlRoutes(handler.Group("/"), walletUseCase, assetUseCase, messengerController, authUseCase)
+	newAssetTomlRoutes(handler.Group("/"), walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 }

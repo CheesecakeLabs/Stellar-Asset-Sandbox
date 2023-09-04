@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 )
@@ -78,5 +80,24 @@ type (
 	VaultRepoInterface interface {
 		GetVaults() ([]entity.Vault, error)
 		CreateVault(entity.Vault) (entity.Vault, error)
+		UpdateVault(entity.Vault) (entity.Vault, error)
+		GetVaultById(id int) (entity.Vault, error)
+		DeleteVault(entity.Vault) (entity.Vault, error)
+	}
+
+	ContractRepoInterface interface {
+		GetContracts() ([]entity.Contract, error)
+		CreateContract(entity.Contract) (entity.Contract, error)
+		GetContractById(id string) (entity.Contract, error)
+	}
+
+	LogTransactionRepoInterface interface {
+		StoreLogTransaction(entity.LogTransaction) error
+		GetLogTransactions(timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByAssetID(assetID int, timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByUserID(userID int, timeRange string) ([]entity.LogTransaction, error)
+		GetLogTransactionsByTransactionTypeID(transactionTypeID int, timeRange string) ([]entity.LogTransaction, error)
+		SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error)
+		SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error)
 	}
 )

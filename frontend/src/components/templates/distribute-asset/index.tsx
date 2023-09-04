@@ -7,25 +7,35 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Text,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
+import { toCrypto } from 'utils/formatter'
+
+import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
+import { SelectVault } from 'components/molecules/select-vault'
 
 interface IDistributeAssetTemplate {
   onSubmit(
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    wallet: string | undefined
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
+  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  assetData: Hooks.UseHorizonTypes.IAsset | undefined
 }
 
 export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
   onSubmit,
   loading,
   asset,
+  vaults,
+  assetData,
 }) => {
   const {
     register,
@@ -33,6 +43,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
     handleSubmit,
     setValue,
   } = useForm()
+  const [wallet, setWallet] = useState<string | undefined>()
 
   return (
     <Flex flexDir="column" w="full">
@@ -41,20 +52,14 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
         <Box p="1rem">
           <form
             onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue)
+              onSubmit(data, setValue, wallet)
             })}
           >
             <FormControl
               isInvalid={errors?.destination_wallet_id !== undefined}
             >
               <FormLabel>Destination Vault</FormLabel>
-              <Input
-                type="text"
-                placeholder="Wallet"
-                {...register('destination_wallet_id', {
-                  required: true,
-                })}
-              />
+              <SelectVault vaults={vaults} setWallet={setWallet} />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
 
@@ -71,6 +76,22 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
 
+            <Text
+              color="gray.900"
+              fontWeight="600"
+              fontSize="xs"
+              mt="0.5rem"
+              ms="0.25rem"
+            >
+              {`Main Vault: ${
+                assetData
+                  ? `${toCrypto(Number(asset.distributorBalance?.balance))} ${
+                      asset.code
+                    }`
+                  : 'loading'
+              }`}
+            </Text>
+
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"
@@ -84,6 +105,12 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
           </form>
         </Box>
       </Container>
+
+      <BalanceChart
+        supply={Number(asset.assetData?.amount || 0)}
+        mainVault={Number(asset.distributorBalance?.balance || 0)}
+        assetCode={asset.code}
+      />
     </Flex>
   )
 }

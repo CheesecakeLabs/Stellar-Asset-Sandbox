@@ -19,11 +19,15 @@ func NewWalletRepo(pg *postgres.Postgres) WalletRepo {
 }
 
 func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
-	stmt := `SELECT * FROM wallet WHERE id=$1`
+	stmt := `SELECT w.id, w.type, w.funded, k.id, k.public_key, k.weight, k.wallet_id 
+             FROM Wallet w 
+             JOIN Key k ON w.id = k.wallet_id 
+             WHERE w.id=$1`
 	row := r.Db.QueryRow(stmt, id)
 
 	var wallet entity.Wallet
-	err := row.Scan(&wallet.Id, &wallet.Type, &wallet.Funded)
+	var key entity.Key
+	err := row.Scan(&wallet.Id, &wallet.Type, &wallet.Funded, &key.Id, &key.PublicKey, &key.Weight, &key.WalletId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return entity.Wallet{}, fmt.Errorf("WalletRepo - GetWallet - wallet not found")
@@ -31,18 +35,24 @@ func (r WalletRepo) GetWallet(id int) (entity.Wallet, error) {
 		return entity.Wallet{}, fmt.Errorf("WalletRepo - GetWallet - row.Scan: %w", err)
 	}
 
+	wallet.Key = key
+
 	return wallet, nil
 }
 
 func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
-	stmt := `SELECT wallet.*, key.* FROM Wallet LEFT JOIN Key ON wallet.id = key.wallet_id WHERE wallet.type=$1`
+	stmt := `SELECT w.id, w.type, w.funded, k.id, k.public_key, k.weight, k.wallet_id 
+             FROM Wallet w 
+             JOIN Key k ON w.id = k.wallet_id 
+             WHERE w.type=$1`
 	rows, err := r.Db.Query(stmt, wType)
 	if err != nil {
 		return nil, fmt.Errorf("WalletRepo - GetWallets - db.Query: %w", err)
 	}
+
 	defer rows.Close()
 
-	var wallets []entity.Wallet
+	entities := make([]entity.Wallet, 0, _defaultEntityCap)
 
 	for rows.Next() {
 		var wallet entity.Wallet
@@ -54,10 +64,10 @@ func (r WalletRepo) GetWallets(wType string) ([]entity.Wallet, error) {
 		}
 
 		wallet.Key = key
-		wallets = append(wallets, wallet)
+		entities = append(entities, wallet)
 	}
 
-	return wallets, nil
+	return entities, nil
 }
 
 func (r WalletRepo) GetKeyByWallet(walletId int) (entity.Key, error) {

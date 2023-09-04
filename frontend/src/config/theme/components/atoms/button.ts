@@ -48,7 +48,7 @@ export const Button = {
       borderRadius: 'none',
       fill: 'gray.650',
       stroke: 'gray.650',
-      color: 'gray.650',
+      color: 'black.900',
       _dark: {
         fill: 'white',
         stroke: 'white',
@@ -68,6 +68,22 @@ export const Button = {
       fill: 'white',
       stroke: 'white',
       color: 'white',
+    },
+    delete: {
+      background: 'none',
+      color: 'red.500',
+      border: '1px solid',
+      borderColor: 'red.500',
+      height: '1.5rem',
+      fontWeight: '500',
+      fontSize: 'xs',
+      px: '0.5rem',
+      borderRadius: '0.25rem',
+      _loading: {
+        _hover: {
+          bg: 'red.500',
+        },
+      },
     },
   },
 }

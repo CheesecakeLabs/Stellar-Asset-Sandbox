@@ -8,7 +8,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { HomeTemplate } from 'components/templates/home'
 
 export const Home: React.FC = () => {
-  const { loading, getAssets, assets } = useAssets()
+  const { loadingAssets, getAssets, assets } = useAssets()
 
   useEffect(() => {
     getAssets()
@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
-        <HomeTemplate loading={loading} assets={assets} />
+        <HomeTemplate loading={loadingAssets} assets={assets} />
       </Sidebar>
     </Flex>
   )

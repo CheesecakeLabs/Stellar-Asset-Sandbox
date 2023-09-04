@@ -25,7 +25,8 @@ func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger,
 }
 
 type CreateVaultCategoryRequest struct {
-	Name string `json:"name"       binding:"required"  example:"Treasury"`
+	Name  string `json:"name"       binding:"required"  example:"Treasury"`
+	Theme string `json:"theme"      example:"blue"`
 }
 
 // @Summary     Create a new vault category
@@ -44,17 +45,18 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	vaultCategory := entity.VaultCategory{
-		Name: request.Name,
+		Name:  request.Name,
+		Theme: &request.Theme,
 	}
 
 	vaultCategory, err = r.vc.Create(vaultCategory)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "database problems")
+		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
 
@@ -72,7 +74,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 func (r *vaultCategoryRoutes) getAllVaultCategories(c *gin.Context) {
 	vaultCategories, err := r.vc.GetAll()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting vault categories")
+		errorResponse(c, http.StatusInternalServerError, "error getting vault categories", err)
 		return
 	}
 

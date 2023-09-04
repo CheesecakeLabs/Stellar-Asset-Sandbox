@@ -33,7 +33,7 @@ func (r *rolePermissions) rolePermissions(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	rolePermissions, err := r.rolePermissionUseCase.GetRolePermissions(token)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 	c.JSON(http.StatusOK, rolePermissions)
 }

@@ -2,6 +2,8 @@ import { Flex, FlexProps, Link } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { STELLAR_EXPERT_URL } from 'utils/constants/constants'
+
 import { PathRoute } from 'components/enums/path-route'
 
 interface INavItemProps extends FlexProps {
@@ -26,6 +28,10 @@ export const NavItem: React.FC<INavItemProps> = ({
   return (
     <Link
       onClick={(): void => {
+        if (path === PathRoute.BLOCKCHAIN_EXPLORER) {
+          window.open(`${STELLAR_EXPERT_URL}`, '_blank')
+          return
+        }
         navigate(path)
       }}
       style={{ textDecoration: 'none', color: 'white', fontSize: 'sm' }}

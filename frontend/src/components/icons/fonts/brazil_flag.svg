@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<svg>
+  <g
+     id="layer1">
+    <circle
+       style="fill:#009b37;fill-opacity:1;stroke:none;stroke-width:336.55914307;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4679"
+       cx="98.097542"
+       cy="107.28635"
+       r="69.198166" />
+    <rect
+       style="fill:#f3d603;fill-opacity:1;stroke:none;stroke-width:293.16552734;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4681"
+       width="67.405678"
+       height="67.405678"
+       x="-74.096138"
+       y="123.50531"
+       transform="matrix(0.83976945,-0.54294316,0.83976945,0.54294316,0,0)" />
+    <ellipse
+       style="fill:#012775;fill-opacity:1;stroke:none;stroke-width:301.61221313;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4675"
+       cx="98.097542"
+       cy="107.28635"
+       rx="24.097765"
+       ry="24.539925" />
+  </g>
+</svg>

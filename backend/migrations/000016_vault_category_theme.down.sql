@@ -1,0 +1,1 @@
+ALTER TABLE VaultCategory DROP COLUMN theme;

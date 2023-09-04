@@ -1,6 +1,6 @@
 [submodule "stellar-kms"]
 	path = stellar-kms
-	url = https://github.com/CheesecakeLabs/stellar-kms
+	url = git@github.com:CheesecakeLabs/stellar-kms.git
 [submodule "starlabs"]
 	path = starlabs
-	url = https://github.com/CheesecakeLabs/starlabs
+	url = git@github.com:CheesecakeLabs/starlabs.git

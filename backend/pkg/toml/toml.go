@@ -13,6 +13,8 @@ func NewTomlGenerator() *DefaultTomlGenerator {
 }
 
 func (g *DefaultTomlGenerator) GenerateToml(req entity.TomlData, cfg config.Horizon) (string, error) {
+	var principalFieldConfigs []FieldConfig
+
 	fieldConfigs := []FieldConfig{
 		{&req.Version, cfg.StellarTomlVersion},
 		{&req.NetworkPassphrase, cfg.TestNetworkPass},
@@ -37,14 +39,16 @@ func (g *DefaultTomlGenerator) GenerateToml(req entity.TomlData, cfg config.Hori
 		{&req.Documentation.OrgOfficialEmail, cfg.Documentation.OrgOfficialEmail},
 	}
 
-	principalFieldConfigs := []FieldConfig{
-		{&req.Principals[0].Name, cfg.Principals.Name},
-		{&req.Principals[0].Email, cfg.Principals.Email},
-		{&req.Principals[0].Keybase, cfg.Principals.Keybase},
-		{&req.Principals[0].Twitter, cfg.Principals.Twitter},
-		{&req.Principals[0].Github, cfg.Principals.Github},
-		{&req.Principals[0].IDPhotoHash, cfg.Principals.IDPhotoHash},
-		{&req.Principals[0].VerificationPhotoHash, cfg.Principals.VerificationPhotoHash},
+	if len(req.Principals) > 0 {
+		principalFieldConfigs = []FieldConfig{
+			{&req.Principals[0].Name, cfg.Principals.Name},
+			{&req.Principals[0].Email, cfg.Principals.Email},
+			{&req.Principals[0].Keybase, cfg.Principals.Keybase},
+			{&req.Principals[0].Twitter, cfg.Principals.Twitter},
+			{&req.Principals[0].Github, cfg.Principals.Github},
+			{&req.Principals[0].IDPhotoHash, cfg.Principals.IDPhotoHash},
+			{&req.Principals[0].VerificationPhotoHash, cfg.Principals.VerificationPhotoHash},
+		}
 	}
 
 	updateFieldsIfEmpty(fieldConfigs)

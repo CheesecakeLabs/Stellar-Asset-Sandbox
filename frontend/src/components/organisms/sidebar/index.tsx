@@ -14,7 +14,7 @@ import {
   ExplorerIcon,
   HomeIcon,
   PaymentsIcon,
-  SecurityIcon,
+  VaultIcon,
 } from 'components/icons'
 import { SidebarContent } from 'components/molecules'
 import { Header } from 'components/molecules/header'
@@ -37,14 +37,9 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Payment Tokens',
+    name: 'Asset Management',
     icon: <PaymentsIcon />,
-    path: `${PathRoute.PAYMENTS_TOKENS}`,
-  },
-  {
-    name: 'Securities Tokens',
-    icon: <SecurityIcon />,
-    path: PathRoute.SECURITIES_TOKENS,
+    path: PathRoute.ASSET_MANAGEMENT,
   },
   {
     name: 'Soroban Smart Contracts',
@@ -52,9 +47,14 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
   },
   {
+    name: 'Treasury',
+    icon: <VaultIcon />,
+    path: `${PathRoute.VAULTS}`,
+  },
+  {
     name: 'Assets Dashboard',
     icon: <DashboardIcon />,
-    path: PathRoute.ASSETS_DASHBOARD,
+    path: PathRoute.DASHBOARDS,
   },
   {
     name: 'Blockchain Explorer',

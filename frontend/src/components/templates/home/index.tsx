@@ -9,16 +9,26 @@ import {
   Text,
   Td,
   Button,
+  Skeleton,
+  Tooltip,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { toCrypto } from 'utils/formatter'
 
-import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
-import { ArrowRightIcon, CoinIcon, JoinIcon } from 'components/icons'
+import {
+  ArrowRightIcon,
+  AuthorizeIcon,
+  BackIcon,
+  BlockIcon,
+  JoinIcon,
+} from 'components/icons'
+import { Empty } from 'components/molecules/empty'
 
 interface IHomeTemplate {
   loading: boolean
@@ -30,7 +40,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="680px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
             Asset Management
@@ -43,115 +53,70 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({ loading, assets }) => {
             Forge asset
           </Button>
         </Flex>
-        <Container variant="primary" p={0} maxW="full">
-          {loading || !assets ? (
-            <Loading />
-          ) : (
-            <Table w="full">
-              <Thead w="full">
-                <Tr>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="2rem"
-                    p={0}
-                  />
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Code
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Name
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Supply
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Asset type
-                  </Th>
-                  <Th
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="2rem"
-                    p={0}
-                  />
-                </Tr>
+        {loading ? (
+          <Skeleton w="full" h="8rem" />
+        ) : assets && assets.length > 0 ? (
+          <Container variant="primary" p={0} maxW="full">
+            <Table variant="simple">
+              <Thead>
+                <Th w="2rem" p={0} />
+                <Th>Code</Th>
+                <Th>Name</Th>
+                <Th>Supply</Th>
+                <Th>Asset type</Th>
+                <Th>Controls</Th>
+                <Th w="2rem" p={0} />
               </Thead>
               <Tbody>
                 {assets.map(asset => (
                   <Tr
-                    borderColor="red"
                     cursor="pointer"
                     onClick={(): void =>
-                      navigate(PathRoute.MINT_ASSET, { state: asset })
+                      navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
                     }
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
                   >
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      <CoinIcon width="2rem" />
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {asset.code}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
-                      {asset.name}
-                    </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
+                    <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
+                    <Td>{asset.code}</Td>
+                    <Td>{asset.name}</Td>
+                    <Td>
                       {asset.assetData
                         ? toCrypto(Number(asset.assetData?.amount))
                         : '-'}
                     </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800' }}
-                    >
+                    <Td>
                       {typesAsset.find(type => type.id === asset.asset_type)
                         ?.name || ''}
                     </Td>
-                    <Td
-                      borderColor={'gray.400'}
-                      _dark={{ borderColor: 'black.800', fill: 'white' }}
-                      w="2rem"
-                      p={0}
-                    >
+                    <Td>
+                      <Flex fill="black.900" _dark={{ fill: 'white' }} gap={2}>
+                        {asset.assetData?.flags.auth_required && (
+                          <Tooltip label="Authorize Required">
+                            <AuthorizeIcon width="18px" height="18px" />
+                          </Tooltip>
+                        )}
+                        {asset.assetData?.flags.auth_clawback_enabled && (
+                          <Tooltip label="Clawback enabled">
+                            <BackIcon width="18px" height="18px" />
+                          </Tooltip>
+                        )}
+                        {asset.assetData?.flags.auth_revocable && (
+                          <Tooltip label="Freeze enabled">
+                            <BlockIcon width="18px" height="18px" />
+                          </Tooltip>
+                        )}
+                      </Flex>
+                    </Td>
+                    <Td w="2rem" p={0}>
                       <ArrowRightIcon width="12px" />
                     </Td>
                   </Tr>
                 ))}
               </Tbody>
             </Table>
-          )}
-        </Container>
+          </Container>
+        ) : (
+          <Empty title="No forged assets" />
+        )}
       </Flex>
     </Flex>
   )

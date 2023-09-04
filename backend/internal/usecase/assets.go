@@ -74,17 +74,18 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 }
 
 func (uc *AssetUseCase) CreateToml(req entity.TomlData) (string, error) {
-	toml, err := uc.tInt.GenerateToml(req, uc.cfg)
+	tomlCreated, err := uc.tInt.GenerateToml(req, uc.cfg)
 	if err != nil {
 		return "", fmt.Errorf("AssetUseCase - CreateToml - uc.tInt.GenerateToml: %w", err)
 	}
 
-	_, err = uc.tRepo.CreateToml(toml)
+	// Save the new toml data in the database
+	_, err = uc.tRepo.CreateToml(tomlCreated)
 	if err != nil {
-		return "", fmt.Errorf("AssetUseCase - CreateToml - uc.repo.CreateToml: %w", err)
+		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.repo.CreateToml: %w", err)
 	}
 
-	return toml, err
+	return tomlCreated, err
 }
 
 func (uc *AssetUseCase) RetrieveToml() (string, error) {

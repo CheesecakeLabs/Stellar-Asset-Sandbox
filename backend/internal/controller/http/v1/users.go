@@ -107,7 +107,7 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 	var user entity.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		// r.l.Error(err, "http - v1 - create")
-		errorResponse(c, http.StatusBadRequest, "invalid request body")
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
 		fmt.Println(err)
 		return
 	}
@@ -115,7 +115,7 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 	user, err := r.t.Autentication(user.Email, user.Password)
 	if err != nil {
 		// r.l.Error(err, "http - v1 - create")
-		errorResponse(c, http.StatusInternalServerError, "database problems")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		fmt.Println(err)
 		return
 	}
