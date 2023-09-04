@@ -14,6 +14,10 @@ definitions:
       id:
         example: 1
         type: integer
+      image:
+        items:
+          type: integer
+        type: array
       issuer:
         $ref: '#/definitions/entity.Wallet'
       name:
@@ -684,6 +688,64 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Create a new asset
+      tags:
+      - Assets
+  /assets/{id}/image:
+    post:
+      consumes:
+      - application/json
+      description: Upload a base64 encoded image for a specific asset by ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Base64 Encoded Asset Image
+        in: body
+        name: image
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Upload image for an asset
+      tags:
+      - Assets
+  /assets/{id}/image.png:
+    get:
+      description: Fetch the image of a specified asset using its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve asset image
       tags:
       - Assets
   /assets/auth-flags:

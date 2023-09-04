@@ -73,6 +73,22 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 	return assets, nil
 }
 
+func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
+	err := uc.aRepo.StoreAssetImage(assetId, imageBytes)
+	if err != nil {
+		return fmt.Errorf("ImageUseCase - UploadImage - uc.aRepo.StoreAssetImage: %w", err)
+	}
+	return nil
+}
+
+func (uc *AssetUseCase) GetImage(assetId string) ([]byte, error) {
+	image, err := uc.aRepo.GetAssetImage(assetId)
+	if err != nil {
+		return nil, fmt.Errorf("ImageUseCase - GetImage - uc.aRepo.GetAssetImage: %w", err)
+	}
+	return image, nil
+}
+
 func (uc *AssetUseCase) CreateToml(req entity.TomlData) (string, error) {
 	tomlCreated, err := uc.tInt.GenerateToml(req, uc.cfg)
 	if err != nil {
