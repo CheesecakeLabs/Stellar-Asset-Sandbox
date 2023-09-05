@@ -55,5 +55,31 @@ export const Table = {
         },
       },
     },
+    small: {
+      th: {
+        borderBottom: '1px solid',
+        borderColor: 'gray.400',
+        _dark: { borderColor: 'black.800' },
+        color: 'gray.700',
+        px: '0',
+      },
+      td: {
+        color: 'black.900',
+        fontSize: 'sm',
+        borderBottom: '1px solid',
+        borderColor: 'gray.400',
+        _dark: { borderColor: 'black.800', color: 'white' },
+        px: '0',
+        py: '0.75rem'
+      },
+      tr: {
+        fill: 'black',
+        stroke: 'black',
+        _dark: {
+          fill: 'white',
+          stroke: 'white',
+        },
+      },
+    },
   },
 }

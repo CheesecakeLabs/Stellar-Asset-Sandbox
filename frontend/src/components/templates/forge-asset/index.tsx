@@ -42,7 +42,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     <Flex flexDir="column" w="full">
       <Flex maxW="840px" alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-          Forge asset
+          Forge Asset
         </Text>
         {errorSubmit && (
           <Alert mb="0.75rem" status="error">
@@ -151,6 +151,9 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                     title={assetFlag.title}
                     description={assetFlag.description}
                     value={assetFlag.flag}
+                    isDisabled={assetFlag.isDisabled}
+                    link={assetFlag.link}
+                    isComing={assetFlag.isComing}
                   />
                 ))}
               </Flex>

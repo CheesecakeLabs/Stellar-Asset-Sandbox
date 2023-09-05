@@ -215,7 +215,10 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                 ) : (
                   <VStack py="2rem">
                     <LockIcon />
-                    <Text>Locked Balance!</Text>
+                    <Text textAlign="center" maxW="360px">
+                      This account is not authorized to hold this asset. Please
+                      contact the asset manager.
+                    </Text>
                   </VStack>
                 )}
               </form>

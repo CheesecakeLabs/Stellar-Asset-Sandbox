@@ -50,7 +50,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Asset Management
+            Stellar Classic
           </Text>
           {havePermission(Permissions.CREATE_ASSET, userPermissions) && (
             <Button
@@ -73,7 +73,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({
                 <Th w="2rem" p={0} />
                 <Th>Code</Th>
                 <Th>Name</Th>
-                <Th>Supply</Th>
+                <Th isNumeric>Supply</Th>
                 <Th>Asset type</Th>
                 <Th>Controls</Th>
                 <Th w="2rem" p={0} />
@@ -89,7 +89,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({
                     <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
-                    <Td>
+                    <Td isNumeric>
                       {asset.assetData
                         ? toCrypto(Number(asset.assetData?.amount))
                         : '-'}
@@ -101,7 +101,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = ({
                     <Td>
                       <Flex fill="black.900" _dark={{ fill: 'white' }} gap={2}>
                         {asset.assetData?.flags.auth_required && (
-                          <Tooltip label="Authorize Required">
+                          <Tooltip label="Authorize required">
                             <AuthorizeIcon width="18px" height="18px" />
                           </Tooltip>
                         )}

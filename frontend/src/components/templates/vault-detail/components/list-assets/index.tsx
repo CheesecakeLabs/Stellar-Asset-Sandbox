@@ -6,7 +6,7 @@ import {
   IconButton,
   Text,
 } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction, useState } from 'react'
+import React, { useState } from 'react'
 
 import { AddIcon, EditIcon } from 'components/icons'
 import { IOption, SelectAsset } from 'components/molecules/select-asset'
@@ -18,9 +18,7 @@ interface IListAssets {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   updatingVaultAssets: boolean
-  setSelectedAsset: Dispatch<
-    SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
-  >
+  changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>
   onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
 }
 
@@ -29,7 +27,7 @@ export const ListAssets: React.FC<IListAssets> = ({
   assets,
   selectedAsset,
   updatingVaultAssets,
-  setSelectedAsset,
+  changeAsset,
   onUpdateVaultAssets,
 }) => {
   const [isEditing, setIsEditing] = useState(false)
@@ -119,7 +117,7 @@ export const ListAssets: React.FC<IListAssets> = ({
                     key={index}
                     balance={balance}
                     assets={assets}
-                    setSelectedAsset={setSelectedAsset}
+                    changeAsset={changeAsset}
                     selectedAsset={selectedAsset}
                     isEditing={isEditing}
                     removeAsset={removeAsset}
@@ -134,7 +132,7 @@ export const ListAssets: React.FC<IListAssets> = ({
                     key={index}
                     balance={balance}
                     assets={assets}
-                    setSelectedAsset={setSelectedAsset}
+                    changeAsset={changeAsset}
                     selectedAsset={selectedAsset}
                     isEditing={isEditing}
                     removeAsset={removeAsset}

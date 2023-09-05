@@ -52,7 +52,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
             navigate(`${PathRoute.ASSET_HOME}/${id}`)
           }}
         >
-          Asset Home
+          Asset home
         </Button>
         {havePermission(Permissions.MINT_ASSET, permissions) && (
           <Button
@@ -68,7 +68,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
               navigate(`${PathRoute.MINT_ASSET}/${id}`)
             }}
           >
-            Mint Assets
+            Mint assets
           </Button>
         )}
         {havePermission(Permissions.BURN_ASSET, permissions) && (
@@ -85,7 +85,7 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
               navigate(`${PathRoute.BURN_ASSET}/${id}`)
             }}
           >
-            Burn Assets
+            Burn assets
           </Button>
         )}
         {havePermission(Permissions.DISTRIBUTE_ASSET, permissions) && (

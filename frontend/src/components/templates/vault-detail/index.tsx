@@ -1,5 +1,5 @@
 import { Flex, Skeleton } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction } from 'react'
+import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { havePermission } from 'utils'
@@ -19,6 +19,7 @@ interface IVaultDetailTemplate {
   loadingOperation: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsByAsset: Hooks.UseVaultsTypes.IVault[] | undefined
   payments: Hooks.UseHorizonTypes.IPayments | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   loadingHorizon: boolean
@@ -34,9 +35,6 @@ interface IVaultDetailTemplate {
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void>
-  setSelectedAsset: Dispatch<
-    SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
-  >
   createVaultCategory(
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
@@ -44,6 +42,7 @@ interface IVaultDetailTemplate {
   onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
   onDeleteVault(): Promise<void>
   getPaymentsDataByLink(link: 'prev' | 'next'): void
+  changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>
 }
 
 export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
@@ -63,22 +62,26 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   isPrevDisabled,
   userPermissions,
   loadingUserPermissions,
+  vaultsByAsset,
   onUpdateVault,
   onSubmit,
-  setSelectedAsset,
   createVaultCategory,
   onUpdateVaultAssets,
   onDeleteVault,
   getPaymentsDataByLink,
+  changeAsset,
 }) => {
-  const filteredVaults = vaults?.filter(
+  const filteredVaults = vaultsByAsset?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
   )
 
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        {loadingAssets || loadingVaults || !vault || loadingUserPermissions ? (
+        {loadingAssets ||
+        (!vaults && loadingVaults) ||
+        !vault ||
+        loadingUserPermissions ? (
           <LoaderSkeleton />
         ) : (
           <>
@@ -99,7 +102,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 selectedAsset={selectedAsset}
                 updatingVaultAssets={updatingVaultAssets}
                 onUpdateVaultAssets={onUpdateVaultAssets}
-                setSelectedAsset={setSelectedAsset}
+                changeAsset={changeAsset}
               />
               {(havePermission(
                 Permissions.MOVE_BALANCES_VAULTS,
@@ -108,26 +111,28 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 havePermission(
                   Permissions.MOVE_BALANCES_EXTERNAL_ACCOUNTS,
                   userPermissions
-                )) && (
-                <DistributeVault
-                  onSubmit={onSubmit}
-                  loading={loadingOperation}
-                  vaults={filteredVaults}
-                  vault={vault}
-                  selectedAsset={selectedAsset}
-                  userPermissions={userPermissions}
-                />
-              )}
+                )) &&
+                (loadingVaults ? (
+                  <Skeleton w="full" />
+                ) : (
+                  <DistributeVault
+                    onSubmit={onSubmit}
+                    loading={loadingOperation}
+                    vaults={filteredVaults}
+                    vault={vault}
+                    selectedAsset={selectedAsset}
+                    userPermissions={userPermissions}
+                  />
+                ))}
             </Flex>
             <Flex mt="1rem" w="full">
-              {loadingHorizon ? (
+              {!payments && loadingHorizon ? (
                 <Skeleton height="4rem" w="full" />
               ) : (
                 <ListPayments
                   payments={payments}
                   vaults={vaults}
                   vault={vault}
-                  loading={loadingHorizon}
                   assets={assets}
                   isPrevDisabled={isPrevDisabled}
                   getPaymentsDataByLink={getPaymentsDataByLink}
