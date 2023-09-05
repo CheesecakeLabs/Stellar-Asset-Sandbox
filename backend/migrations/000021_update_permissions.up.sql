@@ -1,3 +1,5 @@
+TRUNCATE operation;
+
 insert into operation (name,description,permission_id,action) values ('Add / Remove users','',1,'add-remove-users');
 insert into operation (name,description,permission_id,action) values ('Assign Roles','',1,'assign-roles');
 insert into operation (name,description,permission_id,action) values ('Customize roles','',1,'customize-roles');
