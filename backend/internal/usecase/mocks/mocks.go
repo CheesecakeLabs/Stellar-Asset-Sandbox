@@ -507,10 +507,10 @@ func (m *MockRolePermissionRepoInterface) EXPECT() *MockRolePermissionRepoInterf
 }
 
 // GetRolePermissions mocks base method.
-func (m *MockRolePermissionRepoInterface) GetRolePermissions(token string) ([]entity.RolePermissionResponse, error) {
+func (m *MockRolePermissionRepoInterface) GetRolePermissions(token string) ([]entity.UserPermissionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRolePermissions", token)
-	ret0, _ := ret[0].([]entity.RolePermissionResponse)
+	ret0, _ := ret[0].([]entity.UserPermissionResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
