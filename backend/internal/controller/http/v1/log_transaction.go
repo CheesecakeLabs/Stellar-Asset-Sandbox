@@ -28,6 +28,7 @@ func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase,
 		h.GET("/transaction_type/:transaction_type_id/:time_range", r.getLogTransactionsByTransactionTypeID)
 		h.GET("/assets/:asset_id/type/:transaction_type_id/sum/:time_range/:time_frame", r.sumAmountsByAssetID)
 		h.GET("/assets/sum/:time_range/:time_frame", r.sumAmountsForAllAssets)
+		h.GET("/last-transactions/:transaction_type_id", r.getLastLogTransactions)
 	}
 }
 
@@ -215,4 +216,31 @@ func (r *logTransactionsRoutes) sumAmountsForAllAssets(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, sum)
+}
+
+// @Summary Get last transactions
+// @Description Get last transactions logs for a specific transaction type
+// @Tags Log Transactions
+// @Accept json
+// @Produce json
+// @Param transaction_type_id path int true "Transaction Type ID"
+// @Security ApiKeyAuth
+// @Success 200 {object} entity.LogTransaction
+// @Router /log_transactions/last_transactions/{transaction_type_id} [get]
+func (r *logTransactionsRoutes) getLastLogTransactions(c *gin.Context) {
+	transactionTypeIDStr := c.Param("transaction_type_id")
+
+	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
+		return
+	}
+
+	logTransactions, err := r.l.GetLastLogTransactions(transactionTypeID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting last log transactions: %s", err.Error()), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logTransactions)
 }

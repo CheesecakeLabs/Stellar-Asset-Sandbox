@@ -8,6 +8,10 @@ type LogTransaction struct {
 	Date              string  `json:"date" example:"2023-08-10T14:30:00Z"`
 	Amount            float64 `json:"amount" example:"100000"`
 	Description       string  `json:"description" example:"Mint Asset"`
+	OriginPK          *string `json:"origin_pk" example:"GSDC..."`
+	DestinationPK     *string `json:"destination_pk" example:"GSDC..."`
+	CurrentSupply     *int    `json:"current_supply" example:"1000"`
+	CurrentMainVault  *int    `json:"current_main_vault" example:"1000"`
 }
 
 type SumLogTransaction struct {

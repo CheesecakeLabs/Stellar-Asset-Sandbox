@@ -23,3 +23,35 @@ func (useCase *RoleUseCase) List() ([]entity.Role, error) {
 	}
 	return roles, nil
 }
+
+func (useCase *RoleUseCase) CreateRole(data entity.RoleRequest) (entity.RoleRequest, error) {
+	role, err := useCase.repo.CreateRole(data)
+	if err != nil {
+		return entity.RoleRequest{}, fmt.Errorf("RoleUseCase - CreateRole - uc.repo.CreateRole: %w", err)
+	}
+	return role, nil
+}
+
+func (useCase *RoleUseCase) UpdateRole(data entity.Role) (entity.Role, error) {
+	role, err := useCase.repo.UpdateRole(data)
+	if err != nil {
+		return entity.Role{}, fmt.Errorf("RoleUseCase - UpdateRole - uc.repo.UpdateRole: %w", err)
+	}
+	return role, nil
+}
+
+func (useCase *RoleUseCase) DeleteRole(data entity.RoleDelete) (entity.RoleDelete, error) {
+	role, err := useCase.repo.DeleteRole(data)
+	if err != nil {
+		return entity.RoleDelete{}, fmt.Errorf("RoleUseCase - DeleteRole - uc.repo.DeleteRole: %w", err)
+	}
+	return role, nil
+}
+
+func (useCase *RoleUseCase) GetRoleById(id int) (entity.Role, error) {
+	role, err := useCase.repo.GetRoleById(id)
+	if err != nil {
+		return entity.Role{}, fmt.Errorf("RoleUseCase - GetRoleById - uc.repo.GetRoleById: %w", err)
+	}
+	return role, nil
+}

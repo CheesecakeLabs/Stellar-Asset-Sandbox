@@ -509,6 +509,8 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		TransactionTypeID: entity.TransferAsset,
 		UserID:            userID,
 		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
+		OriginPK:          &sourceWallet.Key.PublicKey,
+		DestinationPK:     &request.DestinationWalletPK,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)

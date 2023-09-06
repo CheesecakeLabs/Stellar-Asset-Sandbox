@@ -18,8 +18,8 @@ func NewLogTransactionRepo(postgres *postgres.Postgres) *LogTransactionRepo {
 }
 
 func (repo *LogTransactionRepo) StoreLogTransaction(log entity.LogTransaction) error {
-	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description) VALUES ($1, $2, $3, $4, $5)`
-	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description)
+	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description, origin_pk, destination_pk) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description, log.OriginPK, log.DestinationPK)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -222,6 +222,40 @@ func getDateFilter(timeRange string) (time.Time, error) {
 	default:
 		return time.Time{}, fmt.Errorf("invalid time unit in time range")
 	}
+}
+
+func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error) {
+	query := `
+		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, lt.description,
+		lt.origin_pk, lt.destination_pk
+		FROM logtransactions AS lt
+		JOIN Asset AS a ON lt.asset_id = a.id
+		WHERE lt.transaction_type_id = $1
+		ORDER BY lt.date DESC
+		LIMIT 5
+	`
+
+	rows, err := repo.Db.Query(query, transactionTypeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var logs []entity.LogTransaction
+	for rows.Next() {
+		var log entity.LogTransaction
+		var distributorID, issuerID int
+		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date,
+			&log.Description, &log.OriginPK, &log.DestinationPK)
+		if err != nil {
+			return nil, err
+		}
+		log.Asset.Distributor.Id = distributorID
+		log.Asset.Issuer.Id = issuerID
+		logs = append(logs, log)
+	}
+
+	return logs, nil
 }
 
 func getTimeFrame(timeFrame time.Duration) string {

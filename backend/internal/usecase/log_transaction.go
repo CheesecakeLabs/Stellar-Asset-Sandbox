@@ -69,3 +69,11 @@ func (l *LogTransactionUseCase) SumLogTransactionsByAssetID(assetID int, timeRan
 	}
 	return sum, nil
 }
+
+func (l *LogTransactionUseCase) GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error) {
+	logTransactions, err := l.lRepo.GetLastLogTransactions(transactionTypeID)
+	if err != nil {
+		return nil, err
+	}
+	return logTransactions, nil
+}
