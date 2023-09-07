@@ -165,7 +165,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
                 <Th>Frozen vaults</Th>
               </Thead>
               <Tbody>
-                {vaultsAuthorized?.map(vault => (
+                {vaultsUnauthorized?.map(vault => (
                   <Tr>
                     <Td>{vault.name}</Td>
                   </Tr>
@@ -177,7 +177,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
                 <Th>Unfrozen vaults</Th>
               </Thead>
               <Tbody>
-                {vaultsUnauthorized?.map(vault => (
+                {vaultsAuthorized?.map(vault => (
                   <Tr>
                     <Td>{vault.name}</Td>
                   </Tr>
