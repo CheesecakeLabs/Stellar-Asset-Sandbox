@@ -13,8 +13,10 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
 import { assetFlags, typesAsset } from 'utils/constants/data-constants'
+import { toNumber } from 'utils/formatter'
 
 import { RadioCard } from 'components/atoms'
 
@@ -36,6 +38,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   return (
@@ -101,13 +104,15 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel>Initial supply</FormLabel>
                 <Input
-                  type="number"
+                  as={NumericFormat}
+                  decimalScale={7}
+                  thousandSeparator=","
                   placeholder="Initial supply"
-                  {...register('initial_supply', {
-                    required: false,
-                    minLength: 3,
-                    maxLength: 922337203685,
-                  })}
+                  autoComplete="off"
+                  value={getValues('initial_supply')}
+                  onChange={(event): void => {
+                    setValue('initial_supply', toNumber(event.target.value))
+                  }}
                 />
               </FormControl>
             </Flex>
@@ -120,13 +125,15 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel>Limit</FormLabel>
                 <Input
-                  type="number"
+                  as={NumericFormat}
+                  decimalScale={7}
+                  thousandSeparator=","
                   placeholder="Limit"
-                  {...register('limit', {
-                    required: false,
-                    minLength: 3,
-                    maxLength: 3,
-                  })}
+                  autoComplete="off"
+                  value={getValues('initilimital_supply')}
+                  onChange={(event): void => {
+                    setValue('limit', toNumber(event.target.value))
+                  }}
                 />
               </FormControl>
               <FormControl>

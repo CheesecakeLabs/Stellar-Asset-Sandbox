@@ -65,7 +65,8 @@ export const ForgeAsset: React.FC = () => {
         navigate(PathRoute.HOME)
       }
     })
-  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const toastError = (message: string): void => {
     toast({

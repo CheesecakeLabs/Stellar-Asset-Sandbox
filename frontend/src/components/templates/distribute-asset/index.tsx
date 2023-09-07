@@ -11,8 +11,9 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-import { toCrypto } from 'utils/formatter'
+import { toCrypto, toNumber } from 'utils/formatter'
 
 import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
@@ -38,10 +39,10 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
   assetData,
 }) => {
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
   const [wallet, setWallet] = useState<string | undefined>()
 
@@ -66,12 +67,15 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
             <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
               <FormLabel>Amount</FormLabel>
               <Input
-                type="number"
+                as={NumericFormat}
+                decimalScale={7}
+                thousandSeparator=","
                 placeholder="Amount"
                 autoComplete="off"
-                {...register('amount', {
-                  required: true,
-                })}
+                value={getValues('amount')}
+                onChange={(event): void => {
+                  setValue('amount', toNumber(event.target.value))
+                }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>

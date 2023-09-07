@@ -58,3 +58,7 @@ export const formatAccount = (account: string): string => {
     account.length
   )}`
 }
+
+export const toNumber = (number: string): string => {
+  return number.replaceAll(',', '')
+}

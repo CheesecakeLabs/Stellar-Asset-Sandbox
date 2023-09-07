@@ -11,8 +11,9 @@ import {
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-import { toCrypto } from 'utils/formatter'
+import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
@@ -46,10 +47,10 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
   chartPeriod,
 }) => {
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   return (
@@ -78,12 +79,15 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
                 <HelpIcon />
               </Flex>
               <Input
-                type="number"
+                as={NumericFormat}
+                decimalScale={7}
+                thousandSeparator=","
                 placeholder="Type the amount you want to mint..."
                 autoComplete="off"
-                {...register('amount', {
-                  required: true,
-                })}
+                value={getValues('amount')}
+                onChange={(event): void => {
+                  setValue('amount', toNumber(event.target.value))
+                }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>

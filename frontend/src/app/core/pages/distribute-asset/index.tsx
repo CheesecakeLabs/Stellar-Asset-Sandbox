@@ -1,10 +1,11 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { distributeHelper } from 'utils/constants/helpers'
@@ -21,12 +22,15 @@ import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
   const { distribute, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { getVaults } = useVaults()
+  const { getAssetAccounts } = useHorizon()
+
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -58,7 +62,10 @@ export const DistributeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetById(id).then(asset => setAsset(asset))
+        getAssetById(id).then(asset => {
+          setAsset(asset)
+          filterVaults(asset)
+        })
         return
       }
 
@@ -82,15 +89,55 @@ export const DistributeAsset: React.FC = () => {
     })
   }
 
-  useEffect(() => {
-    getVaults()
-  }, [getVaults])
+  const filterVaults = useCallback(
+    async (
+      asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    ): Promise<void> => {
+      if (!asset) return
+      const assetAccounts = await getAssetAccounts(
+        asset.code,
+        asset.issuer.key.publicKey
+      )
+      const vaults = await getVaults()
+      const filteredVaults =
+        vaults
+          ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
+            assetAccounts
+              ?.find(
+                assetAccount => assetAccount.id === vault.wallet.key.publicKey
+              )
+              ?.balances.some(
+                balance =>
+                  balance.asset_code === asset.code &&
+                  balance.asset_issuer === asset.issuer.key.publicKey
+              )
+          )
+          .map(vault => ({
+            ...vault,
+            isUnauthorized:
+              assetAccounts
+                ?.find(
+                  assetAccount => assetAccount.id === vault.wallet.key.publicKey
+                )
+                ?.balances.find(
+                  balance =>
+                    balance.asset_code === asset.code &&
+                    balance.asset_issuer === asset.issuer.key.publicKey
+                )?.is_authorized === false || false,
+          })) || []
+      setVaults(filteredVaults)
+    },
+    [getAssetAccounts, getVaults]
+  )
 
   useEffect(() => {
     if (id) {
-      getAssetById(id).then(asset => setAsset(asset))
+      getAssetById(id).then(asset => {
+        setAsset(asset)
+        filterVaults(asset)
+      })
     }
-  }, [getAssetById, id])
+  }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
     getUserPermissions().then((): void => {
@@ -101,7 +148,8 @@ export const DistributeAsset: React.FC = () => {
         navigate(PathRoute.HOME)
       }
     })
-  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Flex>

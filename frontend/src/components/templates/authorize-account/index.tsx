@@ -10,13 +10,20 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
-import { AccountsChart } from '../../molecules/accounts-chart'
 import { AssetHeader } from 'components/atoms'
 
+import { AccountsChart } from '../../molecules/accounts-chart'
 import { SelectVault } from '../../molecules/select-vault'
 
 interface IAuthorizeAccountTemplate {
@@ -27,14 +34,16 @@ interface IAuthorizeAccountTemplate {
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
-  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsAuthorized: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsUnauthorized: Hooks.UseVaultsTypes.IVault[] | undefined
 }
 
 export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
   onSubmit,
   loading,
   asset,
-  vaults,
+  vaultsUnauthorized,
+  vaultsAuthorized,
 }) => {
   const {
     register,
@@ -74,7 +83,10 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
             {typeAccount === 'INTERNAL' ? (
               <FormControl isInvalid={errors?.wallet !== undefined}>
                 <FormLabel>Vault</FormLabel>
-                <SelectVault vaults={vaults} setWallet={setWallet} />
+                <SelectVault
+                  vaults={vaultsUnauthorized}
+                  setWallet={setWallet}
+                />
                 <FormErrorMessage>Required</FormErrorMessage>
               </FormControl>
             ) : (
@@ -104,13 +116,54 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
         </Box>
       </Container>
 
-      <AccountsChart
-        authorized={asset.assetData?.accounts.authorized || 0}
-        unauthorized={
-          (asset.assetData?.accounts.authorized_to_maintain_liabilities || 0) +
-          (asset.assetData?.accounts.unauthorized || 0)
-        }
-      />
+      <Container
+        variant="primary"
+        maxW="full"
+        mt="1rem"
+        py="0.5rem"
+        px="0.75rem"
+      >
+        <Text fontSize="xs" fontWeight="600" mb="1rem">
+          Vaults
+        </Text>
+        <Flex w="full" maxW="full">
+          <Box w="280px" mr="1rem">
+            <AccountsChart
+              authorized={asset.assetData?.accounts.authorized || 0}
+              unauthorized={
+                (asset.assetData?.accounts.authorized_to_maintain_liabilities ||
+                  0) + (asset.assetData?.accounts.unauthorized || 0)
+              }
+            />
+          </Box>
+          <Flex w="full" gap={4}>
+            <Table variant="list">
+              <Thead>
+                <Th>Authorized vaults</Th>
+              </Thead>
+              <Tbody>
+                {vaultsAuthorized?.map(vault => (
+                  <Tr>
+                    <Td>{vault.name}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+            <Table variant="list" h="min-content">
+              <Thead>
+                <Th>Unauthorized vaults</Th>
+              </Thead>
+              <Tbody>
+                {vaultsUnauthorized?.map(vault => (
+                  <Tr>
+                    <Td>{vault.name}</Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Flex>
+        </Flex>
+      </Container>
     </Flex>
   )
 }

@@ -1,10 +1,11 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { authorizeHelper } from 'utils/constants/helpers'
@@ -21,12 +22,19 @@ import { AuthorizeAccountTemplate } from 'components/templates/authorize-account
 
 export const AuthorizeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [vaultsAuthorized, setVaultsAuthorized] =
+    useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [vaultsUnauthorized, setVaultsUnauthorized] =
+    useState<Hooks.UseVaultsTypes.IVault[]>()
+
   const { authorize, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { getVaults } = useVaults()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
+  const { getAssetAccounts } = useHorizon()
+
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -55,7 +63,10 @@ export const AuthorizeAccount: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetById(id).then(asset => setAsset(asset))
+        getAssetById(id).then(asset => {
+          setAsset(asset)
+          filterVaults(asset)
+        })
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -78,11 +89,49 @@ export const AuthorizeAccount: React.FC = () => {
     })
   }
 
+  const filterVaults = useCallback(
+    async (
+      asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    ): Promise<void> => {
+      if (!asset) return
+      const assetAccounts = await getAssetAccounts(
+        asset.code,
+        asset.issuer.key.publicKey
+      )
+      const vaults = await getVaults()
+      const vaultsUnauthorized =
+        vaults?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
+          assetAccounts
+            ?.find(
+              assetAccount => assetAccount.id === vault.wallet.key.publicKey
+            )
+            ?.balances.some(
+              balance =>
+                balance.asset_code === asset.code &&
+                balance.asset_issuer === asset.issuer.key.publicKey &&
+                balance.is_authorized === false
+            )
+        ) || []
+      const vaultsAuthorized = vaults?.filter(
+        vault =>
+          !vaultsUnauthorized.some(
+            vaultUnauthorized => vaultUnauthorized.id === vault.id
+          )
+      )
+      setVaultsAuthorized(vaultsAuthorized)
+      setVaultsUnauthorized(vaultsUnauthorized)
+    },
+    [getAssetAccounts, getVaults]
+  )
+
   useEffect(() => {
     if (id) {
-      getAssetById(id).then(asset => setAsset(asset))
+      getAssetById(id).then(asset => {
+        setAsset(asset)
+        filterVaults(asset)
+      })
     }
-  }, [getAssetById, id])
+  }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
     getVaults()
@@ -97,7 +146,8 @@ export const AuthorizeAccount: React.FC = () => {
         navigate(PathRoute.HOME)
       }
     })
-  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Flex>
@@ -112,7 +162,8 @@ export const AuthorizeAccount: React.FC = () => {
                 onSubmit={onSubmit}
                 loading={loadingOperation}
                 asset={asset}
-                vaults={vaults}
+                vaultsUnauthorized={vaultsUnauthorized}
+                vaultsAuthorized={vaultsAuthorized}
               />
             )}
           </Flex>
