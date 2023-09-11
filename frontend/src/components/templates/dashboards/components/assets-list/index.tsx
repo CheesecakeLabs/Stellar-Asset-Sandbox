@@ -118,6 +118,8 @@ export const AssetsList: React.FC<IAssetsList> = ({
                       .authorized_to_maintain_liabilities || 0) +
                     (assetSelected.assetData?.accounts.unauthorized || 0)
                   }
+                  authorizedLabel={'Authorized'}
+                  unauthorizedLabel={'Pending authorization'}
                 />
               </Flex>
             </Flex>

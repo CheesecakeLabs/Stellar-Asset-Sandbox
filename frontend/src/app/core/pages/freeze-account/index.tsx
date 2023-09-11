@@ -22,17 +22,15 @@ import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
 export const FreezeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
-  const [vaultsAuthorized, setVaultsAuthorized] =
-    useState<Hooks.UseVaultsTypes.IVault[]>()
-  const [vaultsUnauthorized, setVaultsUnauthorized] =
-    useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [vaultsStatusList, setVaultsStatusList] =
+    useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
 
   const { updateAuthFlags, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { vaults, getVaults, vaultsToStatusName } = useVaults()
   const { getAssetAccounts } = useHorizon()
 
   const toast = useToast()
@@ -106,29 +104,10 @@ export const FreezeAccount: React.FC = () => {
         asset.issuer.key.publicKey
       )
       const vaults = await getVaults()
-      const vaultsUnauthorized =
-        vaults?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
-          assetAccounts
-            ?.find(
-              assetAccount => assetAccount.id === vault.wallet.key.publicKey
-            )
-            ?.balances.some(
-              balance =>
-                balance.asset_code === asset.code &&
-                balance.asset_issuer === asset.issuer.key.publicKey &&
-                balance.is_authorized === false
-            )
-        ) || []
-      const vaultsAuthorized = vaults?.filter(
-        vault =>
-          !vaultsUnauthorized.some(
-            vaultUnauthorized => vaultUnauthorized.id === vault.id
-          )
-      )
-      setVaultsAuthorized(vaultsAuthorized)
-      setVaultsUnauthorized(vaultsUnauthorized)
+      const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
+      setVaultsStatusList(vaultsStatusList)
     },
-    [getAssetAccounts, getVaults]
+    [getAssetAccounts, getVaults, vaultsToStatusName]
   )
 
   useEffect(() => {
@@ -170,8 +149,7 @@ export const FreezeAccount: React.FC = () => {
                 loading={loadingOperation}
                 asset={asset}
                 vaults={vaults}
-                vaultsAuthorized={vaultsAuthorized}
-                vaultsUnauthorized={vaultsUnauthorized}
+                vaultsStatusList={vaultsStatusList}
               />
             )}
           </Flex>

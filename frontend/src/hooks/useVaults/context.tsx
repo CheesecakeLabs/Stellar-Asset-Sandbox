@@ -5,6 +5,7 @@ import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
 import { getVaultCategoryTheme } from 'utils/colors'
 import { MessagesError } from 'utils/constants/messages-error'
+import { formatAccount } from 'utils/formatter'
 
 import { http } from 'interfaces/http'
 
@@ -205,6 +206,57 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     return false
   }
 
+  const filterVaultsByStatus = useCallback(
+    (
+      vaults: Hooks.UseVaultsTypes.IVault[] | undefined,
+      assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
+      asset: Hooks.UseAssetsTypes.IAssetDto,
+      isAuthorired: boolean
+    ): Hooks.UseVaultsTypes.IVault[] => {
+      return (
+        vaults?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
+          assetAccounts
+            ?.find(
+              assetAccount => assetAccount.id === vault.wallet.key.publicKey
+            )
+            ?.balances.some(
+              balance =>
+                balance.asset_code === asset.code &&
+                balance.asset_issuer === asset.issuer.key.publicKey &&
+                balance.is_authorized === isAuthorired
+            )
+        ) || []
+      )
+    },
+    []
+  )
+
+  const vaultsToStatusName = useCallback(
+    (
+      vaults: Hooks.UseVaultsTypes.IVault[] | undefined,
+      assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
+      asset: Hooks.UseAssetsTypes.IAssetDto
+    ): Hooks.UseVaultsTypes.IVaultAccountName[] => {
+      return (
+        assetAccounts
+          ?.map(assetAccount => ({
+            name:
+              vaults?.find(
+                vault => vault.wallet.key.publicKey === assetAccount.id
+              )?.name || formatAccount(assetAccount.id),
+            isAuthorized:
+              assetAccount.balances.find(
+                balance =>
+                  balance.asset_code === asset.code &&
+                  balance.asset_issuer === asset.issuer.key.publicKey
+              )?.is_authorized || false,
+          }))
+          .sort(account => (account.isAuthorized ? 0 : -1)) || []
+      )
+    },
+    []
+  )
+
   return (
     <VaultsContext.Provider
       value={{
@@ -225,6 +277,8 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
         updateVault,
         updateVaultAssets,
         deleteVault,
+        filterVaultsByStatus,
+        vaultsToStatusName,
       }}
     >
       {children}

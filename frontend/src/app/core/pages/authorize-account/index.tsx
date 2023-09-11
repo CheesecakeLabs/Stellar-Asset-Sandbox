@@ -22,15 +22,15 @@ import { AuthorizeAccountTemplate } from 'components/templates/authorize-account
 
 export const AuthorizeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
-  const [vaultsAuthorized, setVaultsAuthorized] =
-    useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [vaultsStatusList, setVaultsStatusList] =
+    useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
   const [vaultsUnauthorized, setVaultsUnauthorized] =
     useState<Hooks.UseVaultsTypes.IVault[]>()
 
   const { authorize, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { id } = useParams()
-  const { getVaults } = useVaults()
+  const { getVaults, vaultsToStatusName, filterVaultsByStatus } = useVaults()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { getAssetAccounts } = useHorizon()
@@ -99,29 +99,17 @@ export const AuthorizeAccount: React.FC = () => {
         asset.issuer.key.publicKey
       )
       const vaults = await getVaults()
-      const vaultsUnauthorized =
-        vaults?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
-          assetAccounts
-            ?.find(
-              assetAccount => assetAccount.id === vault.wallet.key.publicKey
-            )
-            ?.balances.some(
-              balance =>
-                balance.asset_code === asset.code &&
-                balance.asset_issuer === asset.issuer.key.publicKey &&
-                balance.is_authorized === false
-            )
-        ) || []
-      const vaultsAuthorized = vaults?.filter(
-        vault =>
-          !vaultsUnauthorized.some(
-            vaultUnauthorized => vaultUnauthorized.id === vault.id
-          )
+      const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
+      const vaultsUnauthorized = filterVaultsByStatus(
+        vaults,
+        assetAccounts,
+        asset,
+        false
       )
-      setVaultsAuthorized(vaultsAuthorized)
+      setVaultsStatusList(vaultsStatusList)
       setVaultsUnauthorized(vaultsUnauthorized)
     },
-    [getAssetAccounts, getVaults]
+    [filterVaultsByStatus, getAssetAccounts, getVaults, vaultsToStatusName]
   )
 
   useEffect(() => {
@@ -163,7 +151,7 @@ export const AuthorizeAccount: React.FC = () => {
                 loading={loadingOperation}
                 asset={asset}
                 vaultsUnauthorized={vaultsUnauthorized}
-                vaultsAuthorized={vaultsAuthorized}
+                vaultsStatusList={vaultsStatusList}
               />
             )}
           </Flex>

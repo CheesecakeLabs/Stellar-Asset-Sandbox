@@ -64,6 +64,11 @@ export const VaultDetail: React.FC = () => {
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
         amount: amount,
+        current_supply:
+          Number(selectedAsset.assetData?.amount || 0) - Number(amount),
+        current_main_vault:
+          Number(selectedAsset.distributorBalance?.balance || 0) -
+          Number(amount),
       })
 
       if (isSuccess) {

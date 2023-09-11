@@ -10,20 +10,13 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
-import { AccountsChart } from 'components/molecules/accounts-chart'
 import { SelectVault } from 'components/molecules/select-vault'
+import { VaultsStatusList } from 'components/molecules/vaults-status-list'
 
 interface IFreezeAccountTemplate {
   onSubmit(
@@ -36,8 +29,7 @@ interface IFreezeAccountTemplate {
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
-  vaultsAuthorized: Hooks.UseVaultsTypes.IVault[] | undefined
-  vaultsUnauthorized: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsStatusList: Hooks.UseVaultsTypes.IVaultAccountName[] | undefined
 }
 
 export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
@@ -45,8 +37,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
   loading,
   asset,
   vaults,
-  vaultsAuthorized,
-  vaultsUnauthorized,
+  vaultsStatusList,
 }) => {
   const {
     register,
@@ -139,54 +130,12 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
         </Box>
       </Container>
 
-      <Container
-        variant="primary"
-        maxW="full"
-        mt="1rem"
-        py="0.5rem"
-        px="0.75rem"
-      >
-        <Text fontSize="xs" fontWeight="600" mb="1rem">
-          Vaults
-        </Text>
-        <Flex w="full" maxW="full">
-          <Box w="280px" mr="1rem">
-            <AccountsChart
-              authorized={asset.assetData?.accounts.authorized || 0}
-              unauthorized={
-                (asset.assetData?.accounts.authorized_to_maintain_liabilities ||
-                  0) + (asset.assetData?.accounts.unauthorized || 0)
-              }
-            />
-          </Box>
-          <Flex w="full" gap={4}>
-            <Table variant="list">
-              <Thead>
-                <Th>Frozen vaults</Th>
-              </Thead>
-              <Tbody>
-                {vaultsUnauthorized?.map(vault => (
-                  <Tr>
-                    <Td>{vault.name}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-            <Table variant="list" h="min-content">
-              <Thead>
-                <Th>Unfrozen vaults</Th>
-              </Thead>
-              <Tbody>
-                {vaultsAuthorized?.map(vault => (
-                  <Tr>
-                    <Td>{vault.name}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Flex>
-        </Flex>
-      </Container>
+      <VaultsStatusList
+        vaultsStatus={vaultsStatusList}
+        asset={asset}
+        authorizedLabel={'Authorized'}
+        unauthorizedLabel={'Frozen'}
+      />
     </Flex>
   )
 }

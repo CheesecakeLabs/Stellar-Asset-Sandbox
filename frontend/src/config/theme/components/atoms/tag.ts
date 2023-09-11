@@ -1,13 +1,10 @@
 export const Tag = {
   baseStyle: {
-    label: {
-      fontSize: 'xs',
-      fontWeight: '400',
-    },
     container: {
       borderRadius: 'full',
       fontSize: 'xs',
       padding: '6px 24px',
+      fontWeight: '700',
     },
   },
   variants: {

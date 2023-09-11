@@ -5,15 +5,19 @@ import Chart from 'react-apexcharts'
 interface IAccountsChart {
   authorized: number
   unauthorized: number
+  authorizedLabel: string
+  unauthorizedLabel: string
 }
 
 export const AccountsChart: React.FC<IAccountsChart> = ({
   authorized,
   unauthorized,
+  authorizedLabel,
+  unauthorizedLabel,
 }) => {
   const { colorMode } = useColorMode()
 
-  const series = [unauthorized, authorized]
+  const series = [authorized, unauthorized]
 
   const options = {
     chart: {
@@ -24,8 +28,8 @@ export const AccountsChart: React.FC<IAccountsChart> = ({
       show: true,
       position: 'bottom' as 'top' | 'right' | 'bottom' | 'left',
     },
-    labels: ['Unauthorized', 'Authorized'],
-    colors: ['#f55025', '#195a63'],
+    labels: [authorizedLabel, unauthorizedLabel],
+    colors: ['#195a63', '#f55025'],
     responsive: [
       {
         breakpoint: 480,

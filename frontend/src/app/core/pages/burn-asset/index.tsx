@@ -1,24 +1,29 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { FieldValues, UseFormSetValue } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { useAssets } from 'hooks/useAssets'
-import { useAuth } from 'hooks/useAuth'
-import { useDashboards } from 'hooks/useDashboards'
-import { havePermission } from 'utils'
-import { burnHelper } from 'utils/constants/helpers'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { AssetActions } from 'components/enums/asset-actions'
-import { PathRoute } from 'components/enums/path-route'
-import { Permissions } from 'components/enums/permissions'
-import { ActionHelper } from 'components/molecules/action-helper'
-import { TChartPeriod } from 'components/molecules/chart-period'
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
-import { Sidebar } from 'components/organisms/sidebar'
-import { BurnAssetTemplate } from 'components/templates/burn-asset'
+
+import { useAssets } from 'hooks/useAssets';
+import { useAuth } from 'hooks/useAuth';
+import { useDashboards } from 'hooks/useDashboards';
+import { havePermission } from 'utils';
+import { burnHelper } from 'utils/constants/helpers';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { AssetActions } from 'components/enums/asset-actions';
+import { PathRoute } from 'components/enums/path-route';
+import { Permissions } from 'components/enums/permissions';
+import { ActionHelper } from 'components/molecules/action-helper';
+import { TChartPeriod } from 'components/molecules/chart-period';
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
+import { Sidebar } from 'components/organisms/sidebar';
+import { BurnAssetTemplate } from 'components/templates/burn-asset';
+
 
 export const BurnAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -48,6 +53,9 @@ export const BurnAsset: React.FC = () => {
         code: asset.code,
         sponsor_id: 1,
         amount: data.amount,
+        current_supply: Number(asset.assetData?.amount || 0) - data.amount,
+        current_main_vault:
+          Number(asset.distributorBalance?.balance || 0) - data.amount,
       })
 
       if (isSuccess) {
