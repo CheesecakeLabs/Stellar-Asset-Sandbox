@@ -9,7 +9,7 @@ import { typesAsset } from 'utils/constants/data-constants'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { InfoCard } from '../contracts-detail/components/info-card'
-import { ChartPayments } from './components/chart-payments'
+import { ChartPayments } from '../../molecules/chart-payments'
 import { LinkIcon, WalletIcon } from 'components/icons'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
@@ -104,7 +104,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
               </Text>
               <Flex gap={2}>
                 {asset.assetData?.flags.auth_required && (
-                  <Tag variant={'actived'}>Authorize Required</Tag>
+                  <Tag variant={'actived'}>Authorize required</Tag>
                 )}
                 {asset.assetData?.flags.auth_clawback_enabled && (
                   <Tag variant={'actived'}>Clawback enabled</Tag>

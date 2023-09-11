@@ -81,13 +81,9 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
           </Alert>
         )}
         <Container variant="primary" justifyContent="center" p="2rem">
-          <Text fontSize="2xl" fontWeight="400" mb="0.5rem">
+          <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
             Create an account
           </Text>
-          <Text fontSize="sm" fontWeight="400" mb="1.5rem">
-            You were invited by tomer@stellar.org
-          </Text>
-
           {loadingRoles ? (
             <Loading />
           ) : (

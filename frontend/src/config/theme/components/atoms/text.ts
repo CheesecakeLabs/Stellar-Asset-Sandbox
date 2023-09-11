@@ -5,6 +5,9 @@ export const Text = {
     _dark: {
       color: 'white',
     },
+    a: {
+      color: 'primary.normal'
+    }
   },
   variants: {
     secondary: {

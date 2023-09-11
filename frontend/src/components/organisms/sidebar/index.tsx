@@ -1,23 +1,13 @@
-import {
-  Box,
-  Drawer,
-  DrawerContent,
-  Flex,
-  useDisclosure,
-} from '@chakra-ui/react'
-import React, { ReactNode } from 'react'
+import { Box, Drawer, DrawerContent, Flex, useDisclosure } from '@chakra-ui/react';
+import React, { ReactNode } from 'react';
 
-import { PathRoute } from 'components/enums/path-route'
-import {
-  ContractIcon,
-  DashboardIcon,
-  ExplorerIcon,
-  HomeIcon,
-  PaymentsIcon,
-  VaultIcon,
-} from 'components/icons'
-import { SidebarContent } from 'components/molecules'
-import { Header } from 'components/molecules/header'
+
+
+import { PathRoute } from 'components/enums/path-route';
+import { ContractIcon, DashboardIcon, ExplorerIcon, HomeIcon, PaymentsIcon, VaultIcon } from 'components/icons';
+import { SidebarContent } from 'components/molecules';
+import { Header } from 'components/molecules/header';
+
 
 interface IProps {
   highlightMenu: PathRoute
@@ -37,7 +27,7 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Asset Management',
+    name: 'Stellar Classic',
     icon: <PaymentsIcon />,
     path: PathRoute.ASSET_MANAGEMENT,
   },
