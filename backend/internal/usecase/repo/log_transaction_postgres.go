@@ -18,8 +18,10 @@ func NewLogTransactionRepo(postgres *postgres.Postgres) *LogTransactionRepo {
 }
 
 func (repo *LogTransactionRepo) StoreLogTransaction(log entity.LogTransaction) error {
-	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description, origin_pk, destination_pk) VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description, log.OriginPK, log.DestinationPK)
+	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description, origin_pk, destination_pk, current_supply, current_main_vault)
+	 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description, log.OriginPK, log.DestinationPK,
+		log.CurrentSupply, log.CurrentMainVault)
 	if err != nil {
 		fmt.Println(err)
 		return err
