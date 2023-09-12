@@ -2,8 +2,10 @@ import { Text, Container, Flex, Box } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { useDashboards } from 'hooks/useDashboards'
+import { useHorizon } from 'hooks/useHorizon'
+import { useVaults } from 'hooks/useVaults'
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { toCrypto } from 'utils/formatter'
+import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { ChevronDownIcon } from 'components/icons'
 import { AccountsChart } from 'components/molecules/accounts-chart'
@@ -29,6 +31,8 @@ export const AssetsList: React.FC<IAssetsList> = ({
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
 
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
+  const { getAssetAccounts } = useHorizon()
+  const { getVaults } = useVaults()
 
   useEffect(() => {
     if (assetSelected) {
@@ -37,6 +41,61 @@ export const AssetsList: React.FC<IAssetsList> = ({
       )
     }
   }, [assetSelected, chartPeriod, getPaymentsByAssetId])
+
+  useEffect(() => {
+    if (assetSelected) {
+      getAssetAccounts(
+        assetSelected.code,
+        assetSelected.issuer.key.publicKey
+      ).then(async accounts => {
+        const vaults = (await getVaults()) as
+          | Hooks.UseVaultsTypes.IVault[]
+          | undefined
+        const filteredAccounts = accounts
+          ?.sort(
+            (a, b) =>
+              Number(
+                b.balances?.find(
+                  balance =>
+                    balance.asset_code === assetSelected.code &&
+                    balance.asset_issuer === assetSelected.issuer.key.publicKey
+                )?.balance || 0
+              ) -
+              Number(
+                a.balances.find(
+                  balance =>
+                    balance.asset_code === assetSelected.code &&
+                    balance.asset_issuer === assetSelected.issuer.key.publicKey
+                )?.balance || 0
+              )
+          )
+          .slice(0, 5)
+          .map(account => ({
+            name:
+              vaults?.find(vault => vault.wallet.key.publicKey === account.id)
+                ?.name || formatAccount(account.id),
+            amount: Number(
+              account.balances?.find(
+                balance =>
+                  balance.asset_code === assetSelected.code &&
+                  balance.asset_issuer === assetSelected.issuer.key.publicKey
+              )?.balance || 0
+            ),
+            percentage:
+              (Number(
+                account.balances?.find(
+                  balance =>
+                    balance.asset_code === assetSelected.code &&
+                    balance.asset_issuer === assetSelected.issuer.key.publicKey
+                )?.balance || 0
+              ) /
+                Number(assetSelected.assetData?.amount || 1)) *
+              100,
+          }))
+        setTopHolders(filteredAccounts || [])
+      })
+    }
+  }, [assetSelected, getAssetAccounts, getVaults])
 
   return (
     <Flex flexDir="column">
@@ -102,15 +161,23 @@ export const AssetsList: React.FC<IAssetsList> = ({
         >
           <Flex flexDir="column">
             <Flex gap={4}>
-              {paymentsAsset && (
-                <ChartPayments
-                  loadingChart={loadingChart}
-                  paymentsAsset={paymentsAsset}
-                  chartPeriod={chartPeriod}
-                  setChartPeriod={setChartPeriod}
-                />
-              )}
-              <Flex w="30%" h="min-content">
+              <Flex
+                w="full"
+                borderEnd="1px solid"
+                borderColor={'gray.600'}
+                _dark={{ borderColor: 'black.800' }}
+              >
+                {paymentsAsset && (
+                  <ChartPayments
+                    loadingChart={loadingChart}
+                    paymentsAsset={paymentsAsset}
+                    chartPeriod={chartPeriod}
+                    setChartPeriod={setChartPeriod}
+                    cleanMode
+                  />
+                )}
+              </Flex>
+              <Flex w="30%" h="min-content" flexDir="column">
                 <AccountsChart
                   authorized={assetSelected.assetData?.accounts.authorized || 0}
                   unauthorized={
