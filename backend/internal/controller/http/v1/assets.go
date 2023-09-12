@@ -54,16 +54,14 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 }
 
 type CreateAssetRequest struct {
-	SponsorId int             `json:"sponsor_id"    example:"2"`
-	Name      string          `json:"name"       binding:"required"  example:"USDC"`
-	AssetType string          `json:"asset_type"       binding:"required"  example:"security_token"`
-	Code      string          `json:"code"       binding:"required"  example:"USDC"`
-	Limit     *int            `json:"limit"         example:"1000"`
-	Amount    string          `json:"amount"        example:"1000"`
-	SetFlags  []string        `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
-	Image     string          `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
-	SetToml   bool            `json:"set_toml"       example:"true"`
-	TomlData  entity.TomlData `json:"toml_data" example:"Example entity.TomlData"`
+	SponsorId int      `json:"sponsor_id"    example:"2"`
+	Name      string   `json:"name"       binding:"required"  example:"USDC"`
+	AssetType string   `json:"asset_type"       binding:"required"  example:"security_token"`
+	Code      string   `json:"code"       binding:"required"  example:"USDC"`
+	Limit     *int     `json:"limit"         example:"1000"`
+	Amount    string   `json:"amount"        example:"1000"`
+	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	Image     string   `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
 
 type BurnAssetRequest struct {
@@ -278,19 +276,25 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
-	if !request.SetToml {
-		c.JSON(http.StatusOK, asset)
+	// Set TOML data
+	var tomlData entity.TomlData
+	tomlData.Currencies = []entity.Currency{
+		{
+			Code:   asset.Code,
+			Issuer: asset.Issuer.Key.PublicKey,
+			Name:   asset.Name,
+		},
 	}
 
 	if asset.Id == 1 {
-		_, err = r.as.CreateToml(request.TomlData)
+		_, err = r.as.CreateToml(tomlData)
 		if err != nil {
 			errorResponse(c, http.StatusNotFound, "error to create TOML ", err)
 			return
 		}
 	}
 
-	_, err = r.as.UpdateToml(request.TomlData)
+	_, err = r.as.UpdateToml(tomlData)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to update TOML ", err)
 		return
