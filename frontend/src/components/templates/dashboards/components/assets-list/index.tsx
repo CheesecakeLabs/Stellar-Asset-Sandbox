@@ -12,6 +12,8 @@ import { AccountsChart } from 'components/molecules/accounts-chart'
 import { ChartPayments } from 'components/molecules/chart-payments'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
+import { TopHolders } from '../top-holders'
+
 interface IAssetsList {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   loadingAssets: boolean
@@ -29,6 +31,8 @@ export const AssetsList: React.FC<IAssetsList> = ({
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [topHolders, setTopHolders] =
+    useState<Hooks.UseHorizonTypes.IHolder[]>()
 
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { getAssetAccounts } = useHorizon()
@@ -188,6 +192,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
                   authorizedLabel={'Authorized'}
                   unauthorizedLabel={'Pending authorization'}
                 />
+                {false && <TopHolders holders={topHolders} />}
               </Flex>
             </Flex>
           </Flex>
