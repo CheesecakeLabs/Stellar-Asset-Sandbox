@@ -21,6 +21,13 @@ type SumLogTransaction struct {
 	Quantity []int     `json:"quantity" example:"1"`
 }
 
+type SumLogTransactionSupply struct {
+	Asset             Asset    `json:"asset"`
+	CurrentSupply     []int    `json:"current_supply" example:"1000"`
+	CurrentyMainVault []int    `json:"current_main_vault" example:"1000"`
+	Date              []string `json:"date" example:"2023-08-10T14:30:00Z"`
+}
+
 const (
 	CreateAsset     int = iota + 1 // CreateAsset = 1
 	MintAsset                      // MintAsset = 2

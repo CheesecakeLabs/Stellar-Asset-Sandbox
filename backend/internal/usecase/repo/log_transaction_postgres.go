@@ -172,7 +172,8 @@ func getLogTransactions(repo *LogTransactionRepo, timeRange string, whereClause 
 		return nil, err
 	}
 	query := `
-		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, lt.description
+		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, 
+		lt.description ,lt.current_supply, lt.current_main_vault
 		FROM logtransactions AS lt
 		JOIN Asset AS a ON lt.asset_id = a.id
 		WHERE lt.date >= $1 ` + whereClause + `
@@ -189,7 +190,7 @@ func getLogTransactions(repo *LogTransactionRepo, timeRange string, whereClause 
 	for rows.Next() {
 		var log entity.LogTransaction
 		var distributorID, issuerID int
-		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date, &log.Description)
+		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date, &log.Description, &log.CurrentSupply, &log.CurrentMainVault)
 		if err != nil {
 			return nil, err
 		}
@@ -229,7 +230,7 @@ func getDateFilter(timeRange string) (time.Time, error) {
 func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error) {
 	query := `
 		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, lt.description,
-		lt.origin_pk, lt.destination_pk
+		lt.origin_pk, lt.destination_pk, lt.current_supply, lt.current_main_vault
 		FROM logtransactions AS lt
 		JOIN Asset AS a ON lt.asset_id = a.id
 		WHERE lt.transaction_type_id = $1
@@ -248,7 +249,7 @@ func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([
 		var log entity.LogTransaction
 		var distributorID, issuerID int
 		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date,
-			&log.Description, &log.OriginPK, &log.DestinationPK)
+			&log.Description, &log.OriginPK, &log.DestinationPK, &log.CurrentSupply, &log.CurrentMainVault)
 		if err != nil {
 			return nil, err
 		}
@@ -270,4 +271,104 @@ func getTimeFrame(timeFrame time.Duration) string {
 		timeFrameUnit = "minute"
 	}
 	return timeFrameUnit
+}
+
+func (repo *LogTransactionRepo) SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error) {
+	dateFilter, err := getDateFilter(timeRange)
+	if err != nil {
+		return []entity.SumLogTransactionSupply{}, err
+	}
+
+	timeFrameUnit := getTimeFrame(timeFrame)
+	timeFrameSeconds := timeFrame.Seconds()
+
+	query := `
+		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.current_supply), SUM(lt.current_main_vault),
+		DATE_TRUNC($2, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$3) * $3) as dateFrame
+		FROM logtransactions AS lt
+		JOIN asset AS a ON lt.asset_id = a.id
+		WHERE lt.date >= $1
+		GROUP BY a.id, dateFrame
+		ORDER BY a.id, dateFrame;
+	`
+
+	rows, err := repo.Db.Query(query, dateFilter, timeFrameUnit, timeFrameSeconds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sums []entity.SumLogTransactionSupply
+	var currentAsset entity.Asset
+	var sumLogTransactionSupply entity.SumLogTransactionSupply
+	for rows.Next() {
+		var asset entity.Asset
+		var currentSupply, currentMainVault int
+		var date string
+		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
+		if err != nil {
+			return nil, err
+		}
+
+		if asset.Id != currentAsset.Id && currentAsset.Id != 0 {
+			sums = append(sums, sumLogTransactionSupply)
+			sumLogTransactionSupply = entity.SumLogTransactionSupply{}
+		}
+
+		sumLogTransactionSupply.Asset = asset
+		sumLogTransactionSupply.CurrentSupply = append(sumLogTransactionSupply.CurrentSupply, currentSupply)
+		sumLogTransactionSupply.CurrentyMainVault = append(sumLogTransactionSupply.CurrentyMainVault, currentMainVault)
+		sumLogTransactionSupply.Date = append(sumLogTransactionSupply.Date, date)
+		currentAsset = asset
+	}
+
+	if currentAsset.Id != 0 {
+		sums = append(sums, sumLogTransactionSupply)
+	}
+
+	return sums, nil
+}
+
+func (repo *LogTransactionRepo) SumLogTransactionSupplyByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransactionSupply, error) {
+	dateFilter, err := getDateFilter(timeRange)
+	if err != nil {
+		return entity.SumLogTransactionSupply{}, err
+	}
+
+	timeFrameUnit := getTimeFrame(timeFrame)
+	timeFrameSeconds := timeFrame.Seconds()
+
+	query := `
+		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.current_supply), SUM(lt.current_main_vault),
+		DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame
+		FROM logtransactions AS lt
+		JOIN asset AS a ON lt.asset_id = a.id
+		WHERE lt.date >= $1 AND lt.asset_id = $2
+		GROUP BY a.id, dateFrame
+		ORDER BY a.id, dateFrame;
+	`
+
+	rows, err := repo.Db.Query(query, dateFilter, assetID, timeFrameUnit, timeFrameSeconds)
+	if err != nil {
+		return entity.SumLogTransactionSupply{}, err
+	}
+	defer rows.Close()
+
+	var sumLogTransactionSupply entity.SumLogTransactionSupply
+	for rows.Next() {
+		var asset entity.Asset
+		var currentSupply, currentMainVault int
+		var date string
+		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
+		if err != nil {
+			return entity.SumLogTransactionSupply{}, err
+		}
+
+		sumLogTransactionSupply.Asset = asset
+		sumLogTransactionSupply.CurrentSupply = append(sumLogTransactionSupply.CurrentSupply, currentSupply)
+		sumLogTransactionSupply.CurrentyMainVault = append(sumLogTransactionSupply.CurrentyMainVault, currentMainVault)
+		sumLogTransactionSupply.Date = append(sumLogTransactionSupply.Date, date)
+	}
+
+	return sumLogTransactionSupply, nil
 }

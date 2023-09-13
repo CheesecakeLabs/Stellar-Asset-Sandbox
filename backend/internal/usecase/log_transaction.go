@@ -77,3 +77,19 @@ func (l *LogTransactionUseCase) GetLastLogTransactions(transactionTypeID int) ([
 	}
 	return logTransactions, nil
 }
+
+func (l *LogTransactionUseCase) SumLogTransactionsSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error) {
+	sum, err := l.lRepo.SumLogTransactionSupply(timeRange, timeFrame)
+	if err != nil {
+		return []entity.SumLogTransactionSupply{}, err
+	}
+	return sum, nil
+}
+
+func (l *LogTransactionUseCase) SumLogTransactionsSupplyByAssetID(assetID int, timeRange string, duration time.Duration) (entity.SumLogTransactionSupply, error) {
+	sum, err := l.lRepo.SumLogTransactionSupplyByAssetID(assetID, timeRange, duration)
+	if err != nil {
+		return entity.SumLogTransactionSupply{}, err
+	}
+	return sum, nil
+}

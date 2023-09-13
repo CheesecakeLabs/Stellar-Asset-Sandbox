@@ -96,5 +96,7 @@ type (
 		SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error)
 		SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error)
 		GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error)
+		SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error)
+		SumLogTransactionSupplyByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransactionSupply, error)
 	}
 )

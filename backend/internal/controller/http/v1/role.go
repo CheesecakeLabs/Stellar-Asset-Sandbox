@@ -33,7 +33,7 @@ func newRoleRoutes(handler *gin.RouterGroup, roleUseCase usecase.RoleUseCase, me
 // @Tags Role
 // @Accept json
 // @Produce json
-// @Param   type     query    string     true        "Type"
+// @Param   type query  string true  "Type"
 // @Success 200  {object} []entity.Role
 // @Router /role [get]
 func (r *role) list(c *gin.Context) {
@@ -49,7 +49,7 @@ func (r *role) list(c *gin.Context) {
 // @Tags  	    Role
 // @Accept      json
 // @Produce     json
-// @Param       request body RoleRequest true "Role info"
+// @Param       request body entity.RoleRequest true "Role info"
 // @Success     200 {object} entity.RoleRequest
 // @Failure     400 {object} response
 // @Failure     404 {object} response
@@ -80,7 +80,7 @@ func (r *role) createRole(c *gin.Context) {
 // @Accept      json
 // @Produce     json
 // @Param       id path string true "Role ID" Format(uuid)
-// @Param       request body RoleRequest true "Role info"
+// @Param       request body entity.RoleRequest true "Role info"
 // @Success     200 {object} entity.Role "Updated role information"
 // @Failure     400 {object} response "Bad Request: Invalid input data"
 // @Failure     404 {object} response "Not Found: Role not found"
@@ -130,7 +130,7 @@ func (r *role) updateRole(c *gin.Context) {
 // @Accept      json
 // @Produce     json
 // @Param       id path string true "Role ID" Format(uuid)
-// @Param       request body RoleRequest true "Role info"
+// @Param       request body entity.RoleRequest true "Role info"
 // @Success     200 {object} entity.RoleDelete "Updated role information"
 // @Failure     400 {object} response "Bad Request: Invalid input data"
 // @Failure     404 {object} response "Not Found: Role not found"
