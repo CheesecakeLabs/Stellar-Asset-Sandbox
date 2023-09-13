@@ -46,7 +46,8 @@ declare namespace Hooks {
       deposit(
         amount: bigint,
         address: string,
-        updatePosition: void
+        updatePosition: void,
+        signerSecret: string
       ): Promise<boolean>
       getPosition(
         update: React.Dispatch<React.SetStateAction<bigint>>,
@@ -64,7 +65,8 @@ declare namespace Hooks {
       withdraw(
         address: string,
         premature: boolean,
-        updatePosition: void
+        updatePosition: void,
+        signerSecret: string
       ): Promise<boolean>
     }
   }

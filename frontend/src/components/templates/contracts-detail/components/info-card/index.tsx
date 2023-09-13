@@ -5,7 +5,7 @@ import { HelpIcon } from 'components/icons'
 
 interface IInfoCard {
   title: string
-  icon: ReactNode
+  icon?: ReactNode
   value: string
 }
 
