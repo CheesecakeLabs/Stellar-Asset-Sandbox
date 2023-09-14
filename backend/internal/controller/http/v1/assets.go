@@ -49,39 +49,39 @@ type CreateAssetRequest struct {
 }
 
 type BurnAssetRequest struct {
-	Id               string `json:"id"       binding:"required"  example:"001"`
-	SponsorId        int    `json:"sponsor_id"        example:"2"`
-	Amount           string `json:"amount"       binding:"required"  example:"1000"`
-	CurrentSupply    int    `json:"current_supply"       example:"1000"`
-	CurrentMainVault int    `json:"current_main_vault"       example:"1000"`
+	Id               string  `json:"id"       binding:"required"  example:"001"`
+	SponsorId        int     `json:"sponsor_id"        example:"2"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type MintAssetRequest struct {
-	Id               string `json:"id"       binding:"required"  example:"12"`
-	SponsorId        int    `json:"sponsor_id"       example:"2"`
-	Code             string `json:"code"       binding:"required"  example:"USDC"`
-	Amount           string `json:"amount"       binding:"required"  example:"1000"`
-	CurrentSupply    int    `json:"current_supply"       example:"1000"`
-	CurrentMainVault int    `json:"current_main_vault"       example:"1000"`
+	Id               string  `json:"id"       binding:"required"  example:"12"`
+	SponsorId        int     `json:"sponsor_id"       example:"2"`
+	Code             string  `json:"code"       binding:"required"  example:"USDC"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type ClawbackAssetRequest struct {
-	SponsorId        int    `json:"sponsor_id"   example:"2"`
-	Code             string `json:"code"       binding:"required"  example:"USDC"`
-	Amount           string `json:"amount"       binding:"required"  example:"1000"`
-	From             string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
-	CurrentSupply    int    `json:"current_supply"       example:"1000"`
-	CurrentMainVault int    `json:"current_main_vault"       example:"1000"`
+	SponsorId        int     `json:"sponsor_id"   example:"2"`
+	Code             string  `json:"code"       binding:"required"  example:"USDC"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	From             string  `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type TransferAssetRequest struct {
-	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
-	SponsorId           int    `json:"sponsor_id" example:"2"`
-	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
-	AssetID             string `json:"asset_id" binding:"required" example:"12"`
-	Amount              string `json:"amount" binding:"required" example:"12"`
-	CurrentSupply       int    `json:"current_supply"       example:"1000"`
-	CurrentMainVault    int    `json:"current_main_vault"       example:"1000"`
+	SourceWalletID      int     `json:"source_wallet_id" binding:"required" example:"1"`
+	SponsorId           int     `json:"sponsor_id" example:"2"`
+	DestinationWalletPK string  `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
+	AssetID             string  `json:"asset_id" binding:"required" example:"12"`
+	Amount              string  `json:"amount" binding:"required" example:"12"`
+	CurrentSupply       float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault    float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type UpdateAuthFlagsRequest struct {

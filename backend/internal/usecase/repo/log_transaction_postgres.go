@@ -303,7 +303,7 @@ func (repo *LogTransactionRepo) SumLogTransactionSupply(timeRange string, timeFr
 	var sumLogTransactionSupply entity.SumLogTransactionSupply
 	for rows.Next() {
 		var asset entity.Asset
-		var currentSupply, currentMainVault int
+		var currentSupply, currentMainVault float64
 		var date string
 		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
 		if err != nil {
@@ -357,7 +357,7 @@ func (repo *LogTransactionRepo) SumLogTransactionSupplyByAssetID(assetID int, ti
 	var sumLogTransactionSupply entity.SumLogTransactionSupply
 	for rows.Next() {
 		var asset entity.Asset
-		var currentSupply, currentMainVault int
+		var currentSupply, currentMainVault float64
 		var date string
 		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
 		if err != nil {
