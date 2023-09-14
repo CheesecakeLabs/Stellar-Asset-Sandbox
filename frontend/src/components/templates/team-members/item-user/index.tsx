@@ -9,12 +9,11 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import React, { ReactNode } from 'react'
-import TimeAgo from 'react-timeago'
 
 import { havePermission } from 'utils'
 
 import { Permissions } from 'components/enums/permissions'
-import {EditIcon, MenuDotsIcon} from 'components/icons'
+import { MenuDotsIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
 
 interface IItemUser {
@@ -23,7 +22,7 @@ interface IItemUser {
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 }
 
 export const ItemUser: React.FC<IItemUser> = ({
@@ -47,30 +46,12 @@ export const ItemUser: React.FC<IItemUser> = ({
         handleEditRole={handleEditRole}
         roles={roles}
       />
-      <Tr borderColor="red">
-        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
-          <IconButton
-              variant="icon"
-              icon={<EditIcon />}
-              aria-label={'Edit'}
-              onClick={onOpen}
-          />
-        </Td>
-        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
-          {user.name}
-        </Td>
-        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
-          {user.role}
-        </Td>
-        <Td borderColor={'gray.400'} _dark={{ borderColor: 'black.800' }}>
-          {<TimeAgo date={Date.parse(user.updated_at)} />}
-        </Td>
-        <Td
-          borderColor={'gray.400'}
-          _dark={{ borderColor: 'black.800' }}
-          w="1rem"
-          p={0}
-        >
+      <Tr>
+        <Td>{user.id}</Td>
+        <Td>{user.name}</Td>
+        <Td>{user.role}</Td>
+        <Td>{user.email}</Td>
+        <Td w="1rem" p={0}>
           {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
             <Menu>
               {({ isOpen }): ReactNode => (

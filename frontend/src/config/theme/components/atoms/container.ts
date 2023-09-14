@@ -3,7 +3,7 @@ export const Container = {
     primary: {
       backgroundColor: 'white',
       border: '1px solid',
-      borderColor: 'gray.600',
+      borderColor: 'gray.200',
       borderRadius: '0.25rem',
       p: '1.5rem',
       flexDir: 'column',

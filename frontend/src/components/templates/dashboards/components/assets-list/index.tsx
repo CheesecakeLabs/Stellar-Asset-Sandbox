@@ -1,63 +1,129 @@
 import { Text, Container, Flex, Box } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
+import { useDashboards } from 'hooks/useDashboards'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { HelpIcon } from 'components/icons'
+import { ChevronDownIcon } from 'components/icons'
+import { AccountsChart } from 'components/molecules/accounts-chart'
+import { ChartPayments } from 'components/molecules/chart-payments'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IAssetsList {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   loadingAssets: boolean
+  assetSelected: Hooks.UseAssetsTypes.IAssetDto | undefined
+  setAssetSelected: Dispatch<
+    SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
+  >
 }
 
-export const AssetsList: React.FC<IAssetsList> = ({ assets }) => {
+export const AssetsList: React.FC<IAssetsList> = ({
+  assets,
+  assetSelected,
+  setAssetSelected,
+}) => {
+  const [paymentsAsset, setPaymentsAsset] =
+    useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+
+  const { getPaymentsByAssetId, loadingChart } = useDashboards()
+
+  useEffect(() => {
+    if (assetSelected) {
+      getPaymentsByAssetId(assetSelected.id.toString(), 0, chartPeriod).then(
+        paymentsAsset => setPaymentsAsset(paymentsAsset)
+      )
+    }
+  }, [assetSelected, chartPeriod, getPaymentsByAssetId])
+
   return (
-    <Container
-      variant="primary"
-      justifyContent="center"
-      py="0.5rem"
-      px="0.75rem"
-      w="full"
-      maxW="280px"
-      mt="1rem"
-    >
-      <Flex justifyContent="space-between" mb="1.25rem">
-        <Text fontSize="xs" fontWeight="600">
-          Assets
-        </Text>
-        <Flex>
-          <HelpIcon />
-        </Flex>
-      </Flex>
-      {assets?.map(asset => (
-        <Flex
-          alignItems="center"
-          px="0.5rem"
-          pb="0.5rem"
-          mb="0.5rem"
-          borderBottom="1px solid"
-          borderColor={'gray.600'}
-          _dark={{ borderColor: 'black.800', fill: 'white' }}
-        >
-          <Box
-            w="2rem"
-            fill="black"
-            stroke="black"
-            _dark={{ fill: 'white', stroke: 'white' }}
+    <Flex flexDir="column">
+      <Flex overflowX="scroll">
+        {assets?.map(asset => (
+          <Container
+            variant="primary"
+            justifyContent="center"
+            p="0.5rem"
+            mr="0.5rem"
+            cursor="pointer"
+            bg={asset.id === assetSelected?.id ? 'primary.normal' : undefined}
+            onClick={(): void => {
+              setAssetSelected(
+                assetSelected?.id === asset.id ? undefined : asset
+              )
+            }}
           >
-            {getCurrencyIcon(asset.code, '1.5rem')}
-          </Box>
-          <Flex ms="0.75rem" flexDir="column" w="full">
-            <Text fontSize="sm" fontWeight="700">
-              {asset.code}
-            </Text>
-            <Text fontSize="xs">
-              {toCrypto(Number(asset.assetData?.amount || 0))} {asset.code}
-            </Text>
+            <Flex alignItems="center" h="full">
+              <Box
+                w="2rem"
+                fill={asset.id === assetSelected?.id ? 'white' : 'black'}
+                stroke={asset.id === assetSelected?.id ? 'white' : 'black'}
+                _dark={{ fill: 'white', stroke: 'white' }}
+              >
+                {getCurrencyIcon(asset.code, '1.5rem')}
+              </Box>
+              <Flex ms="0.75rem" flexDir="column" w="full" h="min-content">
+                <Text
+                  fontSize="sm"
+                  fontWeight="700"
+                  color={asset.id === assetSelected?.id ? 'white' : undefined}
+                >
+                  {asset.code}
+                </Text>
+                <Text
+                  fontSize="xs"
+                  color={asset.id === assetSelected?.id ? 'white' : undefined}
+                >
+                  {toCrypto(Number(asset.assetData?.amount || 0))}
+                </Text>
+              </Flex>
+              {assetSelected ? (
+                <Box fill="white">
+                  <ChevronDownIcon />
+                </Box>
+              ) : (
+                <ChevronDownIcon />
+              )}
+            </Flex>
+          </Container>
+        ))}
+      </Flex>
+      {assetSelected && (
+        <Container
+          variant="primary"
+          justifyContent="center"
+          p="0.5rem"
+          mr="0.5rem"
+          cursor="pointer"
+          maxW="full"
+          mt="1rem"
+        >
+          <Flex flexDir="column">
+            <Flex gap={4}>
+              {paymentsAsset && (
+                <ChartPayments
+                  loadingChart={loadingChart}
+                  paymentsAsset={paymentsAsset}
+                  chartPeriod={chartPeriod}
+                  setChartPeriod={setChartPeriod}
+                />
+              )}
+              <Flex w="30%" h="min-content">
+                <AccountsChart
+                  authorized={assetSelected.assetData?.accounts.authorized || 0}
+                  unauthorized={
+                    (assetSelected.assetData?.accounts
+                      .authorized_to_maintain_liabilities || 0) +
+                    (assetSelected.assetData?.accounts.unauthorized || 0)
+                  }
+                />
+              </Flex>
+            </Flex>
           </Flex>
-        </Flex>
-      ))}
-    </Container>
+        </Container>
+      )}
+    </Flex>
   )
 }

@@ -114,8 +114,15 @@ declare namespace Hooks {
       asset_issuer: string
     }
 
+    interface IAssetAccounts {
+      id: 'GA5276GSBII4DNJGEQYFLY3ANIOC7MGYNANFKOAJTG3CSXUYNQIGCSHT'
+      balances: IBalance[]
+    }
+
     interface IHorizonContext {
       loadingHorizon: boolean
+      assetData: IAsset | undefined
+      accountData: IAccount | undefined
       getAssetData(
         assetCode: string,
         assetIssuer: string
@@ -125,8 +132,10 @@ declare namespace Hooks {
         wallet?: string,
         link?: string
       ): Promise<IPayments | undefined>
-      assetData: IAsset | undefined
-      accountData: IAccount | undefined
+      getAssetAccounts(
+        assetCode: string,
+        assetIssuer: string
+      ): Promise<IAssetAccounts[] | undefined>
     }
   }
 }

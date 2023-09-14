@@ -1,15 +1,18 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
 import { useDashboards } from 'hooks/useDashboards'
+import { havePermission } from 'utils'
 import { burnHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
@@ -26,9 +29,12 @@ export const BurnAsset: React.FC = () => {
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
 
   const { burn, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
   const { loadingChart, getPaymentsByAssetId } = useDashboards()
   const { id } = useParams()
   const toast = useToast()
+  const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
@@ -94,6 +100,17 @@ export const BurnAsset: React.FC = () => {
     }
   }, [chartPeriod, getPaymentsByAssetId, id])
 
+  useEffect(() => {
+    getUserPermissions().then((): void => {
+      if (
+        !loadingUserPermissions &&
+        !havePermission(Permissions.BURN_ASSET, userPermissions)
+      ) {
+        navigate(PathRoute.HOME)
+      }
+    })
+  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+
   const toastError = (message: string): void => {
     toast({
       title: 'Burn error!',
@@ -128,7 +145,12 @@ export const BurnAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.BURN} />
+            {(userPermissions || !loadingUserPermissions) && (
+              <MenuActionsAsset
+                action={AssetActions.BURN}
+                permissions={userPermissions}
+              />
+            )}
             <ActionHelper title={'About Burn'} description={burnHelper} />
           </VStack>
         </Flex>

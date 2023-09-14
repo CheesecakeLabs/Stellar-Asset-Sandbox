@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
 import { useDashboards } from 'hooks/useDashboards'
 import { assetHomeHelper } from 'utils/constants/helpers'
 
@@ -22,6 +23,8 @@ export const AssetHome: React.FC = () => {
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
 
   const { loadingAsset, getAssetById } = useAssets()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { id } = useParams()
 
@@ -38,6 +41,10 @@ export const AssetHome: React.FC = () => {
       )
     }
   }, [chartPeriod, getPaymentsByAssetId, id])
+
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
 
   return (
     <Flex>
@@ -59,7 +66,12 @@ export const AssetHome: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.HOME} />
+            {(userPermissions || !loadingUserPermissions) && (
+              <MenuActionsAsset
+                action={AssetActions.HOME}
+                permissions={userPermissions}
+              />
+            )}
             <ActionHelper
               title={'About Assets'}
               description={assetHomeHelper}
