@@ -27,12 +27,12 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Stellar Classic',
+    name: 'Token Management',
     icon: <PaymentsIcon />,
     path: PathRoute.ASSET_MANAGEMENT,
   },
   {
-    name: 'Soroban Smart Contracts',
+    name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
   },

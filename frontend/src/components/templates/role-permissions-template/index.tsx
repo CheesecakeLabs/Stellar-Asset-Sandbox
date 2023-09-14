@@ -75,7 +75,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-          Settings
+          Administration
         </Text>
         <Container variant="primary" px={0} pb={0} maxW="full">
           <Flex

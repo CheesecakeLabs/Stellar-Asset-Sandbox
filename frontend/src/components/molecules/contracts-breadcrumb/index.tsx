@@ -39,7 +39,7 @@ export const ContractsBreadcrumb: React.FC<IContractsBreadcrumb> = ({
             fill="gray.650"
             _dark={{ fill: 'white' }}
           >
-            <ContractIcon /> Soroban Smart Contracts
+            <ContractIcon /> Smart Contracts
           </BreadcrumbLink>
         </BreadcrumbItem>
 

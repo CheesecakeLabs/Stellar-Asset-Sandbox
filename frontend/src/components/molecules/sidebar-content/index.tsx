@@ -82,12 +82,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           Profile
         </NavItem>
         <NavItem
-          key={'Settings'}
+          key={'Administration'}
           icon={<SettingsIcon />}
           path={PathRoute.SETTINGS}
           highlightMenu={highlightMenu}
         >
-          Settings
+          Administration
         </NavItem>
         <Text
           color="gray.900"

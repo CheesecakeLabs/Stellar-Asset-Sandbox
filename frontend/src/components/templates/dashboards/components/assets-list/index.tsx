@@ -1,18 +1,26 @@
-import { Text, Container, Flex, Box } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Text, Container, Flex, Box } from '@chakra-ui/react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
-import { useDashboards } from 'hooks/useDashboards'
-import { useHorizon } from 'hooks/useHorizon'
-import { useVaults } from 'hooks/useVaults'
-import { getCurrencyIcon } from 'utils/constants/constants'
-import { formatAccount, toCrypto } from 'utils/formatter'
 
-import { ChevronDownIcon } from 'components/icons'
-import { AccountsChart } from 'components/molecules/accounts-chart'
-import { ChartPayments } from 'components/molecules/chart-payments'
-import { TChartPeriod } from 'components/molecules/chart-period'
 
-import { TopHolders } from '../top-holders'
+import { useDashboards } from 'hooks/useDashboards';
+import { useHorizon } from 'hooks/useHorizon';
+import { useVaults } from 'hooks/useVaults';
+import { getCurrencyIcon } from 'utils/constants/constants';
+import { formatAccount, toCrypto } from 'utils/formatter';
+
+
+
+import { ChevronDownIcon } from 'components/icons';
+import { AccountsChart } from 'components/molecules/accounts-chart';
+import { ChartPayments } from 'components/molecules/chart-payments';
+import { TChartPeriod } from 'components/molecules/chart-period';
+
+
+
+import { ChartHolders } from '../chart-holders';
+import { TopHolders } from '../top-holders';
+
 
 interface IAssetsList {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -33,6 +41,8 @@ export const AssetsList: React.FC<IAssetsList> = ({
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
   const [topHolders, setTopHolders] =
     useState<Hooks.UseHorizonTypes.IHolder[]>()
+  const [groupedValues, setGroupedValues] = useState<number[]>([])
+  const [divisorValues, setDivisorValues] = useState<number>(0)
 
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { getAssetAccounts } = useHorizon()
@@ -56,6 +66,9 @@ export const AssetsList: React.FC<IAssetsList> = ({
           | Hooks.UseVaultsTypes.IVault[]
           | undefined
         const filteredAccounts = accounts
+          ?.filter(
+            account => account.id !== assetSelected.distributor.key.publicKey
+          )
           ?.sort(
             (a, b) =>
               Number(
@@ -97,6 +110,38 @@ export const AssetsList: React.FC<IAssetsList> = ({
               100,
           }))
         setTopHolders(filteredAccounts || [])
+
+        const groupedValues = [0, 0, 0, 0, 0]
+        const divisorValue =
+          (filteredAccounts ? filteredAccounts[0].amount : 0) / 5
+
+        accounts
+          ?.filter(
+            account => account.id !== assetSelected.distributor.key.publicKey
+          )
+          .forEach(account => {
+            const amount = Number(
+              account.balances?.find(
+                balance =>
+                  balance.asset_code === assetSelected.code &&
+                  balance.asset_issuer === assetSelected.issuer.key.publicKey
+              )?.balance || 0
+            )
+            if (amount < divisorValue) {
+              groupedValues[0]++
+            } else if (amount < divisorValue * 2) {
+              groupedValues[1]++
+            } else if (amount < divisorValue * 3) {
+              groupedValues[2]++
+            } else if (amount < divisorValue * 4) {
+              groupedValues[3]++
+            } else {
+              groupedValues[4]++
+            }
+          })
+
+        setGroupedValues(groupedValues)
+        setDivisorValues(divisorValue)
       })
     }
   }, [assetSelected, getAssetAccounts, getVaults])
@@ -192,7 +237,28 @@ export const AssetsList: React.FC<IAssetsList> = ({
                   authorizedLabel={'Authorized'}
                   unauthorizedLabel={'Pending authorization'}
                 />
-                {false && <TopHolders holders={topHolders} />}
+              </Flex>
+            </Flex>
+            <Flex gap={4} mt="1.5rem">
+              <Flex
+                w="full"
+                borderEnd="1px solid"
+                borderColor={'gray.600'}
+                _dark={{ borderColor: 'black.800' }}
+              >
+                {paymentsAsset && (
+                  <ChartHolders
+                    loadingChart={loadingChart}
+                    groupedValues={groupedValues}
+                    groupValue={divisorValues}
+                  />
+                )}
+              </Flex>
+              <Flex w="30%">
+                <TopHolders
+                  holders={topHolders}
+                  assetCode={assetSelected.code}
+                />
               </Flex>
             </Flex>
           </Flex>
