@@ -11,6 +11,8 @@ import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ProfileIcon, SettingsIcon } from 'components/icons'
 
+import { ReactComponent as CheesecakeLogo } from 'app/core/resources/cheesecake-logo.svg'
+import { ReactComponent as Cheesecake } from 'app/core/resources/cheesecake.svg'
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
 import { ILinkItemProps } from '../../organisms/sidebar'
@@ -89,15 +91,27 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         >
           Administration
         </NavItem>
-        <Text
-          color="gray.900"
-          fontWeight="600"
-          ml="2rem"
-          fontSize="sm"
-          mt="0.5rem"
-        >
-          v2.01
-        </Text>
+        <Flex  mt="1rem" alignItems="center">
+          <Flex
+            fill="black"
+            _dark={{ fill: 'white' }}
+            ms="2rem"
+            gap={3}
+            alignItems="center"
+          >
+            <CheesecakeLogo height="24px" width="24px" />
+            <Cheesecake height="24px" width="128px" />
+          </Flex>
+          <Text
+            color="gray.900"
+            fontWeight="600"
+            fontSize="sm"
+            mr="1rem"
+            ms="1rem"
+          >
+            v2.01
+          </Text>
+        </Flex>
       </Flex>
     </Box>
   )

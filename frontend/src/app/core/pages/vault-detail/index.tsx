@@ -65,7 +65,7 @@ export const VaultDetail: React.FC = () => {
         sponsor_id: 1,
         amount: amount,
         current_supply:
-          Number(selectedAsset.assetData?.amount || 0) - Number(amount),
+          Number(selectedAsset.assetData?.amount || 0),
         current_main_vault:
           Number(selectedAsset.distributorBalance?.balance || 0) -
           Number(amount),

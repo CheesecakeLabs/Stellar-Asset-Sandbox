@@ -53,7 +53,7 @@ export const DistributeAsset: React.FC = () => {
         asset_id: asset.id.toString(),
         sponsor_id: 1,
         amount: data.amount,
-        current_supply: Number(asset.assetData?.amount || 0) - data.amount,
+        current_supply: Number(asset.assetData?.amount || 0),
         current_main_vault:
           Number(asset.distributorBalance?.balance || 0) - data.amount,
       })

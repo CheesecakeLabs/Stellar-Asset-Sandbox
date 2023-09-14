@@ -1,18 +1,11 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useState } from 'react'
 
+import axios from 'axios'
+import { MessagesError } from 'utils/constants/messages-error'
 
+import { TChartPeriod } from 'components/molecules/chart-period'
 
-import axios from 'axios';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { TChartPeriod } from 'components/molecules/chart-period';
-
-
-
-import { http } from 'interfaces/http';
-
+import { http } from 'interfaces/http'
 
 export const DashboardsContext = createContext(
   {} as Hooks.UseDashboardsTypes.IDashboardsContext
@@ -109,9 +102,44 @@ export const DashboardsProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getSupplyByAssetId = useCallback(
+    async (
+      assetId: string,
+      period?: TChartPeriod
+    ): Promise<Hooks.UseDashboardsTypes.ISupply | undefined> => {
+      setLoadingChart(true)
+      try {
+        const timeRange = period || '24h'
+        const timeFrame = !period || period === '24h' ? '1h' : '24h'
+        const response = await http.get(
+          `/log_transactions/supply/${assetId}/sum/${timeRange}/${timeFrame}`
+        )
+        const data = response.data
+        if (data) {
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingChart(false)
+      }
+    },
+    []
+  )
+
   return (
     <DashboardsContext.Provider
-      value={{ loadingChart,loadingLastTransactions,  getPaymentsByAssetId, getPayments, getLastTransactions }}
+      value={{
+        loadingChart,
+        loadingLastTransactions,
+        getPaymentsByAssetId,
+        getPayments,
+        getLastTransactions,
+        getSupplyByAssetId,
+      }}
     >
       {children}
     </DashboardsContext.Provider>

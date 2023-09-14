@@ -1,26 +1,19 @@
-import { Text, Container, Flex, Box } from '@chakra-ui/react';
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Text, Container, Flex, Box } from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
+import { useDashboards } from 'hooks/useDashboards'
+import { useHorizon } from 'hooks/useHorizon'
+import { useVaults } from 'hooks/useVaults'
+import { getCurrencyIcon } from 'utils/constants/constants'
+import { formatAccount, toCrypto } from 'utils/formatter'
 
+import { ChevronDownIcon } from 'components/icons'
+import { AccountsChart } from 'components/molecules/accounts-chart'
+import { ChartPayments } from 'components/molecules/chart-payments'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
-import { useDashboards } from 'hooks/useDashboards';
-import { useHorizon } from 'hooks/useHorizon';
-import { useVaults } from 'hooks/useVaults';
-import { getCurrencyIcon } from 'utils/constants/constants';
-import { formatAccount, toCrypto } from 'utils/formatter';
-
-
-
-import { ChevronDownIcon } from 'components/icons';
-import { AccountsChart } from 'components/molecules/accounts-chart';
-import { ChartPayments } from 'components/molecules/chart-payments';
-import { TChartPeriod } from 'components/molecules/chart-period';
-
-
-
-import { ChartHolders } from '../chart-holders';
-import { TopHolders } from '../top-holders';
-
+import { ChartHolders } from '../chart-holders'
+import { TopHolders } from '../top-holders'
 
 interface IAssetsList {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -44,7 +37,8 @@ export const AssetsList: React.FC<IAssetsList> = ({
   const [groupedValues, setGroupedValues] = useState<number[]>([])
   const [divisorValues, setDivisorValues] = useState<number>(0)
 
-  const { getPaymentsByAssetId, loadingChart } = useDashboards()
+  const { getPaymentsByAssetId, loadingChart } =
+    useDashboards()
   const { getAssetAccounts } = useHorizon()
   const { getVaults } = useVaults()
 

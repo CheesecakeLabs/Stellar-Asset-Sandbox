@@ -50,7 +50,7 @@ export const MintAsset: React.FC = () => {
         amount: data.amount,
         current_supply: Number(asset.assetData?.amount || 0) - data.amount,
         current_main_vault:
-          Number(asset.distributorBalance?.balance || 0) - data.amount,
+          Number(asset.distributorBalance?.balance || 0),
       })
 
       if (isSuccess) {

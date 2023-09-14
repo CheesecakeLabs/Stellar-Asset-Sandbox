@@ -28,7 +28,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       _dark={{ borderColor: 'black.800', bg: 'black.600' }}
     >
       <MobileNav onOpen={onOpen} />
-      <Flex fill="black" _dark={{ fill: 'white' }}>
+      <Flex fill="black" _dark={{ fill: 'white' }} alignItems="center">
         <StellarLogo />
       </Flex>
       <Spacer />

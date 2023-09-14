@@ -1,28 +1,23 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import { FieldValues, UseFormSetValue } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useEffect, useState } from 'react'
+import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 
+import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
+import { useVaults } from 'hooks/useVaults'
+import { havePermission } from 'utils'
+import { clawbackHelper } from 'utils/constants/helpers'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import { useAssets } from 'hooks/useAssets';
-import { useAuth } from 'hooks/useAuth';
-import { useVaults } from 'hooks/useVaults';
-import { havePermission } from 'utils';
-import { clawbackHelper } from 'utils/constants/helpers';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { AssetActions } from 'components/enums/asset-actions';
-import { PathRoute } from 'components/enums/path-route';
-import { Permissions } from 'components/enums/permissions';
-import { ActionHelper } from 'components/molecules/action-helper';
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
-import { Sidebar } from 'components/organisms/sidebar';
-import { ClawbackAssetTemplate } from 'components/templates/clawback-asset';
-
+import { AssetActions } from 'components/enums/asset-actions'
+import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
+import { ActionHelper } from 'components/molecules/action-helper'
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { Sidebar } from 'components/organisms/sidebar'
+import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
 export const ClawbackAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -47,8 +42,7 @@ export const ClawbackAsset: React.FC = () => {
         code: asset.code,
         from: wallet ? wallet : data.from,
         current_supply: Number(asset.assetData?.amount || 0) - data.amount,
-        current_main_vault:
-          Number(asset.distributorBalance?.balance || 0) - data.amount,
+        current_main_vault: Number(asset.distributorBalance?.balance || 0),
       })
 
       if (isSuccess) {

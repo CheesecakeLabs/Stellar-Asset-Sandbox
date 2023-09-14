@@ -1,96 +1,109 @@
-import { Container, Flex, Text } from '@chakra-ui/react'
-import { FunctionComponent, useState } from 'react'
-import { Line } from 'react-chartjs-2'
-
-import { faker } from '@faker-js/faker'
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js'
+  Text,
+  Container,
+  Flex,
+  Box,
+  useColorMode,
+  Skeleton,
+} from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction } from 'react'
+import Chart from 'react-apexcharts'
 
-import { HelpIcon } from 'components/icons'
+import { getChartLabels, isEqualLabel } from 'utils/constants/dashboards'
+import { toCrypto } from 'utils/formatter'
 
-export interface IChartGeneralProps {
-  label: string
-  isDarkMode: boolean | undefined
+import { ChartPeriod, TChartPeriod } from 'components/molecules/chart-period'
+
+interface IChartSupply {
+  loadingChart: boolean
+  supplyAsset: Hooks.UseDashboardsTypes.ISupply
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-)
-
-const ChartSupply: FunctionComponent<IChartGeneralProps> = ({
-  label,
-  isDarkMode,
+export const ChartSupply: React.FC<IChartSupply> = ({
+  supplyAsset,
+  chartPeriod,
+  loadingChart,
+  setChartPeriod,
 }) => {
-  const [optionFilter, setOptionFilter] = useState<'MONTH' | 'YEAR' | 'ALL'>(
-    'MONTH'
-  )
+  const { colorMode } = useColorMode()
+
+  const series = [
+    {
+      name: 'Supply',
+      data: getChartLabels(chartPeriod).map(label => {
+        const index = supplyAsset.date.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
+        )
+        return index > -1 ? supplyAsset.current_supply[index] : 0
+      }),
+    },
+    {
+      name: 'Main vault',
+      data: getChartLabels(chartPeriod).map(label => {
+        const index = supplyAsset.date.findIndex(date =>
+          isEqualLabel(chartPeriod, date, label)
+        )
+        return index > -1 ? supplyAsset.current_main_vault[index] : 0
+      }),
+    },
+  ]
 
   const options = {
-    responsive: true,
-    plugins: {
-      title: {
-        display: false,
+    chart: {
+      id: 'area',
+      foreColor: colorMode === 'dark' ? 'white' : 'black',
+      toolbar: {
+        show: true,
+        offsetX: 0,
+        offsetY: 0,
+        tools: {
+          download: false,
+          selection: false,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: false,
+          reset: true,
+        },
       },
     },
-  }
-
-  const data = {
-    labels: [
-      '10 Mar',
-      '11 Mar',
-      '12 Mar',
-      '13 Mar',
-      '14 Mar',
-      '15 Mar',
-      '16 Mar',
-      '17 Mar',
-    ],
-    datasets: [
-      {
-        label: 'Total supply',
-        data: [
-          '10 Mar',
-          '11 Mar',
-          '12 Mar',
-          '13 Mar',
-          '14 Mar',
-          '15 Mar',
-          '16 Mar',
-          '17 Mar',
-        ].map(() => faker.datatype.number({ min: 0, max: 1000 })),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+    tooltip: {
+      theme: colorMode,
+    },
+    xaxis: {
+      categories: getChartLabels(chartPeriod),
+      labels: {
+        show: true,
+        formatter: function (value: string): string {
+          return `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+        },
       },
-      {
-        label: 'Distribution supply',
-        data: [
-          '10 Mar',
-          '11 Mar',
-          '12 Mar',
-          '13 Mar',
-          '14 Mar',
-          '15 Mar',
-          '16 Mar',
-          '17 Mar',
-        ].map(() => faker.datatype.number({ min: 0, max: 1000 })),
-        borderColor: 'rgb(56,147,138)',
-        backgroundColor: 'rgba(56,147,138,0.5)',
+    },
+    yaxis: {
+      labels: {
+        show: true,
+        formatter: function (value: number): string {
+          return `${toCrypto(value)}`
+        },
       },
-    ],
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.5,
+        opacityTo: 0.4,
+        stops: [0, 90, 100],
+      },
+    },
+    stroke: {
+      width: 2,
+    },
   }
 
   return (
@@ -105,17 +118,25 @@ const ChartSupply: FunctionComponent<IChartGeneralProps> = ({
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Supply over time
+          Payments timeline
         </Text>
         <Flex>
-          <HelpIcon />
+          <ChartPeriod period={chartPeriod} setPeriod={setChartPeriod} />
         </Flex>
       </Flex>
-      <Flex>
-        <Line options={options} data={data} />
-      </Flex>
+      <Box>
+        {loadingChart ? (
+          <Skeleton h="12rem" w="full" />
+        ) : (
+          <Chart
+            options={options}
+            series={series}
+            type="area"
+            width="100%"
+            height="240px"
+          />
+        )}
+      </Box>
     </Container>
   )
 }
-
-export { ChartSupply }
