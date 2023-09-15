@@ -233,10 +233,12 @@ func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([
 		lt.origin_pk, lt.destination_pk, lt.current_supply, lt.current_main_vault
 		FROM logtransactions AS lt
 		JOIN Asset AS a ON lt.asset_id = a.id
+		WHERE lt.transaction_type_id = $1
 		ORDER BY lt.date DESC
+		LIMIT 5
 	`
 
-	rows, err := repo.Db.Query(query)
+	rows, err := repo.Db.Query(query, transactionTypeID)
 	if err != nil {
 		return nil, err
 	}
