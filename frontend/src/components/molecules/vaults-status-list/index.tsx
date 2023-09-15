@@ -3,7 +3,6 @@ import {
   Container,
   Flex,
   Table,
-  Tag,
   Tbody,
   Td,
   Text,
@@ -12,6 +11,8 @@ import {
   Tr,
 } from '@chakra-ui/react'
 import React from 'react'
+
+import { LockIcon } from 'components/icons'
 
 import { AccountsChart } from '../accounts-chart'
 
@@ -55,11 +56,14 @@ export const VaultsStatusList: React.FC<IVaultsStatusList> = ({
               <Tr>
                 <Td>{vaultStatus.name}</Td>
                 <Td>
-                  <Tag variant={vaultStatus.isAuthorized ? 'green' : 'red'}>
+                  <Flex alignItems="center" gap={3}>
+                    {!vaultStatus.isAuthorized && (
+                      <LockIcon height="16px" width="16px" />
+                    )}
                     {vaultStatus.isAuthorized
                       ? authorizedLabel
                       : unauthorizedLabel}
-                  </Tag>
+                  </Flex>
                 </Td>
               </Tr>
             ))}

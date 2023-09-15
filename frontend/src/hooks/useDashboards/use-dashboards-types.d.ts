@@ -52,7 +52,6 @@ declare namespace Hooks {
     }
 
     interface ISupply {
-      asset: IAssetData
       current_main_vault: number[]
       current_supply: number[]
       date: string[]

@@ -31,6 +31,14 @@ export const formatDateMD = (date: string): string => {
   return formattedDate
 }
 
+export const formatHour = (date: string): string => {
+  const formattedDate = new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+  })
+
+  return formattedDate
+}
+
 export const formatDateY = (date: string): string => {
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     year: 'numeric',

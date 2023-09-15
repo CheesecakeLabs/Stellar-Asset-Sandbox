@@ -1,6 +1,7 @@
 import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
+import { filterChart } from 'utils/constants/dashboards'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { TChartPeriod } from 'components/molecules/chart-period'
@@ -109,13 +110,31 @@ export const DashboardsProvider: React.FC<IProps> = ({ children }) => {
     ): Promise<Hooks.UseDashboardsTypes.ISupply | undefined> => {
       setLoadingChart(true)
       try {
-        const timeRange = period || '24h'
-        const timeFrame = !period || period === '24h' ? '1h' : '24h'
-        const response = await http.get(
-          `/log_transactions/supply/${assetId}/sum/${timeRange}/${timeFrame}`
+        const response = await http.post(
+          `/log_transactions/supply/${assetId}`,
+          filterChart(period)
         )
-        const data = response.data
+        const data = response.data as
+          | Hooks.UseDashboardsTypes.ISupply
+          | undefined
         if (data) {
+          let lastCurrentSupply = 0
+          let lastCurrentMainVault = 0
+          data.current_supply.forEach((value, index) => {
+            if (!value) {
+              data.current_supply[index] = lastCurrentSupply
+            } else {
+              lastCurrentSupply = data.current_supply[index]
+            }
+          })
+
+          data.current_main_vault.forEach((value, index) => {
+            if (!value) {
+              data.current_main_vault[index] = lastCurrentMainVault
+            } else {
+              lastCurrentMainVault = data.current_main_vault[index]
+            }
+          })
           return data
         }
       } catch (error) {

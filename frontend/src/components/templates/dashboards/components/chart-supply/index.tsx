@@ -9,8 +9,7 @@ import {
 import React, { Dispatch, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
 
-import { getChartLabels, isEqualLabel } from 'utils/constants/dashboards'
-import { toCrypto } from 'utils/formatter'
+import { formatDateMD, formatHour, toCrypto } from 'utils/formatter'
 
 import { ChartPeriod, TChartPeriod } from 'components/molecules/chart-period'
 
@@ -32,21 +31,11 @@ export const ChartSupply: React.FC<IChartSupply> = ({
   const series = [
     {
       name: 'Supply',
-      data: getChartLabels(chartPeriod).map(label => {
-        const index = supplyAsset.date.findIndex(date =>
-          isEqualLabel(chartPeriod, date, label)
-        )
-        return index > -1 ? supplyAsset.current_supply[index] : 0
-      }),
+      data: supplyAsset.current_supply,
     },
     {
       name: 'Main vault',
-      data: getChartLabels(chartPeriod).map(label => {
-        const index = supplyAsset.date.findIndex(date =>
-          isEqualLabel(chartPeriod, date, label)
-        )
-        return index > -1 ? supplyAsset.current_main_vault[index] : 0
-      }),
+      data: supplyAsset.current_main_vault,
     },
   ]
 
@@ -73,11 +62,11 @@ export const ChartSupply: React.FC<IChartSupply> = ({
       theme: colorMode,
     },
     xaxis: {
-      categories: getChartLabels(chartPeriod),
+      categories: supplyAsset.date,
       labels: {
         show: true,
         formatter: function (value: string): string {
-          return `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+          return chartPeriod === '24h' ? formatHour(value) : formatDateMD(value)
         },
       },
     },

@@ -4,15 +4,16 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { useDashboards } from 'hooks/useDashboards'
 import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
-import { getCurrencyIcon } from 'utils/constants/constants'
-import { formatAccount, toCrypto } from 'utils/formatter'
+import { formatAccount } from 'utils/formatter'
 
 import { ChevronDownIcon } from 'components/icons'
 import { AccountsChart } from 'components/molecules/accounts-chart'
 import { ChartPayments } from 'components/molecules/chart-payments'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
+import { AssetItem } from '../asset-item'
 import { ChartHolders } from '../chart-holders'
+import { ChartSupply } from '../chart-supply'
 import { TopHolders } from '../top-holders'
 
 interface IAssetsList {
@@ -31,13 +32,15 @@ export const AssetsList: React.FC<IAssetsList> = ({
 }) => {
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
+  const [supplyAsset, setSupplyAsset] =
+    useState<Hooks.UseDashboardsTypes.ISupply>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
   const [topHolders, setTopHolders] =
     useState<Hooks.UseHorizonTypes.IHolder[]>()
   const [groupedValues, setGroupedValues] = useState<number[]>([])
   const [divisorValues, setDivisorValues] = useState<number>(0)
 
-  const { getPaymentsByAssetId, loadingChart } =
+  const { getPaymentsByAssetId, getSupplyByAssetId, loadingChart } =
     useDashboards()
   const { getAssetAccounts } = useHorizon()
   const { getVaults } = useVaults()
@@ -49,6 +52,14 @@ export const AssetsList: React.FC<IAssetsList> = ({
       )
     }
   }, [assetSelected, chartPeriod, getPaymentsByAssetId])
+
+  useEffect(() => {
+    if (assetSelected) {
+      getSupplyByAssetId(assetSelected.id.toString(), chartPeriod).then(
+        supplyAsset => setSupplyAsset(supplyAsset)
+      )
+    }
+  }, [assetSelected, chartPeriod, getSupplyByAssetId])
 
   useEffect(() => {
     if (assetSelected) {
@@ -142,46 +153,31 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
   return (
     <Flex flexDir="column">
-      <Flex overflowX="scroll">
-        {assets?.map(asset => (
+      <Flex>
+        {
           <Container
             variant="primary"
+            w="fit-content"
             justifyContent="center"
             p="0.5rem"
             mr="0.5rem"
             cursor="pointer"
-            bg={asset.id === assetSelected?.id ? 'primary.normal' : undefined}
+            bg={!assetSelected ? 'primary.normal' : undefined}
             onClick={(): void => {
-              setAssetSelected(
-                assetSelected?.id === asset.id ? undefined : asset
-              )
+              setAssetSelected(undefined)
             }}
           >
             <Flex alignItems="center" h="full">
-              <Box
-                w="2rem"
-                fill={asset.id === assetSelected?.id ? 'white' : 'black'}
-                stroke={asset.id === assetSelected?.id ? 'white' : 'black'}
-                _dark={{ fill: 'white', stroke: 'white' }}
-              >
-                {getCurrencyIcon(asset.code, '1.5rem')}
-              </Box>
               <Flex ms="0.75rem" flexDir="column" w="full" h="min-content">
                 <Text
                   fontSize="sm"
                   fontWeight="700"
-                  color={asset.id === assetSelected?.id ? 'white' : undefined}
+                  color={!assetSelected ? 'white' : undefined}
                 >
-                  {asset.code}
-                </Text>
-                <Text
-                  fontSize="xs"
-                  color={asset.id === assetSelected?.id ? 'white' : undefined}
-                >
-                  {toCrypto(Number(asset.assetData?.amount || 0))}
+                  All assets
                 </Text>
               </Flex>
-              {assetSelected ? (
+              {!assetSelected ? (
                 <Box fill="white">
                   <ChevronDownIcon />
                 </Box>
@@ -190,6 +186,13 @@ export const AssetsList: React.FC<IAssetsList> = ({
               )}
             </Flex>
           </Container>
+        }
+        {assets?.map(asset => (
+          <AssetItem
+            asset={asset}
+            assetSelected={assetSelected}
+            setAssetSelected={setAssetSelected}
+          />
         ))}
       </Flex>
       {assetSelected && (
@@ -257,6 +260,14 @@ export const AssetsList: React.FC<IAssetsList> = ({
             </Flex>
           </Flex>
         </Container>
+      )}
+      {supplyAsset && (
+        <ChartSupply
+          loadingChart={loadingChart}
+          supplyAsset={supplyAsset}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
+        />
       )}
     </Flex>
   )
