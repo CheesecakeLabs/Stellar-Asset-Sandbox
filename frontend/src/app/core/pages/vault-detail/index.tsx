@@ -27,8 +27,14 @@ export const VaultDetail: React.FC = () => {
   const navigate = useNavigate()
 
   const { id } = useParams()
-  const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
-    useAssets()
+  const {
+    loadingAssets,
+    loadingOperation,
+    assets,
+    getAssets,
+    distribute,
+    getAssetById,
+  } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const {
@@ -58,17 +64,17 @@ export const VaultDetail: React.FC = () => {
     try {
       if (!selectedAsset || !wallet) return
 
+      const assetData = await getAssetById(selectedAsset.id.toString())
+
       const isSuccess = await distribute({
         source_wallet_id: vault?.wallet.id,
         destination_wallet_pk: wallet,
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
         amount: amount,
-        current_supply:
-          Number(selectedAsset.assetData?.amount || 0),
+        current_supply: Number(assetData?.assetData?.amount || 0),
         current_main_vault:
-          Number(selectedAsset.distributorBalance?.balance || 0) -
-          Number(amount),
+          Number(assetData?.distributorBalance?.balance || 0) - Number(amount),
       })
 
       if (isSuccess) {
