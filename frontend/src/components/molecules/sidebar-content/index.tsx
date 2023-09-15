@@ -4,6 +4,7 @@ import {
   CloseButton,
   Flex,
   Spacer,
+  Tag,
   Text,
 } from '@chakra-ui/react'
 
@@ -69,8 +70,23 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
               icon={item.icon}
               path={item.path}
               highlightMenu={highlightMenu}
+              comingSoon={item.comingSoon}
             >
               {item.name}
+              {item.comingSoon && (
+                <Tag
+                  fontSize="10px"
+                  py={0}
+                  px="0.5rem"
+                  w="fit-content"
+                  variant="blue_sky"
+                  bg="gray.400"
+                  color="black.900"
+                  mb="0.25rem"
+                >
+                  Coming soon
+                </Tag>
+              )}
             </NavItem>
           </Box>
         ))}
@@ -91,7 +107,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         >
           Administration
         </NavItem>
-        <Flex  mt="1rem" alignItems="center">
+        <Flex mt="1rem" alignItems="center">
           <Flex
             fill="black"
             _dark={{ fill: 'white' }}

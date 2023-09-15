@@ -104,10 +104,11 @@ export const ChartSupply: React.FC<IChartSupply> = ({
       w="full"
       maxW="full"
       mt="1rem"
+      mb="2rem"
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Payments timeline
+          Supply
         </Text>
         <Flex>
           <ChartPeriod period={chartPeriod} setPeriod={setChartPeriod} />

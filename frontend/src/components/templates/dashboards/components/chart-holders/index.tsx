@@ -9,18 +9,17 @@ import {
 import React from 'react'
 import Chart from 'react-apexcharts'
 
-import { toCrypto } from 'utils/formatter'
-
 interface IChartHolders {
   loadingChart: boolean
   groupedValues: number[]
   groupValue: number
+  assetCode: string
 }
 
 export const ChartHolders: React.FC<IChartHolders> = ({
   groupedValues,
   loadingChart,
-  groupValue,
+  assetCode,
 }) => {
   const { colorMode } = useColorMode()
 
@@ -52,15 +51,17 @@ export const ChartHolders: React.FC<IChartHolders> = ({
     },
     dataLabels: {
       enabled: true,
-      enabledOnSeries: [1],
     },
     xaxis: {
-      categories: [1, 2, 3, 4, 5].map(
-        position =>
-          `${toCrypto(groupValue * (position - 1))} - ${toCrypto(
-            groupValue * position
-          )}`
-      ),
+      categories: [
+        `0 - 1k ${assetCode}`,
+        `1k - 10k ${assetCode}`,
+        `10k - 100k ${assetCode}`,
+        `100k - 1M ${assetCode}`,
+        `1M - 10M ${assetCode}`,
+        `10M - 100M ${assetCode}`,
+        `> 100M ${assetCode}`,
+      ],
       labels: {
         show: true,
         formatter: function (value: string): string {
@@ -72,7 +73,7 @@ export const ChartHolders: React.FC<IChartHolders> = ({
       {
         labels: {
           formatter: function (value: number): string {
-            return `${toCrypto(value)}`
+            return `${value}`
           },
         },
       },
@@ -83,6 +84,7 @@ export const ChartHolders: React.FC<IChartHolders> = ({
     {
       type: 'column',
       data: groupedValues,
+      name: 'Holders',
     },
   ]
 
@@ -97,7 +99,7 @@ export const ChartHolders: React.FC<IChartHolders> = ({
     >
       <Flex justifyContent="space-between" mb="1.25rem">
         <Text fontSize="xs" fontWeight="600">
-          Holders
+          Holders distribution
         </Text>
       </Flex>
       <Box>

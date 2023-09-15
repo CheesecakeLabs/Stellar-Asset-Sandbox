@@ -243,7 +243,12 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
             name:
               vaults?.find(
                 vault => vault.wallet.key.publicKey === assetAccount.id
-              )?.name || formatAccount(assetAccount.id),
+              )?.name ||
+              formatAccount(
+                assetAccount.id,
+                assetAccount.id,
+                asset.distributor.key.publicKey
+              ),
             isAuthorized:
               assetAccount.balances.find(
                 balance =>

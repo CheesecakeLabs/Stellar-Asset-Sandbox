@@ -4,20 +4,19 @@ import React, { Dispatch, SetStateAction } from 'react'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { ChevronDownIcon } from 'components/icons'
-
 interface IAssetItem {
   asset: Hooks.UseAssetsTypes.IAssetDto
   assetSelected: Hooks.UseAssetsTypes.IAssetDto | undefined
   setAssetSelected: Dispatch<
     SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
   >
+  onSelectAsset(asset: Hooks.UseAssetsTypes.IAssetDto): void
 }
 
 export const AssetItem: React.FC<IAssetItem> = ({
   asset,
   assetSelected,
-  setAssetSelected,
+  onSelectAsset,
 }) => {
   return (
     <Container
@@ -29,8 +28,9 @@ export const AssetItem: React.FC<IAssetItem> = ({
       cursor="pointer"
       bg={asset.id === assetSelected?.id ? 'primary.normal' : undefined}
       onClick={(): void => {
-        setAssetSelected(assetSelected?.id === asset.id ? undefined : asset)
+        onSelectAsset(asset)
       }}
+      _hover={asset.id === assetSelected?.id ? undefined : { bg: 'purple.50' }}
     >
       <Flex alignItems="center" h="full">
         <Box
@@ -56,13 +56,6 @@ export const AssetItem: React.FC<IAssetItem> = ({
             {toCrypto(Number(asset.assetData?.amount || 0))}
           </Text>
         </Flex>
-        {asset.id === assetSelected?.id ? (
-          <Box fill="white">
-            <ChevronDownIcon />
-          </Box>
-        ) : (
-          <ChevronDownIcon />
-        )}
       </Flex>
     </Container>
   )

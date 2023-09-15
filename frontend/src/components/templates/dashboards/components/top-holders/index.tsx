@@ -26,25 +26,25 @@ export const TopHolders: React.FC<ITopHolders> = ({ holders }) => {
       px={0}
       w="full"
       maxW="full"
-      mt="1rem"
+      mt="0.5rem"
     >
-      <Flex justifyContent="space-between" mb="1.25rem">
+      <Flex justifyContent="space-between" mb="1.25rem" ms="0.5rem">
         <Text fontSize="xs" fontWeight="600">
           Top holders
         </Text>
       </Flex>
-      <Table size="sm" variant="list">
+      <Table size="sm">
         <Thead>
-          <Th pe={0}></Th>
           <Th>Holder</Th>
-          <Th>Amount</Th>
+          <Th isNumeric>Amount</Th>
         </Thead>
         <Tbody>
-          {holders?.map((holder, index) => (
-            <Tr>
-              <Td pe={0}>{index + 1}</Td>
+          {holders?.map(holder => (
+            <Tr py="2rem">
               <Td>{holder.name}</Td>
-              <Td fontSize="sm">{toCrypto(holder.amount)}</Td>
+              <Td fontSize="sm" isNumeric>
+                {toCrypto(holder.amount)}
+              </Td>
             </Tr>
           ))}
         </Tbody>

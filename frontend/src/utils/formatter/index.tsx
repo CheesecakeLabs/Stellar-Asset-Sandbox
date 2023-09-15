@@ -60,7 +60,14 @@ export const formatDateFull = (date: string): string => {
   return formattedDate
 }
 
-export const formatAccount = (account: string): string => {
+export const formatAccount = (
+  account: string,
+  wallet?: string,
+  distributor?: string
+): string => {
+  if (wallet && distributor && wallet === distributor) {
+    return 'Main vault'
+  }
   return `${account.substring(0, 4)}...${account.substring(
     account.length - 4,
     account.length

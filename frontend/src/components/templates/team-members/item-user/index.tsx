@@ -50,7 +50,6 @@ export const ItemUser: React.FC<IItemUser> = ({
         <Td>{user.id}</Td>
         <Td>{user.name}</Td>
         <Td>{user.role}</Td>
-        <Td>{user.email}</Td>
         <Td w="1rem" p={0}>
           {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
             <Menu>

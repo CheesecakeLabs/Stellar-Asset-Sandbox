@@ -1,13 +1,23 @@
-import { Box, Drawer, DrawerContent, Flex, useDisclosure } from '@chakra-ui/react';
-import React, { ReactNode } from 'react';
+import {
+  Box,
+  Drawer,
+  DrawerContent,
+  Flex,
+  useDisclosure,
+} from '@chakra-ui/react'
+import React, { ReactNode } from 'react'
 
-
-
-import { PathRoute } from 'components/enums/path-route';
-import { ContractIcon, DashboardIcon, ExplorerIcon, HomeIcon, PaymentsIcon, VaultIcon } from 'components/icons';
-import { SidebarContent } from 'components/molecules';
-import { Header } from 'components/molecules/header';
-
+import { PathRoute } from 'components/enums/path-route'
+import {
+  ContractIcon,
+  DashboardIcon,
+  ExplorerIcon,
+  HomeIcon,
+  PaymentsIcon,
+  VaultIcon,
+} from 'components/icons'
+import { SidebarContent } from 'components/molecules'
+import { Header } from 'components/molecules/header'
 
 interface IProps {
   highlightMenu: PathRoute
@@ -19,6 +29,7 @@ export interface ILinkItemProps {
   icon: ReactNode
   path: string
   alerts?: number
+  comingSoon?: boolean
 }
 const linkItems: ILinkItemProps[] = [
   {
@@ -35,6 +46,7 @@ const linkItems: ILinkItemProps[] = [
     name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    comingSoon: true,
   },
   {
     name: 'Treasury',

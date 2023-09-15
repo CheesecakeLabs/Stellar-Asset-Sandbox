@@ -70,7 +70,6 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                 <Th>ID</Th>
                 <Th>Member</Th>
                 <Th>Role</Th>
-                <Th>Email</Th>
                 <Th w="1rem" p={0}></Th>
               </Thead>
               <Tbody>
