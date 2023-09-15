@@ -36,7 +36,7 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="full" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="1580px" alignSelf="center" flexDir="column" w="full">
         <Flex>
           <Text fontSize="2xl" fontWeight="400">
             Dashboards
