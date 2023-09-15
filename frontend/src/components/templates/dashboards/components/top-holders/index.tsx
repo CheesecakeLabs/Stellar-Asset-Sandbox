@@ -18,7 +18,7 @@ interface ITopHolders {
   assetCode: string
 }
 
-export const TopHolders: React.FC<ITopHolders> = ({ holders }) => {
+export const TopHolders: React.FC<ITopHolders> = ({ holders, assetCode }) => {
   return (
     <Container
       justifyContent="center"
@@ -43,7 +43,7 @@ export const TopHolders: React.FC<ITopHolders> = ({ holders }) => {
             <Tr py="2rem">
               <Td>{holder.name}</Td>
               <Td fontSize="sm" isNumeric>
-                {toCrypto(holder.amount)}
+                {toCrypto(holder.amount)} {assetCode}
               </Td>
             </Tr>
           ))}
