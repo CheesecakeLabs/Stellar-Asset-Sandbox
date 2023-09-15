@@ -236,7 +236,7 @@ func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([
 		ORDER BY lt.date DESC
 	`
 
-	rows, err := repo.Db.Query(query, transactionTypeID)
+	rows, err := repo.Db.Query(query)
 	if err != nil {
 		return nil, err
 	}
