@@ -498,6 +498,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
 	}
 
 	token := c.Request.Header.Get("Authorization")
@@ -590,6 +591,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
 	}
 
 	token := c.Request.Header.Get("Authorization")
@@ -602,6 +604,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
