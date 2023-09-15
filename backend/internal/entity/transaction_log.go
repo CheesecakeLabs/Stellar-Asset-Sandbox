@@ -22,10 +22,16 @@ type SumLogTransaction struct {
 }
 
 type SumLogTransactionSupply struct {
-	Asset             Asset     `json:"asset"`
-	CurrentSupply     []float64 `json:"current_supply" example:"1000"`
-	CurrentyMainVault []float64 `json:"current_main_vault" example:"1000"`
-	Date              []string  `json:"date" example:"2023-08-10T14:30:00Z"`
+	Asset             Asset      `json:"asset"`
+	CurrentSupply     []*float64 `json:"current_supply" example:"1000"`
+	CurrentyMainVault []*float64 `json:"current_main_vault" example:"1000"`
+	Date              []string   `json:"date" example:"2023-08-10T14:30:00Z"`
+}
+
+type LogTransactionSupply struct {
+	CurrentSupply     []*float64 `json:"current_supply" example:"1000"`
+	CurrentyMainVault []*float64 `json:"current_main_vault" example:"1000"`
+	Date              []string   `json:"date" example:"2023-08-10T14:30:00Z"`
 }
 
 const (

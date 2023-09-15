@@ -86,10 +86,10 @@ func (l *LogTransactionUseCase) SumLogTransactionsSupply(timeRange string, timeF
 	return sum, nil
 }
 
-func (l *LogTransactionUseCase) SumLogTransactionsSupplyByAssetID(assetID int, timeRange string, duration time.Duration) (entity.SumLogTransactionSupply, error) {
-	sum, err := l.lRepo.SumLogTransactionSupplyByAssetID(assetID, timeRange, duration)
+func (l *LogTransactionUseCase) LogTransactionsSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error) {
+	sum, err := l.lRepo.LogTransactionSupplyByAssetID(assetID, timeRange, periodInitial, interval)
 	if err != nil {
-		return entity.SumLogTransactionSupply{}, err
+		return entity.LogTransactionSupply{}, err
 	}
 	return sum, nil
 }

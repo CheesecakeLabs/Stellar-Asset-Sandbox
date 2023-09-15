@@ -303,7 +303,7 @@ func (repo *LogTransactionRepo) SumLogTransactionSupply(timeRange string, timeFr
 	var sumLogTransactionSupply entity.SumLogTransactionSupply
 	for rows.Next() {
 		var asset entity.Asset
-		var currentSupply, currentMainVault float64
+		var currentSupply, currentMainVault *float64
 		var date string
 		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
 		if err != nil {
@@ -329,46 +329,50 @@ func (repo *LogTransactionRepo) SumLogTransactionSupply(timeRange string, timeFr
 	return sums, nil
 }
 
-func (repo *LogTransactionRepo) SumLogTransactionSupplyByAssetID(assetID int, timeRange string, timeFrame time.Duration) (entity.SumLogTransactionSupply, error) {
-	dateFilter, err := getDateFilter(timeRange)
-	if err != nil {
-		return entity.SumLogTransactionSupply{}, err
-	}
-
-	timeFrameUnit := getTimeFrame(timeFrame)
-	timeFrameSeconds := timeFrame.Seconds()
-
+func (repo *LogTransactionRepo) LogTransactionSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error) {
 	query := `
-		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.current_supply), SUM(lt.current_main_vault),
-		DATE_TRUNC($3, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$4) * $4) as dateFrame
-		FROM logtransactions AS lt
-		JOIN asset AS a ON lt.asset_id = a.id
-		WHERE lt.date >= $1 AND lt.asset_id = $2
-		GROUP BY a.id, dateFrame
-		ORDER BY a.id, dateFrame;
+		WITH period_range AS (
+  			SELECT generate_series(
+    			date_trunc($1, current_timestamp - $2::interval),
+    			date_trunc($1, current_timestamp),
+    			$3::interval
+  			) AS period
+		)
+
+		SELECT
+		  hr.period,
+		  MAX(lt.current_supply) AS current_supply,
+		  MAX(lt.current_main_vault) AS current_main_vault
+		FROM
+		  period_range hr
+		LEFT JOIN
+		  public.logtransactions lt
+		ON
+		  date_trunc($1, hr.period) = date_trunc($1, lt.date) and lt.asset_id = $4
+		GROUP BY
+		  hr.period
+		ORDER BY
+		  hr.period;
 	`
 
-	rows, err := repo.Db.Query(query, dateFilter, assetID, timeFrameUnit, timeFrameSeconds)
+	rows, err := repo.Db.Query(query, timeRange, periodInitial, interval, assetID)
 	if err != nil {
-		return entity.SumLogTransactionSupply{}, err
+		return entity.LogTransactionSupply{}, err
 	}
 	defer rows.Close()
-
-	var sumLogTransactionSupply entity.SumLogTransactionSupply
+	var logTransactionSupply entity.LogTransactionSupply
 	for rows.Next() {
-		var asset entity.Asset
-		var currentSupply, currentMainVault float64
+		var currentSupply, currentMainVault *float64
 		var date string
-		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
+		err := rows.Scan(&date, &currentSupply, &currentMainVault)
 		if err != nil {
-			return entity.SumLogTransactionSupply{}, err
+			return entity.LogTransactionSupply{}, err
 		}
 
-		sumLogTransactionSupply.Asset = asset
-		sumLogTransactionSupply.CurrentSupply = append(sumLogTransactionSupply.CurrentSupply, currentSupply)
-		sumLogTransactionSupply.CurrentyMainVault = append(sumLogTransactionSupply.CurrentyMainVault, currentMainVault)
-		sumLogTransactionSupply.Date = append(sumLogTransactionSupply.Date, date)
+		logTransactionSupply.CurrentSupply = append(logTransactionSupply.CurrentSupply, currentSupply)
+		logTransactionSupply.CurrentyMainVault = append(logTransactionSupply.CurrentyMainVault, currentMainVault)
+		logTransactionSupply.Date = append(logTransactionSupply.Date, date)
 	}
 
-	return sumLogTransactionSupply, nil
+	return logTransactionSupply, nil
 }
