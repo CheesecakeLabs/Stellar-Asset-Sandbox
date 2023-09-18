@@ -9,6 +9,7 @@ import { useDashboards } from 'hooks/useDashboards'
 import { havePermission } from 'utils'
 import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -47,10 +48,9 @@ export const MintAsset: React.FC = () => {
         id: asset.id.toString(),
         code: asset.code,
         sponsor_id: 1,
-        amount: data.amount,
+        amount: toFixedCrypto(data.amount),
         current_supply: Number(asset.assetData?.amount || 0) - data.amount,
-        current_main_vault:
-          Number(asset.distributorBalance?.balance || 0),
+        current_main_vault: Number(asset.distributorBalance?.balance || 0),
       })
 
       if (isSuccess) {

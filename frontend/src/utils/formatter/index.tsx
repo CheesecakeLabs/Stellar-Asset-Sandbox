@@ -77,3 +77,7 @@ export const formatAccount = (
 export const toNumber = (number: string): string => {
   return number.replaceAll(',', '')
 }
+
+export const toFixedCrypto = (amount: string): string => {
+  return Number(amount).toFixed(7)
+}

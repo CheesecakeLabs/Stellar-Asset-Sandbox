@@ -37,7 +37,7 @@ declare namespace Hooks {
       id: string
       code: string
       sponsor_id: number
-      amount: number
+      amount: string
       current_supply: number
       current_main_vault: number
     }
@@ -46,7 +46,7 @@ declare namespace Hooks {
       id: string
       sponsor_id: number
       code: string
-      amount: number
+      amount: string
       current_supply: number
       current_main_vault: number
     }
@@ -64,7 +64,7 @@ declare namespace Hooks {
     interface IClawbackRequest {
       sponsor_id: number
       code: string
-      amount: number
+      amount: string
       from: string
       current_supply: number
       current_main_vault: number

@@ -1,29 +1,25 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { FieldValues, UseFormSetValue } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 
+import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
+import { useVaults } from 'hooks/useVaults'
+import { havePermission } from 'utils'
+import { distributeHelper } from 'utils/constants/helpers'
+import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
-
-import { useAssets } from 'hooks/useAssets';
-import { useAuth } from 'hooks/useAuth';
-import { useHorizon } from 'hooks/useHorizon';
-import { useVaults } from 'hooks/useVaults';
-import { havePermission } from 'utils';
-import { distributeHelper } from 'utils/constants/helpers';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { AssetActions } from 'components/enums/asset-actions';
-import { PathRoute } from 'components/enums/path-route';
-import { Permissions } from 'components/enums/permissions';
-import { ActionHelper } from 'components/molecules/action-helper';
-import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb';
-import { MenuActionsAsset } from 'components/organisms/menu-actions-asset';
-import { Sidebar } from 'components/organisms/sidebar';
-import { DistributeAssetTemplate } from 'components/templates/distribute-asset';
-
+import { AssetActions } from 'components/enums/asset-actions'
+import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
+import { ActionHelper } from 'components/molecules/action-helper'
+import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
+import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { Sidebar } from 'components/organisms/sidebar'
+import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -52,7 +48,7 @@ export const DistributeAsset: React.FC = () => {
         destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
         asset_id: asset.id.toString(),
         sponsor_id: 1,
-        amount: data.amount,
+        amount: toFixedCrypto(data.amount),
         current_supply: Number(asset.assetData?.amount || 0),
         current_main_vault:
           Number(asset.distributorBalance?.balance || 0) - data.amount,

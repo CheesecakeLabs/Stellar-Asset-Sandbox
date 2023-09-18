@@ -9,6 +9,7 @@ import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { clawbackHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -38,7 +39,7 @@ export const ClawbackAsset: React.FC = () => {
     try {
       const isSuccess = await clawback({
         sponsor_id: 1,
-        amount: data.amount,
+        amount: toFixedCrypto(data.amount),
         code: asset.code,
         from: wallet ? wallet : data.from,
         current_supply: Number(asset.assetData?.amount || 0) - data.amount,

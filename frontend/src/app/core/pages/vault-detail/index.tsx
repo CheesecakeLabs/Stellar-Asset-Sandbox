@@ -8,6 +8,7 @@ import { useAuth } from 'hooks/useAuth'
 import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -71,7 +72,7 @@ export const VaultDetail: React.FC = () => {
         destination_wallet_pk: wallet,
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
-        amount: amount,
+        amount: toFixedCrypto(amount),
         current_supply: Number(assetData?.assetData?.amount || 0),
         current_main_vault:
           Number(assetData?.distributorBalance?.balance || 0) - Number(amount),
