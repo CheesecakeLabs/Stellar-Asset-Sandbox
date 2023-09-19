@@ -1,6 +1,8 @@
 import { ReactComponent as AddIcon } from './fonts/add.svg'
 import { ReactComponent as AddUserIcon } from './fonts/add_user.svg'
 import { ReactComponent as ApyIcon } from './fonts/apy.svg'
+import { ReactComponent as ArrowBackIcon } from './fonts/arrow_back.svg'
+import { ReactComponent as ArrowForwardIcon } from './fonts/arrow_forward.svg'
 import { ReactComponent as ArrowRightIcon } from './fonts/arrow_right.svg'
 import { ReactComponent as ArsIcon } from './fonts/ars.svg'
 import { ReactComponent as AuthorizeIcon } from './fonts/authorize.svg'
@@ -108,4 +110,6 @@ export {
   PermissionsIcon,
   DeleteIcon,
   RoleIcon,
+  ArrowBackIcon,
+  ArrowForwardIcon,
 }

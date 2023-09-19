@@ -1,31 +1,28 @@
-import { PathRoute } from 'components/enums/path-route';
+import { PathRoute } from 'components/enums/path-route'
 
-
-
-import { AssetHome } from '../pages/asset-home';
-import { AssetManagement } from '../pages/asset-management';
-import { AuthorizeAccount } from '../pages/authorize-account';
-import { BurnAsset } from '../pages/burn-asset';
-import { ClawbackAsset } from '../pages/clawback-asset';
-import { Contracts } from '../pages/contracts';
-import { ContractsCreate } from '../pages/contracts-create';
-import { ContractsDetail } from '../pages/contracts-detail';
-import { Dashboards } from '../pages/dashboards';
-import { DistributeAsset } from '../pages/distribute-asset';
-import { ForgeAsset } from '../pages/forge-asset';
-import { FreezeAccount } from '../pages/freeze-account';
-import { Home } from '../pages/home';
-import { MintAsset } from '../pages/mint-asset';
-import { PaymentsTokens } from '../pages/payments-tokens';
-import { Profile } from '../pages/profile';
-import { RolePermissions } from '../pages/role-permissions';
-import { RolesManage } from '../pages/roles-manage';
-import { TeamMembers } from '../pages/team-members';
-import { VaultCreate } from '../pages/vault-create';
-import { VaultDetail } from '../pages/vault-detail';
-import { Vaults } from '../pages/vaults';
-import { AppRoute } from './types';
-
+import { AssetHome } from '../pages/asset-home'
+import { AuthorizeAccount } from '../pages/authorize-account'
+import { BurnAsset } from '../pages/burn-asset'
+import { ClawbackAsset } from '../pages/clawback-asset'
+import { Contracts } from '../pages/contracts'
+import { ContractsCreate } from '../pages/contracts-create'
+import { ContractsDetail } from '../pages/contracts-detail'
+import { Dashboards } from '../pages/dashboards'
+import { DistributeAsset } from '../pages/distribute-asset'
+import { ForgeAsset } from '../pages/forge-asset'
+import { FreezeAccount } from '../pages/freeze-account'
+import { Home } from '../pages/home'
+import { MintAsset } from '../pages/mint-asset'
+import { PaymentsTokens } from '../pages/payments-tokens'
+import { Profile } from '../pages/profile'
+import { RolePermissions } from '../pages/role-permissions'
+import { RolesManage } from '../pages/roles-manage'
+import { TeamMembers } from '../pages/team-members'
+import { TokenManagement } from '../pages/token-management'
+import { VaultCreate } from '../pages/vault-create'
+import { VaultDetail } from '../pages/vault-detail'
+import { Vaults } from '../pages/vaults'
+import { AppRoute } from './types'
 
 export const coreRoutes: AppRoute[] = [
   { path: PathRoute.HOME, component: Home, isPrivate: true },
@@ -103,8 +100,8 @@ export const coreRoutes: AppRoute[] = [
     isPrivate: true,
   },
   {
-    path: PathRoute.ASSET_MANAGEMENT,
-    component: AssetManagement,
+    path: PathRoute.TOKEN_MANAGEMENT,
+    component: TokenManagement,
     isPrivate: true,
   },
   {

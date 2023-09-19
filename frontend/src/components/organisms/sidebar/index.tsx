@@ -40,7 +40,7 @@ const linkItems: ILinkItemProps[] = [
   {
     name: 'Token Management',
     icon: <PaymentsIcon />,
-    path: PathRoute.ASSET_MANAGEMENT,
+    path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
     name: 'Smart Contracts',
