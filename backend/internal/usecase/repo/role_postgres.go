@@ -17,7 +17,7 @@ func NewRoleRepo(pg *postgres.Postgres) RoleRepo {
 }
 
 func (r RoleRepo) GetRoles() ([]entity.Role, error) {
-	stmt := `SELECT * FROM Role ORDER BY name ASC`
+	stmt := `SELECT id, name, admin FROM Role ORDER BY name ASC`
 	rows, err := r.Db.Query(stmt)
 
 	if err != nil {
@@ -31,7 +31,7 @@ func (r RoleRepo) GetRoles() ([]entity.Role, error) {
 	for rows.Next() {
 		var role entity.Role
 
-		err = rows.Scan(&role.Id, &role.Name)
+		err = rows.Scan(&role.Id, &role.Name, &role.Admin)
 		if err != nil {
 			return nil, fmt.Errorf("RoleRepo - GetRoles - rows.Scan: %w", err)
 		}
