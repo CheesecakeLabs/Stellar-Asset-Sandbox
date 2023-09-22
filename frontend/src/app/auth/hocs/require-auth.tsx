@@ -9,7 +9,7 @@ const RequireAuth = ({ children }: { children: JSX.Element }): JSX.Element => {
 
   if (!isAuthenticated) {
     return (
-      <Navigate to={`/sandbox/v2/login`} state={{ from: location }} replace />
+      <Navigate to={`/login`} state={{ from: location }} replace />
     )
   }
 
