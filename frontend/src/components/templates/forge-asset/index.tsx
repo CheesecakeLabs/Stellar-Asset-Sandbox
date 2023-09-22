@@ -128,7 +128,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel>
                   <Flex gap={1} alignItems="center">
-                    Limit
+                    {`Limit (optional)`}
                     <Tooltip label={TooltipsData.limit}>
                       <HelpIcon width="20px" />
                     </Tooltip>
@@ -138,7 +138,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   as={NumericFormat}
                   decimalScale={7}
                   thousandSeparator=","
-                  placeholder="Limit (optional)"
+                  placeholder="Limit"
                   autoComplete="off"
                   value={getValues('initilimital_supply')}
                   onChange={(event): void => {

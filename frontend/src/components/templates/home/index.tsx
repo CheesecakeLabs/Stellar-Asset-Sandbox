@@ -64,27 +64,42 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                     maxW="full"
                     display="flex"
                     justifyContent="center"
+                    alignItems="center"
                   >
-                    <ReactPlayer
-                      playing
-                      loop
-                      muted
-                      url={data.slide}
-                      width="100%"
-                      height="480px"
-                    />
-
                     <Text
                       fontWeight="bold"
-                      mb="0.25rem"
+                      mb="1.5rem"
                       mt="1rem"
-                      pt="1rem"
-                      borderTop="1px solid"
+                      pb="1rem"
+                      borderBottom="1px solid"
                       borderColor={'gray.600'}
                       _dark={{ borderColor: 'black.800' }}
+                      textAlign="center"
+                      w="fit-content"
+                      fontSize="xl"
                     >
                       {data.title}
                     </Text>
+                    <Box
+                      overflow="hidden"
+                      border="1px solid #d1d1d1"
+                      borderRadius="16px"
+                      height="448px"
+                      w="fit-content"
+                      mb="2rem"
+                    >
+                      <Box w="full" h="full" top="-4px" pos="relative">
+                        <ReactPlayer
+                          playing
+                          loop
+                          muted
+                          url={data.slide}
+                          width="100%"
+                          height="452px"
+                        />
+                      </Box>
+                    </Box>
+
                     {data.children}
                     {data.actionName && (
                       <Flex w="full" justifyContent="flex-end" mt="0.5rem">

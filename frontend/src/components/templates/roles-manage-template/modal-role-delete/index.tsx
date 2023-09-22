@@ -95,7 +95,9 @@ export const ModalRoleDelete: React.FC<IModalRoleDelete> = ({
               >
                 {roles && (
                   <FormControl isInvalid={errors?.role_id !== undefined}>
-                    <FormLabel mt="1.5rem">Role</FormLabel>
+                    <FormLabel mt="1.5rem">
+                      Select new role to replace users with current role
+                    </FormLabel>
                     <Select
                       placeholder="Select role"
                       {...register('role_id', { required: true })}
@@ -103,7 +105,7 @@ export const ModalRoleDelete: React.FC<IModalRoleDelete> = ({
                         setRoleSelected(Number(event.target.value))
                       }}
                     >
-                      {roles.map(role => (
+                      {roles.filter(filterRole => filterRole.id !== role.id).map(role => (
                         <option value={role.id}>{role.name}</option>
                       ))}
                     </Select>

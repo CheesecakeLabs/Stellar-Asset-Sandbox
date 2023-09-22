@@ -81,3 +81,8 @@ export const toNumber = (number: string): string => {
 export const toFixedCrypto = (amount: string): string => {
   return Number(amount).toFixed(7)
 }
+
+export const formatName = (name: string): string => {
+  const words = name.split(' ')
+  return `${words[0]} ${words.length > 1 ? `${words[1].substring(0, 1)}.` : ''}`
+}
