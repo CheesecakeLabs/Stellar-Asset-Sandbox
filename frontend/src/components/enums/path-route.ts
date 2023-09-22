@@ -1,4 +1,5 @@
 export enum PathRoute {
+  SANDBOX = '/sandbox',
   HOME = '/',
   LOGIN = '/login/:expired?',
   SIGNUP = '/signup',

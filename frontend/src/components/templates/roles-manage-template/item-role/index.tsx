@@ -58,10 +58,19 @@ export const ItemRole: React.FC<IItemRole> = ({
         <Td>{role.name}</Td>
         <Td>
           <Flex w="full" justifyContent="flex-end" gap={2}>
-            <Button variant="secondary" onClick={onOpenUpdate}>
+            <Button
+              variant="secondary"
+              onClick={onOpenUpdate}
+              isDisabled={role.admin === 1}
+            >
               Rename
             </Button>
-            <Button variant="primary" onClick={onOpenDelete} bg="red.500">
+            <Button
+              variant="primary"
+              onClick={onOpenDelete}
+              bg="red.500"
+              isDisabled={role.admin === 1}
+            >
               <DeleteIcon />
             </Button>
           </Flex>

@@ -17,6 +17,7 @@ import { PaymentsTokens } from '../pages/payments-tokens'
 import { Profile } from '../pages/profile'
 import { RolePermissions } from '../pages/role-permissions'
 import { RolesManage } from '../pages/roles-manage'
+import { SandboxPage } from '../pages/sandbox-page'
 import { TeamMembers } from '../pages/team-members'
 import { TokenManagement } from '../pages/token-management'
 import { VaultCreate } from '../pages/vault-create'
@@ -25,6 +26,7 @@ import { Vaults } from '../pages/vaults'
 import { AppRoute } from './types'
 
 export const coreRoutes: AppRoute[] = [
+  { path: PathRoute.SANDBOX, component: SandboxPage },
   { path: PathRoute.HOME, component: Home, isPrivate: true },
   { path: PathRoute.PROFILE, component: Profile, isPrivate: true },
   { path: PathRoute.SETTINGS, component: TeamMembers, isPrivate: true },

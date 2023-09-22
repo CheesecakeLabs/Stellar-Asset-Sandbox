@@ -8,11 +8,13 @@ import {
   FormLabel,
   Input,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
@@ -64,19 +66,11 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
             })}
           >
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex
-                justifyContent="space-between"
-                w="full"
-                px="0.25rem"
-                fill="gray.900"
-                stroke="gray.900"
-                _dark={{
-                  fill: 'white',
-                  stroke: 'white',
-                }}
-              >
+              <Flex justifyContent="space-between" w="full" px="0.25rem">
                 <FormLabel>Amount to burn</FormLabel>
-                <HelpIcon />
+                <Tooltip label={TooltipsData.burn}>
+                  <HelpIcon width="20px" />
+                </Tooltip>
               </Flex>
               <Input
                 as={NumericFormat}

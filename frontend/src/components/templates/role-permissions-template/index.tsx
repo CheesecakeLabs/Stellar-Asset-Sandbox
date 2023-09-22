@@ -134,6 +134,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                             permission.id,
                             role.id
                           )}
+                          isDisabled={role.admin === 1}
                           onChange={(event): void => {
                             onChange(
                               permission.id,

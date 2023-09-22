@@ -10,15 +10,18 @@ import {
   Input,
   Select,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
 import { assetFlags, typesAsset } from 'utils/constants/data-constants'
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
 
 import { RadioCard } from 'components/atoms'
+import { HelpIcon } from 'components/icons'
 
 interface IForgeAssetTemplate {
   onSubmit(
@@ -43,7 +46,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="840px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="920px" alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Forge Asset
         </Text>
@@ -123,12 +126,19 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               mt="1.5rem"
             >
               <FormControl>
-                <FormLabel>Limit</FormLabel>
+                <FormLabel>
+                  <Flex gap={1} alignItems="center">
+                    Limit
+                    <Tooltip label={TooltipsData.limit}>
+                      <HelpIcon width="20px" />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
                 <Input
                   as={NumericFormat}
                   decimalScale={7}
                   thousandSeparator=","
-                  placeholder="Limit"
+                  placeholder="Limit (optional)"
                   autoComplete="off"
                   value={getValues('initilimital_supply')}
                   onChange={(event): void => {

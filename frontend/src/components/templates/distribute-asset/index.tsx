@@ -8,15 +8,18 @@ import {
   FormLabel,
   Input,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
+import { HelpIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
 
 interface IDistributeAssetTemplate {
@@ -56,6 +59,11 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
               onSubmit(data, setValue, wallet)
             })}
           >
+            <Flex justifyContent="flex-end" w="full">
+              <Tooltip label={TooltipsData.distribute}>
+                <HelpIcon width="20px" />
+              </Tooltip>
+            </Flex>
             <FormControl
               isInvalid={errors?.destination_wallet_id !== undefined}
             >
