@@ -73,7 +73,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                       pb="1rem"
                       borderBottom="1px solid"
                       borderColor={'gray.600'}
-                      _dark={{ borderColor: 'black.800' }}
+                      _dark={{ borderColor: 'black.800', color: 'white' }}
                       textAlign="center"
                       w="fit-content"
                       fontSize="xl"
@@ -84,7 +84,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                       overflow="hidden"
                       border="1px solid #d1d1d1"
                       borderRadius="16px"
-                      height="448px"
+                      maxH="448px"
                       w="fit-content"
                       mb="2rem"
                     >
@@ -95,7 +95,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                           muted
                           url={data.slide}
                           width="100%"
-                          height="452px"
+                          height="100%"
                         />
                       </Box>
                     </Box>

@@ -1,4 +1,4 @@
-import { Text, Container, Flex, Divider } from '@chakra-ui/react'
+import { Text, Container, Flex, Divider, useMediaQuery } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
@@ -31,6 +31,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
   assetSelected,
   setAssetSelected,
 }) => {
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [supplyAsset, setSupplyAsset] =
@@ -178,6 +179,11 @@ export const AssetsList: React.FC<IAssetsList> = ({
               setAssetSelected(undefined)
             }}
             _hover={!assetSelected?.id ? undefined : { bg: 'purple.50' }}
+            _dark={
+              !assetSelected?.id
+                ? { bg: 'primary.normal', border: 'none' }
+                : undefined
+            }
           >
             <Flex alignItems="center" h="full">
               <Flex flexDir="column" w="full" h="min-content">
@@ -204,7 +210,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
       {assetSelected && (
         <Flex flexDir="column">
-          <Flex>
+          <Flex  flexDir={isLargerThanSm ? 'row' : 'column'}>
             <Container
               variant="primary"
               justifyContent="center"
@@ -268,7 +274,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
             </Container>
           </Flex>
 
-          <Flex>
+          <Flex  flexDir={isLargerThanSm ? 'row' : 'column'}>
             <Container
               variant="primary"
               justifyContent="center"

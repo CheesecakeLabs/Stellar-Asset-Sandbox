@@ -31,6 +31,11 @@ export const AssetItem: React.FC<IAssetItem> = ({
         onSelectAsset(asset)
       }}
       _hover={asset.id === assetSelected?.id ? undefined : { bg: 'purple.50' }}
+      _dark={
+        asset.id === assetSelected?.id
+          ? { bg: 'primary.normal', border:'none' }
+          : undefined
+      }
     >
       <Flex alignItems="center" h="full">
         <Box

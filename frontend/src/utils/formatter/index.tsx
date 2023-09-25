@@ -60,6 +60,18 @@ export const formatDateFull = (date: string): string => {
   return formattedDate
 }
 
+export const formatDateFullClean = (date: string): string => {
+  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+    month: '2-digit',
+    day: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+
+  return formattedDate
+}
+
 export const formatAccount = (
   account: string,
   wallet?: string,

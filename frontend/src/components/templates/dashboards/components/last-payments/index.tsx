@@ -11,11 +11,12 @@ import {
   Th,
   Thead,
   SimpleGrid,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { formatDateFull, toCrypto } from 'utils/formatter'
+import { formatDateFull, formatDateFullClean, toCrypto } from 'utils/formatter'
 
 interface ILastPayments {
   transactions: Hooks.UseDashboardsTypes.ITransaction[] | undefined
@@ -30,6 +31,8 @@ export const LastPayments: React.FC<ILastPayments> = ({
   assets,
   vaults,
 }) => {
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+
   const walletToName = (publicKey: string): string => {
     if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
       return 'Asset Issuer'
@@ -62,21 +65,27 @@ export const LastPayments: React.FC<ILastPayments> = ({
           <Flex>
             <Table w="full" variant="small">
               <Thead w="full">
-                <Th></Th>
+                {isLargerThanSm && <Th></Th>}
                 <Th>Date</Th>
                 <Th>From</Th>
                 <Th>Amount</Th>
-                <Th>Asset</Th>
+                {isLargerThanSm && <Th>Asset</Th>}
                 <Th>To</Th>
               </Thead>
               <Tbody>
                 {transactions?.map(transaction => (
                   <Tr>
-                    <Td>{getCurrencyIcon(transaction.asset.code, '1rem')}</Td>
-                    <Td>{formatDateFull(transaction.date)}</Td>
+                    {isLargerThanSm && (
+                      <Td>{getCurrencyIcon(transaction.asset.code, '1rem')}</Td>
+                    )}
+                    <Td>
+                      {isLargerThanSm
+                        ? formatDateFull(transaction.date)
+                        : formatDateFullClean(transaction.date)}
+                    </Td>
                     <Td>{walletToName(transaction.origin_pk)}</Td>
                     <Td>{`${toCrypto(Number(transaction.amount || 0))}`}</Td>
-                    <Td>{`${transaction.asset.code}`}</Td>
+                    {isLargerThanSm && <Td>{`${transaction.asset.code}`}</Td>}
                     <Td>{walletToName(transaction.destination_pk)}</Td>
                   </Tr>
                 ))}

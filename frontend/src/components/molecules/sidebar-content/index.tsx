@@ -35,12 +35,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       w={{ base: 'full', md: 60 }}
       minW="282px"
       pos="fixed"
-      h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
+      h={{ base: '100vh', md: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
       borderColor={'gray.600'}
       pb="2rem"
       bg={{ sm: 'white', md: 'none' }}
-      _dark={{ bg: { sm: 'black.600', md: 'none' }, borderColor: 'black.800' }}
+      _dark={{ bg: { base: 'black.600' }, borderColor: 'black.800' }}
       {...rest}
       overflowY="auto"
     >
