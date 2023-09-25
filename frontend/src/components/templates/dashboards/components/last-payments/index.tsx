@@ -31,7 +31,7 @@ export const LastPayments: React.FC<ILastPayments> = ({
   assets,
   vaults,
 }) => {
-  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   const walletToName = (publicKey: string): string => {
     if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
@@ -65,27 +65,27 @@ export const LastPayments: React.FC<ILastPayments> = ({
           <Flex>
             <Table w="full" variant="small">
               <Thead w="full">
-                {isLargerThanSm && <Th></Th>}
+                {isLargerThanMd && <Th></Th>}
                 <Th>Date</Th>
                 <Th>From</Th>
                 <Th>Amount</Th>
-                {isLargerThanSm && <Th>Asset</Th>}
+                {isLargerThanMd && <Th>Asset</Th>}
                 <Th>To</Th>
               </Thead>
               <Tbody>
                 {transactions?.map(transaction => (
                   <Tr>
-                    {isLargerThanSm && (
+                    {isLargerThanMd && (
                       <Td>{getCurrencyIcon(transaction.asset.code, '1rem')}</Td>
                     )}
                     <Td>
-                      {isLargerThanSm
+                      {isLargerThanMd
                         ? formatDateFull(transaction.date)
                         : formatDateFullClean(transaction.date)}
                     </Td>
                     <Td>{walletToName(transaction.origin_pk)}</Td>
                     <Td>{`${toCrypto(Number(transaction.amount || 0))}`}</Td>
-                    {isLargerThanSm && <Td>{`${transaction.asset.code}`}</Td>}
+                    {isLargerThanMd && <Td>{`${transaction.asset.code}`}</Td>}
                     <Td>{walletToName(transaction.destination_pk)}</Td>
                   </Tr>
                 ))}

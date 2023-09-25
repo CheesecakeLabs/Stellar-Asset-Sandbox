@@ -1,4 +1,4 @@
-import { Container, Flex, Spacer, Text } from '@chakra-ui/react'
+import { Container, Flex, Spacer, Text, useMediaQuery } from '@chakra-ui/react'
 import React from 'react'
 
 import { MobileNav } from 'components/atoms'
@@ -13,6 +13,8 @@ interface IHeader {
 }
 
 export const Header: React.FC<IHeader> = ({ onOpen }) => {
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+
   return (
     <Flex
       h="4.5rem"
@@ -32,17 +34,19 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
         <StellarLogo />
       </Flex>
       <Spacer />
-      <Container
-        variant="primary"
-        w="max-content"
-        mr="1rem"
-        px="0.75rem"
-        py="0.25rem"
-      >
-        <Text fontSize="xs" py="0.25rem" lineHeight="20px">
-          {Authentication.getUser()?.name || '-'}
-        </Text>
-      </Container>
+      {isLargerThanSm && (
+        <Container
+          variant="primary"
+          w="max-content"
+          mr="1rem"
+          px="0.75rem"
+          py="0.25rem"
+        >
+          <Text fontSize="xs" py="0.25rem" lineHeight="20px">
+            {Authentication.getUser()?.name || '-'}
+          </Text>
+        </Container>
+      )}
       <SwitchTheme />
     </Flex>
   )

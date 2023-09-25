@@ -31,7 +31,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
   assetSelected,
   setAssetSelected,
 }) => {
-  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [supplyAsset, setSupplyAsset] =
@@ -210,7 +210,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
       {assetSelected && (
         <Flex flexDir="column">
-          <Flex  flexDir={isLargerThanSm ? 'row' : 'column'}>
+          <Flex flexDir={isLargerThanMd ? 'row' : 'column'}>
             <Container
               variant="primary"
               justifyContent="center"
@@ -238,7 +238,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
               justifyContent="center"
               p="0.5rem"
               cursor="pointer"
-              maxW="340px"
+              maxW={isLargerThanMd ? '340px' : 'full'}
               mt="1rem"
             >
               <Flex flexDir="column">
@@ -274,7 +274,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
             </Container>
           </Flex>
 
-          <Flex  flexDir={isLargerThanSm ? 'row' : 'column'}>
+          <Flex flexDir={isLargerThanMd ? 'row' : 'column'}>
             <Container
               variant="primary"
               justifyContent="center"
@@ -299,7 +299,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
               justifyContent="center"
               p="0.5rem"
               cursor="pointer"
-              maxW="340px"
+              maxW={isLargerThanMd ? '340px' : 'full'}
               mt="1rem"
             >
               <TopHolders holders={topHolders} assetCode={assetSelected.code} />

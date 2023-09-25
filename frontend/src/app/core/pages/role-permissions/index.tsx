@@ -1,4 +1,4 @@
-import { Flex, VStack, useToast } from '@chakra-ui/react'
+import { Flex, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
@@ -17,6 +17,7 @@ export interface IChange {
 }
 
 export const RolePermissions: React.FC = () => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [changes, setChanges] = useState<IChange[]>([])
 
   const {
@@ -91,7 +92,12 @@ export const RolePermissions: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={isLargerThanMd ? 'row' : 'column'}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
           <Flex maxW="966px" flexDir="column" w="full">
             <RolePermissionsTemplate
               loading={loading}
