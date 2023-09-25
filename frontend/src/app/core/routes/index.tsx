@@ -18,7 +18,7 @@ const CoreRouter = (): JSX.Element => {
   ]
 
   return (
-    <Router basename='/sandbox/v2'>
+    <Router>
       <Routes>{routes.map(route => route)}</Routes>
     </Router>
   )
