@@ -2,6 +2,7 @@
   "name": "react-typescript",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://stellar.cheesecakelabs.com/sandbox/v2/",
   "dependencies": {
     "@chakra-ui/react": "^2.5.5",
     "@chakra-ui/theme-tools": "^2.0.18",
