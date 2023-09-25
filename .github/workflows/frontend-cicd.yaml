@@ -92,6 +92,7 @@ jobs:
           build-args: |
             REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
             REACT_APP_SENTRY_DSN=${{ secrets.REACT_APP_SENTRY_DSN }}
+            PUBLIC_URL=${{ vars.REACT_APP_PUBLIC_URL }}
           outputs: type=docker,dest=/tmp/docker_image.tar
 
       - name: Upload artifact
