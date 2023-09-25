@@ -1,9 +1,16 @@
 import { Text, Box } from '@chakra-ui/react'
 
+import VIDEO_ASSET_MANAGEMENT from 'app/core/resources/home-videos/asset-management.mp4'
+import VIDEO_DASHBOARDS from 'app/core/resources/home-videos/dashboards.mp4'
+import VIDEO_GENERAL from 'app/core/resources/home-videos/general.mp4'
+import VIDEO_ROLES from 'app/core/resources/home-videos/roles.mp4'
+import VIDEO_SOROBAN from 'app/core/resources/home-videos/soroban.mp4'
+import VIDEO_TREASURY from 'app/core/resources/home-videos/treasury.mp4'
+
 export const carouselData = [
   {
     title: 'Welcome to the Stellar Asset Issuance Sandbox (Custodial Edition)!',
-    slide: 'general.mp4',
+    slide: VIDEO_GENERAL,
     actionName: undefined,
     actionDestination: undefined,
     children: (
@@ -28,7 +35,7 @@ export const carouselData = [
   },
   {
     title: 'Role-based Access and Custody',
-    slide: 'roles.mp4',
+    slide: VIDEO_ROLES,
     actionName: undefined,
     actionDestination: undefined,
     children: (
@@ -61,7 +68,7 @@ export const carouselData = [
   },
   {
     title: 'Token Management in the Sandbox',
-    slide: 'asset-management.mp4',
+    slide: VIDEO_ASSET_MANAGEMENT,
     actionName: undefined,
     actionDestination: undefined,
     children: (
@@ -105,7 +112,7 @@ export const carouselData = [
   },
   {
     title: 'Treasury Management in the Sandbox',
-    slide: 'treasury.mp4',
+    slide: VIDEO_TREASURY,
     actionName: undefined,
     actionDestination: undefined,
     children: (
@@ -148,7 +155,7 @@ export const carouselData = [
   },
   {
     title: 'Dashboards: Insights at Your Fingertips',
-    slide: 'dashboards.mp4',
+    slide: VIDEO_DASHBOARDS,
     actionName: undefined,
     actionDestination: undefined,
     children: (
@@ -182,7 +189,7 @@ export const carouselData = [
   },
   {
     title: 'Soroban: The Next Evolution (Coming Soon)',
-    slide: 'soroban.mp4',
+    slide: VIDEO_SOROBAN,
     actionName: undefined,
     actionDestination: undefined,
     children: (

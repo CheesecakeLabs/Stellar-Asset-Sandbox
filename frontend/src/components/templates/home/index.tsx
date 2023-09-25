@@ -53,10 +53,10 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
           >
             <ArrowBackIcon />
           </IconButton>
-          <Box height={'400px'} width={'900px'}>
+          <Box w="full" maxW={'900px'}>
             <Slider {...settings} ref={(slider): void => setSlider(slider)}>
-              {carouselData.map(data => (
-                <Box w="full">
+              {carouselData.map((data, index) => (
+                <Box w="full" key={index}>
                   <Container
                     variant="primary"
                     mt="1rem"

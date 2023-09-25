@@ -24,7 +24,7 @@ export const PaymentsTokens: React.FC = () => {
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
-      navigate('/login')
+      navigate('/sandbox/v2/login')
     }
   }
 

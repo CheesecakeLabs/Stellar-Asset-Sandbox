@@ -11,6 +11,7 @@ import {
   Button,
   Skeleton,
   Tooltip,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -44,6 +45,9 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
   userPermissions,
 }) => {
   const navigate = useNavigate()
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
     <Flex flexDir="column" w="full">
@@ -70,17 +74,20 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
           <Container variant="primary" p={0} maxW="full">
             <Table variant="simple">
               <Thead>
-                <Th w="2rem" p={0} />
-                <Th>Code</Th>
-                <Th>Name</Th>
-                <Th isNumeric>Supply</Th>
-                <Th>Asset type</Th>
-                <Th>Controls</Th>
-                <Th w="2rem" p={0} />
+                <Tr>
+                  <Th w="2rem" p={0} />
+                  <Th>Code</Th>
+                  <Th>Name</Th>
+                  {isLargerThanSm && <Th isNumeric>Supply</Th>}
+                  {isLargerThanLg && <Th>Asset type</Th>}
+                  {isLargerThanMd && <Th>Controls</Th>}
+                  <Th w="2rem" p={0} />
+                </Tr>
               </Thead>
               <Tbody>
-                {assets.map(asset => (
+                {assets.map((asset, index) => (
                   <Tr
+                    key={index}
                     cursor="pointer"
                     onClick={(): void =>
                       navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
@@ -89,34 +96,44 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                     <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
-                    <Td isNumeric>
-                      {asset.assetData
-                        ? toCrypto(Number(asset.assetData?.amount))
-                        : '-'}
-                    </Td>
-                    <Td>
-                      {typesAsset.find(type => type.id === asset.asset_type)
-                        ?.name || ''}
-                    </Td>
-                    <Td>
-                      <Flex fill="black.900" _dark={{ fill: 'white' }} gap={2}>
-                        {asset.assetData?.flags.auth_required && (
-                          <Tooltip label="Authorize required">
-                            <AuthorizeIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
-                        {asset.assetData?.flags.auth_clawback_enabled && (
-                          <Tooltip label="Clawback enabled">
-                            <BackIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
-                        {asset.assetData?.flags.auth_revocable && (
-                          <Tooltip label="Freeze enabled">
-                            <BlockIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
-                      </Flex>
-                    </Td>
+                    {isLargerThanSm && (
+                      <Td isNumeric>
+                        {asset.assetData
+                          ? toCrypto(Number(asset.assetData?.amount))
+                          : '-'}
+                      </Td>
+                    )}
+                    {isLargerThanLg && (
+                      <Td>
+                        {typesAsset.find(type => type.id === asset.asset_type)
+                          ?.name || ''}
+                      </Td>
+                    )}
+                    {isLargerThanMd && (
+                      <Td>
+                        <Flex
+                          fill="black.900"
+                          _dark={{ fill: 'white' }}
+                          gap={2}
+                        >
+                          {asset.assetData?.flags.auth_required && (
+                            <Tooltip label="Authorize required">
+                              <AuthorizeIcon width="18px" height="18px" />
+                            </Tooltip>
+                          )}
+                          {asset.assetData?.flags.auth_clawback_enabled && (
+                            <Tooltip label="Clawback enabled">
+                              <BackIcon width="18px" height="18px" />
+                            </Tooltip>
+                          )}
+                          {asset.assetData?.flags.auth_revocable && (
+                            <Tooltip label="Freeze enabled">
+                              <BlockIcon width="18px" height="18px" />
+                            </Tooltip>
+                          )}
+                        </Flex>
+                      </Td>
+                    )}
                     <Td w="2rem" p={0}>
                       <ArrowRightIcon width="12px" />
                     </Td>
