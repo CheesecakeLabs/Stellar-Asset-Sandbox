@@ -77,7 +77,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Administration
         </Text>
-        <Container variant="primary" px={0} pb={0} maxW="full"  overflowX="scroll">
+        <Container variant="primary" px={0} pb={0} maxW="full" overflowX="auto">
           <Flex
             justifyContent="space-between"
             px="1.25rem"

@@ -82,7 +82,7 @@ export const ListPayments: React.FC<IListPayments> = ({
           Payments
         </Text>
       </Flex>
-      <Box px="1rem" overflowX="scroll">
+      <Box px="1rem" overflowX="auto">
         {payments?._embedded.records &&
         payments._embedded.records.length > 0 ? (
           <Table w="full" variant="list">
