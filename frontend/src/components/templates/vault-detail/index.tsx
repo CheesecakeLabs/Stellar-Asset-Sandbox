@@ -1,4 +1,4 @@
-import { Flex, Skeleton } from '@chakra-ui/react'
+import { Flex, Skeleton, useMediaQuery } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
@@ -71,6 +71,8 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   getPaymentsDataByLink,
   changeAsset,
 }) => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   const filteredVaults = vaultsByAsset?.filter(
     (itemVault: Hooks.UseVaultsTypes.IVault) => itemVault.id !== vault?.id
   )
@@ -95,7 +97,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
               onUpdateVault={onUpdateVault}
               onDeleteVault={onDeleteVault}
             />
-            <Flex gap="1rem">
+            <Flex gap="1rem" flexDir={isLargerThanMd ? 'row' : 'column'}>
               <ListAssets
                 vault={vault}
                 assets={assets}

@@ -69,7 +69,8 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box w="full">
+    <Box w="full" 
+      zIndex={101}>
       <Header onOpen={onOpen} />
       <Flex pt="5rem">
         <SidebarContent

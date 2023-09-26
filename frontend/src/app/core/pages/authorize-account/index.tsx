@@ -139,7 +139,7 @@ export const AuthorizeAccount: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Authorize'} />

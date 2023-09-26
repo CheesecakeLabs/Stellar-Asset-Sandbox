@@ -11,8 +11,8 @@ export const Skeleton = {
       [$endColor.variable]: 'colors.gray.600',
     },
     _dark: {
-      [$startColor.variable]: 'colors.gray.600',
-      [$endColor.variable]: 'colors.gray.800',
+      [$startColor.variable]: 'colors.black.600',
+      [$endColor.variable]: 'colors.black.800',
     },
   },
 }

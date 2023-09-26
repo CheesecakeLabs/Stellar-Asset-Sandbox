@@ -85,7 +85,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             </FormControl>
 
             <Flex
-              flexDir={{ md: 'row', sm: 'column' }}
+              flexDir={{ md: 'row', base: 'column' }}
               gap="1.5rem"
               mt="1.5rem"
             >
@@ -121,7 +121,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             </Flex>
 
             <Flex
-              flexDir={{ md: 'row', sm: 'column' }}
+              flexDir={{ md: 'row', base: 'column' }}
               gap="1.5rem"
               mt="1.5rem"
             >

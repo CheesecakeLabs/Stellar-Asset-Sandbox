@@ -81,7 +81,7 @@ export const ForgeAsset: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <ForgeAssetTemplate onSubmit={onSubmit} loading={loadingOperation} />
       </Sidebar>
     </Flex>

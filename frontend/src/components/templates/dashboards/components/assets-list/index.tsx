@@ -164,7 +164,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
   return (
     <Flex flexDir="column">
-      <Flex>
+      <Flex overflowX="auto">
         {
           <Container
             variant="primary"
