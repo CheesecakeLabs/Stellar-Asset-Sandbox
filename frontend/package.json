@@ -92,7 +92,7 @@
     "start": "react-scripts start",
     "start:dev": "env-cmd --silent -f ./src/config/.env.local npm start",
     "start:staging": "env-cmd -f ./src/config/.env.staging npm start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && mkdir -p build/sandbox/v2/ && cp -Rp build/static build/sandbox/v2/",
     "test": "react-scripts test",
     "test:coverage": "npm run test -- --coverage --watchAll=false",
     "eject": "react-scripts eject",
