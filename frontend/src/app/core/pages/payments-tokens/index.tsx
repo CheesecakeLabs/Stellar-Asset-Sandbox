@@ -1,6 +1,5 @@
 import { Flex } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 
@@ -9,9 +8,7 @@ import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 
 export const PaymentsTokens: React.FC = () => {
-  const navigate = useNavigate()
   const {
-    signOut,
     editProfile,
     getProfile,
     getRoles,
@@ -20,13 +17,6 @@ export const PaymentsTokens: React.FC = () => {
     profile,
     loadingRoles,
   } = useAuth()
-
-  const handleSignOut = async (): Promise<void> => {
-    const isSuccess = await signOut()
-    if (isSuccess) {
-      navigate('/sandbox/v2/login')
-    }
-  }
 
   const handleEditRole = async (
     params: Hooks.UseAuthTypes.IUserRole
@@ -49,7 +39,6 @@ export const PaymentsTokens: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.HOME}>
         <PaymentsTokensTemplate
-          handleSignOut={handleSignOut}
           loading={loading}
           profile={profile}
           handleEditRole={handleEditRole}

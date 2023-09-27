@@ -24,7 +24,7 @@ export const Profile: React.FC = () => {
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
-      navigate('/sandbox/v2/login')
+      navigate('/login')
     }
   }
 
