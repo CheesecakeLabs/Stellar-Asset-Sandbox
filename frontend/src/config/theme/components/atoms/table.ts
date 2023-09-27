@@ -1,6 +1,18 @@
 export const Table = {
   variants: {
     simple: {
+      thead: {
+        tr: {
+          _hover: {
+            bg: 'none',
+            _dark: {
+              _hover: {
+                bg: 'none',
+              },
+            },
+          },
+        },
+      },
       th: {
         borderColor: 'gray.400',
         _dark: { borderColor: 'black.800' },
@@ -70,7 +82,7 @@ export const Table = {
         borderColor: 'gray.400',
         _dark: { borderColor: 'black.800', color: 'white' },
         px: '0',
-        py: '0.75rem'
+        py: '0.75rem',
       },
       tr: {
         fill: 'black',
