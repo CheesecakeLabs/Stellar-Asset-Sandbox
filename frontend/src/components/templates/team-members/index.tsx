@@ -1,18 +1,17 @@
 import {
   Container,
   Flex,
+  Skeleton,
   Table,
   Tbody,
   Text,
   Th,
   Thead,
-  Tr,
 } from '@chakra-ui/react'
 import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
-import { Loading } from 'components/atoms'
 import { InfoIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
@@ -24,10 +23,10 @@ interface ISettingsTemplate {
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 }
 
-export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
+export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
   users,
   loading,
   handleEditRole,
@@ -41,7 +40,7 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Settings
         </Text>
-        <Container variant="primary" px={0} pb={2} maxW="full">
+        <Container variant="primary" px={0} pb={0} maxW="full">
           <Flex
             justifyContent="space-between"
             px="1.25rem"
@@ -62,46 +61,17 @@ export const SettingsTemplate: React.FC<ISettingsTemplate> = ({
             </Flex>
           </Flex>
           {loading ? (
-            <Loading />
+            <Skeleton h="8rem" w="full" />
           ) : !users || users.length === 0 ? (
             <Empty title="No team members" />
           ) : (
-            <Table w="full">
+            <Table w="full" variant="list">
               <Thead w="full">
-                <Tr>
-                  <Th
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  />
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Member
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Role
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                  >
-                    Last active
-                  </Th>
-                  <Th
-                    color={'gray.700'}
-                    borderColor={'gray.400'}
-                    _dark={{ borderColor: 'black.800' }}
-                    w="1rem"
-                    p={0}
-                  ></Th>
-                </Tr>
+                <Th>ID</Th>
+                <Th>Member</Th>
+                <Th>Role</Th>
+                <Th>Email</Th>
+                <Th w="1rem" p={0}></Th>
               </Thead>
               <Tbody>
                 {users.map(user => (

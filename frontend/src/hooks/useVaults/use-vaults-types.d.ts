@@ -7,6 +7,7 @@ declare namespace Hooks {
       wallet: Hooks.UseWalletsTypes.IWallet
       accountData: Hooks.UseHorizonTypes.IAccount | undefined
       active: 0 | 1
+      isUnauthorized?: boolean
     }
 
     interface IVaultRequest {

@@ -1,17 +1,22 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
+import { havePermission } from 'utils'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from '../../../../components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ForgeAssetTemplate } from 'components/templates/forge-asset'
 
 export const ForgeAsset: React.FC = () => {
   const { forge, loadingOperation } = useAssets()
+  const { userPermissions, loadingUserPermissions, getUserPermissions } =
+    useAuth()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -50,6 +55,17 @@ export const ForgeAsset: React.FC = () => {
       toastError(message)
     }
   }
+
+  useEffect(() => {
+    getUserPermissions().then(() => {
+      if (
+        !loadingUserPermissions &&
+        !havePermission(Permissions.CREATE_ASSET, userPermissions)
+      ) {
+        navigate(PathRoute.HOME)
+      }
+    })
+  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
 
   const toastError = (message: string): void => {
     toast({

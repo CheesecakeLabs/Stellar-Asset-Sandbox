@@ -17,13 +17,25 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Authentication.getUser()
   )
   const [loading, setLoading] = useState(false)
+  const [loadingUserPermissions, setLoadingUserPermissions] = useState(true)
+  const [updatingRolesPermissions, setUpdatingRolesPermissions] =
+    useState(false)
   const [loadingRoles, setLoadingRoles] = useState(true)
+  const [creatingRole, setCreatingRole] = useState(false)
+  const [updatingRole, setUpdatingRole] = useState(false)
+  const [deletingRole, setDeletingRole] = useState(false)
   const [roles, setRoles] = useState<Hooks.UseAuthTypes.IRole[] | undefined>()
   const [users, setUsers] = useState<Hooks.UseAuthTypes.IUserDto[] | undefined>(
     []
   )
   const [profile, setProfile] = useState<
     Hooks.UseAuthTypes.IUserDto | undefined
+  >()
+  const [userPermissions, setUserPermissions] = useState<
+    Hooks.UseAuthTypes.IUserPermission[] | undefined
+  >()
+  const [rolesPermissions, setRolesPermissions] = useState<
+    Hooks.UseAuthTypes.IRolePermission[] | undefined
   >()
   const [permissions, setPermissions] = useState<
     Hooks.UseAuthTypes.IPermission[] | undefined
@@ -166,18 +178,18 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getPermissions = useCallback(async (): Promise<void> => {
-    setLoading(true)
+  const getUserPermissions = useCallback(async (): Promise<void> => {
+    setLoadingUserPermissions(true)
     try {
-      const response = await http.get(`role-permissions/permissions`)
+      const response = await http.get(`role-permissions/user-permissions`)
       const data = response.data
       if (data) {
-        setPermissions(data)
+        setUserPermissions(data)
       }
     } catch (error) {
       return
     } finally {
-      setLoading(false)
+      setLoadingUserPermissions(false)
     }
   }, [])
 
@@ -202,6 +214,122 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getRolesPermissions = useCallback(async (): Promise<void> => {
+    setLoading(true)
+    try {
+      const response = await http.get(`role-permissions/roles-permissions`)
+      const data = response.data
+      if (data) {
+        setRolesPermissions(data)
+      }
+    } catch (error) {
+      return
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const getPermissions = useCallback(async (): Promise<void> => {
+    setLoading(true)
+    try {
+      const response = await http.get(`role-permissions/permissions`)
+      const data = response.data
+      if (data) {
+        setPermissions(data)
+      }
+    } catch (error) {
+      return
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const updateRolesPermissions = async (
+    params: Hooks.UseAuthTypes.IRolePermission[]
+  ): Promise<boolean> => {
+    setUpdatingRolesPermissions(true)
+    try {
+      const response = await http.put(
+        `role-permissions/roles-permissions`,
+        params
+      )
+      if (response.status !== 200) {
+        throw new Error()
+      }
+
+      return true
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setUpdatingRolesPermissions(false)
+    }
+  }
+
+  const createRole = async (name: string): Promise<boolean> => {
+    setCreatingRole(true)
+    try {
+      const response = await http.post(`role`, { name: name })
+      if (response.status !== 200) {
+        throw new Error()
+      }
+
+      return true
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setCreatingRole(false)
+    }
+  }
+
+  const updateRole = async (id: number, name: string): Promise<boolean> => {
+    setUpdatingRole(true)
+    try {
+      const response = await http.put(`role/${id}`, { name: name })
+      if (response.status !== 200) {
+        throw new Error()
+      }
+
+      return true
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setUpdatingRole(false)
+    }
+  }
+
+  const deleteRole = async (
+    id: number,
+    idNewUsersRole: number
+  ): Promise<boolean> => {
+    setDeletingRole(true)
+    try {
+      const response = await http.post(`role/delete/${id}`, {
+        new_users_role_id: Number(idNewUsersRole),
+      })
+      if (response.status !== 200) {
+        throw new Error()
+      }
+
+      return true
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setDeletingRole(false)
+    }
+  }
+
   const isAuthenticated = !!user
 
   return (
@@ -214,15 +342,28 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         getAllUsers,
         editUsersRole,
         getProfile,
-        getPermissions,
+        getUserPermissions,
         editProfile,
+        getRolesPermissions,
+        getPermissions,
+        updateRolesPermissions,
+        createRole,
+        updateRole,
+        deleteRole,
         isAuthenticated,
         loading,
         loadingRoles,
         roles,
         users,
         profile,
+        userPermissions,
+        rolesPermissions,
         permissions,
+        updatingRolesPermissions,
+        creatingRole,
+        updatingRole,
+        deletingRole,
+        loadingUserPermissions
       }}
     >
       {children}

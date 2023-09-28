@@ -16,21 +16,20 @@ import { ChartPeriod, TChartPeriod } from 'components/molecules/chart-period'
 
 interface IChartPayments {
   loadingChart: boolean
-  paymentsAssets: Hooks.UseDashboardsTypes.IAsset[]
+  paymentsAssets: Hooks.UseDashboardsTypes.IAsset[] | undefined
   chartPeriod: TChartPeriod
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 export const ChartPayments: React.FC<IChartPayments> = ({
   paymentsAssets,
-
   chartPeriod,
   loadingChart,
   setChartPeriod,
 }) => {
   const { colorMode } = useColorMode()
 
-  const series = paymentsAssets.map(paymentsAsset => ({
+  const series = paymentsAssets?.map(paymentsAsset => ({
     name: paymentsAsset.asset.code,
     data: getChartLabels(chartPeriod).map(label => {
       const index = paymentsAsset.date.findIndex(date =>
@@ -38,7 +37,7 @@ export const ChartPayments: React.FC<IChartPayments> = ({
       )
       return index > -1 ? paymentsAsset.amount[index] : 0
     }),
-  }))
+  })) || []
 
   const options = {
     chart: {

@@ -1,0 +1,1 @@
+ALTER TABLE Role DROP COLUMN admin;

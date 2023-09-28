@@ -70,7 +70,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 // @Produce     json
 // @Success     200 {object} []entity.VaultCategory
 // @Failure     500 {object} response
-// @Router      / [get]
+// @Router      /vault-category [get]
 func (r *vaultCategoryRoutes) getAllVaultCategories(c *gin.Context) {
 	vaultCategories, err := r.vc.GetAll()
 	if err != nil {

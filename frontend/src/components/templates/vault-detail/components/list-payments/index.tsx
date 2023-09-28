@@ -16,7 +16,6 @@ import React from 'react'
 import { STELLAR_EXPERT_TX_URL } from 'utils/constants/constants'
 import { formatDateFull, toCrypto } from 'utils/formatter'
 
-import { Loading } from 'components/atoms'
 import {
   LinkIcon,
   NavLeftIcon,
@@ -30,7 +29,6 @@ interface IListPayments {
   payments: Hooks.UseHorizonTypes.IPayments | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vault: Hooks.UseVaultsTypes.IVault | undefined
-  loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   isPrevDisabled: boolean
   getPaymentsDataByLink(link: 'prev' | 'next'): void
@@ -40,7 +38,6 @@ export const ListPayments: React.FC<IListPayments> = ({
   payments,
   vaults,
   vault,
-  loading,
   assets,
   isPrevDisabled,
   getPaymentsDataByLink,
@@ -83,26 +80,26 @@ export const ListPayments: React.FC<IListPayments> = ({
         </Text>
       </Flex>
       <Box px="1rem">
-        {loading ? (
-          <Loading />
-        ) : payments?._embedded.records &&
-          payments._embedded.records.length > 0 ? (
-          <Table w="full">
+        {payments?._embedded.records &&
+        payments._embedded.records.length > 0 ? (
+          <Table w="full" variant="list">
             <Thead w="full">
-              <Th w="2rem" p={0} />
-              <Th>From</Th>
-              <Th>To</Th>
-              <Th>Asset</Th>
+              <Tr>
+                <Th w="2rem" p={0} />
+                <Th>From</Th>
+                <Th>To</Th>
+                <Th>Asset</Th>
 
-              <Th>Amount</Th>
-              <Th>Date</Th>
-              <Th />
+                <Th>Amount</Th>
+                <Th>Date</Th>
+                <Th />
+              </Tr>
             </Thead>
             <Tbody>
               {payments._embedded.records.map(
-                payment =>
+                (payment, index) =>
                   payment.type === 'payment' && (
-                    <Tr>
+                    <Tr key={index}>
                       <Td px="1rem" py={0}>
                         {isCurrentVault(payment.from) ? (
                           <SendedIcon width="1.25rem" />

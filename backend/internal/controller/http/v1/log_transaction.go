@@ -28,7 +28,16 @@ func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase,
 		h.GET("/transaction_type/:transaction_type_id/:time_range", r.getLogTransactionsByTransactionTypeID)
 		h.GET("/assets/:asset_id/type/:transaction_type_id/sum/:time_range/:time_frame", r.sumAmountsByAssetID)
 		h.GET("/assets/sum/:time_range/:time_frame", r.sumAmountsForAllAssets)
+		h.GET("/last-transactions/:transaction_type_id", r.getLastLogTransactions)
+		h.POST("/supply/:asset_id", r.supplyByAssetID)
+
 	}
+}
+
+type FiltersRequest struct {
+	TimeRange     string `json:"time_range"        example:"hour"`
+	PeriodInitial string `json:"period_initial"        example:"24 hours"`
+	Interval      string `json:"interval"        example:"1 hour"`
 }
 
 // @Summary Get all transactions logs
@@ -209,6 +218,70 @@ func (r *logTransactionsRoutes) sumAmountsForAllAssets(c *gin.Context) {
 		return
 	}
 	sum, err := r.l.SumLogTransactions(timeRange, duration)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, sum)
+}
+
+// @Summary Get last transactions
+// @Description Get last transactions logs for a specific transaction type
+// @Tags Log Transactions
+// @Accept json
+// @Produce json
+// @Param transaction_type_id path int true "Transaction Type ID"
+// @Security ApiKeyAuth
+// @Success 200 {object} entity.LogTransaction
+// @Router /log_transactions/last_transactions/{transaction_type_id} [get]
+func (r *logTransactionsRoutes) getLastLogTransactions(c *gin.Context) {
+	transactionTypeIDStr := c.Param("transaction_type_id")
+
+	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
+		return
+	}
+
+	logTransactions, err := r.l.GetLastLogTransactions(transactionTypeID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting last log transactions: %s", err.Error()), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, logTransactions)
+}
+
+// @Summary Get sum of supply by Asset ID within a specific time frame
+// @Description Get sum of supply for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour)
+// @Tags Log Transactions
+// @Accept json
+// @Produce json
+// @Param asset_id path int true "Asset ID"
+// @Param time_range path string true "Time range for the query (e.g., '24h' or '1d' '7d' '30d')"
+// @Param time_frame path string true "Time frame for the query (e.g., '1h' '2h' '24h' '36h')"
+// @Security ApiKeyAuth
+// @Success 200 {object} entity.SumLogTransaction
+// @Failure 400 {string} string "Invalid time_frame format"
+// @Failure 500 {string} string "Internal server error"
+// @Router /log_transactions/supply/{asset_id}/{time_range}/{time_frame} [get]
+func (r *logTransactionsRoutes) supplyByAssetID(c *gin.Context) {
+	assetIDStr := c.Param("asset_id")
+
+	var request FiltersRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	assetID, err := strconv.Atoi(assetIDStr)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
+		return
+	}
+
+	sum, err := r.l.LogTransactionsSupplyByAssetID(assetID, request.TimeRange, request.PeriodInitial, request.Interval)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
