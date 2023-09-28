@@ -1,1 +1,0 @@
-ALTER TABLE asset DROP COLUMN image;
