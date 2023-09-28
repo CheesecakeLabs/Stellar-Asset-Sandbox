@@ -37,7 +37,7 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
 	VaultCategoryId int    `json:"vault_category_id" binding:"required" example:"1"`
-	AssetsId        []int  `json:"assets_id" binding:"required" example:"[1,2]"`
+	AssetsId        []int  `json:"assets_id" binding:"required"`
 }
 
 type UpdateVaultCategoryRequest struct {
@@ -173,7 +173,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 // @Produce     json
 // @Success     200 {object} []entity.Vault
 // @Failure     500 {object} response
-// @Router      / [get]
+// @Router      /vault/list [get]
 func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 	vault, err := r.v.GetAll()
 	if err != nil {
@@ -191,7 +191,7 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 // @Produce     json
 // @Success     200 {object} entity.Vault
 // @Failure     500 {object} response
-// @Router      / [get]
+// @Router      /vault/{id} [get]
 func (r *vaultRoutes) getVaultById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

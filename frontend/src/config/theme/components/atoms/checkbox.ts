@@ -2,8 +2,8 @@ export const Checkbox = {
   baseStyle: {
     control: {
       _checked: {
-        bg: 'black.300',
-        borderColor: 'black.300'
+        bg: 'primary.normal',
+        borderColor: 'primary.normal',
       },
     },
   },

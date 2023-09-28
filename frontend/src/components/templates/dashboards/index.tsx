@@ -1,10 +1,11 @@
-import { Box, Flex, Text } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction } from 'react'
+import { Flex, Text } from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { AssetsList } from './components/assets-list'
 import { ChartPayments } from './components/chart-payments'
+import { LastPayments } from './components/last-payments'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IDashboardsTemplate {
@@ -16,6 +17,8 @@ interface IDashboardsTemplate {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   loadingAssets: boolean
   chartPeriod: TChartPeriod
+  transactions: Hooks.UseDashboardsTypes.ITransaction[] | undefined
+  loadingLastTransactions: boolean
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
@@ -25,8 +28,14 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
   assets,
   loadingAssets,
   chartPeriod,
+  transactions,
+  loadingLastTransactions,
+  vaults,
   setChartPeriod,
 }) => {
+  const [assetSelected, setAssetSelected] =
+    useState<Hooks.UseAssetsTypes.IAssetDto>()
+
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
@@ -35,18 +44,31 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
             Dashboards
           </Text>
         </Flex>
-        <Flex>
-          <Box w="full" mr="1rem">
-            {paymentsAssets && (
-              <ChartPayments
-                loadingChart={loadingChart}
-                paymentsAssets={paymentsAssets}
-                chartPeriod={chartPeriod}
-                setChartPeriod={setChartPeriod}
+        <Flex flexDir="column" mt="1rem">
+          <AssetsList
+            assets={assets}
+            loadingAssets={loadingAssets}
+            assetSelected={assetSelected}
+            setAssetSelected={setAssetSelected}
+          />
+          {!assetSelected && (
+            <>
+              <Flex w="full" gap="1rem">
+                <ChartPayments
+                  loadingChart={loadingChart}
+                  paymentsAssets={paymentsAssets}
+                  chartPeriod={chartPeriod}
+                  setChartPeriod={setChartPeriod}
+                />
+              </Flex>
+              <LastPayments
+                transactions={transactions}
+                loading={loadingLastTransactions}
+                assets={assets}
+                vaults={vaults}
               />
-            )}
-          </Box>
-          <AssetsList assets={assets} loadingAssets={loadingAssets} />
+            </>
+          )}
         </Flex>
       </Flex>
     </Flex>

@@ -1,11 +1,18 @@
-import { createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useState } from 'react';
 
-import axios from 'axios'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { TChartPeriod } from 'components/molecules/chart-period'
 
-import { http } from 'interfaces/http'
+import axios from 'axios';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { TChartPeriod } from 'components/molecules/chart-period';
+
+
+
+import { http } from 'interfaces/http';
+
 
 export const DashboardsContext = createContext(
   {} as Hooks.UseDashboardsTypes.IDashboardsContext
@@ -17,6 +24,7 @@ interface IProps {
 
 export const DashboardsProvider: React.FC<IProps> = ({ children }) => {
   const [loadingChart, setLoadingChart] = useState(true)
+  const [loadingLastTransactions, setLoadingLastTransactions] = useState(true)
 
   const getPaymentsByAssetId = useCallback(
     async (
@@ -76,9 +84,34 @@ export const DashboardsProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getLastTransactions = useCallback(
+    async (
+      transactionId: number
+    ): Promise<Hooks.UseDashboardsTypes.ITransaction[] | undefined> => {
+      setLoadingLastTransactions(true)
+      try {
+        const response = await http.get(
+          `/log_transactions/last-transactions/${transactionId}`
+        )
+        const data = response.data
+        if (data) {
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingLastTransactions(false)
+      }
+    },
+    []
+  )
+
   return (
     <DashboardsContext.Provider
-      value={{ loadingChart, getPaymentsByAssetId, getPayments }}
+      value={{ loadingChart,loadingLastTransactions,  getPaymentsByAssetId, getPayments, getLastTransactions }}
     >
       {children}
     </DashboardsContext.Provider>

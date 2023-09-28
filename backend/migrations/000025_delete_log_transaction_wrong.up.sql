@@ -1,0 +1,1 @@
+DELETE FROM LogTransactions WHERE LOG_ID = 181;

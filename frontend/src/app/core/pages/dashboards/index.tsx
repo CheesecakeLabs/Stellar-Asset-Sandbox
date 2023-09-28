@@ -17,9 +17,16 @@ export const Dashboards: React.FC = () => {
   const [paymentsAssets, setPaymentsAssets] =
     useState<Hooks.UseDashboardsTypes.IAsset[]>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [lastTransactions, setLastTransactions] =
+    useState<Hooks.UseDashboardsTypes.ITransaction[]>()
 
   const { loadingVaults, getVaults, getVaultCategories } = useVaults()
-  const { loadingChart, getPayments } = useDashboards()
+  const {
+    loadingChart,
+    loadingLastTransactions,
+    getLastTransactions,
+    getPayments,
+  } = useDashboards()
   const { loadingAssets, getAssets, assets } = useAssets()
 
   useEffect(() => {
@@ -42,6 +49,12 @@ export const Dashboards: React.FC = () => {
     getAssets()
   }, [getAssets])
 
+  useEffect(() => {
+    getLastTransactions(6).then(lastTransactions =>
+      setLastTransactions(lastTransactions)
+    )
+  }, [getLastTransactions])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.DASHBOARDS}>
@@ -54,6 +67,8 @@ export const Dashboards: React.FC = () => {
           assets={assets}
           loadingAssets={loadingAssets}
           chartPeriod={chartPeriod}
+          transactions={lastTransactions}
+          loadingLastTransactions={loadingLastTransactions}
           setChartPeriod={setChartPeriod}
         />
       </Sidebar>

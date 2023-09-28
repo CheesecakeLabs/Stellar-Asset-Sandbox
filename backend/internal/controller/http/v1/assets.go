@@ -55,31 +55,39 @@ type CreateAssetRequest struct {
 }
 
 type BurnAssetRequest struct {
-	Id        string `json:"id"       binding:"required"  example:"001"`
-	SponsorId int    `json:"sponsor_id"        example:"2"`
-	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+	Id               string  `json:"id"       binding:"required"  example:"001"`
+	SponsorId        int     `json:"sponsor_id"        example:"2"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type MintAssetRequest struct {
-	Id        string `json:"id"       binding:"required"  example:"12"`
-	SponsorId int    `json:"sponsor_id"       example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
-	Amount    string `json:"amount"       binding:"required"  example:"1000"`
+	Id               string  `json:"id"       binding:"required"  example:"12"`
+	SponsorId        int     `json:"sponsor_id"       example:"2"`
+	Code             string  `json:"code"       binding:"required"  example:"USDC"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type ClawbackAssetRequest struct {
-	SponsorId int    `json:"sponsor_id"   example:"2"`
-	Code      string `json:"code"       binding:"required"  example:"USDC"`
-	Amount    string `json:"amount"       binding:"required"  example:"1000"`
-	From      string `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
+	SponsorId        int     `json:"sponsor_id"   example:"2"`
+	Code             string  `json:"code"       binding:"required"  example:"USDC"`
+	Amount           string  `json:"amount"       binding:"required"  example:"1000"`
+	From             string  `json:"from"       binding:"required"  example:"GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L"`
+	CurrentSupply    float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type TransferAssetRequest struct {
-	SourceWalletID      int    `json:"source_wallet_id" binding:"required" example:"1"`
-	SponsorId           int    `json:"sponsor_id" example:"2"`
-	DestinationWalletPK string `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
-	AssetID             string `json:"asset_id" binding:"required" example:"12"`
-	Amount              string `json:"amount" binding:"required" example:"12"`
+	SourceWalletID      int     `json:"source_wallet_id" binding:"required" example:"1"`
+	SponsorId           int     `json:"sponsor_id" example:"2"`
+	DestinationWalletPK string  `json:"destination_wallet_pk" binding:"required" example:"GABCD...."`
+	AssetID             string  `json:"asset_id" binding:"required" example:"12"`
+	Amount              string  `json:"amount" binding:"required" example:"12"`
+	CurrentSupply       float64 `json:"current_supply"       example:"1000"`
+	CurrentMainVault    float64 `json:"current_main_vault"       example:"1000"`
 }
 
 type UpdateAuthFlagsRequest struct {
@@ -340,12 +348,15 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	if err != nil {
 		amount = 0
 	}
+
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
 		Amount:            amount,
 		TransactionTypeID: entity.MintAsset,
 		UserID:            userID,
 		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
+		CurrentSupply:     &request.CurrentSupply,
+		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
@@ -434,6 +445,8 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		Amount:            amount,
 		UserID:            userID,
 		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
+		CurrentSupply:     &request.CurrentSupply,
+		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
@@ -504,6 +517,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
 	}
 
 	token := c.Request.Header.Get("Authorization")
@@ -528,6 +542,10 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		TransactionTypeID: entity.TransferAsset,
 		UserID:            userID,
 		Description:       createLogDescription(entity.TransferAsset, asset.Code, nil, nil),
+		OriginPK:          &sourceWallet.Key.PublicKey,
+		DestinationPK:     &request.DestinationWalletPK,
+		CurrentSupply:     &request.CurrentSupply,
+		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
@@ -592,6 +610,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
 	}
 
 	token := c.Request.Header.Get("Authorization")
@@ -604,6 +623,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)
@@ -616,6 +636,8 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		Amount:            amount,
 		UserID:            userID,
 		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
+		CurrentSupply:     &request.CurrentSupply,
+		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
