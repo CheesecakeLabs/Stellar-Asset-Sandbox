@@ -101,7 +101,11 @@ func (c Connection) Run(cfg *config.Config, chanName string) {
 				fmt.Println(err)
 				continue
 			}
-			notify.Post(string(msg.Key), &entity.NotifyData{Key: string(msg.Key), Message: data})
+			err = notify.Post(string(msg.Key), &entity.NotifyData{Key: string(msg.Key), Message: data})
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 		}
 	}
 }

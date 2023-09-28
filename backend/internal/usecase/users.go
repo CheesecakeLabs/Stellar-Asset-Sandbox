@@ -41,7 +41,11 @@ func (uc *UserUseCase) CreateUser(user entity.User) error {
 	if err != nil {
 		return err
 	}
-	uc.repo.CreateUser(user)
+
+	err = uc.repo.CreateUser(user)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -91,11 +95,10 @@ func (uc *UserUseCase) GetAllUsers() ([]entity.UserResponse, error) {
 }
 
 func (uc *UserUseCase) EditUsersRole(userRole entity.UserRole) error {
-	var err error
+	err := uc.repo.EditUsersRole(userRole.ID_user, userRole.ID_role)
 	if err != nil {
 		return err
 	}
-	uc.repo.EditUsersRole(userRole.ID_user, userRole.ID_role)
 	return nil
 }
 
