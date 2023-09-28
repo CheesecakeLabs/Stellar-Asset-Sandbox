@@ -86,13 +86,12 @@ func (r *rolePermissions) permissions(c *gin.Context) {
 // @Tags  	    RolesPermissions
 // @Accept      json
 // @Produce     json
-// @Param       request body RolePermissionRequest
-// @Success     200 {object} entity.RolePermissionRequest "Updated roles permissions information"
+// @Param       request body RolePermissionRequest true "Roles permissions information"
+// @Success     200 {object} RolePermissionRequest "Updated roles permissions information"
 // @Failure     400 {object} response "Bad Request: Invalid input data"
 // @Failure     500 {object} response "Internal Server Error: Failed to update roles permissions"
 // @Router      /role-permission [put]
 func (r *rolePermissions) updateRolesPermissions(c *gin.Context) {
-
 	var request []RolePermissionRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)

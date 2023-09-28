@@ -1,0 +1,2 @@
+ALTER TABLE Role ADD COLUMN admin INT DEFAULT 0;
+UPDATE Role SET admin = 1 WHERE id = 1;

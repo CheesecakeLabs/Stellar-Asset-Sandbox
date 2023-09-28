@@ -18,8 +18,10 @@ func NewLogTransactionRepo(postgres *postgres.Postgres) *LogTransactionRepo {
 }
 
 func (repo *LogTransactionRepo) StoreLogTransaction(log entity.LogTransaction) error {
-	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description, origin_pk, destination_pk) VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description, log.OriginPK, log.DestinationPK)
+	stmp := `INSERT INTO logtransactions (user_id, transaction_type_id, asset_id, amount, description, origin_pk, destination_pk, current_supply, current_main_vault)
+	 		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	_, err := repo.Db.Exec(stmp, log.UserID, log.TransactionTypeID, log.Asset.Id, log.Amount, log.Description, log.OriginPK, log.DestinationPK,
+		log.CurrentSupply, log.CurrentMainVault)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -170,7 +172,8 @@ func getLogTransactions(repo *LogTransactionRepo, timeRange string, whereClause 
 		return nil, err
 	}
 	query := `
-		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, lt.description
+		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, 
+		lt.description ,lt.current_supply, lt.current_main_vault
 		FROM logtransactions AS lt
 		JOIN Asset AS a ON lt.asset_id = a.id
 		WHERE lt.date >= $1 ` + whereClause + `
@@ -187,7 +190,7 @@ func getLogTransactions(repo *LogTransactionRepo, timeRange string, whereClause 
 	for rows.Next() {
 		var log entity.LogTransaction
 		var distributorID, issuerID int
-		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date, &log.Description)
+		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date, &log.Description, &log.CurrentSupply, &log.CurrentMainVault)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +230,7 @@ func getDateFilter(timeRange string) (time.Time, error) {
 func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error) {
 	query := `
 		SELECT lt.log_id, lt.user_id, lt.transaction_type_id, a.id, a.name, a.code, a.distributor_id, a.issuer_id, a.asset_type, lt.amount, lt.date, lt.description,
-		lt.origin_pk, lt.destination_pk
+		lt.origin_pk, lt.destination_pk, lt.current_supply, lt.current_main_vault
 		FROM logtransactions AS lt
 		JOIN Asset AS a ON lt.asset_id = a.id
 		WHERE lt.transaction_type_id = $1
@@ -246,7 +249,7 @@ func (repo *LogTransactionRepo) GetLastLogTransactions(transactionTypeID int) ([
 		var log entity.LogTransaction
 		var distributorID, issuerID int
 		err := rows.Scan(&log.LogID, &log.UserID, &log.TransactionTypeID, &log.Asset.Id, &log.Asset.Name, &log.Asset.Code, &distributorID, &issuerID, &log.Asset.AssetType, &log.Amount, &log.Date,
-			&log.Description, &log.OriginPK, &log.DestinationPK)
+			&log.Description, &log.OriginPK, &log.DestinationPK, &log.CurrentSupply, &log.CurrentMainVault)
 		if err != nil {
 			return nil, err
 		}
@@ -268,4 +271,108 @@ func getTimeFrame(timeFrame time.Duration) string {
 		timeFrameUnit = "minute"
 	}
 	return timeFrameUnit
+}
+
+func (repo *LogTransactionRepo) SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error) {
+	dateFilter, err := getDateFilter(timeRange)
+	if err != nil {
+		return []entity.SumLogTransactionSupply{}, err
+	}
+
+	timeFrameUnit := getTimeFrame(timeFrame)
+	timeFrameSeconds := timeFrame.Seconds()
+
+	query := `
+		SELECT a.id, a.name, a.code, a.asset_type, SUM(lt.current_supply), SUM(lt.current_main_vault),
+		DATE_TRUNC($2, TIMESTAMP 'epoch' + INTERVAL '1 second' * floor(EXTRACT(EPOCH FROM lt.date)/$3) * $3) as dateFrame
+		FROM logtransactions AS lt
+		JOIN asset AS a ON lt.asset_id = a.id
+		WHERE lt.date >= $1
+		GROUP BY a.id, dateFrame
+		ORDER BY a.id, dateFrame;
+	`
+
+	rows, err := repo.Db.Query(query, dateFilter, timeFrameUnit, timeFrameSeconds)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sums []entity.SumLogTransactionSupply
+	var currentAsset entity.Asset
+	var sumLogTransactionSupply entity.SumLogTransactionSupply
+	for rows.Next() {
+		var asset entity.Asset
+		var currentSupply, currentMainVault *float64
+		var date string
+		err := rows.Scan(&asset.Id, &asset.Name, &asset.Code, &asset.AssetType, &currentSupply, &currentMainVault, &date)
+		if err != nil {
+			return nil, err
+		}
+
+		if asset.Id != currentAsset.Id && currentAsset.Id != 0 {
+			sums = append(sums, sumLogTransactionSupply)
+			sumLogTransactionSupply = entity.SumLogTransactionSupply{}
+		}
+
+		sumLogTransactionSupply.Asset = asset
+		sumLogTransactionSupply.CurrentSupply = append(sumLogTransactionSupply.CurrentSupply, currentSupply)
+		sumLogTransactionSupply.CurrentyMainVault = append(sumLogTransactionSupply.CurrentyMainVault, currentMainVault)
+		sumLogTransactionSupply.Date = append(sumLogTransactionSupply.Date, date)
+		currentAsset = asset
+	}
+
+	if currentAsset.Id != 0 {
+		sums = append(sums, sumLogTransactionSupply)
+	}
+
+	return sums, nil
+}
+
+func (repo *LogTransactionRepo) LogTransactionSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error) {
+	query := `
+		WITH period_range AS (
+  			SELECT generate_series(
+    			date_trunc($1, current_timestamp - $2::interval),
+    			date_trunc($1, current_timestamp),
+    			$3::interval
+  			) AS period
+		)
+
+		SELECT
+		  hr.period,
+		  MAX(lt.current_supply) AS current_supply,
+		  MAX(lt.current_main_vault) AS current_main_vault
+		FROM
+		  period_range hr
+		LEFT JOIN
+		  public.logtransactions lt
+		ON
+		  date_trunc($1, hr.period) = date_trunc($1, lt.date) and lt.asset_id = $4
+		GROUP BY
+		  hr.period
+		ORDER BY
+		  hr.period;
+	`
+
+	rows, err := repo.Db.Query(query, timeRange, periodInitial, interval, assetID)
+	if err != nil {
+		return entity.LogTransactionSupply{}, err
+	}
+	defer rows.Close()
+	var logTransactionSupply entity.LogTransactionSupply
+	for rows.Next() {
+		var currentSupply, currentMainVault *float64
+		var date string
+		err := rows.Scan(&date, &currentSupply, &currentMainVault)
+		if err != nil {
+			return entity.LogTransactionSupply{}, err
+		}
+
+		logTransactionSupply.CurrentSupply = append(logTransactionSupply.CurrentSupply, currentSupply)
+		logTransactionSupply.CurrentyMainVault = append(logTransactionSupply.CurrentyMainVault, currentMainVault)
+		logTransactionSupply.Date = append(logTransactionSupply.Date, date)
+	}
+
+	return logTransactionSupply, nil
 }
