@@ -73,10 +73,10 @@ definitions:
         $ref: '#/definitions/entity.Asset'
       current_main_vault:
         example: 1000
-        type: integer
+        type: number
       current_supply:
         example: 1000
-        type: integer
+        type: number
       date:
         example: "2023-08-10T14:30:00Z"
         type: string
@@ -113,6 +113,9 @@ definitions:
     type: object
   entity.Role:
     properties:
+      admin:
+        example: 1
+        type: integer
       id:
         example: 1
         type: integer
@@ -264,10 +267,10 @@ definitions:
         type: string
       current_main_vault:
         example: 1000
-        type: integer
+        type: number
       current_supply:
         example: 1000
-        type: integer
+        type: number
       id:
         example: "001"
         type: string
@@ -288,10 +291,10 @@ definitions:
         type: string
       current_main_vault:
         example: 1000
-        type: integer
+        type: number
       current_supply:
         example: 1000
-        type: integer
+        type: number
       from:
         example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
         type: string
@@ -429,10 +432,10 @@ definitions:
         type: string
       current_main_vault:
         example: 1000
-        type: integer
+        type: number
       current_supply:
         example: 1000
-        type: integer
+        type: number
       id:
         example: "12"
         type: string
@@ -466,10 +469,10 @@ definitions:
         type: string
       current_main_vault:
         example: 1000
-        type: integer
+        type: number
       current_supply:
         example: 1000
-        type: integer
+        type: number
       destination_wallet_pk:
         example: GABCD....
         type: string
@@ -656,19 +659,20 @@ paths:
   /assets/{id}/image:
     post:
       consumes:
-      - multipart/form-data
-      description: Upload an image for a specific asset by ID
+      - application/json
+      description: Upload a base64 encoded image for a specific asset by ID
       parameters:
       - description: Asset ID
         in: path
         name: id
         required: true
         type: string
-      - description: Asset Image
-        in: formData
+      - description: Base64 Encoded Asset Image
+        in: body
         name: image
         required: true
-        type: file
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -1109,45 +1113,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get sum of supply by Asset ID within a specific time frame
-      tags:
-      - Log Transactions
-  /log_transactions/supply/{time_range}/{time_frame}:
-    get:
-      consumes:
-      - application/json
-      description: Get sum of supply for all assets, grouped by a specified time frame
-        (e.g., '1h' for 1 hour)
-      parameters:
-      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
-        in: path
-        name: time_range
-        required: true
-        type: string
-      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
-        in: path
-        name: time_frame
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/entity.SumLogTransaction'
-            type: array
-        "400":
-          description: Invalid time_frame format
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Get sum of supply for all assets within a specific time frame
       tags:
       - Log Transactions
   /log_transactions/transaction_type/{transaction_type_id}:

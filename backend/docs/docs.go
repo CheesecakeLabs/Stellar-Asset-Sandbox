@@ -418,9 +418,9 @@ const docTemplate = `{
         },
         "/assets/{id}/image": {
             "post": {
-                "description": "Upload an image for a specific asset by ID",
+                "description": "Upload a base64 encoded image for a specific asset by ID",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -438,11 +438,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "file",
-                        "description": "Asset Image",
+                        "description": "Base64 Encoded Asset Image",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -839,65 +841,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/entity.SumLogTransaction"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid time_frame format",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/log_transactions/supply/{time_range}/{time_frame}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get sum of supply for all assets, grouped by a specified time frame (e.g., '1h' for 1 hour)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Log Transactions"
-                ],
-                "summary": "Get sum of supply for all assets within a specific time frame",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Time range for the query (e.g., '24h' or '1d' '7d' '30d')",
-                        "name": "time_range",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Time frame for the query (e.g., '1h' '2h' '24h' '36h')",
-                        "name": "time_frame",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.SumLogTransaction"
-                            }
                         }
                     },
                     "400": {
@@ -2089,11 +2032,11 @@ const docTemplate = `{
                     "$ref": "#/definitions/entity.Asset"
                 },
                 "current_main_vault": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "current_supply": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "date": {
@@ -2146,6 +2089,10 @@ const docTemplate = `{
         "entity.Role": {
             "type": "object",
             "properties": {
+                "admin": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -2372,11 +2319,11 @@ const docTemplate = `{
                     "example": "1000"
                 },
                 "current_main_vault": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "current_supply": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "id": {
@@ -2406,11 +2353,11 @@ const docTemplate = `{
                     "example": "USDC"
                 },
                 "current_main_vault": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "current_supply": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "from": {
@@ -2600,11 +2547,11 @@ const docTemplate = `{
                     "example": "USDC"
                 },
                 "current_main_vault": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "current_supply": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "id": {
@@ -2652,11 +2599,11 @@ const docTemplate = `{
                     "example": "12"
                 },
                 "current_main_vault": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "current_supply": {
-                    "type": "integer",
+                    "type": "number",
                     "example": 1000
                 },
                 "destination_wallet_pk": {
