@@ -20,17 +20,18 @@ export const ContractsDetail: React.FC = () => {
     getYield,
     getTime,
     withdraw,
-    getAccount,
     deposit,
   } = useContracts()
   const toast = useToast()
 
   const [userPosition, setUserPosition] = useState<bigint>(BigInt(0))
   const [userYield, setUserYield] = useState<bigint>(BigInt(0))
-  const [userAccount, setUserAccount] = useState<string>('')
   const [time, setTime] = useState<bigint>(BigInt(0))
   const [userDeposit, setUserDeposit] = useState(0)
   const [pauseProcess, setPauseProcess] = useState(false)
+
+  const userAccount = 'GDNG5OBGQFGWWG5UQXLFQLXOH5BA3GIXQO6YNZFDUFBYSHVUX7BUU6RT'
+  const secretKey = 'SBBMN3QPHH7UYPHEPXXVTLAIYLOIPDGRNW65TTN2ANBWSLNW6NYH2OZW'
 
   const updatePosition = useCallback((): void => {
     if (!pauseProcess) {
@@ -48,7 +49,7 @@ export const ContractsDetail: React.FC = () => {
     if (userAccount) {
       updatePositionPeriodically()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userAccount])
 
   useEffect(() => {
@@ -61,16 +62,17 @@ export const ContractsDetail: React.FC = () => {
     getContract('1')
   }, [getContract])
 
-  useEffect(() => {
-    getAccount(setUserAccount)
-  }, [getAccount, getContract])
-
   const onSubmitDeposit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
     try {
-      const isSuccess = await deposit(BigInt(data.amount), userAccount)
+      const isSuccess = await deposit(
+        BigInt(data.amount),
+        userAccount,
+        updatePosition(),
+        secretKey
+      )
       setUserDeposit(data.amount)
 
       if (isSuccess) {
@@ -102,7 +104,8 @@ export const ContractsDetail: React.FC = () => {
       const isSuccess = await withdraw(
         userAccount,
         true,
-        updatePosition()
+        updatePosition(),
+        secretKey
       )
 
       if (isSuccess) {
@@ -127,10 +130,6 @@ export const ContractsDetail: React.FC = () => {
       toastError(message)
       setPauseProcess(false)
     }
-  }
-
-  const onClickGetAccount = (): void => {
-    getAccount(setUserAccount)
   }
 
   const toastError = (message: string): void => {
@@ -158,7 +157,6 @@ export const ContractsDetail: React.FC = () => {
           deposit={userDeposit}
           balance={Number(userPosition)}
           onSubmitWithdraw={onSubmitWithdraw}
-          onClickGetAccount={onClickGetAccount}
           onSubmitDeposit={onSubmitDeposit}
         />
       </Sidebar>

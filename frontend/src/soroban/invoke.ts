@@ -1,21 +1,21 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import freighter from "@stellar/freighter-api";
-// working around ESM compatibility issues
-const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter;
-import * as SorobanClient from "soroban-client";
-import type {
-  Account,
-  Memo,
-  MemoType,
-  Operation,
-  Transaction,
-} from "soroban-client";
-import { NETWORK_PASSPHRASE, CONTRACT_ID } from "./constants";
-import { Server } from "./server";
-import { Options, ResponseTypes } from "./method-options";
 
-export type Tx = Transaction<Memo<MemoType>, Operation[]>;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import freighter from '@stellar/freighter-api';
+import * as SorobanClient from 'soroban-client';
+import type { Account, Memo, MemoType, Operation, Transaction } from 'soroban-client';
+
+
+
+import { NETWORK_PASSPHRASE, CONTRACT_ID } from './constants';
+import { Options, ResponseTypes } from './method-options';
+import { Server } from './server';
+
+
+// working around ESM compatibility issues
+const { isConnected, isAllowed, getUserInfo, signTransaction } = freighter
+
+export type Tx = Transaction<Memo<MemoType>, Operation[]>
 
 /**
  * Get account details from the Soroban network for the publicKey currently
@@ -23,30 +23,31 @@ export type Tx = Transaction<Memo<MemoType>, Operation[]>;
  */
 async function getAccount(): Promise<Account | null> {
   if (!(await isConnected()) || !(await isAllowed())) {
-    return null;
+    return null
   }
-  const { publicKey } = await getUserInfo();
+  const { publicKey } = await getUserInfo()
   if (!publicKey) {
-    return null;
+    return null
   }
-  return Server.getAccount(publicKey);
+  return Server.getAccount(publicKey)
 }
 
 export class NotImplementedError extends Error {}
 
-type Simulation = SorobanClient.SorobanRpc.SimulateTransactionResponse;
-type SendTx = SorobanClient.SorobanRpc.SendTransactionResponse;
-type GetTx = SorobanClient.SorobanRpc.GetTransactionResponse;
+type Simulation = SorobanClient.SorobanRpc.SimulateTransactionResponse
+type SendTx = SorobanClient.SorobanRpc.SendTransactionResponse
+type GetTx = SorobanClient.SorobanRpc.GetTransactionResponse
 
 // defined this way so typeahead shows full union, not named alias
-let someRpcResponse: Simulation | SendTx | GetTx;
-type SomeRpcResponse = typeof someRpcResponse;
+let someRpcResponse: Simulation | SendTx | GetTx
+type SomeRpcResponse = typeof someRpcResponse
 
 type InvokeArgs<R extends ResponseTypes, T = string> = Options<R> & {
-  method: string;
-  args?: any[];
-  parseResultXdr?: (xdr: string) => T;
-};
+  method: string
+  args?: any[]
+  parseResultXdr?: (xdr: string) => T
+  signerSecret?: string
+}
 
 /**
  * Invoke a method on the certificates_of_deposit contract.
@@ -60,12 +61,12 @@ export async function invoke<R extends ResponseTypes = undefined, T = string>(
 ): Promise<
   R extends undefined
     ? T
-    : R extends "simulated"
+    : R extends 'simulated'
     ? Simulation
-    : R extends "full"
+    : R extends 'full'
     ? SomeRpcResponse
     : T
->;
+>
 export async function invoke<R extends ResponseTypes, T = string>({
   method,
   args = [],
@@ -73,19 +74,28 @@ export async function invoke<R extends ResponseTypes, T = string>({
   responseType,
   parseResultXdr,
   secondsToWait = 10,
+  signerSecret = "",
 }: InvokeArgs<R, T>): Promise<T | string | SomeRpcResponse> {
-  const freighterAccount = await getAccount();
+  let account
+  if (signerSecret) {
+    const signerKeypar = SorobanClient.Keypair.fromSecret(signerSecret)
+    account = await Server.getAccount(signerKeypar.publicKey())
+  } else {
+    const freighterAccount = await getAccount()
 
-  // console.log(freighter.getUserInfo());
-  // use a placeholder null account if not yet connected to Freighter so that view calls can still work
-  const account =
-    freighterAccount ??
-    new SorobanClient.Account(
-      "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
-      "0"
-    );
+    // console.log(freighter.getUserInfo());
+    // use a placeholder null account if not yet connected to Freighter so that view calls can still work
+    account =
+      freighterAccount ??
+      new SorobanClient.Account(
+        'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF',
+        '0'
+      )
+  }
 
-  const contract = new SorobanClient.Contract(CONTRACT_ID);
+  console.log(0)
+  const contract = new SorobanClient.Contract(CONTRACT_ID)
+  console.log(1)
 
   let tx = new SorobanClient.TransactionBuilder(account, {
     fee: fee.toString(10),
@@ -93,46 +103,44 @@ export async function invoke<R extends ResponseTypes, T = string>({
   })
     .addOperation(contract.call(method, ...args))
     .setTimeout(SorobanClient.TimeoutInfinite)
-    .build();
+    .build()
 
-  const simulated = await Server.simulateTransaction(tx);
+  const simulated = await Server.simulateTransaction(tx)
 
-  if (responseType === "simulated") return simulated;
+  if (responseType === 'simulated') return simulated
 
   // is it possible for `auths` to be present but empty? Probably not, but let's be safe.
-  const auths = simulated.results?.[0]?.auth;
-  const authsCount = auths?.length ?? 0;
+  const auths = simulated.results?.[0]?.auth
+  const authsCount = auths?.length ?? 0
 
   const writeLength = SorobanClient.xdr.SorobanTransactionData.fromXDR(
     simulated.transactionData,
-    "base64"
+    'base64'
   )
     .resources()
     .footprint()
-    .readWrite().length;
+    .readWrite().length
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const parse = parseResultXdr ?? ((xdr) => xdr);
+  const parse = parseResultXdr ?? (xdr => xdr)
 
-  const isViewCall = authsCount === 0 && writeLength === 0;
+  const isViewCall = authsCount === 0 && writeLength === 0
 
   if (isViewCall) {
-    if (responseType === "full") return simulated;
+    if (responseType === 'full') return simulated
 
-    const { results } = simulated;
+    const { results } = simulated
     if (!results || results[0] === undefined) {
       if (simulated.error) {
-        throw new Error(simulated.error as unknown as string);
+        throw new Error(simulated.error as unknown as string)
       }
-      throw new Error(
-        `Invalid response from simulateTransaction:\n{simulated}`
-      );
+      throw new Error(`Invalid response from simulateTransaction:\n{simulated}`)
     }
-    return parse(results[0].xdr);
+    return parse(results[0].xdr)
   }
 
   if (authsCount > 1) {
-    throw new NotImplementedError("Multiple auths not yet supported");
+    throw new NotImplementedError('Multiple auths not yet supported')
   }
   if (authsCount === 1) {
     // TODO: figure out how to fix with new SorobanClient
@@ -145,28 +153,29 @@ export async function invoke<R extends ResponseTypes, T = string>({
     // }
   }
 
-  if (!freighterAccount) {
-    throw new Error("Not connected to Freighter");
-  }
+  /*if (!freighterAccount) {
+    throw new Error('Not connected to Freighter')
+  }*/
 
   tx = await signTx(
-    SorobanClient.assembleTransaction(tx, NETWORK_PASSPHRASE, simulated) as Tx
-  );
+    SorobanClient.assembleTransaction(tx, NETWORK_PASSPHRASE, simulated) as Tx,
+    signerSecret
+  )
 
-  const raw = await sendTx(tx, secondsToWait);
+  const raw = await sendTx(tx, secondsToWait)
 
-  if (responseType === "full") return raw;
+  if (responseType === 'full') return raw
 
   // if `sendTx` awaited the inclusion of the tx in the ledger, it used
   // `getTransaction`, which has a `resultXdr` field
-  if ("resultXdr" in raw) return parse(raw.resultXdr || '');
+  if ('resultXdr' in raw) return parse(raw.resultXdr || '')
 
   // otherwise, it returned the result of `sendTransaction`
-  if ("errorResultXdr" in raw) return parse(raw.errorResultXdr || '');
+  if ('errorResultXdr' in raw) return parse(raw.errorResultXdr || '')
 
   // if neither of these are present, something went wrong
-  console.error("Don't know how to parse result! Returning full RPC response.");
-  return raw;
+  console.error("Don't know how to parse result! Returning full RPC response.")
+  return raw
 }
 
 /**
@@ -177,15 +186,23 @@ export async function invoke<R extends ResponseTypes, T = string>({
  * or one of the exported contract methods, you may want to use this function
  * to sign the transaction with Freighter.
  */
-export async function signTx(tx: Tx): Promise<Tx> {
-  const signed = await signTransaction(tx.toXDR(), {
-    networkPassphrase: NETWORK_PASSPHRASE,
-  });
+export async function signTx(tx: Tx, signerSecret?: string): Promise<Tx> {
+  let signed
+
+  if (signerSecret) {
+    const sender = SorobanClient.Keypair.fromSecret(signerSecret)
+    tx.sign(sender)
+    signed = tx.toXDR()
+  } else {
+    signed = await signTransaction(tx.toXDR(), {
+      networkPassphrase: NETWORK_PASSPHRASE,
+    })
+  }
 
   return SorobanClient.TransactionBuilder.fromXDR(
     signed,
     NETWORK_PASSPHRASE
-  ) as Tx;
+  ) as Tx
 }
 
 /**
@@ -202,44 +219,44 @@ export async function sendTx(
   tx: Tx,
   secondsToWait: number
 ): Promise<SendTx | GetTx> {
-  const sendTransactionResponse = await Server.sendTransaction(tx);
+  const sendTransactionResponse = await Server.sendTransaction(tx)
 
-  if (sendTransactionResponse.status !== "PENDING" || secondsToWait === 0) {
-    return sendTransactionResponse;
+  if (sendTransactionResponse.status !== 'PENDING' || secondsToWait === 0) {
+    return sendTransactionResponse
   }
 
   let getTransactionResponse = await Server.getTransaction(
     sendTransactionResponse.hash
-  );
+  )
 
-  const waitUntil = new Date(Date.now() + secondsToWait * 1000).valueOf();
+  const waitUntil = new Date(Date.now() + secondsToWait * 1000).valueOf()
 
-  let waitTime = 1000;
-  const exponentialFactor = 1.5;
+  let waitTime = 1000
+  const exponentialFactor = 1.5
 
   while (
     Date.now() < waitUntil &&
-    getTransactionResponse.status === "NOT_FOUND"
+    getTransactionResponse.status === 'NOT_FOUND'
   ) {
     // Wait a beat
-    await new Promise((resolve) => setTimeout(resolve, waitTime));
+    await new Promise(resolve => setTimeout(resolve, waitTime))
     /// Exponential backoff
-    waitTime = waitTime * exponentialFactor;
+    waitTime = waitTime * exponentialFactor
     // See if the transaction is complete
     getTransactionResponse = await Server.getTransaction(
       sendTransactionResponse.hash
-    );
+    )
   }
 
-  if (getTransactionResponse.status === "NOT_FOUND") {
+  if (getTransactionResponse.status === 'NOT_FOUND') {
     console.log(
       `Waited ${secondsToWait} seconds for transaction to complete, but it did not. Returning anyway. Check the transaction status manually. Info: ${JSON.stringify(
         sendTransactionResponse,
         null,
         2
       )}`
-    );
+    )
   }
 
-  return getTransactionResponse;
+  return getTransactionResponse
 }

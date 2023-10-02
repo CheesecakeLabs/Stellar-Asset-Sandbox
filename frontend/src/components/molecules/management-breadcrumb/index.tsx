@@ -39,7 +39,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
             fill="gray.650"
             _dark={{ fill: 'white' }}
           >
-            <HomeIcon /> Stellar Classic
+            <HomeIcon /> Token Management
           </BreadcrumbLink>
         </BreadcrumbItem>
 

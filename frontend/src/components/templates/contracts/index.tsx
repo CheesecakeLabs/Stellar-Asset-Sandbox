@@ -60,6 +60,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                 <Th>Contract</Th>
                 <Th>APY</Th>
                 <Th>Term</Th>
+                <Th>Compound</Th>
                 <Th>Minimum Deposit</Th>
                 <Th w="2rem" p={0} />
               </Thead>
@@ -77,6 +78,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                     <Td>Contract</Td>
                     <Td>{`${contract.yield_rate}%`}</Td>
                     <Td>{`${contract.term}s`}</Td>
+                    <Td>Every 10s</Td>
                     <Td>{toCrypto(contract.min_deposit)}</Td>
                     <Td w="2rem" p={0}>
                       <ArrowRightIcon width="12px" />

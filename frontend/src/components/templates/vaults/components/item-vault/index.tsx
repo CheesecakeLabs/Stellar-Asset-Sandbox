@@ -22,6 +22,8 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
       flexDir="column"
       onClick={(): void => navigate(`${PathRoute.VAULT_DETAIL}/${vault.id}`)}
       cursor="pointer"
+      w="full"
+      maxW="full"
     >
       <Text
         pb="0.5rem"

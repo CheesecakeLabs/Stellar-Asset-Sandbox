@@ -39,6 +39,11 @@ declare namespace Hooks {
       is_remove: boolean
     }
 
+    interface IVaultAccountName {
+      name: string
+      isAuthorized: boolean
+    }
+
     interface IVaultsContext {
       loadingVault: boolean
       loadingVaults: boolean
@@ -62,6 +67,17 @@ declare namespace Hooks {
         params: IVaultAssetsUpdateParams[]
       ) => Promise<boolean>
       deleteVault: (id: number) => Promise<boolean>
+      filterVaultsByStatus: (
+        vaults: Hooks.UseVaultsTypes.IVault[] | undefined,
+        assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
+        asset: Hooks.UseAssetsTypes.IAssetDto,
+        isAuthorired: boolean
+      ) => Hooks.UseVaultsTypes.IVault[]
+      vaultsToStatusName: (
+        vaults: Hooks.UseVaultsTypes.IVault[] | undefined,
+        assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
+        asset: Hooks.UseAssetsTypes.IAssetDto
+      ) => Hooks.UseVaultsTypes.IVaultAccountName[]
     }
   }
 }

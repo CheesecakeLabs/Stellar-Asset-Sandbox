@@ -1,8 +1,6 @@
 import { Flex, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useState } from 'react'
 
-import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
-
 import { AssetsList } from './components/assets-list'
 import { ChartPayments } from './components/chart-payments'
 import { LastPayments } from './components/last-payments'
@@ -38,7 +36,7 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="1580px" alignSelf="center" flexDir="column" w="full">
         <Flex>
           <Text fontSize="2xl" fontWeight="400">
             Dashboards

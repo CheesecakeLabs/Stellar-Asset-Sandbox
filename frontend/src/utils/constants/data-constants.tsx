@@ -15,20 +15,20 @@ export const assetFlags = [
     isDisabled: false,
   },
   {
-    name: 'auth_clawback',
-    flag: 'AUTH_CLAWBACK_ENABLED',
-    title: 'Clawback enabled',
-    description:
-      'When active, this flag enables the ‘Clawback’  functionality for this asset.  It allows for the asset manager to clawback funds from a target account holding balance in its assets. The clawback amount is burned from the circulating supply as result.',
-    isChecked: false,
-    isDisabled: false,
-  },
-  {
     name: 'auth_revocable',
     flag: 'AUTH_REVOCABLE_FLAG',
     title: 'Freeze enabled',
     description:
       'When active, this flag enables the ‘Freeze’ functionality for this asset. It allows for the asset manager to freeze the current balance of a given account holding its asset. The frozen account will then be unable to receive or send the asset in any way until the asset manager unfreezes it.',
+    isChecked: false,
+    isDisabled: false,
+  },
+  {
+    name: 'auth_clawback',
+    flag: 'AUTH_CLAWBACK_ENABLED',
+    title: 'Clawback enabled',
+    description:
+      'When active, this flag enables the ‘Clawback’  functionality for this asset.  It allows for the asset manager to clawback funds from a target account holding balance in its assets. The clawback amount is burned from the circulating supply as result.',
     isChecked: false,
     isDisabled: false,
   },

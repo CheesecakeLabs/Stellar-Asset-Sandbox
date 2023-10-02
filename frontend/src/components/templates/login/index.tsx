@@ -108,18 +108,20 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
             </Button>
           </form>
 
-          <Button
-            variant="link"
-            fontSize="sm"
-            color="primary.normal"
-            mt="1rem"
-            fontWeight="500"
-            onClick={(): void => {
-              navigate(PathRoute.RESET_PASSWORD)
-            }}
-          >
-            Forgot Password?
-          </Button>
+          {false && (
+            <Button
+              variant="link"
+              fontSize="sm"
+              color="primary.normal"
+              mt="1rem"
+              fontWeight="500"
+              onClick={(): void => {
+                navigate(PathRoute.RESET_PASSWORD)
+              }}
+            >
+              Forgot Password?
+            </Button>
+          )}
 
           <Flex gap={1} justifyContent="center" mt="3rem">
             <Text fontSize="sm">Don't have an account?</Text>

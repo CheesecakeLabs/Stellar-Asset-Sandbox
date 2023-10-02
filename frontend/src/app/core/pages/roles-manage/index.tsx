@@ -1,21 +1,18 @@
-import { Flex, VStack, useToast } from '@chakra-ui/react';
-import React, { useEffect } from 'react';
+import { Flex, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
+import React, { useEffect } from 'react'
 
+import { useAuth } from 'hooks/useAuth'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import { useAuth } from 'hooks/useAuth';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { PathRoute } from 'components/enums/path-route';
-import { SettingsOptions } from 'components/enums/settings-options';
-import { MenuSettings } from 'components/organisms/menu-settings';
-import { Sidebar } from 'components/organisms/sidebar';
-import { RolesManageTemplate } from 'components/templates/roles-manage-template';
-
+import { PathRoute } from 'components/enums/path-route'
+import { SettingsOptions } from 'components/enums/settings-options'
+import { MenuSettings } from 'components/organisms/menu-settings'
+import { Sidebar } from 'components/organisms/sidebar'
+import { RolesManageTemplate } from 'components/templates/roles-manage-template'
 
 export const RolesManage: React.FC = () => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   const {
     getRoles,
     createRole,
@@ -105,7 +102,12 @@ export const RolesManage: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={isLargerThanMd ? 'row' : 'column'}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
           <Flex maxW="966px" flexDir="column" w="full">
             <RolesManageTemplate
               roles={roles}
