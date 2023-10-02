@@ -1,10 +1,11 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { freezeHelper } from 'utils/constants/helpers'
@@ -21,12 +22,17 @@ import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
 export const FreezeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [vaultsStatusList, setVaultsStatusList] =
+    useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
+
   const { updateAuthFlags, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { vaults, getVaults, vaultsToStatusName } = useVaults()
+  const { getAssetAccounts } = useHorizon()
+
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -61,7 +67,10 @@ export const FreezeAccount: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetById(id).then(asset => setAsset(asset))
+        getAssetById(id).then(asset => {
+          setAsset(asset)
+          filterVaults(asset)
+        })
         return
       }
 
@@ -85,15 +94,34 @@ export const FreezeAccount: React.FC = () => {
     })
   }
 
+  const filterVaults = useCallback(
+    async (
+      asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    ): Promise<void> => {
+      if (!asset) return
+      const assetAccounts = await getAssetAccounts(
+        asset.code,
+        asset.issuer.key.publicKey
+      )
+      const vaults = await getVaults()
+      const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
+      setVaultsStatusList(vaultsStatusList)
+    },
+    [getAssetAccounts, getVaults, vaultsToStatusName]
+  )
+
   useEffect(() => {
     getVaults()
   }, [getVaults])
 
   useEffect(() => {
     if (id) {
-      getAssetById(id).then(asset => setAsset(asset))
+      getAssetById(id).then(asset => {
+        setAsset(asset)
+        filterVaults(asset)
+      })
     }
-  }, [getAssetById, id])
+  }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
     getUserPermissions().then((): void => {
@@ -104,11 +132,12 @@ export const FreezeAccount: React.FC = () => {
         navigate(PathRoute.HOME)
       }
     })
-  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Freeze'} />
@@ -120,6 +149,7 @@ export const FreezeAccount: React.FC = () => {
                 loading={loadingOperation}
                 asset={asset}
                 vaults={vaults}
+                vaultsStatusList={vaultsStatusList}
               />
             )}
           </Flex>

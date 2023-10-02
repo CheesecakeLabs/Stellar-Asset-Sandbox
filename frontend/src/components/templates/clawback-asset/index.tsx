@@ -1,24 +1,17 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Radio,
-  RadioGroup,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form';
+import { NumericFormat } from 'react-number-format';
 
-import { toCrypto } from 'utils/formatter'
 
-import { AssetHeader } from 'components/atoms'
-import { SelectVault } from 'components/molecules/select-vault'
+
+import { toCrypto, toNumber } from 'utils/formatter';
+
+
+
+import { AssetHeader } from 'components/atoms';
+import { SelectVault } from 'components/molecules/select-vault';
+
 
 interface IClawbackAssetTemplate {
   onSubmit(
@@ -44,6 +37,7 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   const [wallet, setWallet] = useState<string | undefined>()
@@ -99,12 +93,15 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
             <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
               <FormLabel>Amount</FormLabel>
               <Input
-                type="number"
+                as={NumericFormat}
+                decimalScale={7}
+                thousandSeparator=","
                 placeholder="Amount"
                 autoComplete="off"
-                {...register('amount', {
-                  required: true,
-                })}
+                value={getValues('amount')}
+                onChange={(event): void => {
+                  setValue('amount', toNumber(event.target.value))
+                }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>

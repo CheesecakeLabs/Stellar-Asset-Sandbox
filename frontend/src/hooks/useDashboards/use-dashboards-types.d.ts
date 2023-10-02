@@ -51,6 +51,12 @@ declare namespace Hooks {
       current_main_vault: number
     }
 
+    interface ISupply {
+      current_main_vault: number[]
+      current_supply: number[]
+      date: string[]
+    }
+
     interface IDashboardsContext {
       loadingChart: boolean
       loadingLastTransactions: boolean
@@ -65,6 +71,10 @@ declare namespace Hooks {
       getLastTransactions(
         transactionId: number
       ): Promise<Hooks.UseDashboardsTypes.ITransaction[] | undefined>
+      getSupplyByAssetId(
+        assetId: string,
+        period?: TChartPeriod
+      ): Promise<Hooks.UseDashboardsTypes.ISupply | undefined>
     }
   }
 }

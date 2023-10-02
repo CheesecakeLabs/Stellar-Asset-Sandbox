@@ -11,6 +11,7 @@ import {
 import React, { ReactNode } from 'react'
 
 import { havePermission } from 'utils'
+import { formatName } from 'utils/formatter'
 
 import { Permissions } from 'components/enums/permissions'
 import { MenuDotsIcon } from 'components/icons'
@@ -48,9 +49,8 @@ export const ItemUser: React.FC<IItemUser> = ({
       />
       <Tr>
         <Td>{user.id}</Td>
-        <Td>{user.name}</Td>
+        <Td>{formatName(user.name)}</Td>
         <Td>{user.role}</Td>
-        <Td>{user.email}</Td>
         <Td w="1rem" p={0}>
           {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
             <Menu>

@@ -19,6 +19,7 @@ export interface IChartPayments {
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset
   chartPeriod: TChartPeriod
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
+  cleanMode?: boolean
 }
 
 const ChartPayments: FunctionComponent<IChartPayments> = ({
@@ -26,6 +27,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
   chartPeriod,
   loadingChart,
   setChartPeriod,
+  cleanMode = false,
 }) => {
   const { colorMode } = useColorMode()
 
@@ -72,7 +74,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
     yaxis: [
       {
         title: {
-          text: 'Volume',
+          text: !cleanMode ? 'Volume' : undefined,
         },
         labels: {
           formatter: function (value: number): string {
@@ -83,7 +85,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       {
         opposite: true,
         title: {
-          text: 'Payments',
+          text: !cleanMode ? 'Payments' : undefined,
         },
         labels: {
           formatter: function (value: number): string {
@@ -121,7 +123,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
 
   return (
     <Container
-      variant="primary"
+      variant={!cleanMode ? 'primary' : undefined}
       justifyContent="center"
       py="0.5rem"
       px="0.75rem"

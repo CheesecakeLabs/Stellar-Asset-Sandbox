@@ -10,13 +10,18 @@ import {
   Input,
   Select,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
 import { assetFlags, typesAsset } from 'utils/constants/data-constants'
+import { TooltipsData } from 'utils/constants/tooltips-data'
+import { toNumber } from 'utils/formatter'
 
 import { RadioCard } from 'components/atoms'
+import { HelpIcon } from 'components/icons'
 
 interface IForgeAssetTemplate {
   onSubmit(
@@ -36,11 +41,12 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="840px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW="920px" alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
           Forge Asset
         </Text>
@@ -79,7 +85,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             </FormControl>
 
             <Flex
-              flexDir={{ md: 'row', sm: 'column' }}
+              flexDir={{ md: 'row', base: 'column' }}
               gap="1.5rem"
               mt="1.5rem"
             >
@@ -101,32 +107,43 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel>Initial supply</FormLabel>
                 <Input
-                  type="number"
+                  as={NumericFormat}
+                  decimalScale={7}
+                  thousandSeparator=","
                   placeholder="Initial supply"
-                  {...register('initial_supply', {
-                    required: false,
-                    minLength: 3,
-                    maxLength: 922337203685,
-                  })}
+                  autoComplete="off"
+                  value={getValues('initial_supply')}
+                  onChange={(event): void => {
+                    setValue('initial_supply', toNumber(event.target.value))
+                  }}
                 />
               </FormControl>
             </Flex>
 
             <Flex
-              flexDir={{ md: 'row', sm: 'column' }}
+              flexDir={{ md: 'row', base: 'column' }}
               gap="1.5rem"
               mt="1.5rem"
             >
               <FormControl>
-                <FormLabel>Limit</FormLabel>
+                <FormLabel>
+                  <Flex gap={1} alignItems="center">
+                    {`Limit (optional)`}
+                    <Tooltip label={TooltipsData.limit}>
+                      <HelpIcon width="20px" />
+                    </Tooltip>
+                  </Flex>
+                </FormLabel>
                 <Input
-                  type="number"
+                  as={NumericFormat}
+                  decimalScale={7}
+                  thousandSeparator=","
                   placeholder="Limit"
-                  {...register('limit', {
-                    required: false,
-                    minLength: 3,
-                    maxLength: 3,
-                  })}
+                  autoComplete="off"
+                  value={getValues('initilimital_supply')}
+                  onChange={(event): void => {
+                    setValue('limit', toNumber(event.target.value))
+                  }}
                 />
               </FormControl>
               <FormControl>

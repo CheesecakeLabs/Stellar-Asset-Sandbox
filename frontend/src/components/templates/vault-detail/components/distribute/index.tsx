@@ -17,10 +17,11 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
 import { havePermission } from 'utils'
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { toCrypto } from 'utils/formatter'
+import { toCrypto, toNumber } from 'utils/formatter'
 
 import { Permissions } from 'components/enums/permissions'
 import { LockIcon } from 'components/icons'
@@ -171,7 +172,6 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                             <FormLabel>External address</FormLabel>
                             <Input
                               isDisabled={!isAuthorized()}
-                              type="number"
                               placeholder="External address"
                               autoComplete="off"
                               onChange={(event): void => {
@@ -188,12 +188,14 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                       >
                         <FormLabel>Amount</FormLabel>
                         <Input
+                          as={NumericFormat}
+                          decimalScale={7}
+                          thousandSeparator=","
                           isDisabled={!isAuthorized()}
-                          type="number"
                           placeholder="Amount"
                           autoComplete="off"
                           onChange={(event): void => {
-                            setAmount(event.target.value)
+                            setAmount(toNumber(event.target.value))
                           }}
                         />
                         <FormErrorMessage>Required</FormErrorMessage>

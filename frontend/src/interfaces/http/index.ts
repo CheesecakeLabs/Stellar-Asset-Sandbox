@@ -29,7 +29,7 @@ http.interceptors.response.use(
     const status = error.response?.status || 500
     if (status === 401) {
       Authentication.logout()
-      window.location.href = '/login/expired'
+      window.location.href = '/sandbox/v2/login/expired'
     }
     return Promise.reject(error)
   }

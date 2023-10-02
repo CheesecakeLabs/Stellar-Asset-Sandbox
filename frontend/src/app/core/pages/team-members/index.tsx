@@ -1,4 +1,4 @@
-import { Flex, VStack } from '@chakra-ui/react'
+import { Flex, VStack, useMediaQuery } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
@@ -10,6 +10,8 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { TeamMembersTemplate } from 'components/templates/team-members'
 
 export const TeamMembers: React.FC = () => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   const {
     getAllUsers,
     editUsersRole,
@@ -44,7 +46,12 @@ export const TeamMembers: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={isLargerThanMd ? 'row' : 'column'}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
           <Flex maxW="966px" flexDir="column" w="full">
             <TeamMembersTemplate
               users={users}

@@ -1,36 +1,24 @@
 import {
+  Box,
+  Button,
   Container,
   Flex,
-  Table,
-  Tbody,
-  Th,
-  Thead,
-  Tr,
+  IconButton,
   Text,
-  Td,
-  Button,
-  Skeleton,
-  Tooltip,
 } from '@chakra-ui/react'
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import ReactPlayer from 'react-player'
+import Slider from 'react-slick'
 
-import { havePermission } from 'utils'
-import { getCurrencyIcon } from 'utils/constants/constants'
-import { typesAsset } from 'utils/constants/data-constants'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import 'swiper/css/scrollbar'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
-import { toCrypto } from 'utils/formatter'
 
-import { PathRoute } from 'components/enums/path-route'
-import { Permissions } from 'components/enums/permissions'
-import {
-  ArrowRightIcon,
-  AuthorizeIcon,
-  BackIcon,
-  BlockIcon,
-  JoinIcon,
-} from 'components/icons'
-import { Empty } from 'components/molecules/empty'
+import { ArrowBackIcon, ArrowForwardIcon } from 'components/icons'
+
+import { carouselData } from './carousel-data'
 
 interface IHomeTemplate {
   loading: boolean
@@ -38,96 +26,100 @@ interface IHomeTemplate {
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 }
 
-export const HomeTemplate: React.FC<IHomeTemplate> = ({
-  loading,
-  assets,
-  userPermissions,
-}) => {
-  const navigate = useNavigate()
+export const HomeTemplate: React.FC<IHomeTemplate> = () => {
+  const [slider, setSlider] = React.useState<Slider | null>(null)
+
+  const settings = {
+    dots: false,
+    infinite: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+  }
 
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        <Flex mb="1.5rem" justifyContent="space-between">
-          <Text fontSize="2xl" fontWeight="400">
-            Stellar Classic
-          </Text>
-          {havePermission(Permissions.CREATE_ASSET, userPermissions) && (
-            <Button
-              variant="primary"
-              leftIcon={<JoinIcon fill="white" />}
-              onClick={(): void =>
-                navigate({ pathname: PathRoute.FORGE_ASSET })
-              }
-            >
-              Forge asset
-            </Button>
-          )}
-        </Flex>
-        {loading ? (
-          <Skeleton w="full" h="8rem" />
-        ) : assets && assets.length > 0 ? (
-          <Container variant="primary" p={0} maxW="full">
-            <Table variant="simple">
-              <Thead>
-                <Th w="2rem" p={0} />
-                <Th>Code</Th>
-                <Th>Name</Th>
-                <Th isNumeric>Supply</Th>
-                <Th>Asset type</Th>
-                <Th>Controls</Th>
-                <Th w="2rem" p={0} />
-              </Thead>
-              <Tbody>
-                {assets.map(asset => (
-                  <Tr
-                    cursor="pointer"
-                    onClick={(): void =>
-                      navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
-                    }
+      <Flex
+        maxW={MAX_PAGE_WIDTH}
+        alignSelf="center"
+        flexDir="column"
+        w="full"
+        pb="4rem"
+      >
+        <Flex alignItems="center" w="full" justifyContent="center" gap={4}>
+          <IconButton
+            onClick={(): void => slider?.slickPrev()}
+            aria-label={'Previous'}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Box w="full" maxW={'900px'}>
+            <Slider {...settings} ref={(slider): void => setSlider(slider)}>
+              {carouselData.map((data, index) => (
+                <Box w="full" key={index}>
+                  <Container
+                    variant="primary"
+                    mt="1rem"
+                    w="full"
+                    maxW="full"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
                   >
-                    <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
-                    <Td>{asset.code}</Td>
-                    <Td>{asset.name}</Td>
-                    <Td isNumeric>
-                      {asset.assetData
-                        ? toCrypto(Number(asset.assetData?.amount))
-                        : '-'}
-                    </Td>
-                    <Td>
-                      {typesAsset.find(type => type.id === asset.asset_type)
-                        ?.name || ''}
-                    </Td>
-                    <Td>
-                      <Flex fill="black.900" _dark={{ fill: 'white' }} gap={2}>
-                        {asset.assetData?.flags.auth_required && (
-                          <Tooltip label="Authorize required">
-                            <AuthorizeIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
-                        {asset.assetData?.flags.auth_clawback_enabled && (
-                          <Tooltip label="Clawback enabled">
-                            <BackIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
-                        {asset.assetData?.flags.auth_revocable && (
-                          <Tooltip label="Freeze enabled">
-                            <BlockIcon width="18px" height="18px" />
-                          </Tooltip>
-                        )}
+                    <Text
+                      fontWeight="bold"
+                      mb="1.5rem"
+                      mt="1rem"
+                      pb="1rem"
+                      borderBottom="1px solid"
+                      borderColor={'gray.600'}
+                      _dark={{ borderColor: 'black.800', color: 'white' }}
+                      textAlign="center"
+                      w="fit-content"
+                      fontSize="xl"
+                    >
+                      {data.title}
+                    </Text>
+                    <Box
+                      overflow="hidden"
+                      border="1px solid #d1d1d1"
+                      borderRadius="16px"
+                      maxH="448px"
+                      w="fit-content"
+                      mb="2rem"
+                    >
+                      <Box w="full" h="full" top="-4px" pos="relative">
+                        <ReactPlayer
+                          playing
+                          loop
+                          muted
+                          url={data.slide}
+                          width="100%"
+                          height="100%"
+                        />
+                      </Box>
+                    </Box>
+
+                    {data.children}
+                    {data.actionName && (
+                      <Flex w="full" justifyContent="flex-end" mt="0.5rem">
+                        <Button variant="secondary" mt="1rem">
+                          {data.actionName}
+                        </Button>
                       </Flex>
-                    </Td>
-                    <Td w="2rem" p={0}>
-                      <ArrowRightIcon width="12px" />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Container>
-        ) : (
-          <Empty title="No forged assets" />
-        )}
+                    )}
+                  </Container>
+                </Box>
+              ))}
+            </Slider>
+          </Box>
+          <IconButton
+            aria-label="next"
+            onClick={(): void => slider?.slickNext()}
+          >
+            <ArrowForwardIcon />
+          </IconButton>
+        </Flex>
       </Flex>
     </Flex>
   )

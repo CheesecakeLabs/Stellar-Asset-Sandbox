@@ -1,13 +1,23 @@
-import { Box, Drawer, DrawerContent, Flex, useDisclosure } from '@chakra-ui/react';
-import React, { ReactNode } from 'react';
+import {
+  Box,
+  Drawer,
+  DrawerContent,
+  Flex,
+  useDisclosure,
+} from '@chakra-ui/react'
+import React, { ReactNode } from 'react'
 
-
-
-import { PathRoute } from 'components/enums/path-route';
-import { ContractIcon, DashboardIcon, ExplorerIcon, HomeIcon, PaymentsIcon, VaultIcon } from 'components/icons';
-import { SidebarContent } from 'components/molecules';
-import { Header } from 'components/molecules/header';
-
+import { PathRoute } from 'components/enums/path-route'
+import {
+  ContractIcon,
+  DashboardIcon,
+  ExplorerIcon,
+  HomeIcon,
+  PaymentsIcon,
+  VaultIcon,
+} from 'components/icons'
+import { SidebarContent } from 'components/molecules'
+import { Header } from 'components/molecules/header'
 
 interface IProps {
   highlightMenu: PathRoute
@@ -19,6 +29,7 @@ export interface ILinkItemProps {
   icon: ReactNode
   path: string
   alerts?: number
+  comingSoon?: boolean
 }
 const linkItems: ILinkItemProps[] = [
   {
@@ -27,14 +38,15 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Stellar Classic',
+    name: 'Token Management',
     icon: <PaymentsIcon />,
-    path: PathRoute.ASSET_MANAGEMENT,
+    path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
-    name: 'Soroban Smart Contracts',
+    name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    comingSoon: true,
   },
   {
     name: 'Treasury',
@@ -57,7 +69,8 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box w="full">
+    <Box w="full" 
+      zIndex={101}>
       <Header onOpen={onOpen} />
       <Flex pt="5rem">
         <SidebarContent

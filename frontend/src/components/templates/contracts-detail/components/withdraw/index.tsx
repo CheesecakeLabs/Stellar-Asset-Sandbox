@@ -42,10 +42,9 @@ export const Withdraw: React.FC<IWithdraw> = ({
         </Flex>
         <Box p="1rem">
           <Text fontSize="sm">
-            Some explanation text, what it does and what will happen lorem ipsum
-            dolor sit amet consecteur lorem ipsum dolor sit amet consec teur
-            lorem ipsum dolor sit amet consecteur lorem ipsum dolor sit amet
-            consecteur.
+            The full amount will be available to be withdrawn at the end of the
+            term. By withdrawing earlier, a penalty rate will be applied to the
+            accrued interest, reducing your gains.
           </Text>
           <Text
             my="1rem"
@@ -65,7 +64,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
           >
             <Flex justifyContent="space-between" alignItems="center" mt="2rem">
               <Text fontSize="xs" fontWeight="600" ms="0.25rem">
-                {`Available balance: ${toCrypto(withdrawValue)}`}
+                {`Available balance: ${toCrypto(withdrawValue / 10000000)}`}
               </Text>
 
               <Flex justifyContent="flex-end">

@@ -114,7 +114,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     ): Promise<Hooks.UseHorizonTypes.IAssetAccounts[] | undefined> => {
       try {
         const response = await axios.get(
-          `${BASE_URL}/accounts/?asset=${assetCode}%3A${assetIssuer}&limit=100`
+          `${BASE_URL}/accounts/?asset=${assetCode}%3A${assetIssuer}&limit=200`
         )
         const data = response.data
         if (data) {
