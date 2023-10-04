@@ -60,13 +60,19 @@ declare namespace Hooks {
       signIn: (params: ISignIn) => Promise<IUser | null>
       signUp: (params: ISignUp) => Promise<IUser | null>
       signOut: () => Promise<boolean>
-      getRoles: () => Promise<void>
+      getRoles: () => Promise<Hooks.UseAuthTypes.IRole[] | undefined>
       getAllUsers: () => Promise<void>
       getProfile: () => Promise<void>
       editUsersRole: (params: IUserRole) => Promise<boolean>
-      getUserPermissions: () => Promise<void>
-      getRolesPermissions: () => Promise<void>
-      getPermissions: () => Promise<void>
+      getUserPermissions: () => Promise<
+        Hooks.UseAuthTypes.IUserPermission[] | undefined
+      >
+      getRolesPermissions: () => Promise<
+        Hooks.UseAuthTypes.IRolePermission[] | undefined
+      >
+      getPermissions: () => Promise<
+        Hooks.UseAuthTypes.IPermission[] | undefined
+      >
       editProfile: (params: IUserRole) => Promise<boolean>
       updateRolesPermissions: (
         params: Hooks.UseAuthTypes.IRolePermission[]

@@ -6,6 +6,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Img,
   Input,
   Tab,
   TabList,
@@ -26,6 +27,7 @@ import { toCrypto, toNumber } from 'utils/formatter'
 import { Permissions } from 'components/enums/permissions'
 import { LockIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
+import { base64ToImg } from 'utils/converter'
 
 interface IDistributeVault {
   onSubmit(
@@ -125,7 +127,11 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                   stroke="black"
                   _dark={{ fill: 'white', stroke: 'white' }}
                 >
-                  {getCurrencyIcon(selectedAsset.code, '2rem')}
+                  {selectedAsset.image ? (
+                    <Img src={base64ToImg(selectedAsset.image)} w="32px" h="32px" />
+                  ) : (
+                    getCurrencyIcon(selectedAsset.code, '2rem')
+                  )}
                   <Flex flexDir="column" ms="1rem">
                     <Text fontSize="sm">{selectedAsset.code}</Text>
                     <Text fontSize="xs">{toCrypto(Number(getBalance()))}</Text>

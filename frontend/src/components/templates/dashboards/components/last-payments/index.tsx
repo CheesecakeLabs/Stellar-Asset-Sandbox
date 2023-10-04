@@ -12,10 +12,12 @@ import {
   Thead,
   SimpleGrid,
   useMediaQuery,
+  Img,
 } from '@chakra-ui/react'
 import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
+import { base64ToImg } from 'utils/converter'
 import { formatDateFull, formatDateFullClean, toCrypto } from 'utils/formatter'
 
 interface ILastPayments {
@@ -76,7 +78,17 @@ export const LastPayments: React.FC<ILastPayments> = ({
                 {transactions?.map(transaction => (
                   <Tr>
                     {isLargerThanMd && (
-                      <Td>{getCurrencyIcon(transaction.asset.code, '1rem')}</Td>
+                      <Td>
+                        {transaction.asset.image ? (
+                          <Img
+                            src={base64ToImg(transaction.asset.image)}
+                            w="16px"
+                            h="16px"
+                          />
+                        ) : (
+                          getCurrencyIcon(transaction.asset.code, '1rem')
+                        )}
+                      </Td>
                     )}
                     <Td>
                       {isLargerThanMd

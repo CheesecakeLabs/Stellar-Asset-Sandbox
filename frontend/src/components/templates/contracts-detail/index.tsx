@@ -1,19 +1,21 @@
-import { Box, Flex, SimpleGrid } from '@chakra-ui/react'
+import { Box, Flex, Img, SimpleGrid } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { AccountCard } from './components/account-card'
 import { Chart } from './components/chart'
 import { Deposit } from './components/deposit'
-import { InfoCard } from '../../molecules/info-card'
 import { Withdraw } from './components/withdraw'
 import { Loading } from 'components/atoms'
 import { ApyIcon, TimeIcon, WalletIcon } from 'components/icons'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
+
+import { InfoCard } from '../../molecules/info-card'
 
 interface IContractsDetailTemplate {
   onSubmitWithdraw(isPremature: boolean): Promise<void>
@@ -62,7 +64,15 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     stroke="black"
                     _dark={{ fill: 'white', stroke: 'white' }}
                   >
-                    {getCurrencyIcon(contract.asset.code, '1.5rem')}{' '}
+                    {contract.asset.image ? (
+                      <Img
+                        src={base64ToImg(contract.asset.image)}
+                        w="24px"
+                        h="24px"
+                      />
+                    ) : (
+                      getCurrencyIcon(contract.asset.code, '1.5rem')
+                    )}
                   </Box>
                 }
                 value={contract.asset.name}

@@ -9,6 +9,7 @@ declare namespace Hooks {
       distributor: Hooks.UseWalletsTypes.IWallet
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
+      image: string
     }
 
     interface IAssetDto {
@@ -21,6 +22,7 @@ declare namespace Hooks {
       distributorBalance: Hooks.UseHorizonTypes.IBalance | undefined
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
+      image: string
     }
 
     interface IAssetRequest {
@@ -31,6 +33,7 @@ declare namespace Hooks {
       name: string
       set_flags?: string[]
       sponsor_id?: int
+      image?: unknown
     }
 
     interface IMintRequest {

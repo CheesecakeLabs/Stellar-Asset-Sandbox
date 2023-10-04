@@ -1,8 +1,9 @@
-import { Container, Flex, Tag, Text } from '@chakra-ui/react'
+import { Container, Flex, Img, Tag, Text } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { getCurrencyIcon, vaultCategoryTheme } from 'utils/constants/constants'
+import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -10,10 +11,21 @@ import { LockIcon } from 'components/icons'
 
 interface IItemVault {
   vault: Hooks.UseVaultsTypes.IVault
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
 }
 
-export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
+export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
   const navigate = useNavigate()
+
+  const findAsset = (
+    balance: Hooks.UseHorizonTypes.IBalance
+  ): Hooks.UseAssetsTypes.IAssetDto | undefined => {
+    return assets?.find(
+      asset =>
+        asset.code === balance.asset_code &&
+        asset.issuer.key.publicKey === balance.asset_issuer
+    )
+  }
 
   return (
     <Container
@@ -64,7 +76,15 @@ export const ItemVault: React.FC<IItemVault> = ({ vault }) => {
                 h="1.75rem"
               >
                 <Flex alignItems="center" gap={2}>
-                  {getCurrencyIcon(balance.asset_code, '1rem')}{' '}
+                  {findAsset(balance)?.image ? (
+                    <Img
+                      src={base64ToImg(findAsset(balance)?.image)}
+                      w="16px"
+                      h="16px"
+                    />
+                  ) : (
+                    getCurrencyIcon(balance.asset_code, '1rem')
+                  )}
                   <Text fontSize="sm">{balance.asset_code}</Text>
                 </Flex>
                 <Flex alignItems="center" gap={2}>

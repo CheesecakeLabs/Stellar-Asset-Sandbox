@@ -1,6 +1,7 @@
 import { Flex } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 
+import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -12,6 +13,7 @@ export const Vaults: React.FC = () => {
   const [vaultCategories, setVaultCategories] =
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const { loadingVaults, getVaults, getVaultCategories } = useVaults()
+  const { assets, getAssets } = useAssets()
 
   useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
@@ -23,6 +25,10 @@ export const Vaults: React.FC = () => {
     )
   }, [getVaultCategories])
 
+  useEffect(() => {
+    getAssets()
+  }, [getAssets])
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.VAULTS}>
@@ -30,6 +36,7 @@ export const Vaults: React.FC = () => {
           loading={loadingVaults}
           vaults={vaults}
           vaultCategories={vaultCategories}
+          assets={assets}
         />
       </Sidebar>
     </Flex>

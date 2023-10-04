@@ -3,7 +3,8 @@ export const Button = {
     primary: {
       background: 'primary.normal',
       color: 'white',
-      height: '2.125rem',
+      height: '2.75rem',
+      px: '2rem',
       fontWeight: '500',
       fontSize: 'sm',
       borderRadius: '0.25rem',

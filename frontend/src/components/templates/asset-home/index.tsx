@@ -1,4 +1,4 @@
-import { Container, Flex, Tag, Text } from '@chakra-ui/react'
+import { Container, Flex, Img, Tag, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import {
@@ -7,6 +7,7 @@ import {
 } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { TooltipsData } from 'utils/constants/tooltips-data'
+import { base64ToImg } from 'utils/converter'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { LinkIcon, WalletIcon } from 'components/icons'
@@ -44,7 +45,11 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
               stroke="black"
               _dark={{ fill: 'white', stroke: 'white' }}
             >
-              {getCurrencyIcon(asset.code, '2.5rem')}
+              {asset.image ? (
+                <Img src={base64ToImg(asset.image)} w="48px" h="48px" />
+              ) : (
+                getCurrencyIcon(asset.code, '2.5rem')
+              )}
             </Flex>
             <Flex
               borderBottom="1px solid"

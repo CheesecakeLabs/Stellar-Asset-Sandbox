@@ -12,6 +12,7 @@ import {
   Skeleton,
   Tooltip,
   useMediaQuery,
+  Img,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -20,6 +21,7 @@ import { havePermission } from 'utils'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -93,7 +95,13 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                       navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
                     }
                   >
-                    <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
+                    <Td>
+                      {asset.image ? (
+                        <Img src={base64ToImg(asset.image)} w="32px" h="32px" />
+                      ) : (
+                        getCurrencyIcon(asset.code, '2rem')
+                      )}
+                    </Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
                     {isLargerThanSm && (

@@ -12,11 +12,13 @@ interface IVaultsTemplate {
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
 }
 
 export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
   loading,
   vaults,
+  assets,
 }) => {
   const navigate = useNavigate()
 
@@ -41,7 +43,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           ) : vaults ? (
             <SimpleGrid columns={{ xl: 4, md: 3, sm: 2 }} spacing={5}>
               {vaults.map((vault, index) => (
-                <ItemVault key={index} vault={vault} />
+                <ItemVault key={index} vault={vault} assets={assets} />
               ))}
             </SimpleGrid>
           ) : (

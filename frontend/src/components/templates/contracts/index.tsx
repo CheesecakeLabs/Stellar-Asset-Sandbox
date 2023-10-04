@@ -9,12 +9,14 @@ import {
   Text,
   Td,
   Button,
+  Img,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { Loading } from 'components/atoms'
@@ -73,7 +75,17 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                       navigate(`${PathRoute.CONTRACT_DETAIL}/${contract.id}`)
                     }}
                   >
-                    <Td>{getCurrencyIcon(contract.asset.code, '2rem')}</Td>
+                    <Td>
+                      {contract.asset.image ? (
+                        <Img
+                          src={base64ToImg(contract.asset.image)}
+                          w="32px"
+                          h="32px"
+                        />
+                      ) : (
+                        getCurrencyIcon(contract.asset.code, '2rem')
+                      )}
+                    </Td>
                     <Td>{contract.asset.code}</Td>
                     <Td>Contract</Td>
                     <Td>{`${contract.yield_rate}%`}</Td>

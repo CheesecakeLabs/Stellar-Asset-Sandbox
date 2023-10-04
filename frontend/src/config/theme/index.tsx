@@ -1,8 +1,13 @@
-import { extendTheme } from '@chakra-ui/react'
+import { extendTheme } from '@chakra-ui/react';
 
-import '@fontsource/inter'
 
-import * as components from './components'
+
+import '@fontsource/inter';
+
+
+
+import * as components from './components';
+
 
 const theme = extendTheme({
   config: {
@@ -113,6 +118,7 @@ const theme = extendTheme({
       200: '#F5F2FF',
       300: '#9CADCE',
       500: '#AA99EC',
+      800: '#3f307a',
     },
   },
   borders: {

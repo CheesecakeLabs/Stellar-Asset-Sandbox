@@ -121,7 +121,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
         const groupedValues = [0, 0, 0, 0, 0, 0, 0]
         const divisorValue =
-          (filteredAccounts ? filteredAccounts[0].amount : 0) / 5
+          (filteredAccounts ? filteredAccounts[0]?.amount || 0 : 0) / 5
 
         accounts
           ?.filter(
