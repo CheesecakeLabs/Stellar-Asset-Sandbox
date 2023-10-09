@@ -34,6 +34,7 @@ export const UploadImage: React.FC<IUploadImage> = ({
         initial="rest"
         animate="rest"
         whileHover="hover"
+         className="asset-icon"
       >
         <Box height="100%" width="100%" position="relative">
           <Box height="100%" width="100%" display="flex" flexDirection="column">

@@ -10,13 +10,17 @@ import { VaultsTemplate } from 'components/templates/vaults'
 
 export const Vaults: React.FC = () => {
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [loadingVaults, setLoadingVaults] = useState(true)
   const [vaultCategories, setVaultCategories] =
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
-  const { loadingVaults, getVaults, getVaultCategories } = useVaults()
+  const { getVaults, getVaultCategories } = useVaults()
   const { assets, getAssets } = useAssets()
 
   useEffect(() => {
-    getVaults().then(vaults => setVaults(vaults))
+    getVaults().then(vaults => {
+      setVaults(vaults)
+      setLoadingVaults(false)
+    })
   }, [getVaults])
 
   useEffect(() => {

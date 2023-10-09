@@ -145,7 +145,9 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getAssets = useCallback(async (): Promise<void> => {
+  const getAssets = useCallback(async (): Promise<
+    Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  > => {
     setLoadingAssets(true)
     try {
       const response = await http.get(`assets`)
@@ -161,6 +163,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
           })
         )
         setAssets(data)
+        return data
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

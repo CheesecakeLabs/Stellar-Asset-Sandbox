@@ -65,6 +65,12 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 
   const steps = [
     {
+      target: '.asset-icon',
+      content:
+        'Select the icon that your token will have, this field is optional and if it is not filled in, your token will have a default icon.',
+      disableBeacon: true,
+    },
+    {
       target: '.asset-name',
       content: 'This will be the name of your token, for example "USD Coin".',
       disableBeacon: true,
@@ -72,6 +78,21 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     {
       target: '.asset-code',
       content: 'This will be your token code, for example "USDC".',
+      disableBeacon: true,
+    },
+    {
+      target: '.asset-initial-supply',
+      content: 'Initial value of your token, (Ex: 1,000,000.00)',
+      disableBeacon: true,
+    },
+    {
+      target: '.asset-limit',
+      content: 'Limit value of your token',
+      disableBeacon: true,
+    },
+    {
+      target: '.asset-type',
+      content: 'Token Type',
       disableBeacon: true,
     },
   ]
@@ -92,7 +113,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             backgroundColor: colorMode === 'light' ? 'white' : '#3a3e4d',
             primaryColor: '#6E56CF',
             textColor: colorMode === 'light' ? '#004a14' : 'white',
-            zIndex: 10000,
+            zIndex: 1000,
           },
         }}
       />
@@ -107,14 +128,14 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
               Forge Asset
             </Text>
-            {/*<Button
+            <Button
               variant="secondary"
               onClick={(): void => {
                 setRunTour(true)
               }}
             >
               Help to create my first asset
-            </Button>*/}
+            </Button>
           </Flex>
           {errorSubmit && (
             <Alert mb="0.75rem" status="error">
@@ -214,6 +235,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                             toNumber(event.target.value)
                           )
                         }}
+                        className="asset-initial-supply"
                       />
                     </FormControl>
                   </Flex>
@@ -238,10 +260,11 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         thousandSeparator=","
                         placeholder="Limit"
                         autoComplete="off"
-                        value={getValues('initilimital_supply')}
+                        value={getValues('limit')}
                         onChange={(event): void => {
                           setValue('limit', toNumber(event.target.value))
                         }}
+                        className="asset-limit"
                       />
                     </FormControl>
                     <FormControl>
@@ -249,6 +272,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                       <Select
                         {...register('asset_type', { required: true })}
                         defaultValue={typesAsset[0].id}
+                        className="asset-type"
                       >
                         {typesAsset.map(typeAsset => (
                           <option value={typeAsset.id}>{typeAsset.name}</option>

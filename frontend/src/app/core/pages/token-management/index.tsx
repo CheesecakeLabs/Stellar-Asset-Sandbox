@@ -1,5 +1,5 @@
 import { Flex } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
@@ -9,12 +9,16 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { TokenManagementTemplate } from 'components/templates/token-management'
 
 export const TokenManagement: React.FC = () => {
-  const { loadingAssets, getAssets, assets } = useAssets()
-  const { userPermissions, loadingUserPermissions, getUserPermissions } =
-    useAuth()
+  const [loading, setLoading] = useState(true)
+  const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[]>()
+  const { getAssets } = useAssets()
+  const { userPermissions, getUserPermissions } = useAuth()
 
   useEffect(() => {
-    getAssets()
+    getAssets().then(assets => {
+      setAssets(assets)
+      setLoading(false)
+    })
   }, [getAssets])
 
   useEffect(() => {
@@ -25,7 +29,7 @@ export const TokenManagement: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <TokenManagementTemplate
-          loading={loadingAssets || loadingUserPermissions}
+          loading={loading}
           assets={assets}
           userPermissions={userPermissions}
         />
