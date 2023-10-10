@@ -24,6 +24,7 @@ import { VaultCreate } from '../pages/vault-create'
 import { VaultDetail } from '../pages/vault-detail'
 import { Vaults } from '../pages/vaults'
 import { AppRoute } from './types'
+import { PublishInformation } from '../pages/publish-information'
 
 export const coreRoutes: AppRoute[] = [
   { path: PathRoute.SANDBOX, component: SandboxPage },
@@ -59,6 +60,11 @@ export const coreRoutes: AppRoute[] = [
   {
     path: `${PathRoute.FREEZE_ACCOUNT}/:id`,
     component: FreezeAccount,
+    isPrivate: true,
+  },
+  {
+    path: `${PathRoute.PUBLISH_INFORMATION}/:id`,
+    component: PublishInformation,
     isPrivate: true,
   },
   {

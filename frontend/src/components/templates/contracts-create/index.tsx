@@ -13,8 +13,11 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
 import { newContractHelper } from 'utils/constants/helpers'
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { toNumber } from 'utils/formatter'
 
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
@@ -45,11 +48,11 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
     Hooks.UseAssetsTypes.IAssetDto | undefined
   >()
 
-  const { register, handleSubmit, setValue } = useForm()
+  const { handleSubmit, setValue, getValues, register } = useForm()
 
   return (
     <Flex flexDir="row" gap="1.5rem" w="full" justifyContent="center">
-      <Flex maxW="640px" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <ContractsBreadcrumb title="New Contract" />
         {errorSubmit && (
           <Alert mb="0.75rem" status="error">
@@ -109,11 +112,15 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 <FormControl>
                   <FormLabel>Minimum Deposit</FormLabel>
                   <Input
-                    type="number"
-                    placeholder="Minimum Deposit"
-                    {...register('min_deposit', {
-                      required: true,
-                    })}
+                    as={NumericFormat}
+                    decimalScale={7}
+                    thousandSeparator=","
+                    placeholder="Minimum deposit"
+                    autoComplete="off"
+                    value={getValues('min_deposit')}
+                    onChange={(event): void => {
+                      setValue('min_deposit', toNumber(event.target.value))
+                    }}
                   />
                 </FormControl>
               </Flex>

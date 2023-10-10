@@ -165,6 +165,26 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
             Clawback
           </Button>
         )}
+        {havePermission(Permissions.CLAWBACK_ASSET, permissions) && (
+          <Button
+            variant={
+              action === AssetActions.CLAWBACK
+                ? 'menuButtonSelected'
+                : 'menuButton'
+            }
+            borderBottomRadius="0.25rem"
+            leftIcon={
+              <Flex w="1rem" justifyContent="center">
+                <BackIcon />
+              </Flex>
+            }
+            onClick={(): void => {
+              navigate(`${PathRoute.PUBLISH_INFORMATION}/${id}`)
+            }}
+          >
+            Publish information
+          </Button>
+        )}
       </Container>
     </Flex>
   )

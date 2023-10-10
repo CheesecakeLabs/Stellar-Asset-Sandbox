@@ -9,10 +9,17 @@ import {
   Th,
   Thead,
   Tr,
+  SimpleGrid,
+  Divider,
 } from '@chakra-ui/react'
 import React from 'react'
 
-import { CircleCheckIcon } from 'components/icons'
+import {
+  CircleCheckIcon,
+  ContractIcon,
+  JoinIcon,
+  VaultIcon,
+} from 'components/icons'
 
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
@@ -110,6 +117,53 @@ export const Overview: React.FC<IOverview> = ({
             </Container>
           )}
         </Flex>
+        <Divider w="full" my="3rem" />
+        <SimpleGrid columns={3} gap="2rem">
+          <Flex>
+            <Flex>
+              <JoinIcon fill="grey" width="48px" height="48px" />
+            </Flex>
+            <Flex flexDir="column" ms="1rem">
+              <Text fontSize="xl" mb="0.75rem">
+                Forge your assets
+              </Text>
+              <Text>
+                In the Sandbox you can define permissions for each type of role
+                you want, and you can also create new roles
+              </Text>
+            </Flex>
+          </Flex>
+
+          <Flex>
+            <Flex>
+              <ContractIcon fill="grey" width="32px" height="32px" />
+            </Flex>
+            <Flex flexDir="column" ms="1rem">
+              <Text fontSize="xl" mb="0.75rem">
+                Create Smart Contracts
+              </Text>
+              <Text>
+                In the Sandbox you can define permissions for each type of role
+                you want, and you can also create new roles
+              </Text>
+            </Flex>
+          </Flex>
+
+          <Flex>
+            <Flex>
+              <VaultIcon fill="grey" width="48px" height="48px" />
+            </Flex>
+            <Flex flexDir="column" ms="1rem">
+              <Text fontSize="xl" mb="0.75rem">
+                Control your Vaults
+              </Text>
+              <Text>
+                In the Sandbox you can define permissions for each type of role
+                you want, and you can also create new roles
+              </Text>
+            </Flex>
+          </Flex>
+        </SimpleGrid>
       </Flex>
     </Flex>
   )

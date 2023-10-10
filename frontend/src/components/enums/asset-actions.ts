@@ -6,4 +6,5 @@ export enum AssetActions {
   CLAWBACK = 'Clawback',
   FREEZE = 'Freeze',
   AUTHORIZE = 'Authorize',
+  PUBLISH_INFORMATION = 'Publish Information',
 }
