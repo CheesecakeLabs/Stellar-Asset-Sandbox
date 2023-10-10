@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -25,7 +26,10 @@ type assetsRoutes struct {
 
 func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
 	r := &assetsRoutes{w, as, m, a, l}
-	h := handler.Group("/assets").Use(Auth(r.a.ValidateToken()))
+
+	h := handler.Group("/assets")
+	h.GET("/:id/image.png", r.getAssetImage)
+	h.Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllAssets)
 		h.POST("", r.createAsset)
@@ -35,6 +39,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/burn", r.burnAsset)
 		h.POST("/transfer", r.transferAsset)
 		h.GET("/:id", r.getAssetById)
+		h.POST("/:id/image", r.uploadAssetImage)
 	}
 }
 
@@ -46,6 +51,7 @@ type CreateAssetRequest struct {
 	Limit     *int     `json:"limit"         example:"1000"`
 	Amount    string   `json:"amount"        example:"1000"`
 	SetFlags  []string `json:"set_flags"       example:"[\"AUTH_REQUIRED_FLAGS\", \"AUTH_REVOCABLE_FLAGS\",\"AUTH_CLAWBACK_ENABLED\"]"`
+	Image     string   `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
 
 type BurnAssetRequest struct {
@@ -91,6 +97,10 @@ type UpdateAuthFlagsRequest struct {
 	SetFlags   []string `json:"set_flags"   example:"[\"TRUST_LINE_AUTHORIZED\", \"TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES\",\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
 	ClearFlags []string `json:"clear_flags"  example:"[\"TRUST_LINE_CLAWBACK_ENABLED\"]"`
 	TrustorPK  string   `json:"trustor_pk"   example:"2"`
+}
+
+type UploadAssetImageRequest struct {
+	Image string `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
 
 // @Summary     Create a new asset
@@ -221,6 +231,15 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 			},
 		},
 	}
+
+	if request.Image != "" {
+		asset.Image, err = base64.StdEncoding.DecodeString(request.Image)
+		if err != nil {
+			errorResponse(c, http.StatusBadRequest, "Failed to decode base64 image", err)
+			return
+		}
+	}
+
 	asset, err = r.as.Create(asset)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "database problems", err)
@@ -753,4 +772,59 @@ func (r *assetsRoutes) getAssetById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, assets)
+}
+
+// @Summary Upload image for an asset
+// @Description Upload a base64 encoded image for a specific asset by ID
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       id path string true "Asset ID"
+// @Param       image body string true "Base64 Encoded Asset Image"
+// @Success     200 {object} response
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/{id}/image [post]
+func (r *assetsRoutes) uploadAssetImage(c *gin.Context) {
+	var req UploadAssetImageRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		errorResponse(c, http.StatusBadRequest, "Invalid request format", err)
+		return
+	}
+
+	// Decode the base64 string to get raw bytes
+	decodedBytes, err := base64.StdEncoding.DecodeString(req.Image)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "Failed to decode base64 image", err)
+		return
+	}
+
+	assetId := c.Param("id")
+	if err := r.as.UploadImage(assetId, decodedBytes); err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Failed to store the image", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Image uploaded successfully",
+	})
+}
+
+// @Summary     Retrieve asset image
+// @Description Fetch the image of a specified asset using its ID
+// @Tags        Assets
+// @Produce     png
+// @Param       id path string true "Asset ID"
+// @Success     200 {file} image/png "Asset Image"
+// @Failure     500 {object} response "Internal Server Error"
+// @Router      /assets/{id}/image.png [get]
+func (r *assetsRoutes) getAssetImage(c *gin.Context) {
+	assetId := c.Param("id")
+	image, err := r.as.GetImage(assetId)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
+		return
+	}
+
+	c.Data(http.StatusOK, "image/png", image)
 }
