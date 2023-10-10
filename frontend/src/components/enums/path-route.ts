@@ -1,4 +1,5 @@
 export enum PathRoute {
+  SANDBOX = '/sandbox',
   HOME = '/',
   LOGIN = '/login/:expired?',
   SIGNUP = '/signup',
@@ -24,6 +25,6 @@ export enum PathRoute {
   VAULT_DETAIL = '/vault-detail',
   CONTRACT_DETAIL = '/contract-detail',
   CONTRACT_CREATE = '/contract-create',
-  ASSET_MANAGEMENT = '/asset-management',
+  TOKEN_MANAGEMENT = '/token-management',
   DASHBOARDS = '/dashboards',
 }

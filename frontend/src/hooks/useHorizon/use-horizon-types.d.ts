@@ -119,6 +119,12 @@ declare namespace Hooks {
       balances: IBalance[]
     }
 
+    interface IHolder {
+      name: string
+      amount: number
+      percentage: number
+    }
+
     interface IHorizonContext {
       loadingHorizon: boolean
       assetData: IAsset | undefined

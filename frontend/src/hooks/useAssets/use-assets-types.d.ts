@@ -37,14 +37,18 @@ declare namespace Hooks {
       id: string
       code: string
       sponsor_id: number
-      amount: number
+      amount: string
+      current_supply: number
+      current_main_vault: number
     }
 
     interface IBurnRequest {
       id: string
       sponsor_id: number
       code: string
-      amount: number
+      amount: string
+      current_supply: number
+      current_main_vault: number
     }
 
     interface IDistributeRequest {
@@ -53,13 +57,17 @@ declare namespace Hooks {
       asset_id: string
       amount: string
       sponsor_id: number
+      current_supply: number
+      current_main_vault: number
     }
 
     interface IClawbackRequest {
       sponsor_id: number
       code: string
-      amount: number
+      amount: string
       from: string
+      current_supply: number
+      current_main_vault: number
     }
 
     interface IUpdateAuthFlagsRequest {

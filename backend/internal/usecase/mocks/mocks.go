@@ -1139,6 +1139,21 @@ func (mr *MockLogTransactionRepoInterfaceMockRecorder) GetLogTransactionsByUserI
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogTransactionsByUserID", reflect.TypeOf((*MockLogTransactionRepoInterface)(nil).GetLogTransactionsByUserID), userID, timeRange)
 }
 
+// LogTransactionSupplyByAssetID mocks base method.
+func (m *MockLogTransactionRepoInterface) LogTransactionSupplyByAssetID(assetID int, timeRange, periodInitial, interval string) (entity.LogTransactionSupply, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LogTransactionSupplyByAssetID", assetID, timeRange, periodInitial, interval)
+	ret0, _ := ret[0].(entity.LogTransactionSupply)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LogTransactionSupplyByAssetID indicates an expected call of LogTransactionSupplyByAssetID.
+func (mr *MockLogTransactionRepoInterfaceMockRecorder) LogTransactionSupplyByAssetID(assetID, timeRange, periodInitial, interval interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogTransactionSupplyByAssetID", reflect.TypeOf((*MockLogTransactionRepoInterface)(nil).LogTransactionSupplyByAssetID), assetID, timeRange, periodInitial, interval)
+}
+
 // StoreLogTransaction mocks base method.
 func (m *MockLogTransactionRepoInterface) StoreLogTransaction(arg0 entity.LogTransaction) error {
 	m.ctrl.T.Helper()
@@ -1151,6 +1166,21 @@ func (m *MockLogTransactionRepoInterface) StoreLogTransaction(arg0 entity.LogTra
 func (mr *MockLogTransactionRepoInterfaceMockRecorder) StoreLogTransaction(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreLogTransaction", reflect.TypeOf((*MockLogTransactionRepoInterface)(nil).StoreLogTransaction), arg0)
+}
+
+// SumLogTransactionSupply mocks base method.
+func (m *MockLogTransactionRepoInterface) SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SumLogTransactionSupply", timeRange, timeFrame)
+	ret0, _ := ret[0].([]entity.SumLogTransactionSupply)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SumLogTransactionSupply indicates an expected call of SumLogTransactionSupply.
+func (mr *MockLogTransactionRepoInterfaceMockRecorder) SumLogTransactionSupply(timeRange, timeFrame interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SumLogTransactionSupply", reflect.TypeOf((*MockLogTransactionRepoInterface)(nil).SumLogTransactionSupply), timeRange, timeFrame)
 }
 
 // SumLogTransactions mocks base method.

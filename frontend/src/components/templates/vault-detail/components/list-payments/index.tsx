@@ -10,11 +10,12 @@ import {
   Th,
   Thead,
   Tr,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 
 import { STELLAR_EXPERT_TX_URL } from 'utils/constants/constants'
-import { formatDateFull, toCrypto } from 'utils/formatter'
+import { formatDateFull, formatDateFullClean, toCrypto } from 'utils/formatter'
 
 import {
   LinkIcon,
@@ -42,6 +43,8 @@ export const ListPayments: React.FC<IListPayments> = ({
   isPrevDisabled,
   getPaymentsDataByLink,
 }) => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   const walletToName = (publicKey: string): string => {
     if (assets?.find(asset => asset.distributor.key.publicKey === publicKey)) {
       return 'Asset Issuer'
@@ -79,7 +82,7 @@ export const ListPayments: React.FC<IListPayments> = ({
           Payments
         </Text>
       </Flex>
-      <Box px="1rem">
+      <Box px="1rem" overflowX="auto">
         {payments?._embedded.records &&
         payments._embedded.records.length > 0 ? (
           <Table w="full" variant="list">
@@ -113,7 +116,9 @@ export const ListPayments: React.FC<IListPayments> = ({
                       <Td>{toCrypto(Number(payment.amount))}</Td>
                       <Td>
                         <Text fontSize="sm">
-                          {formatDateFull(payment.created_at)}
+                          {isLargerThanMd
+                            ? formatDateFull(payment.created_at)
+                            : formatDateFullClean(payment.created_at)}
                         </Text>
                       </Td>
                       <Td>

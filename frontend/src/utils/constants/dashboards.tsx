@@ -2,6 +2,12 @@ import { formatDateMD } from 'utils/formatter'
 
 import { TChartPeriod } from 'components/molecules/chart-period'
 
+export interface ITypeFilter {
+  time_range: 'hour' | 'day'
+  period_initial: string
+  interval: string
+}
+
 export const getChartLabels = (type: '24h' | '7d' | '30d'): string[] => {
   let labels: string[] = []
 
@@ -53,4 +59,26 @@ export const isEqualLabel = (
     return new Date(date).getHours().toString() === label
   }
   return formatDateMD(date) === label
+}
+
+export const filterChart = (period: TChartPeriod | undefined): ITypeFilter => {
+  if (period === '24h') {
+    return {
+      time_range: 'hour',
+      period_initial: '24 hours',
+      interval: '1 hour',
+    }
+  }
+  if (period === '7d') {
+    return {
+      time_range: 'day',
+      period_initial: '7 days',
+      interval: '1 day',
+    }
+  }
+  return {
+    time_range: 'day',
+    period_initial: '30 day',
+    interval: '1 day',
+  }
 }

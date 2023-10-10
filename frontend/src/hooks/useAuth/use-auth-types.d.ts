@@ -32,6 +32,7 @@ declare namespace Hooks {
     interface IRole {
       id: number
       name: string
+      admin: id
     }
 
     interface IUserRole {

@@ -127,8 +127,8 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type) VALUES ($1, $2, $3,$4, $5) RETURNING id;`
-	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType).Scan(&res.Id)
+	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType, data.Image).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
 	}

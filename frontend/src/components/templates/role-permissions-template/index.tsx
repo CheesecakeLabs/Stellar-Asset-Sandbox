@@ -75,9 +75,9 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-          Settings
+          Administration
         </Text>
-        <Container variant="primary" px={0} pb={0} maxW="full">
+        <Container variant="primary" px={0} pb={0} maxW="full" overflowX="auto">
           <Flex
             justifyContent="space-between"
             px="1.25rem"
@@ -134,6 +134,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                             permission.id,
                             role.id
                           )}
+                          isDisabled={role.admin === 1}
                           onChange={(event): void => {
                             onChange(
                               permission.id,

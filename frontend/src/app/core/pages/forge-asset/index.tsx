@@ -65,7 +65,8 @@ export const ForgeAsset: React.FC = () => {
         navigate(PathRoute.HOME)
       }
     })
-  }, [getUserPermissions, loadingUserPermissions, navigate, userPermissions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const toastError = (message: string): void => {
     toast({
@@ -80,7 +81,7 @@ export const ForgeAsset: React.FC = () => {
 
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <ForgeAssetTemplate onSubmit={onSubmit} loading={loadingOperation} />
       </Sidebar>
     </Flex>

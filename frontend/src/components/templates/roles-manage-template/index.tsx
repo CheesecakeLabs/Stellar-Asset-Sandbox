@@ -55,7 +55,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
           w="full"
         >
           <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-            Settings
+            Administration
           </Text>
           <Container variant="primary" px={0} pb={0} maxW="full">
             <Flex

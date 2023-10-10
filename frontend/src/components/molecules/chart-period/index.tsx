@@ -15,6 +15,8 @@ export const ChartPeriod: React.FC<IChartPeriod> = ({ period, setPeriod }) => {
         <Button
           variant={period === '24h' ? 'menuButtonSelected' : 'menuButton'}
           borderStartRadius="0.25rem"
+          border={0}
+          fontSize="xs"
           h="2rem"
           onClick={(): void => {
             setPeriod('24h')
@@ -25,6 +27,8 @@ export const ChartPeriod: React.FC<IChartPeriod> = ({ period, setPeriod }) => {
         <Button
           variant={period === '7d' ? 'menuButtonSelected' : 'menuButton'}
           h="2rem"
+          border={0}
+          fontSize="xs"
           onClick={(): void => {
             setPeriod('7d')
           }}
@@ -34,6 +38,8 @@ export const ChartPeriod: React.FC<IChartPeriod> = ({ period, setPeriod }) => {
         <Button
           variant={period === '30d' ? 'menuButtonSelected' : 'menuButton'}
           h="2rem"
+          border={0}
+          fontSize="xs"
           borderEndRadius="0.25rem"
           onClick={(): void => {
             setPeriod('30d')

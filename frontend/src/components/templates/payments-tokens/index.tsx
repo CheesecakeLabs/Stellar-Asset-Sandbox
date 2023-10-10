@@ -5,7 +5,6 @@ import { Loading } from 'components/atoms'
 import { ModalEditRole } from 'components/molecules'
 
 interface IProfileTemplate {
-  handleSignOut(): Promise<void>
   loading: boolean
   profile: Hooks.UseAuthTypes.IUserDto | undefined
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>

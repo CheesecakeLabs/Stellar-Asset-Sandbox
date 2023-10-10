@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable no-empty-function */
@@ -198,6 +200,7 @@ export async function deposit<R extends ResponseTypes = undefined>(
      * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
      */
     secondsToWait?: number
+    signerSecret?: string
   } = {}
 ) {
   return await invoke({
@@ -231,6 +234,7 @@ export async function withdraw<R extends ResponseTypes = undefined>(
      * If the simulation shows that this invocation requires auth/signing, `invoke` will wait `secondsToWait` seconds for the transaction to complete before giving up and returning the incomplete {@link SorobanClient.SorobanRpc.GetTransactionResponse} results (or attempting to parse their probably-missing XDR with `parseResultXdr`, depending on `responseType`). Set this to `0` to skip waiting altogether, which will return you {@link SorobanClient.SorobanRpc.SendTransactionResponse} more quickly, before the transaction has time to be included in the ledger. Default: 10.
      */
     secondsToWait?: number
+    secret?: string
   } = {}
 ) {
   return await invoke({
@@ -240,6 +244,7 @@ export async function withdraw<R extends ResponseTypes = undefined>(
       (i => xdr.ScVal.scvBool(i))(accept_premature_withdraw),
     ],
     ...options,
+    signerSecret: options.secret,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     parseResultXdr: () => {},
   })
