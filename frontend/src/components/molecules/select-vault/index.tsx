@@ -1,9 +1,11 @@
+import { useColorMode } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import Select from 'react-select'
 
 export interface IOption {
   readonly label: string
   readonly value: string
+  readonly disabled: boolean
 }
 
 interface ISelectVault {
@@ -12,9 +14,14 @@ interface ISelectVault {
   distributorWallet?: string
 }
 
-const createOption = (label: string, value: string): IOption => ({
+const createOption = (
+  label: string,
+  value: string,
+  isDisabled: boolean
+): IOption => ({
   label,
   value: value,
+  disabled: isDisabled,
 })
 
 export const SelectVault: React.FC<ISelectVault> = ({
@@ -22,15 +29,20 @@ export const SelectVault: React.FC<ISelectVault> = ({
   setWallet,
   distributorWallet,
 }) => {
+  const { colorMode } = useColorMode()
   const [options, setOptions] = useState<IOption[] | []>([])
 
   useEffect(() => {
     const listVaults = vaults?.map((vault: Hooks.UseVaultsTypes.IVault) =>
-      createOption(vault.name, vault.wallet.key.publicKey)
+      createOption(
+        vault.name,
+        vault.wallet.key.publicKey,
+        vault.isUnauthorized || false
+      )
     )
 
     let ops = distributorWallet
-      ? [createOption('Banco Central', distributorWallet)]
+      ? [createOption('Asset Issuer', distributorWallet, false)]
       : []
     if (listVaults) {
       ops = [...ops, ...listVaults]
@@ -43,11 +55,37 @@ export const SelectVault: React.FC<ISelectVault> = ({
     <Select
       options={options}
       onChange={(newValue): void => setWallet(newValue?.value)}
+      isOptionDisabled={(option): boolean => option.disabled}
       styles={{
         control: baseStyles => ({
           ...baseStyles,
           borderColor: 'gray.400',
           fontSize: '14px',
+          backgroundColor: 'none',
+          color: colorMode === 'dark' ? 'white' : 'black',
+        }),
+        menuList: base => ({
+          ...base,
+          backgroundColor: colorMode === 'dark' ? '#303448' : undefined,
+        }),
+        option: (styles, { isFocused, isSelected, isDisabled }) => ({
+          ...styles,
+
+          background: isFocused
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : undefined
+            : isSelected
+            ? colorMode === 'dark'
+              ? '#292d3e'
+              : isDisabled
+              ? 'red'
+              : undefined
+            : undefined,
+        }),
+        singleValue: provided => ({
+          ...provided,
+          color: colorMode === 'dark' ? 'white' : 'black',
         }),
       }}
     />

@@ -8,7 +8,7 @@ const { definePartsStyle, defineMultiStyleConfig } =
 const sizes = {
   md: definePartsStyle({
     field: {
-      height: '34px',
+      height: '38px',
       p: '6px 10px',
       fontSize: 'sm',
     },
@@ -17,10 +17,9 @@ const sizes = {
 
 const baseStyle = definePartsStyle({
   sizes: {
-    height: '50px',
+    height: '60px',
   },
   field: {
-    border: '1px solid #EEEDEF',
     borderRadius: '0.25rem',
     color: 'black',
     _placeholder: { color: 'gray.900' },

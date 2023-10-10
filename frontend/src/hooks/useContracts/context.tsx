@@ -5,7 +5,7 @@ import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
 import { mockContracts } from 'utils/mockups'
 
-import * as certificatesOfDeposit from '../../soroban-cod/src'
+import * as certificatesOfDeposit from '../../soroban'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -76,18 +76,20 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const deposit = async (
     amount: bigint,
     address: string,
-    updatePosition: void
+    updatePosition: void,
+    signerSecret: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
       await certificatesOfDeposit.deposit(
         {
-          amount: amount,
+          amount: amount * BigInt(10000000),
           address: address,
         },
         {
           fee: 10000,
           secondsToWait: 300,
+          signerSecret: signerSecret,
         }
       )
       setIsDepositing(false)
@@ -162,14 +164,18 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const withdraw = async (
     address: string,
     premature: boolean,
-    updatePosition: void
+    updatePosition: void,
+    signerSecret: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      await certificatesOfDeposit.withdraw({
-        address: address,
-        accept_premature_withdraw: premature,
-      })
+      await certificatesOfDeposit.withdraw(
+        {
+          address: address,
+          accept_premature_withdraw: premature,
+        },
+        { secret: signerSecret }
+      )
       setIsWithdrawing(false)
       updatePosition
       setWithdrawConfirmed(true)

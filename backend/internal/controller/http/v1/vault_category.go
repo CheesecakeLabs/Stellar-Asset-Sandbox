@@ -45,7 +45,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
@@ -56,7 +56,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 
 	vaultCategory, err = r.vc.Create(vaultCategory)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "database problems")
+		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
 
@@ -70,11 +70,11 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 // @Produce     json
 // @Success     200 {object} []entity.VaultCategory
 // @Failure     500 {object} response
-// @Router      / [get]
+// @Router      /vault-category [get]
 func (r *vaultCategoryRoutes) getAllVaultCategories(c *gin.Context) {
 	vaultCategories, err := r.vc.GetAll()
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting vault categories")
+		errorResponse(c, http.StatusInternalServerError, "error getting vault categories", err)
 		return
 	}
 

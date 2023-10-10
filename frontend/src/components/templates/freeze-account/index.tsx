@@ -16,6 +16,7 @@ import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
 import { SelectVault } from 'components/molecules/select-vault'
+import { VaultsStatusList } from 'components/molecules/vaults-status-list'
 
 interface IFreezeAccountTemplate {
   onSubmit(
@@ -28,6 +29,7 @@ interface IFreezeAccountTemplate {
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsStatusList: Hooks.UseVaultsTypes.IVaultAccountName[] | undefined
 }
 
 export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
@@ -35,6 +37,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
   loading,
   asset,
   vaults,
+  vaultsStatusList,
 }) => {
   const {
     register,
@@ -126,6 +129,13 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
           </Flex>
         </Box>
       </Container>
+
+      <VaultsStatusList
+        vaultsStatus={vaultsStatusList}
+        asset={asset}
+        authorizedLabel={'Authorized'}
+        unauthorizedLabel={'Frozen'}
+      />
     </Flex>
   )
 }

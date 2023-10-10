@@ -1,5 +1,5 @@
 import { Button, Flex, Text, Tooltip } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction } from 'react'
+import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
@@ -11,9 +11,7 @@ interface IItemAsset {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   isEditing: boolean
-  setSelectedAsset: Dispatch<
-    SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>
-  >
+  changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>
   removeAsset(balanceSelected: Hooks.UseHorizonTypes.IBalance): void
 }
 
@@ -22,7 +20,7 @@ export const ItemAsset: React.FC<IItemAsset> = ({
   assets,
   selectedAsset,
   isEditing,
-  setSelectedAsset,
+  changeAsset,
   removeAsset,
 }) => {
   const getAsset = (
@@ -47,16 +45,16 @@ export const ItemAsset: React.FC<IItemAsset> = ({
       onClick={(): void => {
         if (isEditing) return
         if (selectedAsset === getAsset(balance)) {
-          setSelectedAsset(undefined)
+          changeAsset(undefined)
           return
         }
-        setSelectedAsset(getAsset(balance))
+        changeAsset(getAsset(balance))
       }}
       bg={selectedAsset === getAsset(balance) ? 'gray.100' : 'white'}
       _dark={
-        selectedAsset
+        selectedAsset === getAsset(balance)
           ? { bg: 'black.600', borderColor: 'black.800' }
-          : { bg: 'none', borderColor: 'black.800' }
+          : { bg: 'black.700', borderColor: 'black.800' }
       }
     >
       <Flex
@@ -69,7 +67,7 @@ export const ItemAsset: React.FC<IItemAsset> = ({
         {getCurrencyIcon(balance.asset_code, '1.5rem')}{' '}
         <Text fontSize="sm">{balance.asset_code}</Text>
       </Flex>
-      <Flex alignItems="center" gap={2}>
+      <Flex alignItems="center" gap={2} _dark={{ fill: 'white' }}>
         <Text
           fontSize="xs"
           fontWeight="700"

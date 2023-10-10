@@ -1,4 +1,5 @@
 export enum PathRoute {
+  SANDBOX = '/sandbox',
   HOME = '/',
   LOGIN = '/login/:expired?',
   SIGNUP = '/signup',
@@ -6,9 +7,10 @@ export enum PathRoute {
   PAYMENTS_TOKENS = '/payments-tokens',
   SECURITIES_TOKENS = '/securities-tokens',
   SOROBAN_SMART_CONTRACTS = '/soroban-smart-contracts',
-  ASSETS_DASHBOARD = '/assets-dashboard',
   BLOCKCHAIN_EXPLORER = '/blockchain-explorer',
-  SETTINGS = '/settings',
+  SETTINGS = '/settings/team-members',
+  PERMISSIONS = '/settings/permissions',
+  ROLES_MANAGE = '/settings/roles_manage',
   PROFILE = '/profile',
   FORGE_ASSET = '/forge-asset',
   ASSET_HOME = '/asset-management/home',
@@ -23,5 +25,6 @@ export enum PathRoute {
   VAULT_DETAIL = '/vault-detail',
   CONTRACT_DETAIL = '/contract-detail',
   CONTRACT_CREATE = '/contract-create',
-  ASSET_MANAGEMENT = '/asset-management',
+  TOKEN_MANAGEMENT = '/token-management',
+  DASHBOARDS = '/dashboards',
 }

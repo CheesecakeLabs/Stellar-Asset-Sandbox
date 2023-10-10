@@ -2,6 +2,7 @@ import { Image } from '@chakra-ui/react'
 import { ReactNode } from 'react'
 
 import arsPng from './../../components/icons/fonts/ars.png'
+import brazilPng from './../../components/icons/fonts/brazil_flag.png'
 import { CoinIcon, EurocIcon, UsdcIcon } from 'components/icons'
 
 export const STELLAR_EXPERT_TX_URL =
@@ -9,6 +10,8 @@ export const STELLAR_EXPERT_TX_URL =
 
 export const STELLAR_EXPERT_ASSET =
   'https://stellar.expert/explorer/testnet/asset'
+
+export const STELLAR_EXPERT_URL = 'https://stellar.expert/explorer/testnet'
 
 export const getCurrencyIcon = (
   assetCode: string,
@@ -37,7 +40,12 @@ export const getCurrencyIcon = (
       return <UsdcIcon width={width} height={width} />
     case 'EUROC':
       return <EurocIcon width={width} height={width} />
-
+    case 'DREX':
+      return <Image src={brazilPng} width={width} height={width} />
+    case 'BRL':
+      return <Image src={brazilPng} width={width} height={width} />
+    case 'MBRL':
+      return <Image src={brazilPng} width={width} height={width} />
     case 'ARS':
       return <Image src={arsPng} width={width} height={width} />
 

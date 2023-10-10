@@ -26,7 +26,7 @@ export const AssetHeader: React.FC<IAssetHeader> = ({ asset }) => {
           {`${asset.name} (${asset.code})`}
         </Text>
       </Flex>
-      <Text fontSize="sm" color="gray.650" mr="0.5rem">
+      <Text fontSize="sm" mr="0.5rem">
         {typesAsset.find(type => type.id === asset.asset_type)?.name || ''}
       </Text>
     </Flex>

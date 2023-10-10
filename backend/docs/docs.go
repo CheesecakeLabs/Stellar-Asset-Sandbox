@@ -18,7 +18,7 @@ const docTemplate = `{
     "paths": {
         "/": {
             "get": {
-                "description": "Get all vault categories",
+                "description": "Get contract",
                 "consumes": [
                     "application/json"
                 ],
@@ -26,17 +26,43 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Vault category"
+                    "Contract"
                 ],
-                "summary": "Get all vault categories",
+                "summary": "Get contract",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.VaultCategory"
-                            }
+                            "$ref": "#/definitions/entity.Contract"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/asset": {
+            "get": {
+                "description": "Get asset by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Get asset by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Asset"
                         }
                     },
                     "500": {
@@ -390,6 +416,522 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/{id}/image": {
+            "post": {
+                "description": "Upload a base64 encoded image for a specific asset by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Upload image for an asset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Base64 Encoded Asset Image",
+                        "name": "image",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/{id}/image.png": {
+            "get": {
+                "description": "Fetch the image of a specified asset using its ID",
+                "produces": [
+                    "image/png"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Retrieve asset image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contract": {
+            "post": {
+                "description": "Create new contract",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Create a new contract",
+                "parameters": [
+                    {
+                        "description": "Contract info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateContractRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Contract"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs within a specific time range",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get all transactions logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Time range (e.g., last 24 hours, last 7 days, last 30 days)",
+                        "name": "time_range",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/asset/{asset_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific asset",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by Asset ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/assets/sum/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of amounts for all assets, grouped by a specified time frame (e.g., '1h' for 1 hour)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of amounts for all assets within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for grouping (e.g., '1h'). Default is '1h'",
+                        "name": "time_frame",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of sum log transactions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.SumLogTransaction"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid time_frame format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of amounts for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour) and a specific transaction type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of amounts by Asset ID within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction type ID (e.g., '0' for all transactions, '1' for type create asset '2' for mint asset)",
+                        "name": "transaction_type_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h' or '1d' '7d' '30d')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for the query (e.g., '1h' '2h' '24h' '36h')",
+                        "name": "time_frame",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sum log transaction for the specified asset",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SumLogTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid transaction type",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/last_transactions/{transaction_type_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get last transactions logs for a specific transaction type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get last transactions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction Type ID",
+                        "name": "transaction_type_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/supply/{asset_id}/{time_range}/{time_frame}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get sum of supply for a specific asset, grouped by a specified time frame (e.g., '1h' for 1 hour)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get sum of supply by Asset ID within a specific time frame",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Asset ID",
+                        "name": "asset_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time range for the query (e.g., '24h' or '1d' '7d' '30d')",
+                        "name": "time_range",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time frame for the query (e.g., '1h' '2h' '24h' '36h')",
+                        "name": "time_frame",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.SumLogTransaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid time_frame format",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/transaction_type/{transaction_type_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific transaction type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by Transaction Type ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction Type ID",
+                        "name": "transaction_type_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
+        "/log_transactions/user/{user_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all transactions logs for a specific user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log Transactions"
+                ],
+                "summary": "Get transactions logs by User ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.LogTransaction"
+                        }
+                    }
+                }
+            }
+        },
         "/role": {
             "get": {
                 "description": "List role",
@@ -423,11 +965,133 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Create a new role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Create a new role",
+                "parameters": [
+                    {
+                        "description": "Role info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.RoleRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/role-permission": {
+            "put": {
+                "description": "Update roles permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RolesPermissions"
+                ],
+                "summary": "Update roles permissions",
+                "parameters": [
+                    {
+                        "description": "Roles permissions information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.RolePermissionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated roles permissions information",
+                        "schema": {
+                            "$ref": "#/definitions/v1.RolePermissionRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update roles permissions",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
             }
         },
         "/role-permission/permissions": {
             "get": {
-                "description": "Role permissions",
+                "description": "permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Permissions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Permission"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/role-permission/role-permissions": {
+            "get": {
+                "description": "Roles permissions",
                 "consumes": [
                     "application/json"
                 ],
@@ -437,7 +1101,7 @@ const docTemplate = `{
                 "tags": [
                     "RolePermissions"
                 ],
-                "summary": "Role permissions",
+                "summary": "Roles permissions",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -451,9 +1115,153 @@ const docTemplate = `{
                 }
             }
         },
+        "/role-permission/user-permissions": {
+            "get": {
+                "description": "User permissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RolePermissions"
+                ],
+                "summary": "User permissions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.UserPermissionResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/role/{id}": {
+            "put": {
+                "description": "Update a role by providing the Role ID and the updated information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Update a role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Role info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated role information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Role not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update role",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a role by providing the Role ID and the updated information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Role"
+                ],
+                "summary": "Delete a role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Role ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Role info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated role information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.RoleDelete"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Role not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to delete role",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
-                "description": "Edit users role",
+                "description": "Create user",
                 "consumes": [
                     "application/json"
                 ],
@@ -463,13 +1271,13 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Edit users role",
-                "operationId": "editUsersRole",
+                "summary": "Create user",
+                "operationId": "create",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserRole"
+                            "$ref": "#/definitions/v1.userResponse"
                         }
                     },
                     "500": {
@@ -541,7 +1349,63 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/users/edit-users-role": {
+            "post": {
+                "description": "Edit users role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Edit users role",
+                "operationId": "editUsersRole",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserRole"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/list-users": {
+            "get": {
+                "description": "List users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "GET All Users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.UserResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/profile": {
             "get": {
                 "description": "Get PRofile",
                 "consumes": [
@@ -677,6 +1541,36 @@ const docTemplate = `{
             }
         },
         "/vault-category": {
+            "get": {
+                "description": "Get all vault categories",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault category"
+                ],
+                "summary": "Get all vault categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.VaultCategory"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create and issue a new asset on Stellar",
                 "consumes": [
@@ -781,6 +1675,118 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error: Failed to update vault category",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault-delete/{id}": {
+            "put": {
+                "description": "Update a vault by providing the Vault ID and the updated the status.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Update a vault status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Vault ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated vault status information",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Vault not found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Failed to update vault status",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault/list": {
+            "get": {
+                "description": "Get all vault",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Get all vault",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Vault"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vault/{id}": {
+            "get": {
+                "description": "Get vault",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Get vault",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Vault"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -942,12 +1948,55 @@ const docTemplate = `{
                     "type": "integer",
                     "example": 1
                 },
+                "image": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "issuer": {
                     "$ref": "#/definitions/entity.Wallet"
                 },
                 "name": {
                     "type": "string",
                     "example": "USD Coin"
+                }
+            }
+        },
+        "entity.Contract": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "min_deposit": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Smart Contract"
+                },
+                "penalty_rate": {
+                    "type": "integer"
+                },
+                "term": {
+                    "type": "integer"
+                },
+                "vault": {
+                    "$ref": "#/definitions/entity.Vault"
+                },
+                "yield_rate": {
+                    "type": "integer"
                 }
             }
         },
@@ -972,9 +2021,78 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.LogTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "example": 100000
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "current_main_vault": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "current_supply": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2023-08-10T14:30:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Mint Asset"
+                },
+                "destination_pk": {
+                    "type": "string",
+                    "example": "GSDC..."
+                },
+                "log_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "origin_pk": {
+                    "type": "string",
+                    "example": "GSDC..."
+                },
+                "transaction_type_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 42
+                }
+            }
+        },
+        "entity.Permission": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "description"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "name"
+                }
+            }
+        },
         "entity.Role": {
             "type": "object",
             "properties": {
+                "admin": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -985,16 +2103,73 @@ const docTemplate = `{
                 }
             }
         },
+        "entity.RoleDelete": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "new_users_role_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "entity.RolePermissionResponse": {
             "type": "object",
             "properties": {
-                "action": {
-                    "type": "string",
-                    "example": "Edit action"
+                "permission_id": {
+                    "type": "integer",
+                    "example": 1
                 },
+                "role_id": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
+        "entity.RoleRequest": {
+            "type": "object",
+            "properties": {
                 "name": {
                     "type": "string",
-                    "example": "Edit"
+                    "example": "Admin"
+                }
+            }
+        },
+        "entity.SumLogTransaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "example": [
+                        100000
+                    ]
+                },
+                "asset": {
+                    "$ref": "#/definitions/entity.Asset"
+                },
+                "date": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "2023-08-10T14:30:00Z"
+                    ]
+                },
+                "quantity": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1
+                    ]
                 }
             }
         },
@@ -1024,6 +2199,19 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.UserPermissionResponse": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "Edit action"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Edit"
                 }
             }
         },
@@ -1064,6 +2252,9 @@ const docTemplate = `{
         "entity.Vault": {
             "type": "object",
             "properties": {
+                "active": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -1090,6 +2281,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
@@ -1123,6 +2318,14 @@ const docTemplate = `{
                     "type": "string",
                     "example": "1000"
                 },
+                "current_main_vault": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "current_supply": {
+                    "type": "number",
+                    "example": 1000
+                },
                 "id": {
                     "type": "string",
                     "example": "001"
@@ -1148,6 +2351,14 @@ const docTemplate = `{
                 "code": {
                     "type": "string",
                     "example": "USDC"
+                },
+                "current_main_vault": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "current_supply": {
+                    "type": "number",
+                    "example": 1000
                 },
                 "from": {
                     "type": "string",
@@ -1179,6 +2390,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "USDC"
                 },
+                "image": {
+                    "type": "string",
+                    "example": "iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."
+                },
                 "limit": {
                     "type": "integer",
                     "example": 1000
@@ -1204,6 +2419,53 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.CreateContractRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "asset_id",
+                "min_deposit",
+                "name",
+                "penalty_rate",
+                "term",
+                "vault_id",
+                "yield_rate"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "GSDSC..."
+                },
+                "asset_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "min_deposit": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                },
+                "penalty_rate": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "term": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "vault_id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "yield_rate": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "v1.CreateVaultCategoryRequest": {
             "type": "object",
             "required": [
@@ -1213,11 +2475,36 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "theme": {
+                    "type": "string",
+                    "example": "blue"
                 }
             }
         },
         "v1.CreateVaultRequest": {
-            "type": "object"
+            "type": "object",
+            "required": [
+                "assets_id",
+                "name",
+                "vault_category_id"
+            ],
+            "properties": {
+                "assets_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Treasury"
+                },
+                "vault_category_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
         },
         "v1.CreateWalletRequest": {
             "type": "object",
@@ -1259,6 +2546,14 @@ const docTemplate = `{
                     "type": "string",
                     "example": "USDC"
                 },
+                "current_main_vault": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "current_supply": {
+                    "type": "number",
+                    "example": 1000
+                },
                 "id": {
                     "type": "string",
                     "example": "12"
@@ -1266,6 +2561,23 @@ const docTemplate = `{
                 "sponsor_id": {
                     "type": "integer",
                     "example": 2
+                }
+            }
+        },
+        "v1.RolePermissionRequest": {
+            "type": "object",
+            "properties": {
+                "is_add": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "permission_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "role_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -1285,6 +2597,14 @@ const docTemplate = `{
                 "asset_id": {
                     "type": "string",
                     "example": "12"
+                },
+                "current_main_vault": {
+                    "type": "number",
+                    "example": 1000
+                },
+                "current_supply": {
+                    "type": "number",
+                    "example": 1000
                 },
                 "destination_wallet_pk": {
                     "type": "string",
@@ -1348,12 +2668,25 @@ const docTemplate = `{
         "v1.UpdateVaultAssetRequest": {
             "type": "object",
             "required": [
-                "asset_id"
+                "asset_code",
+                "asset_issuer_pk"
             ],
             "properties": {
-                "asset_id": {
-                    "type": "integer",
-                    "example": 1
+                "asset_code": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "asset_issuer_pk": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "is_add": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "is_remove": {
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },
@@ -1377,8 +2710,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string",
-                    "example": "message"
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
                 }
             }
         },

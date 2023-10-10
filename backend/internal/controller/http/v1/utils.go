@@ -3,7 +3,9 @@ package v1
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/bitly/go-notify"
@@ -35,15 +37,18 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 
 	res := <-channel
 	notify.Stop(msgKey, channel)
-
 	if notifyData, ok := res.(*entity.NotifyData); ok {
 		switch msg := notifyData.Message.(type) {
 		case entity.EnvelopeResponse:
-			if msg.StatusCode != 200 {
-				return nil, fmt.Errorf("sendMessage - error response: %v", msg)
+			if msg.Error != nil {
+				errorDetails := msg.Error.(map[string]interface{})
+				errorDetailsJSON, err := json.Marshal(errorDetails)
+				if err != nil {
+					return notifyData, fmt.Errorf("error marshaling error details: %v", err)
+				}
+				return notifyData, fmt.Errorf(string(errorDetailsJSON))
 			}
 			return notifyData, nil
-
 		default:
 			return notifyData, nil
 		}
@@ -75,4 +80,29 @@ func (m *HTTPControllerMessenger) produce(chanName string, msgKey string, value 
 		err = fmt.Errorf("invalid channel name")
 	}
 	return
+}
+
+func createLogDescription(transaction int, assetCode string, setFlags, clearFlags []string) string {
+	switch transaction {
+	case entity.CreateAsset:
+		return fmt.Sprintf("Operation: Create Asset | Asset Code: %s", assetCode)
+	case entity.MintAsset:
+		return fmt.Sprintf("Operation: Mint | Asset Code: %s", assetCode)
+	case entity.BurnAsset:
+		return fmt.Sprintf("Operation: Burn | Asset Code: %s", assetCode)
+	case entity.ClawbackAsset:
+		return fmt.Sprintf("Operation: Clawback | Asset Code: %s", assetCode)
+	case entity.TransferAsset:
+		return fmt.Sprintf("Operation: Transfer | Asset Code: %s", assetCode)
+	case entity.UpdateAuthFlags:
+		if len(setFlags) == 0 {
+			setFlags = []string{"none"}
+		}
+		if len(clearFlags) == 0 {
+			clearFlags = []string{"none"}
+		}
+		return fmt.Sprintf("Operation: Update Auth Flags | Asset Code: %s | Set Flags: %s | Clear Flags: %s", assetCode, strings.Join(setFlags, ","), strings.Join(clearFlags, ","))
+	default:
+		return "Unrecognized transaction type"
+	}
 }

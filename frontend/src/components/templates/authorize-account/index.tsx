@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
+import { VaultsStatusList } from 'components/molecules/vaults-status-list'
 
 import { SelectVault } from '../../molecules/select-vault'
 
@@ -26,14 +27,16 @@ interface IAuthorizeAccountTemplate {
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
-  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsUnauthorized: Hooks.UseVaultsTypes.IVault[] | undefined
+  vaultsStatusList: Hooks.UseVaultsTypes.IVaultAccountName[] | undefined
 }
 
 export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
   onSubmit,
   loading,
   asset,
-  vaults,
+  vaultsUnauthorized,
+  vaultsStatusList,
 }) => {
   const {
     register,
@@ -73,7 +76,10 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
             {typeAccount === 'INTERNAL' ? (
               <FormControl isInvalid={errors?.wallet !== undefined}>
                 <FormLabel>Vault</FormLabel>
-                <SelectVault vaults={vaults} setWallet={setWallet} />
+                <SelectVault
+                  vaults={vaultsUnauthorized}
+                  setWallet={setWallet}
+                />
                 <FormErrorMessage>Required</FormErrorMessage>
               </FormControl>
             ) : (
@@ -102,6 +108,12 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
           </form>
         </Box>
       </Container>
+      <VaultsStatusList
+        vaultsStatus={vaultsStatusList}
+        asset={asset}
+        authorizedLabel={'Authorized'}
+        unauthorizedLabel={'Pending authorization'}
+      />
     </Flex>
   )
 }

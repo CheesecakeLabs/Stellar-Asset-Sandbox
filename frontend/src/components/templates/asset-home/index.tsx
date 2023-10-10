@@ -1,27 +1,36 @@
-import { Container, Flex, SimpleGrid, Tag, Text } from '@chakra-ui/react'
-import React from 'react'
+import { Container, Flex, Tag, Text } from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 import {
   STELLAR_EXPERT_ASSET,
   getCurrencyIcon,
 } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
-import { InfoCard } from '../contracts-detail/components/info-card'
-import { AccountsChart } from './components/accounts-chart'
 import { LinkIcon, WalletIcon } from 'components/icons'
+import { TChartPeriod } from 'components/molecules/chart-period'
+
+import { ChartPayments } from '../../molecules/chart-payments'
+import { InfoCard } from '../../molecules/info-card'
 
 interface IAssetHomeTemplate {
   loading: boolean
+  loadingChart: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
+  paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
-export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
-  const isFlagActive = (status: boolean): string => {
-    return status ? 'actived' : 'none'
-  }
-
+export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
+  asset,
+  loadingChart,
+  paymentsAsset,
+  chartPeriod,
+  setChartPeriod,
+}) => {
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="1rem">
@@ -63,7 +72,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
                   <LinkIcon />
                 </Flex>
               </Flex>
-              <Text fontSize="sm" color="gray.650" mr="0.5rem">
+              <Text fontSize="sm" mr="0.5rem">
                 {typesAsset.find(type => type.id === asset.asset_type)?.name ||
                   ''}
               </Text>
@@ -73,13 +82,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
           <Flex ms="4rem" flexDir="column">
             <Flex>
               <Flex flexDir="column">
-                <Text
-                  fontSize="xs"
-                  fontWeight="700"
-                  color="gray.650"
-                  mb="0.25rem"
-                  _dark={{ color: 'white' }}
-                >
+                <Text fontSize="xs" fontWeight="700" mb="0.25rem">
                   Issuer
                 </Text>
                 <Text fontSize="sm">
@@ -88,13 +91,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
               </Flex>
 
               <Flex flexDir="column" ms="1.5rem">
-                <Text
-                  fontSize="xs"
-                  fontWeight="700"
-                  color="gray.650"
-                  mb="0.25rem"
-                  _dark={{ color: 'white' }}
-                >
+                <Text fontSize="xs" fontWeight="700" mb="0.25rem">
                   Distributor
                 </Text>
                 <Text fontSize="sm">
@@ -104,64 +101,48 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({ asset }) => {
             </Flex>
 
             <Flex flexDir="column" mt="1rem">
-              <Text
-                fontSize="xs"
-                fontWeight="700"
-                color="gray.650"
-                mb="0.5rem"
-                _dark={{ color: 'white' }}
-              >
+              <Text fontSize="xs" fontWeight="700" mb="0.5rem">
                 Flags
               </Text>
               <Flex gap={2}>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_required || false
-                  )}
-                >
-                  Authorize Required
-                </Tag>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_clawback_enabled || false
-                  )}
-                >
-                  Clawback enabled
-                </Tag>
-                <Tag
-                  variant={isFlagActive(
-                    asset.assetData?.flags.auth_revocable || false
-                  )}
-                >
-                  Freeze enabled
-                </Tag>
+                {asset.assetData?.flags.auth_required && (
+                  <Tag variant={'actived'}>Authorize required</Tag>
+                )}
+                {asset.assetData?.flags.auth_clawback_enabled && (
+                  <Tag variant={'actived'}>Clawback enabled</Tag>
+                )}
+                {asset.assetData?.flags.auth_revocable && (
+                  <Tag variant={'actived'}>Freeze enabled</Tag>
+                )}
               </Flex>
             </Flex>
           </Flex>
         </Flex>
       </Container>
 
-      <SimpleGrid columns={{ md: 2, sm: 1 }} mt="1rem" gap={3}>
-        <Flex flexDir="column" w="full" gap={3}>
-          <InfoCard
-            title={`Total Supply`}
-            icon={<WalletIcon />}
-            value={toCrypto(Number(asset.assetData?.amount || 0))}
-          />
-          <InfoCard
-            title={`Main Vault`}
-            icon={<WalletIcon />}
-            value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
-          />
-        </Flex>
-        <AccountsChart
-          authorized={asset.assetData?.accounts.authorized || 0}
-          unauthorized={
-            (asset.assetData?.accounts.authorized_to_maintain_liabilities ||
-              0) + (asset.assetData?.accounts.unauthorized || 0)
-          }
+      <Flex flexDir="row" w="full" gap={3} mt="1rem">
+        <InfoCard
+          title={`Total Supply`}
+          icon={<WalletIcon />}
+          value={toCrypto(Number(asset.assetData?.amount || 0))}
+          helper={TooltipsData.totalSupply}
         />
-      </SimpleGrid>
+        <InfoCard
+          title={`Main Vault`}
+          icon={<WalletIcon />}
+          value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
+          helper={TooltipsData.mainVault}
+        />
+      </Flex>
+
+      {paymentsAsset && (
+        <ChartPayments
+          loadingChart={loadingChart}
+          paymentsAsset={paymentsAsset}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
+        />
+      )}
     </Flex>
   )
 }

@@ -29,6 +29,7 @@ export interface ILinkItemProps {
   icon: ReactNode
   path: string
   alerts?: number
+  comingSoon?: boolean
 }
 const linkItems: ILinkItemProps[] = [
   {
@@ -37,24 +38,15 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Asset Management',
+    name: 'Token Management',
     icon: <PaymentsIcon />,
-    path: PathRoute.ASSET_MANAGEMENT,
+    path: PathRoute.TOKEN_MANAGEMENT,
   },
-  // {
-  //   name: 'Payment Tokens',
-  //   icon: <PaymentsIcon />,
-  //   path: `${PathRoute.PAYMENTS_TOKENS}`,
-  // },
-  // {
-  //   name: 'Securities Tokens',
-  //   icon: <SecurityIcon />,
-  //   path: PathRoute.SECURITIES_TOKENS,
-  // },
   {
-    name: 'Soroban Smart Contracts',
+    name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    comingSoon: true,
   },
   {
     name: 'Treasury',
@@ -64,7 +56,7 @@ const linkItems: ILinkItemProps[] = [
   {
     name: 'Assets Dashboard',
     icon: <DashboardIcon />,
-    path: PathRoute.ASSETS_DASHBOARD,
+    path: PathRoute.DASHBOARDS,
   },
   {
     name: 'Blockchain Explorer',
@@ -77,7 +69,8 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box w="full">
+    <Box w="full" 
+      zIndex={101}>
       <Header onOpen={onOpen} />
       <Flex pt="5rem">
         <SidebarContent

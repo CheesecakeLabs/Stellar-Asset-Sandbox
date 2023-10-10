@@ -8,14 +8,19 @@ import {
   FormLabel,
   Input,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-import { toCrypto } from 'utils/formatter'
+import { TooltipsData } from 'utils/constants/tooltips-data'
+import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
+import { ChartMintBurn } from 'components/molecules/chart-mint-burn'
+import { TChartPeriod } from 'components/molecules/chart-period'
 
 interface IBurnAssetTemplate {
   onSubmit(
@@ -25,19 +30,29 @@ interface IBurnAssetTemplate {
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   assetData: Hooks.UseHorizonTypes.IAsset | undefined
+  mintOperations: Hooks.UseDashboardsTypes.IAsset | undefined
+  burnOperations: Hooks.UseDashboardsTypes.IAsset | undefined
+  loadingChart: boolean
+  chartPeriod: TChartPeriod
+  setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
 }
 
 export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
   onSubmit,
+  setChartPeriod,
   loading,
   asset,
   assetData,
+  chartPeriod,
+  mintOperations,
+  burnOperations,
+  loadingChart,
 }) => {
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   return (
@@ -51,27 +66,22 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
             })}
           >
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex
-                justifyContent="space-between"
-                w="full"
-                px="0.25rem"
-                fill="gray.900"
-                stroke="gray.900"
-                _dark={{
-                  fill: 'white',
-                  stroke: 'white',
-                }}
-              >
+              <Flex justifyContent="space-between" w="full" px="0.25rem">
                 <FormLabel>Amount to burn</FormLabel>
-                <HelpIcon />
+                <Tooltip label={TooltipsData.burn}>
+                  <HelpIcon width="20px" />
+                </Tooltip>
               </Flex>
               <Input
-                type="number"
+                as={NumericFormat}
+                decimalScale={7}
+                thousandSeparator=","
                 placeholder="Type the amount you want to burn..."
                 autoComplete="off"
-                {...register('amount', {
-                  required: true,
-                })}
+                value={getValues('amount')}
+                onChange={(event): void => {
+                  setValue('amount', toNumber(event.target.value))
+                }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
@@ -101,6 +111,16 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
           </form>
         </Box>
       </Container>
+      {mintOperations && burnOperations && (
+        <ChartMintBurn
+          loadingChart={loadingChart}
+          mintOperations={mintOperations}
+          burnOperations={burnOperations}
+          chartPeriod={chartPeriod}
+          setChartPeriod={setChartPeriod}
+          assetCode={asset.code}
+        />
+      )}
     </Flex>
   )
 }

@@ -32,6 +32,7 @@ declare namespace Hooks {
     interface IRole {
       id: number
       name: string
+      admin: id
     }
 
     interface IUserRole {
@@ -39,9 +40,20 @@ declare namespace Hooks {
       id_role: number
     }
 
-    interface IPermission {
+    interface IUserPermission {
       name: string
       action: string
+    }
+
+    interface IRolePermission {
+      role_id: number
+      permission_id: number
+    }
+
+    interface IPermission {
+      id: number
+      name: string
+      description: string
     }
 
     interface IAuthContext {
@@ -52,15 +64,30 @@ declare namespace Hooks {
       getAllUsers: () => Promise<void>
       getProfile: () => Promise<void>
       editUsersRole: (params: IUserRole) => Promise<boolean>
+      getUserPermissions: () => Promise<void>
+      getRolesPermissions: () => Promise<void>
       getPermissions: () => Promise<void>
       editProfile: (params: IUserRole) => Promise<boolean>
+      updateRolesPermissions: (
+        params: Hooks.UseAuthTypes.IRolePermission[]
+      ) => Promise<boolean>
+      createRole: (name: string) => Promise<boolean>
+      updateRole: (id: number, name: string) => Promise<boolean>
+      deleteRole: (id: number, idNewUsersRole: number) => Promise<boolean>
       isAuthenticated: boolean
       loading: boolean
       loadingRoles: boolean
       roles: IRole[] | undefined
       users: IUserDto[] | undefined
       profile: IUserDto | undefined
+      userPermissions: IUserPermission[] | undefined
+      rolesPermissions: IRolePermission[] | undefined
       permissions: IPermission[] | undefined
+      updatingRolesPermissions: boolean
+      creatingRole: boolean
+      updatingRole: boolean
+      deletingRole: boolean
+      loadingUserPermissions: boolean
     }
   }
 }
