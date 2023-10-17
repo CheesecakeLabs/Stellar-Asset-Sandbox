@@ -28,4 +28,5 @@ export enum PathRoute {
   CONTRACT_CREATE = '/contract-create',
   TOKEN_MANAGEMENT = '/token-management',
   DASHBOARDS = '/dashboards',
+  TOML_FILE = '/.well-known/stellar.toml',
 }

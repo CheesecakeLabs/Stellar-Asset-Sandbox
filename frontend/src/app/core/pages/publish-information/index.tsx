@@ -8,7 +8,6 @@ import { useAuth } from 'hooks/useAuth'
 import { havePermission } from 'utils'
 import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
-import { toFixedCrypto } from 'utils/formatter'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -21,8 +20,15 @@ import { PublishInformationTemplate } from 'components/templates/publish-informa
 
 export const PublishInformation: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [tomlData, setTomlData] = useState<Hooks.UseAssetsTypes.ITomlFile>()
 
-  const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const {
+    generateToml,
+    getTomlData,
+    getAssetById,
+    loadingOperation,
+    loadingAsset,
+  } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { id } = useParams()
@@ -31,31 +37,34 @@ export const PublishInformation: React.FC = () => {
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    isAssetAnchored: boolean
   ): Promise<void> => {
-    if (!asset || !id) return
-
     try {
-      const isSuccess = await mint({
-        id: asset.id.toString(),
-        code: asset.code,
-        sponsor_id: 1,
-        amount: toFixedCrypto(data.amount),
-        current_supply: Number(asset.assetData?.amount || 0) - data.amount,
-        current_main_vault: Number(asset.distributorBalance?.balance || 0),
+      const isSuccess = await generateToml({
+        currencies: [
+          {
+            code: asset?.code,
+            issuer: asset?.issuer.key.publicKey,
+            desc: data.desc,
+            image: data.image,
+            is_asset_anchored: isAssetAnchored,
+            anchor_asset_type: isAssetAnchored ? data.anchor_asset_type : null,
+            anchor_asset: isAssetAnchored ? data.anchor_asset : null,
+            attestation_of_reserve: data.attestation_of_reserve,
+          },
+        ],
       })
 
       if (isSuccess) {
         setValue('amount', '')
         toast({
-          title: 'Mint success!',
-          description: `You minted ${data.amount} ${asset.code}`,
+          title: 'Information published!',
           status: 'success',
           duration: 9000,
           isClosable: true,
           position: 'top-right',
         })
-        getAssetById(id).then(asset => setAsset(asset))
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -72,6 +81,10 @@ export const PublishInformation: React.FC = () => {
       getAssetById(id).then(asset => setAsset(asset))
     }
   }, [getAssetById, id])
+
+  useEffect(() => {
+    getTomlData().then(toml => setTomlData(toml))
+  }, [getTomlData])
 
   useEffect(() => {
     getUserPermissions().then((): void => {
@@ -101,7 +114,7 @@ export const PublishInformation: React.FC = () => {
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Mint'} />
+            <ManagementBreadcrumb title={'Publish information'} />
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -109,6 +122,7 @@ export const PublishInformation: React.FC = () => {
                 onSubmit={onSubmit}
                 loading={loadingOperation}
                 asset={asset}
+                tomlData={tomlData}
               />
             )}
           </Flex>

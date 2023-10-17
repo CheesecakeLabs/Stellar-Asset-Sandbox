@@ -88,6 +88,33 @@ declare namespace Hooks {
       set_flags: string[]
     }
 
+    interface ITomlCurrency {
+      code?: string
+      issuer?: string
+      desc: string
+      image: string
+      is_asset_anchored: boolean
+      anchor_asset_type: string
+      anchor_asset: string
+      attestation_of_reserve: string
+    }
+
+    interface ITomlData {
+      currencies: ITomlCurrency[]
+    }
+
+    interface ITomlFile {
+      CURRENCIES: {
+        code: string
+        issuer: string
+        desc: string
+        anchor_asset: string
+        anchor_asset_type: string
+        is_asset_anchored: boolean
+        attestation_of_reserve: string
+      }[]
+    }
+
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
@@ -102,6 +129,9 @@ declare namespace Hooks {
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
       getAssets: () => Promise<IAssetDto[] | undefined>
       getAssetById: (id: string) => Promise<IAssetDto | undefined>
+      generateToml: (params: ITomlData) => Promise<boolean>
+      retrieveToml: () => Promise<Blob | undefined>
+      getTomlData: () => Promise<ITomlFile | undefined>
     }
   }
 }

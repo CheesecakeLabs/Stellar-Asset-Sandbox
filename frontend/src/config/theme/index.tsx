@@ -1,13 +1,8 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/react'
 
+import '@fontsource/inter'
 
-
-import '@fontsource/inter';
-
-
-
-import * as components from './components';
-
+import * as components from './components'
 
 const theme = extendTheme({
   config: {
@@ -76,6 +71,7 @@ const theme = extendTheme({
       dark: '#F0F0F0',
     },
     gray: {
+      25: '#fcfcfc',
       50: '#FBFCFD',
       100: '#f8f8fb',
       200: '#f1f2f6',

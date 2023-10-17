@@ -21,6 +21,7 @@ import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as EmptyIcon } from './fonts/empty.svg'
 import { ReactComponent as EurocIcon } from './fonts/euroc.svg'
 import { ReactComponent as ExplorerIcon } from './fonts/explorer.svg'
+import { ReactComponent as FileIcon } from './fonts/file.svg'
 import { ReactComponent as FilterIcon } from './fonts/filter.svg'
 import { ReactComponent as HelpIcon } from './fonts/help.svg'
 import { ReactComponent as HomeIcon } from './fonts/home.svg'
@@ -113,5 +114,6 @@ export {
   RoleIcon,
   ArrowBackIcon,
   ArrowForwardIcon,
-  CircleCheckIcon
+  CircleCheckIcon,
+  FileIcon,
 }

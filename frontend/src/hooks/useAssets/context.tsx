@@ -1,10 +1,15 @@
-import { createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useState } from 'react';
 
-import axios from 'axios'
-import { useHorizon } from 'hooks/useHorizon'
-import { MessagesError } from 'utils/constants/messages-error'
 
-import { http } from 'interfaces/http'
+
+import axios from 'axios';
+import { useHorizon } from 'hooks/useHorizon';
+import { MessagesError } from 'utils/constants/messages-error';
+
+
+
+import { BASE_URL, http } from 'interfaces/http';
+
 
 export const AssetsContext = createContext(
   {} as Hooks.UseAssetsTypes.IAssetsContext
@@ -208,6 +213,62 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData, getAssetData]
   )
 
+  const generateToml = async (
+    params: Hooks.UseAssetsTypes.ITomlData
+  ): Promise<boolean> => {
+    setLoadingOperation(true)
+    try {
+      const response = await http.put(`assets/update-toml`, params)
+      return response.status === 200
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoadingOperation(false)
+    }
+  }
+
+  const retrieveToml = useCallback(async (): Promise<Blob> => {
+    try {
+      const response = await axios
+        .create({
+          baseURL: BASE_URL,
+          responseType: 'blob',
+        })
+        .get(`/.well-known/stellar.toml`)
+
+      const file = new Blob([response.data], { type: 'application/txt' })
+      const fileURL = URL.createObjectURL(file)
+        window.location.href = fileURL
+
+      return response.data
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    }
+  }, [])
+
+  const getTomlData =
+    useCallback(async (): Promise<Hooks.UseAssetsTypes.ITomlFile> => {
+      setLoadingAssets(true)
+      try {
+        const response = await http.get(`assets/toml-data`)
+        const data = response.data
+        return data
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingAssets(false)
+      }
+    }, [])
+
   return (
     <AssetsContext.Provider
       value={{
@@ -224,6 +285,9 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         forge,
         getAssets,
         getAssetById,
+        generateToml,
+        retrieveToml,
+        getTomlData,
       }}
     >
       {children}

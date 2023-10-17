@@ -13,6 +13,7 @@ import {
   BackIcon,
   BlockIcon,
   BurnIcon,
+  FileIcon,
   HomeIcon,
   TransferIcon,
 } from 'components/icons'
@@ -152,7 +153,6 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
                 ? 'menuButtonSelected'
                 : 'menuButton'
             }
-            borderBottomRadius="0.25rem"
             leftIcon={
               <Flex w="1rem" justifyContent="center">
                 <BackIcon />
@@ -168,14 +168,14 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
         {havePermission(Permissions.CLAWBACK_ASSET, permissions) && (
           <Button
             variant={
-              action === AssetActions.CLAWBACK
+              action === AssetActions.PUBLISH_INFORMATION
                 ? 'menuButtonSelected'
                 : 'menuButton'
             }
             borderBottomRadius="0.25rem"
             leftIcon={
               <Flex w="1rem" justifyContent="center">
-                <BackIcon />
+                <FileIcon />
               </Flex>
             }
             onClick={(): void => {
