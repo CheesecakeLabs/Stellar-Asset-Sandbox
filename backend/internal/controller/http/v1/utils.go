@@ -15,10 +15,11 @@ type HTTPControllerMessenger struct {
 	pKp  entity.ProducerInterface
 	pHor entity.ProducerInterface
 	pEnv entity.ProducerInterface
+	pSub entity.ProducerInterface
 }
 
-func newHTTPControllerMessenger(pKp, pHor, pEnv entity.ProducerInterface) HTTPControllerMessenger {
-	return HTTPControllerMessenger{pKp, pHor, pEnv}
+func newHTTPControllerMessenger(pKp, pHor, pEnv, pSub entity.ProducerInterface) HTTPControllerMessenger {
+	return HTTPControllerMessenger{pKp, pHor, pEnv, pSub}
 }
 
 func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}) (*entity.NotifyData, error) {
@@ -26,7 +27,6 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 	if err != nil {
 		return &entity.NotifyData{}, fmt.Errorf("sendMessage - generateHash: %v", err)
 	}
-
 	channel := make(chan interface{})
 	notify.Start(msgKey, channel)
 
@@ -76,6 +76,8 @@ func (m *HTTPControllerMessenger) produce(chanName string, msgKey string, value 
 		err = m.pHor.Produce(msgKey, value)
 	case entity.EnvelopeChannel:
 		err = m.pEnv.Produce(msgKey, value)
+	case entity.SubmitTransactionChannel:
+		err = m.pSub.Produce(msgKey, value)
 	default:
 		err = fmt.Errorf("invalid channel name")
 	}

@@ -53,5 +53,15 @@ func main() {
 	}
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer)
+	// Kafka submit transaction connection
+	fmt.Println("Kafka submit transaction connection", cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
+	submitConn := kafka.New(cfg.Kafka, cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
+	err = submitConn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka submit transaction topics %s\n", err)
+		os.Exit(1)
+	}
+	go submitConn.Run(cfg, entity.SubmitTransactionChannel)
+
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer)
 }

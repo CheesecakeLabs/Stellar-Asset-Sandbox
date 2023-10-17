@@ -30,6 +30,10 @@ type (
 			ConsumerTopics []string `env:"KAFKA_HORIZON_CONSUMER_TOPICS"`
 			ProducerTopic  string   `env:"KAFKA_HORIZON_PRODUCER_TOPIC"`
 		}
+		SubmitTransactionCfg struct {
+			ConsumerTopics []string `env:"KAFKA_ENVELOPE_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_SUBMIT_TRANSACTION_PRODUCER_TOPIC"`
+		}
 	}
 
 	PGConfig struct {

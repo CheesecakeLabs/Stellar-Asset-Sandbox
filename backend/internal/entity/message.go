@@ -75,4 +75,15 @@ type (
 		Account string
 		Weight  uint8
 	}
+
+	SignTransactionRequest struct {
+		Id        int    `json:"id"`
+		Envelope  string `json:"envelope"`
+		PublicKey string `json:"publicKey"`
+	}
+
+	SubmitRequest struct {
+		Id       int    `json:"id"`
+		Envelope string `json:"envelope"`
+	}
 )
