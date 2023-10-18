@@ -459,6 +459,26 @@ definitions:
         example: 1
         type: integer
     type: object
+  v1.SignedTransactionRequest:
+    properties:
+      envelope:
+        example: KJDSKD...
+        type: string
+      wallet_pk:
+        example: GDSKJG...
+        type: string
+    required:
+    - envelope
+    - wallet_pk
+    type: object
+  v1.SubmitTransactionRequest:
+    properties:
+      envelope:
+        example: KJDSKD...
+        type: string
+    required:
+    - envelope
+    type: object
   v1.TransferAssetRequest:
     properties:
       amount:
@@ -1377,6 +1397,66 @@ paths:
       summary: Update a role
       tags:
       - Role
+  /soroban-transactions/sign:
+    post:
+      consumes:
+      - application/json
+      description: Signed a XDR transaction
+      parameters:
+      - description: Signed a XDR transaction
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SignedTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Signed Transaction
+      tags:
+      - Soroban
+  /soroban-transactions/submit:
+    post:
+      consumes:
+      - application/json
+      description: Submit a XDR transaction
+      parameters:
+      - description: Submit a XDR transaction
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SubmitTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Submit Transaction
+      tags:
+      - Soroban
   /user/create:
     post:
       consumes:
