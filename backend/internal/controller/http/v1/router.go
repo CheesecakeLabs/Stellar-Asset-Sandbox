@@ -35,7 +35,7 @@ func CORSMiddleware(cfg config.HTTP) gin.HandlerFunc {
 // @BasePath    /v1
 func NewRouter(
 	handler *gin.Engine,
-	pKp, pHor, pEnv, pSub entity.ProducerInterface,
+	pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface,
 	authUseCase usecase.AuthUseCase,
 	userUseCase usecase.UserUseCase,
 	walletUseCase usecase.WalletUseCase,
@@ -49,7 +49,7 @@ func NewRouter(
 	cfg config.HTTP,
 ) {
 	// Messenger
-	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv, pSub)
+	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv, pSub, pSig)
 	// Options Gin
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())

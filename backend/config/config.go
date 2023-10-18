@@ -34,6 +34,10 @@ type (
 			ConsumerTopics []string `env:"KAFKA_ENVELOPE_CONSUMER_TOPICS"`
 			ProducerTopic  string   `env:"KAFKA_SUBMIT_TRANSACTION_PRODUCER_TOPIC"`
 		}
+		SignTransactionCfg struct {
+			ConsumerTopics []string `env:"KAFKA_SIGN_TRANSACTION_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_SIGN_TRANSACTION_PRODUCER_TOPIC"`
+		}
 	}
 
 	PGConfig struct {

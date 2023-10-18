@@ -26,7 +26,7 @@ func (p *mockProducer) Produce(key string, value interface{}) error {
 
 func TestSendMessage(t *testing.T) {
 	mockProducer := newMockProducer()
-	messenger := newHTTPControllerMessenger(mockProducer, mockProducer, mockProducer, mockProducer)
+	messenger := newHTTPControllerMessenger(mockProducer, mockProducer, mockProducer, mockProducer, mockProducer)
 
 	reqData := &entity.CreateKeypairRequest{Amount: 1}
 	actualData, err := messenger.SendMessage(entity.EnvelopeChannel, reqData)

@@ -16,10 +16,11 @@ type HTTPControllerMessenger struct {
 	pHor entity.ProducerInterface
 	pEnv entity.ProducerInterface
 	pSub entity.ProducerInterface
+	pSig entity.ProducerInterface
 }
 
-func newHTTPControllerMessenger(pKp, pHor, pEnv, pSub entity.ProducerInterface) HTTPControllerMessenger {
-	return HTTPControllerMessenger{pKp, pHor, pEnv, pSub}
+func newHTTPControllerMessenger(pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface) HTTPControllerMessenger {
+	return HTTPControllerMessenger{pKp, pHor, pEnv, pSub, pSig}
 }
 
 func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}) (*entity.NotifyData, error) {
@@ -78,6 +79,8 @@ func (m *HTTPControllerMessenger) produce(chanName string, msgKey string, value 
 		err = m.pEnv.Produce(msgKey, value)
 	case entity.SubmitTransactionChannel:
 		err = m.pSub.Produce(msgKey, value)
+	case entity.SignChannel:
+		err = m.pSig.Produce(msgKey, value)
 	default:
 		err = fmt.Errorf("invalid channel name")
 	}

@@ -28,7 +28,7 @@ func newSorobanRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPC
 
 type SignedTransactionRequest struct {
 	Envelope string `json:"envelope"       binding:"required"  example:"KJDSKD..."`
-	WalletId int    `json:"wallet_id"       binding:"required"  example:"1"`
+	WalletPk string `json:"wallet_pk"       binding:"required"  example:"GDSKJG..."`
 }
 
 type SubmitTransactionRequest struct {
@@ -51,6 +51,17 @@ func (r *sorobanRoutes) signTransaction(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "invalid request", err)
 		return
 	}
+
+	res, err := r.m.SendMessage(entity.SignChannel, entity.SignTransactionRequest{
+		PublicKey: request.WalletPk,
+		Envelope:  request.Envelope,
+	})
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
 }
 
 // @Summary     Submit Transaction
