@@ -6,56 +6,35 @@ export const Tabs = {
   sizes: {
     md: {
       tab: {
-        fontSize: 'md',
-        py: '3',
-        mr: '2rem',
+        fontSize: 'sm',
+        py: '1',
+        mr: '0.5rem',
       },
     },
     sm: {
       tab: {
         fontSize: 'sm',
-        py: '2',
+        py: '1',
+        mr: '0.5rem',
       },
     },
   },
   variants: {
-    horizontal: {
+    simpleRounded: {
       tab: {
         fontWeight: '400',
+        borderRadius: 'full',
         _selected: {
-          borderBottom: '2px solid',
-          color: 'black.300',
+          color: 'white',
+          bg: 'primary.normal',
+          borderRadius: 'full',
         },
       },
       tablist: {
         color: 'gray.300',
-        borderBottom: '1.5px solid',
-        borderColor: 'gray.100',
       },
       tabpanel: {
         p: '0',
-      },
-    },
-    vertical: {
-      tab: {
-        fontWeight: '400',
-        fontSize: 'sm',
-        width: { md: '16rem', sm: '4rem' },
-        justifyContent: 'flex-start',
-        py: '0.5rem',
-        px: '0',
-        mb: '1rem',
-        _selected: {
-          borderBottom: '2px solid',
-          color: 'blue.500',
-        },
-      },
-      root: {
-        display: 'flex',
-      },
-      tablist: {
-        flexDirection: { md: 'column', sm: 'row' },
-        color: 'gray.300',
       },
     },
   },

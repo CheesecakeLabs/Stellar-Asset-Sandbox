@@ -8,11 +8,14 @@ import {
   FormLabel,
   Input,
   Text,
+  Tooltip,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-import { toCrypto } from 'utils/formatter'
+import { TooltipsData } from 'utils/constants/tooltips-data'
+import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
@@ -46,10 +49,10 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
   chartPeriod,
 }) => {
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
   } = useForm()
 
   return (
@@ -67,23 +70,22 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
                 justifyContent="space-between"
                 w="full"
                 px="0.25rem"
-                fill="gray.900"
-                stroke="gray.900"
-                _dark={{
-                  fill: 'white',
-                  stroke: 'white',
-                }}
               >
                 <FormLabel>Amount to mint</FormLabel>
-                <HelpIcon />
+                <Tooltip label={TooltipsData.mint}>
+                  <HelpIcon width="20px" />
+                </Tooltip>
               </Flex>
               <Input
-                type="number"
+                as={NumericFormat}
+                decimalScale={7}
+                thousandSeparator=","
                 placeholder="Type the amount you want to mint..."
                 autoComplete="off"
-                {...register('amount', {
-                  required: true,
-                })}
+                value={getValues('amount')}
+                onChange={(event): void => {
+                  setValue('amount', toNumber(event.target.value))
+                }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>

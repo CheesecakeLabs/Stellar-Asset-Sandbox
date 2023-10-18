@@ -1,7 +1,6 @@
 import { PathRoute } from 'components/enums/path-route'
 
 import { AssetHome } from '../pages/asset-home'
-import { AssetManagement } from '../pages/asset-management'
 import { AuthorizeAccount } from '../pages/authorize-account'
 import { BurnAsset } from '../pages/burn-asset'
 import { ClawbackAsset } from '../pages/clawback-asset'
@@ -16,16 +15,21 @@ import { Home } from '../pages/home'
 import { MintAsset } from '../pages/mint-asset'
 import { PaymentsTokens } from '../pages/payments-tokens'
 import { Profile } from '../pages/profile'
-import { Settings } from '../pages/settings'
+import { RolePermissions } from '../pages/role-permissions'
+import { RolesManage } from '../pages/roles-manage'
+import { SandboxPage } from '../pages/sandbox-page'
+import { TeamMembers } from '../pages/team-members'
+import { TokenManagement } from '../pages/token-management'
 import { VaultCreate } from '../pages/vault-create'
 import { VaultDetail } from '../pages/vault-detail'
 import { Vaults } from '../pages/vaults'
 import { AppRoute } from './types'
 
 export const coreRoutes: AppRoute[] = [
+  { path: PathRoute.SANDBOX, component: SandboxPage },
   { path: PathRoute.HOME, component: Home, isPrivate: true },
   { path: PathRoute.PROFILE, component: Profile, isPrivate: true },
-  { path: PathRoute.SETTINGS, component: Settings, isPrivate: true },
+  { path: PathRoute.SETTINGS, component: TeamMembers, isPrivate: true },
   { path: PathRoute.FORGE_ASSET, component: ForgeAsset, isPrivate: true },
   {
     path: `${PathRoute.MINT_ASSET}/:id`,
@@ -98,13 +102,23 @@ export const coreRoutes: AppRoute[] = [
     isPrivate: true,
   },
   {
-    path: PathRoute.ASSET_MANAGEMENT,
-    component: AssetManagement,
+    path: PathRoute.TOKEN_MANAGEMENT,
+    component: TokenManagement,
     isPrivate: true,
   },
   {
     path: PathRoute.DASHBOARDS,
     component: Dashboards,
+    isPrivate: true,
+  },
+  {
+    path: PathRoute.PERMISSIONS,
+    component: RolePermissions,
+    isPrivate: true,
+  },
+  {
+    path: PathRoute.ROLES_MANAGE,
+    component: RolesManage,
     isPrivate: true,
   },
 ]

@@ -1,15 +1,19 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
 import { useVaults } from 'hooks/useVaults'
+import { havePermission } from 'utils'
 import { clawbackHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
@@ -19,9 +23,12 @@ import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 export const ClawbackAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const { clawback, getAssetById, loadingOperation, loadingAsset } = useAssets()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
   const { id } = useParams()
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
+  const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
@@ -32,9 +39,11 @@ export const ClawbackAsset: React.FC = () => {
     try {
       const isSuccess = await clawback({
         sponsor_id: 1,
-        amount: data.amount,
+        amount: toFixedCrypto(data.amount),
         code: asset.code,
         from: wallet ? wallet : data.from,
+        current_supply: Number(asset.assetData?.amount || 0) - data.amount,
+        current_main_vault: Number(asset.distributorBalance?.balance || 0),
       })
 
       if (isSuccess) {
@@ -83,9 +92,21 @@ export const ClawbackAsset: React.FC = () => {
     }
   }, [getAssetById, id])
 
+  useEffect(() => {
+    getUserPermissions().then((): void => {
+      if (
+        !loadingUserPermissions &&
+        !havePermission(Permissions.CLAWBACK_ASSET, userPermissions)
+      ) {
+        navigate(PathRoute.HOME)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Clawback'} />
@@ -102,7 +123,12 @@ export const ClawbackAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.CLAWBACK} />
+            {(userPermissions || !loadingUserPermissions) && (
+              <MenuActionsAsset
+                action={AssetActions.CLAWBACK}
+                permissions={userPermissions}
+              />
+            )}
             <ActionHelper
               title={'About Clawback'}
               description={clawbackHelper}

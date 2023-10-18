@@ -1,0 +1,1 @@
+UPDATE asset SET asset_type = 'PAYMENT_TOKEN' WHERE asset_type = 'STABLECOIN'

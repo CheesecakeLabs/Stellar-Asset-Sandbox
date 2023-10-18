@@ -164,7 +164,7 @@ func (r *usersRoutes) logout(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200  {object} []entity.UserResponse
-// @Router /users [get]
+// @Router /users/list-users [get]
 func (r *usersRoutes) getAllUsers(c *gin.Context) {
 	users, err := r.t.GetAllUsers()
 	fmt.Println(users)
@@ -186,7 +186,7 @@ func (r *usersRoutes) getAllUsers(c *gin.Context) {
 // @Produce     json
 // @Success     200 {object} entity.UserRole
 // @Failure     500 {object} response
-// @Router      /user/create [post]
+// @Router      /users/edit-users-role [post]
 func (r *usersRoutes) editUsersRole(c *gin.Context) {
 	var userRole entity.UserRole
 	if err := c.ShouldBindJSON(&userRole); err != nil {
@@ -213,7 +213,7 @@ func (r *usersRoutes) editUsersRole(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200  {object} entity.UserResponse
-// @Router /users [get]
+// @Router /users/profile [get]
 func (r *usersRoutes) getProfile(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	profile, err := r.t.GetProfile(token)

@@ -1,15 +1,19 @@
 import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
+import { havePermission } from 'utils'
 import { authorizeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
+import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
@@ -18,11 +22,21 @@ import { AuthorizeAccountTemplate } from 'components/templates/authorize-account
 
 export const AuthorizeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [vaultsStatusList, setVaultsStatusList] =
+    useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
+  const [vaultsUnauthorized, setVaultsUnauthorized] =
+    useState<Hooks.UseVaultsTypes.IVault[]>()
+
   const { authorize, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { getVaults, vaultsToStatusName, filterVaultsByStatus } = useVaults()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
+  const { getAssetAccounts } = useHorizon()
+
   const toast = useToast()
+  const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
@@ -49,7 +63,10 @@ export const AuthorizeAccount: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
-        getAssetById(id).then(asset => setAsset(asset))
+        getAssetById(id).then(asset => {
+          setAsset(asset)
+          filterVaults(asset)
+        })
         return
       }
       toastError(MessagesError.errorOccurred)
@@ -72,19 +89,57 @@ export const AuthorizeAccount: React.FC = () => {
     })
   }
 
+  const filterVaults = useCallback(
+    async (
+      asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    ): Promise<void> => {
+      if (!asset) return
+      const assetAccounts = await getAssetAccounts(
+        asset.code,
+        asset.issuer.key.publicKey
+      )
+      const vaults = await getVaults()
+      const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
+      const vaultsUnauthorized = filterVaultsByStatus(
+        vaults,
+        assetAccounts,
+        asset,
+        false
+      )
+      setVaultsStatusList(vaultsStatusList)
+      setVaultsUnauthorized(vaultsUnauthorized)
+    },
+    [filterVaultsByStatus, getAssetAccounts, getVaults, vaultsToStatusName]
+  )
+
   useEffect(() => {
     if (id) {
-      getAssetById(id).then(asset => setAsset(asset))
+      getAssetById(id).then(asset => {
+        setAsset(asset)
+        filterVaults(asset)
+      })
     }
-  }, [getAssetById, id])
+  }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
     getVaults()
   }, [getVaults])
 
+  useEffect(() => {
+    getUserPermissions().then((): void => {
+      if (
+        !loadingUserPermissions &&
+        !havePermission(Permissions.AUTHORIZE_ASSET, userPermissions)
+      ) {
+        navigate(PathRoute.HOME)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Flex>
-      <Sidebar highlightMenu={PathRoute.HOME}>
+      <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Authorize'} />
@@ -95,12 +150,18 @@ export const AuthorizeAccount: React.FC = () => {
                 onSubmit={onSubmit}
                 loading={loadingOperation}
                 asset={asset}
-                vaults={vaults}
+                vaultsUnauthorized={vaultsUnauthorized}
+                vaultsStatusList={vaultsStatusList}
               />
             )}
           </Flex>
           <VStack>
-            <MenuActionsAsset action={AssetActions.AUTHORIZE} />
+            {(userPermissions || !loadingUserPermissions) && (
+              <MenuActionsAsset
+                action={AssetActions.AUTHORIZE}
+                permissions={userPermissions}
+              />
+            )}
             <ActionHelper
               title={'About Authorize'}
               description={authorizeHelper}

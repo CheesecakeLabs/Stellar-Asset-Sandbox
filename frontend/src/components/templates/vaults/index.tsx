@@ -25,7 +25,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
       <Flex maxW="1280px" alignSelf="center" flexDir="column" w="full">
         <Flex mb="1rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Vaults
+            Treasury
           </Text>
           <Button
             variant="primary"
@@ -39,7 +39,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           {loading ? (
             <LoaderSkeleton />
           ) : vaults ? (
-            <SimpleGrid columns={{xl: 4, md: 3, sm: 2 }} spacing={5}>
+            <SimpleGrid columns={{ xl: 4, md: 3, sm: 2 }} spacing={5}>
               {vaults.map((vault, index) => (
                 <ItemVault key={index} vault={vault} />
               ))}

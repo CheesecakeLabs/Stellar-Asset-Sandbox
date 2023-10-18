@@ -46,17 +46,27 @@ type (
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 		GetAssetById(string) (entity.Asset, error)
+		StoreAssetImage(string, []byte) error
+		GetAssetImage(string) ([]byte, error)
 	}
 
 	// Role -.
 	RoleRepoInterface interface {
 		GetRoles() ([]entity.Role, error)
+		CreateRole(entity.RoleRequest) (entity.RoleRequest, error)
+		UpdateRole(entity.Role) (entity.Role, error)
+		DeleteRole(entity.RoleDelete) (entity.RoleDelete, error)
+		GetRoleById(id int) (entity.Role, error)
 	}
 
 	// Role Permission-.
 	RolePermissionRepoInterface interface {
 		Validate(action string, roleId int) (bool, error)
-		GetRolePermissions(token string) ([]entity.RolePermissionResponse, error)
+		GetUserPermissions(token string) ([]entity.UserPermissionResponse, error)
+		GetRolesPermissions() ([]entity.RolePermissionResponse, error)
+		GetPermissions() ([]entity.Permission, error)
+		DeleteRolePermission(entity.RolePermissionRequest) (entity.RolePermissionRequest, error)
+		CreateRolePermission(entity.RolePermissionRequest) (entity.RolePermissionRequest, error)
 	}
 
 	VaultCategoryRepoInterface interface {
@@ -87,5 +97,8 @@ type (
 		GetLogTransactionsByTransactionTypeID(transactionTypeID int, timeRange string) ([]entity.LogTransaction, error)
 		SumLogTransactionsByAssetID(assetID int, timeRange string, timeFrame time.Duration, transactionType int) (entity.SumLogTransaction, error)
 		SumLogTransactions(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransaction, error)
+		GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error)
+		SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error)
+		LogTransactionSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error)
 	}
 )

@@ -1,70 +1,132 @@
-# Cheesecake Stellar Token Factory - V2
+<!-- PROJECT LOGO -->
+<br  />
+<p  align="center">
+<img  width="50%"  src="https://images.sympla.com.br/5d11137d98ce3.png"  alt="Logo">
+</p>
 
-The Cheesecake Stellar Token Factory - V2 is a comprehensive system designed for the creation and management of Stellar-based tokens. Its second version architecture combines advanced technologies to deliver a scalable, secure, and user-friendly platform.
+# Stellar Asset Sandbox
 
-## Components
+Brought to you by Cheesecake Labs and proudly supported by the Stellar
+Development Foundation, this sandbox is your gateway to
+enterprise-grade token management. Dive deep into the core
+functionalities of the Stellar network, specifically tailored for
+asset issuance.
 
-- **Postgres:** Our primary relational database for structured data management.
-- **Apache Kafka:** A distributed event store for real-time data processing and insights.
-- **UI for Apache Kafka:** An open-source web UI offering in-depth monitoring and management capabilities for Apache Kafka clusters.
-- **Frontend:** An interactive React Web application for a user-friendly experience.
-- **Backend:** A Golang backend that manages business logic, ranging from API endpoints to core Stellar token functions.
-- **Starlabs**: An exclusive Stellar service, integrated as a git submodule and written in Go. It centralizes Stellar network interactions, enhancing platform capabilities and ensuring consistent communication.
-- **KMS:** The CKL Key Management Service (KMS) safeguards cryptographic keys and other sensitive data.
+Stellar Asset Sandbox is composed by:
 
-### Topics
+- [Postgres](https://www.postgresql.org/): relational database
+- [Apache Kafka](https://kafka.apache.org/): Distributed event store
+- [UI for Apache Kafka](https://github.com/provectus/kafka-ui): open-source web UI to monitor and manage Apache Kafka clusters
+- [Frontend](./frontend/): Frontend service - React Web application
+- [Backend](./backend/): Backend service - Go
+- [Starlabs](./starlabs/): Starlabs service (git submodule) - Go
+- [KMS](./stellar-kms/): Stellar KMS service (git sobmodule) - Go
 
-For further details on functionalities, system requirements, and setup guides, refer to:
+# Topics
 
-- [Development Environment with Makefile](#development-environment-with-makefile)
-- [API Documentation](#api-documentation)
-- [Kafka Topics & Communication Flows](#kafka-topics--communication-flows)
+- [Getting started](#getting-started)
+  - [Requirements](#requirements)
+  - [Docker Desktop Recommendations](#docker-desktop-recommendations)
+  - [Git Submodules](#git-submodules)
+  - [Running application locally](#running-application-locally)
+  - [Kafka Topics & Communication Flows](#kafka-topics-&-communication-flows)
+- [Features](#features)
+  - [Role-based Access and Custody](#role-based-access-and-custody)
+  - [Token Management in the Sandbox](#token-management-in-the-sandbox)
+  - [Treasury Management in the Sandbox](#treasury-management-in-the-Sandbox)
+  - [Dashboards: Insights at Your Fingertips](#dashboards-insights-at-your-fingertips)
+  - [Role-based Access and Custody](#role-based-access-and-custody)
+  - [Soroban: The Next Evolution (Coming Soon)](#soroban-the-next-evolution-coming-soon)
 
-## Development Environment with Makefile
+# Getting started
 
-Our Makefile, in conjunction with Docker Compose, offers a set of commands to simplify the development workflow.
+## Requirements
 
-### Build and Start All Services
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Make](https://formulae.brew.sh/formula/make)
+
+## Docker Desktop Recommendations
+
+To run this project, there are some recommendations about the Docker Desktop resources configuration. You can find how to edit the resources settings [here](https://docs.docker.com/desktop/settings/mac/#resources).
+
+- CPUs: 4
+- Memory: 8GB
+
+## Git Submodules
+
+This project is using Git Submodules, that allow to keep a Git repository as a subdirectory of another Git repository. Currently, there is one submodule used in this project:
+
+- [Starlabs](./starlabs/)
+- [Stellar-KMS](./stellar-kms/)
+
+### Pull
 
 ```bash
-make dev-up-all
+git submodule init
+git submodule update
 ```
 
-### Build and Start Individual Services
-
-Invoke individual services using `make dev-up-[service-name]`:
-
-- Starlabs: `make dev-up-starlabs`
-- Tests: `make dev-up-tests` (Note: This command will execute tests and then exit.)
-- Kafka: `make dev-up-kafka`
-- Backend: `make dev-up-backend`
-- Frontend: `make dev-up-frontend`
-
-### Stop All Services
+### Upgrade to latest version
 
 ```bash
-make dev-stop
+git submodule update --remote
+git add .
+git commit -m "Upgrade to latest version"
 ```
 
-### Reset Development Environment
-
-**Warning**: This action deletes all data in the development environment.
+### Upgrade to specific version
 
 ```bash
-make dev-destroy
+cd packages/starlabs
+git checkout <version>
+git add .
+git commit -m "Upgrade to specific version"
 ```
 
-Modify the `dev.docker-compose.yml` file to adjust the Docker container configurations to your preferences.
+## Running application locally
 
-> **Note**: Ensure the `dev-env.sh` script is executable: `chmod +x dev-env.sh`.
+To start all the applications locally, follow these steps:
 
-### **API Documentation**
+**1.** To change and override pre-defined environment variables, you can create a `.env` file in the `KEY=VALUE` pair format in the `backend` directory, so Docker can pass these environment variables to the running applications. Check the `.env.example` to see available environment variables.
 
-The backend features Swagger documentation for an interactive overview and testing of the API endpoints.
+**2.** Build and up the `Starlabs`, `KMS`, and `Postgresql` from the dockerfile in the project root folder:
 
-#### Access the Swagger UI:
+```bash
+$ docker-compose -f dev.docker-compose.yml --profile starlabs build
+$ docker-compose -f dev.docker-compose.yml --profile starlabs up
+```
 
-Navigate to [http://localhost:8080/v1/swagger/index.html](http://localhost:8080/v1/swagger/index.html) for detailed insights into each API route.
+**3.** Run the backend from the `backend` folder:
+
+```bash
+$ go run .
+```
+
+**4.** Run the frontend from the `frontend` folder:
+
+```bash
+$ make start_dev
+```
+
+**5.** Create the sponsor wallet (This must be the first wallet created in the database, necessarily with ID 1):
+
+```bash
+$ POST http://127.0.0.1:8080/v1/wallets
+$ Body:
+    {
+      "type" : "sponsor"
+    }
+```
+
+**6.** Fund the sponsor wallet:
+
+```bash
+$ POST http://127.0.0.1:8080/v1/wallets/fund
+$ Body:
+    {
+      "id" : 1
+    }
+```
 
 ### **Kafka Topics & Communication Flows**
 
@@ -115,3 +177,105 @@ Apache Kafka plays a vital role in the Cheesecake Stellar Token Factory - V2 by 
 - **`submitResponse`**:
   - **Purpose**: Report transaction results from the Stellar network.
   - **Usage**: Communicate transaction results.
+
+## Features
+
+## Role-based Access and Custody
+
+The Stellar Asset Issuance Sandbox automates the management of all
+accounts and wallets involved in the process of asset creation and
+treasury management. Users register with their email addresses and are
+granted access to specific platform features based on their assigned
+roles and permissions.
+
+<b>Admins</b>: Have the authority to customize permissions and create new roles to fit different operational needs.
+
+<b>Default Roles</b>: The platform comes with predefined roles such as Asset Manager and Treasurer, each with its set of permissions.
+
+This role-based system is designed to demonstrate the various operational structures an asset issuance platform can adopt, serving as an educational example for enterprise solutions.
+
+## Token Management in the Sandbox
+
+The Stellar Asset Issuance Sandbox provides a comprehensive suite of
+tools for token management, allowing Asset Managers to tailor tokens
+to specific needs and operational structures:
+
+<b>Token Creation</b>: Design tokens with distinct profiles and
+characteristics, ensuring they align with your business objectives or
+experimental goals.
+
+<b>Supply Management</b>: Adjust the supply of your tokens with ease,
+whether you need to mint new tokens or burn existing ones.
+
+<b>Distribution</b>: Seamlessly distribute tokens to vaults within the
+platform or to external Stellar accounts, facilitating a wide range of
+transactional scenarios.
+
+<b>Access Control</b>: Manage who can access and interact with your
+tokens. Define and enforce permissions, ensuring that only authorized
+entities can perform specific actions.
+
+With these features, the sandbox offers a hands-on experience in
+managing tokens on the Stellar network, demonstrating the flexibility
+and potential of the platform.
+
+## Treasury Management in the Sandbox
+
+The Stellar Asset Issuance Sandbox introduces a robust treasury
+management system, empowering treasurers with the tools they need to
+efficiently handle assets:
+
+<b>Vault Creation</b>: Treasurers can establish vaults, which serve as
+abstract representations of Stellar accounts within the platform.
+
+<b>Token Allocation</b>: Define which tokens a vault can hold,
+ensuring compatibility and alignment with operational needs.
+
+<b>Fund Transfers</b>: Vaults have the capability to send and receive
+funds, facilitating transactions both with other vaults on the
+platform and with external Stellar accounts.
+
+<b>Transaction History</b>: Every transaction made by a vault is
+meticulously recorded. Treasurers can easily track and review the
+history of transactions, ensuring transparency and accountability.
+Through these features, the sandbox provides a practical understanding
+of how treasuries can be managed on the Stellar network, showcasing
+the network's adaptability for diverse financial operations.
+
+## Dashboards: Insights at Your Fingertips
+
+The Stellar Asset Issuance Sandbox equips users with comprehensive
+dashboards that illuminate both the overarching activity within the
+platform and the intricate details of individual tokens.
+
+Gain a bird's-eye view with insights into the overall transactions and
+usage of the sandbox. These visual representations capture trends,
+peaks, and patterns in asset transactions, offering a snapshot of the
+broader dynamics at play. For those seeking a deeper dive, the
+platform provides asset-specific charts that shed light on the
+performance and utilization of each token created within the sandbox.
+Users can explore metrics such as transaction volume, top holders, and
+the current supply of each token, tracking any mints or burns to
+understand supply dynamics over time.
+
+With the Stellar Asset Issuance Sandbox dashboards, users are
+empowered to make informed decisions, monitor the repercussions of
+their actions, and delve into the Stellar network's prowess in asset management.
+
+## Soroban: The Next Evolution (Coming Soon)
+
+Prepare to unlock a new dimension of possibilities with the Stellar
+network. We're excited to announce that the Stellar Asset Issuance
+Sandbox will soon integrate features powered by Soroban, Stellar's
+upcoming smart contracts platform.
+
+Soroban promises to revolutionize the Stellar ecosystem by introducing
+enhanced programmability, paving the way for more intricate and
+diverse use cases to be constructed. With this integration, users will
+be able to explore and experiment with the advanced functionalities
+that smart contracts bring to the table, further expanding the
+horizons of what's achievable on the Stellar network.
+
+Stay tuned for this transformative update, as we continue our
+commitment to providing the best educational and experimental platform
+for Stellar enthusiasts and professionals alike.

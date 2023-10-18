@@ -6,12 +6,14 @@ import {
   getCurrencyIcon,
 } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
-import { InfoCard } from '../contracts-detail/components/info-card'
-import { ChartPayments } from './components/chart-payments'
 import { LinkIcon, WalletIcon } from 'components/icons'
 import { TChartPeriod } from 'components/molecules/chart-period'
+
+import { ChartPayments } from '../../molecules/chart-payments'
+import { InfoCard } from '../../molecules/info-card'
 
 interface IAssetHomeTemplate {
   loading: boolean
@@ -104,7 +106,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
               </Text>
               <Flex gap={2}>
                 {asset.assetData?.flags.auth_required && (
-                  <Tag variant={'actived'}>Authorize Required</Tag>
+                  <Tag variant={'actived'}>Authorize required</Tag>
                 )}
                 {asset.assetData?.flags.auth_clawback_enabled && (
                   <Tag variant={'actived'}>Clawback enabled</Tag>
@@ -123,11 +125,13 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
           title={`Total Supply`}
           icon={<WalletIcon />}
           value={toCrypto(Number(asset.assetData?.amount || 0))}
+          helper={TooltipsData.totalSupply}
         />
         <InfoCard
           title={`Main Vault`}
           icon={<WalletIcon />}
           value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
+          helper={TooltipsData.mainVault}
         />
       </Flex>
 

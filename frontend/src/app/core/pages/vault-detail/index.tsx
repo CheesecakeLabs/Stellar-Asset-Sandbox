@@ -4,9 +4,11 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useAuth } from 'hooks/useAuth'
 import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toFixedCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -15,6 +17,8 @@ import { VaultDetailTemplate } from 'components/templates/vault-detail'
 export const VaultDetail: React.FC = () => {
   const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault>()
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [vaultsByAsset, setVaultsByAsset] =
+    useState<Hooks.UseVaultsTypes.IVault[]>()
   const [vaultCategories, setVaultCategories] =
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayments>()
@@ -24,8 +28,16 @@ export const VaultDetail: React.FC = () => {
   const navigate = useNavigate()
 
   const { id } = useParams()
-  const { loadingAssets, loadingOperation, assets, getAssets, distribute } =
-    useAssets()
+  const {
+    loadingAssets,
+    loadingOperation,
+    assets,
+    getAssets,
+    distribute,
+    getAssetById,
+  } = useAssets()
+  const { loadingUserPermissions, userPermissions, getUserPermissions } =
+    useAuth()
   const {
     loadingVault,
     loadingVaults,
@@ -40,25 +52,30 @@ export const VaultDetail: React.FC = () => {
     updateVaultAssets,
     deleteVault,
   } = useVaults()
-  const { loadingHorizon, getPaymentsData } = useHorizon()
+  const { loadingHorizon, getPaymentsData, getAssetAccounts } = useHorizon()
 
   const [selectedAsset, setSelectedAsset] =
     useState<Hooks.UseAssetsTypes.IAssetDto>()
 
   const onSubmit = async (
-    data: FieldValues,
+    amount: string,
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void> => {
     try {
-      if (!selectedAsset) return
+      if (!selectedAsset || !wallet) return
+
+      const assetData = await getAssetById(selectedAsset.id.toString())
 
       const isSuccess = await distribute({
         source_wallet_id: vault?.wallet.id,
-        destination_wallet_pk: wallet ? wallet : data.destination_wallet_id,
+        destination_wallet_pk: wallet,
         asset_id: selectedAsset.id.toString(),
         sponsor_id: 1,
-        amount: data.amount,
+        amount: toFixedCrypto(amount),
+        current_supply: Number(assetData?.assetData?.amount || 0),
+        current_main_vault:
+          Number(assetData?.distributorBalance?.balance || 0) - Number(amount),
       })
 
       if (isSuccess) {
@@ -67,7 +84,7 @@ export const VaultDetail: React.FC = () => {
 
         toast({
           title: 'Distribute success!',
-          description: `You distributed ${data.amount} ${selectedAsset.code}`,
+          description: `You distributed ${amount} ${selectedAsset.code}`,
           status: 'success',
           duration: 9000,
           isClosable: true,
@@ -282,6 +299,10 @@ export const VaultDetail: React.FC = () => {
     }
   }, [getPaymentsData, vault])
 
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
   const getPaymentsDataByLink = (action: 'prev' | 'next'): void => {
     const link =
       action === 'next'
@@ -303,6 +324,48 @@ export const VaultDetail: React.FC = () => {
     }
   }
 
+  const changeAsset = async (
+    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+  ): Promise<void> => {
+    if (!asset) {
+      setSelectedAsset(undefined)
+      return
+    }
+    const assetAccounts = await getAssetAccounts(
+      asset.code,
+      asset.issuer.key.publicKey
+    )
+    const vaults = await getVaults()
+    const filteredVaults =
+      vaults
+        ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
+          assetAccounts
+            ?.find(
+              assetAccount => assetAccount.id === vault.wallet.key.publicKey
+            )
+            ?.balances.some(
+              balance =>
+                balance.asset_code === asset.code &&
+                balance.asset_issuer === asset.issuer.key.publicKey
+            )
+        )
+        .map(vault => ({
+          ...vault,
+          isUnauthorized:
+            assetAccounts
+              ?.find(
+                assetAccount => assetAccount.id === vault.wallet.key.publicKey
+              )
+              ?.balances.find(
+                balance =>
+                  balance.asset_code === asset.code &&
+                  balance.asset_issuer === asset.issuer.key.publicKey
+              )?.is_authorized === false || false,
+        })) || []
+    setVaultsByAsset(filteredVaults)
+    setSelectedAsset(asset)
+  }
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.VAULTS}>
@@ -321,13 +384,16 @@ export const VaultDetail: React.FC = () => {
           updatingVaultAssets={updatingVaultAssets}
           deletingVault={deletingVault}
           isPrevDisabled={historyNavPayments.length === 0}
+          loadingUserPermissions={loadingUserPermissions}
+          userPermissions={userPermissions}
+          vaultsByAsset={vaultsByAsset}
           onSubmit={onSubmit}
-          setSelectedAsset={setSelectedAsset}
           createVaultCategory={createVaultCategory}
           onUpdateVault={onUpdateVault}
           onUpdateVaultAssets={onUpdateVaultAssets}
           onDeleteVault={onDeleteVault}
           getPaymentsDataByLink={getPaymentsDataByLink}
+          changeAsset={changeAsset}
         />
       </Sidebar>
     </Flex>
