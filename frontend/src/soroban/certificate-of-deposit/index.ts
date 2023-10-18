@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { sorobanConfig, Address, channelAccounts } from '../constants'
+import { sorobanConfig, Address, channelAccounts, I128 } from '../constants'
 import { IInvokeSorobanArgs, invokeSoroban, simulateSorobanTx } from '../index'
 import {
   IAccountQuotaReleaseData,
@@ -9,7 +9,7 @@ import {
   spec,
 } from './constants'
 
-const invokeAssetController = async (
+const invokeCertificateOfDeposit = async (
   method: Methods,
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   args?: any,
@@ -37,30 +37,31 @@ const invokeAssetController = async (
     : invokeSoroban(invokeArgs)
 }
 
-const getQuota = async (
-  rawArgs: { id: string },
-  options?: { signWithFreighter?: boolean; simulateTx?: boolean },
-  channel?: number
-): Promise<bigint[]> => {
+const deposit = async (rawArgs: {
+  amount: I128
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
   const args = {
-    id: new Address(rawArgs.id),
+    address: new Address(rawArgs.address),
+    amount: rawArgs.amount,
   }
 
-  const result: any = await invokeAssetController(
-    Methods.get_quota,
-    options,
-    args,
-    channel
-  )
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId,
+    spec,
+    method: Methods.deposit,
+    sourcePk: rawArgs.address,
+  }
 
-  const output = options?.simulateTx
-    ? spec.funcResToNative(Methods.get_quota, result.result?.retval)
-    : spec.funcResToNative(
-        Methods.get_quota,
-        result.resultMetaXdr.v3().sorobanMeta()?.returnValue().toXDR('base64')
-      )
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
 
-  return output
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
 }
 
 const getQuotaReleaseTime = async (
@@ -72,7 +73,7 @@ const getQuotaReleaseTime = async (
     id: new Address(rawArgs.id),
   }
 
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_quota_release_time,
     options,
     args,
@@ -101,7 +102,7 @@ const getAccountProbationPeriod = async (
     id: new Address(rawArgs.id),
   }
 
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_account_probation_period,
     options,
     args,
@@ -125,7 +126,7 @@ const getProbationPeriod = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<bigint> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_probation_period,
     options,
     channel
@@ -145,7 +146,7 @@ const getQuotaTimeLimit = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<bigint> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_quota_time_limit,
     options,
     channel
@@ -165,7 +166,7 @@ const getInflowLimit = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<bigint> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_inflow_limit,
     options,
     channel
@@ -185,7 +186,7 @@ const getOutflowLimit = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<bigint> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_outflow_limit,
     options,
     channel
@@ -205,7 +206,7 @@ const getAsset = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<string> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_asset,
     options,
     channel
@@ -225,7 +226,7 @@ const getAdmin = async (
   options?: { signWithFreighter?: boolean; simulateTx?: boolean },
   channel?: number
 ): Promise<string> => {
-  const result: any = await invokeAssetController(
+  const result: any = await invokeCertificateOfDeposit(
     Methods.get_admin,
     options,
     channel

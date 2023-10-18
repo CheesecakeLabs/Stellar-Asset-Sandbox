@@ -1,9 +1,12 @@
-import * as SorobanClient from 'soroban-client'
-import { ContractSpec, SorobanRpc, xdr, hash } from 'soroban-client'
+import * as SorobanClient from 'soroban-client';
+import { ContractSpec, SorobanRpc, xdr, hash } from 'soroban-client';
 
-import { FREIGHTER } from './Freighter'
-import { SELECTED_NETWORK } from './StellarHelpers'
-import { sorobanConfig } from './constants'
+
+
+import { FREIGHTER } from './Freighter';
+import { SELECTED_NETWORK } from './StellarHelpers';
+import { sorobanConfig } from './constants';
+
 
 const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
   allowHttp: true,
@@ -185,10 +188,7 @@ export const invokeSoroban = async (
 export const wrapClassicAsset = async (wrapArgs: {
   assetCode: string
   assetIssuerPk: string
-}): Promise<
-  | SorobanClient.SorobanRpc.GetTransactionResponse
-  | SorobanClient.SorobanRpc.GetTransactionStatus
-> => {
+}): Promise<string> => {
   const asset = new SorobanClient.Asset(
     wrapArgs.assetCode,
     wrapArgs.assetIssuerPk
@@ -223,7 +223,7 @@ export const wrapClassicAsset = async (wrapArgs: {
   }
   const operation = SorobanClient.Operation.invokeHostFunction(options)
 
-  const sourceAccount = await server.getAccount(sorobanConfig.admin.pk)
+  const sourceAccount = await server.getAccount(sponsor)
 
   const transaction = new SorobanClient.TransactionBuilder(sourceAccount, {
     fee: sorobanConfig.fee,
@@ -235,12 +235,10 @@ export const wrapClassicAsset = async (wrapArgs: {
 
   try {
     const preparedTransaction = await server.prepareTransaction(transaction)
-    const signedTx = await signWithSecret(
-      preparedTransaction,
-      sorobanConfig.admin.sk
-    )
+    const signedTx = await signWithSecret(preparedTransaction, sponsor)
 
-    return await submitSorobanTx(signedTx)
+    await submitSorobanTx(signedTx)
+    return contractId
   } catch (e) {
     console.log('Wraping of asset ${wrapArgs.code} failed: ', e)
     throw e

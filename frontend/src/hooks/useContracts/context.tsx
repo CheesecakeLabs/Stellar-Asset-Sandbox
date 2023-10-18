@@ -2,6 +2,7 @@ import { SetStateAction, createContext, useCallback, useState } from 'react'
 
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
+import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
 import { MessagesError } from 'utils/constants/messages-error'
 import { mockContracts } from 'utils/mockups'
 
@@ -77,21 +78,15 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     amount: bigint,
     address: string,
     updatePosition: void,
-    signerSecret: string
+    signerSecret?: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      await certificatesOfDeposit.deposit(
-        {
-          amount: amount * BigInt(10000000),
-          address: address,
-        },
-        {
-          fee: 10000,
-          secondsToWait: 300,
-          signerSecret: signerSecret,
-        }
-      )
+      await certificateOfDepositClient.deposit({
+        amount: amount * BigInt(10000000),
+        address: address,
+        signerSecret: signerSecret,
+      })
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
