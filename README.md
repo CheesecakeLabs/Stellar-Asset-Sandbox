@@ -12,8 +12,8 @@ enterprise-grade token management. Dive deep into the core
 functionalities of the Stellar network, specifically tailored for
 asset issuance.
 
-
 Stellar Asset Sandbox is composed by:
+
 - [Postgres](https://www.postgresql.org/): relational database
 - [Apache Kafka](https://kafka.apache.org/): Distributed event store
 - [UI for Apache Kafka](https://github.com/provectus/kafka-ui): open-source web UI to monitor and manage Apache Kafka clusters
@@ -29,6 +29,7 @@ Stellar Asset Sandbox is composed by:
   - [Docker Desktop Recommendations](#docker-desktop-recommendations)
   - [Git Submodules](#git-submodules)
   - [Running application locally](#running-application-locally)
+  - [Kafka Topics & Communication Flows](#kafka-topics-&-communication-flows)
 - [Features](#features)
   - [Role-based Access and Custody](#role-based-access-and-custody)
   - [Token Management in the Sandbox](#token-management-in-the-sandbox)
@@ -47,14 +48,16 @@ Stellar Asset Sandbox is composed by:
 ## Docker Desktop Recommendations
 
 To run this project, there are some recommendations about the Docker Desktop resources configuration. You can find how to edit the resources settings [here](https://docs.docker.com/desktop/settings/mac/#resources).
-* CPUs: 4
-* Memory: 8GB
+
+- CPUs: 4
+- Memory: 8GB
 
 ## Git Submodules
 
 This project is using Git Submodules, that allow to keep a Git repository as a subdirectory of another Git repository. Currently, there is one submodule used in this project:
-* [Starlabs](./starlabs/)
-* [Stellar-KMS](./stellar-kms/)
+
+- [Starlabs](./starlabs/)
+- [Stellar-KMS](./stellar-kms/)
 
 ### Pull
 
@@ -75,7 +78,7 @@ git commit -m "Upgrade to latest version"
 
 ```bash
 cd packages/starlabs
-git checkout <version>      
+git checkout <version>
 git add .
 git commit -m "Upgrade to specific version"
 ```
@@ -91,9 +94,10 @@ To start all the applications locally, follow these steps:
 ```bash
 $ docker-compose -f dev.docker-compose.yml --profile starlabs build
 $ docker-compose -f dev.docker-compose.yml --profile starlabs up
-``` 
+```
 
 **3.** Run the backend from the `backend` folder:
+
 ```bash
 $ go run .
 ```
@@ -108,7 +112,7 @@ $ make start_dev
 
 ```bash
 $ POST http://127.0.0.1:8080/v1/wallets
-$ Body: 
+$ Body:
     {
       "type" : "sponsor"
     }
@@ -118,11 +122,61 @@ $ Body:
 
 ```bash
 $ POST http://127.0.0.1:8080/v1/wallets/fund
-$ Body: 
+$ Body:
     {
       "id" : 1
     }
 ```
+
+### **Kafka Topics & Communication Flows**
+
+Apache Kafka plays a vital role in the Cheesecake Stellar Token Factory - V2 by enabling asynchronous data processing and efficient communication among components. Below are key Kafka topics and their communication pathways:
+
+#### **Backend to Stellar KMS**:
+
+- **`generateKeypair`**:
+  - **Purpose**: Generate a new Stellar key pair.
+  - **Usage**: Triggered when a new key pair is required.
+
+#### **Stellar KMS to Backend**:
+
+- **`generatedKeypairs`**:
+  - **Purpose**: Announce a newly generated key pair.
+  - **Usage**: Used after a key pair is stored securely.
+
+#### **Backend to Starlabs**:
+
+- **`createEnvelope`**:
+
+  - **Purpose**: Handle transaction envelope creation.
+  - **Usage**: Process messages detailing transactions for envelope generation.
+
+- **`horizonRequest`**:
+  - **Purpose**: Manage GET requests to the Stellar Horizon server.
+  - **Usage**: Fetch account or transaction details.
+
+#### **Starlabs to KMS**:
+
+- **`signEnvelope`**:
+  - **Purpose**: Handle transaction envelope signing requests.
+  - **Usage**: Process unsigned transaction envelopes awaiting signatures.
+
+#### **KMS to Starlabs**:
+
+- **`signedEnvelopes`**:
+  - **Purpose**: Communicate signed transaction envelopes.
+  - **Usage**: Services monitoring signed envelopes use this topic.
+
+#### **Starlabs to Backend**:
+
+- **`horizonResponse`**:
+
+  - **Purpose**: Relay Stellar Horizon server responses.
+  - **Usage**: Communicate fetched account data and other Horizon responses.
+
+- **`submitResponse`**:
+  - **Purpose**: Report transaction results from the Stellar network.
+  - **Usage**: Communicate transaction results.
 
 ## Features
 
@@ -166,6 +220,7 @@ managing tokens on the Stellar network, demonstrating the flexibility
 and potential of the platform.
 
 ## Treasury Management in the Sandbox
+
 The Stellar Asset Issuance Sandbox introduces a robust treasury
 management system, empowering treasurers with the tools they need to
 efficiently handle assets:

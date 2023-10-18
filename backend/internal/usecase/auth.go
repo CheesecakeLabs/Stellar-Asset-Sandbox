@@ -1,6 +1,8 @@
 package usecase
 
-import "github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+import (
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+)
 
 // Auth Use Case
 type AuthUseCase struct {
@@ -27,7 +29,7 @@ func (uc *AuthUseCase) UpdateToken(id string, token string) error {
 func (uc *AuthUseCase) ValidateToken() string {
 	err := uc.repo.ValidateToken(uc.jwtSecretKey)
 	if err != nil {
-		return ""
+		return "invalid token"
 	}
 	return uc.jwtSecretKey
 }

@@ -34,25 +34,26 @@ func (uc *UserUseCase) Detail(email string) (entity.User, error) {
 // CreateUser - creating user.
 func (uc *UserUseCase) CreateUser(user entity.User) error {
 	var err error
-	if user.Password == "" {
-		return fmt.Errorf("password is empty")
-	}
 	user.Password, err = uc.HashPassword(user.Password)
 	if err != nil {
 		return err
 	}
-	uc.repo.CreateUser(user)
+	err = uc.repo.CreateUser(user)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (uc *UserUseCase) Autentication(email string, password string) (user entity.User, err error) {
 	user, err = uc.repo.GetUser(email)
 	if err != nil {
-		return user, err
+		fmt.Println("Oi")
+		return user, fmt.Errorf("email or password incorrect")
 	}
 	err = uc.CheckPassword(user, password)
 	if err != nil {
-		return
+		return entity.User{}, fmt.Errorf("email or password incorrect")
 	}
 	return
 }

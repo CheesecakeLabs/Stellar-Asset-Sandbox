@@ -530,6 +530,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)

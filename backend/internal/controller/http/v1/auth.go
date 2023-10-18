@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -25,15 +26,15 @@ func ValidateToken(signedToken string, jwtSecretKey string) (err error) {
 		},
 	)
 	if err != nil {
-		return
+		return err
 	}
 	_, ok := token.Claims.(*JWTClaim)
 	if !ok {
 		err = errors.New("couldn't parse claims")
-		return
+		return err
 	}
 
-	return
+	return nil
 }
 
 func GenerateJWT(user entity.User, jwtSecretKey string) (tokenString string, err error) {
@@ -55,13 +56,13 @@ func Auth(jwtSecretKey string) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenString := context.GetHeader("Authorization")
 		if tokenString == "" {
-			context.JSON(401, gin.H{"error": "request does not contain an access token"})
+			context.String(http.StatusUnauthorized, "Unauthorized")
 			context.Abort()
 			return
 		}
 		err := ValidateToken(tokenString, jwtSecretKey)
 		if err != nil {
-			context.JSON(401, gin.H{"error": err.Error()})
+			context.String(http.StatusUnauthorized, err.Error())
 			context.Abort()
 			return
 		}

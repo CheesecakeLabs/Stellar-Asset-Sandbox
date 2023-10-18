@@ -44,8 +44,7 @@ func (r UserRepo) CreateUser(user entity.User) error {
 	stmt := `INSERT INTO UserAccount (name, password, role_id, email, token) VALUES ($1, $2, $3, $4, $5)`
 	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId, user.Email, user.Token)
 	if err != nil {
-		panic(err)
-		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
 	}
 	fmt.Println("User created successfully")
 	return nil
@@ -72,7 +71,7 @@ func (r UserRepo) ValidateToken(token string) error {
 
 	defer rows.Close()
 
-	// Check if any row was returned
+	// Check if rows is empty
 	if !rows.Next() {
 		return errors.New("UserRepo - ValidateToken - no user found for token")
 	}
