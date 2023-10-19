@@ -168,6 +168,8 @@ services:
       KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
       KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
       KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
+      KAFKA_SIGN_SOROBAN_TRANSACTION_CONSUMER_TOPICS: ${KAFKA_SIGN_SOROBAN_TRANSACTION_CONSUMER_TOPICS:-signSorobanTransaction}
+      KAFKA_SIGN_SOROBAN_TRANSACTION_PRODUCER_TOPIC: ${KAFKA_SIGN_SOROBAN_TRANSACTION_PRODUCER_TOPIC:-signedSorobanTransaction}
 
     depends_on:
       kafka1:
@@ -182,6 +184,8 @@ services:
       kafka-topics --create --topic $$KAFKA_ENVELOPE_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_SIGN_SOROBAN_TRANSACTION_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_SIGN_SOROBAN_TRANSACTION_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka1 cub kafka-ready -b kafka1:129092 1 20
       "
 
