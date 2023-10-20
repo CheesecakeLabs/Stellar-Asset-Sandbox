@@ -128,14 +128,14 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
             <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
               Forge Asset
             </Text>
-            <Button
+            {/*<Button
               variant="secondary"
               onClick={(): void => {
                 setRunTour(true)
               }}
             >
               Help to create my first asset
-            </Button>
+            </Button>*/}
           </Flex>
           {errorSubmit && (
             <Alert mb="0.75rem" status="error">

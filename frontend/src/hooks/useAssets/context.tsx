@@ -225,7 +225,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const retrieveToml = useCallback(async (): Promise<Blob> => {
+  const retrieveToml = useCallback(async (): Promise<Blob | undefined> => {
     try {
       const response = await axios
         .create({
@@ -234,15 +234,17 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         })
         .get(`/.well-known/stellar.toml`)
 
-      const file = new Blob([response.data], { type: 'application/txt' })
+      if (response.data) {
+        const file = new Blob([response.data], { type: 'application/txt' })
 
-      const reader = new FileReader()
-      reader.readAsText(file)
-      reader.onload = (): void => {
-        document.body.innerText = reader.result as string
+        const reader = new FileReader()
+        reader.readAsText(file)
+        reader.onload = (): void => {
+          document.body.innerText = reader.result as string
+        }
+
+        return response.data
       }
-
-      return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
