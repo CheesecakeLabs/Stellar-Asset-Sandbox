@@ -235,8 +235,12 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         .get(`/.well-known/stellar.toml`)
 
       const file = new Blob([response.data], { type: 'application/txt' })
-      const fileURL = URL.createObjectURL(file)
-      window.location.href = fileURL
+
+      const reader = new FileReader()
+      reader.readAsText(file)
+      reader.onload = (): void => {
+        document.body.innerText = reader.result as string
+      }
 
       return response.data
     } catch (error) {
