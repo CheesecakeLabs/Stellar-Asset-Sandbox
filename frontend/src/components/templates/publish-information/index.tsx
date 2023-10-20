@@ -185,7 +185,7 @@ export const PublishInformationTemplate: React.FC<
             <ItemToml
               title={'Max number'}
               description={
-                'Max number of tokens, if there will never be more than max_number tokens'
+                'Max number of tokens, defining the upper limit for the total circulating supply.'
               }
             >
               <Input
