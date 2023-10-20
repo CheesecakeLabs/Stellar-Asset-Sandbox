@@ -19,7 +19,7 @@ export const Button = {
       color: 'primary.normal',
       border: '1px solid',
       borderColor: 'primary.normal',
-      height: '2.125rem',
+      height: '2.75rem',
       fontWeight: '500',
       fontSize: 'sm',
       borderRadius: '0.25rem',

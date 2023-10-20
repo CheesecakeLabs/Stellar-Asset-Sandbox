@@ -1,15 +1,10 @@
-import { createContext, useCallback, useState } from 'react';
+import { createContext, useCallback, useState } from 'react'
 
+import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
+import { MessagesError } from 'utils/constants/messages-error'
 
-
-import axios from 'axios';
-import { useHorizon } from 'hooks/useHorizon';
-import { MessagesError } from 'utils/constants/messages-error';
-
-
-
-import { BASE_URL, http } from 'interfaces/http';
-
+import { BASE_URL, http } from 'interfaces/http'
 
 export const AssetsContext = createContext(
   {} as Hooks.UseAssetsTypes.IAssetsContext
@@ -241,7 +236,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
 
       const file = new Blob([response.data], { type: 'application/txt' })
       const fileURL = URL.createObjectURL(file)
-        window.location.href = fileURL
+      window.location.href = fileURL
 
       return response.data
     } catch (error) {
@@ -269,6 +264,21 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       }
     }, [])
 
+  const updateImage = async (id: number, image: unknown): Promise<boolean> => {
+    setLoadingOperation(true)
+    try {
+      const response = await http.post(`assets/${id}/image`, { image: image })
+      return response.status === 200
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoadingOperation(false)
+    }
+  }
+
   return (
     <AssetsContext.Provider
       value={{
@@ -288,6 +298,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         generateToml,
         retrieveToml,
         getTomlData,
+        updateImage,
       }}
     >
       {children}

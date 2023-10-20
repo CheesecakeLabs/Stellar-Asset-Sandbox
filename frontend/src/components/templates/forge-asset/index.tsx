@@ -23,7 +23,7 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
 
-import { UploadImage } from './components/upload-image'
+import { UploadImage } from '../../molecules/upload-image'
 import { RadioCard } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
 

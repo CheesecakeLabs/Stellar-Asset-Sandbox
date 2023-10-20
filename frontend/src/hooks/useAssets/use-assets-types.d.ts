@@ -97,22 +97,28 @@ declare namespace Hooks {
       anchor_asset_type: string
       anchor_asset: string
       attestation_of_reserve: string
+      max_number: number | null
+      is_unlimited: boolean
     }
 
     interface ITomlData {
       currencies: ITomlCurrency[]
     }
 
+    interface ICurrencies {
+      code: string
+      issuer: string
+      desc: string
+      anchor_asset: string
+      anchor_asset_type: string
+      is_asset_anchored: boolean
+      attestation_of_reserve: string
+      max_number: number
+      is_unlimited: boolean
+    }
+
     interface ITomlFile {
-      CURRENCIES: {
-        code: string
-        issuer: string
-        desc: string
-        anchor_asset: string
-        anchor_asset_type: string
-        is_asset_anchored: boolean
-        attestation_of_reserve: string
-      }[]
+      CURRENCIES: ICurrencies[]
     }
 
     interface IAssetsContext {
@@ -132,6 +138,7 @@ declare namespace Hooks {
       generateToml: (params: ITomlData) => Promise<boolean>
       retrieveToml: () => Promise<Blob | undefined>
       getTomlData: () => Promise<ITomlFile | undefined>
+      updateImage: (id: number, image: unknown) => Promise<boolean>
     }
   }
 }

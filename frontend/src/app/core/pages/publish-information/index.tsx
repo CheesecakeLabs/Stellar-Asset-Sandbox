@@ -6,13 +6,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { havePermission } from 'utils'
-import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
-import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -37,8 +35,9 @@ export const PublishInformation: React.FC = () => {
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>,
-    isAssetAnchored: boolean
+    isAssetAnchored: boolean,
+    isUnlimited: boolean,
+    setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
     try {
       const isSuccess = await generateToml({
@@ -52,6 +51,8 @@ export const PublishInformation: React.FC = () => {
             anchor_asset_type: isAssetAnchored ? data.anchor_asset_type : null,
             anchor_asset: isAssetAnchored ? data.anchor_asset : null,
             attestation_of_reserve: data.attestation_of_reserve,
+            max_number: data.max_number ? Number(data?.max_number || 0) : null,
+            is_unlimited: isUnlimited,
           },
         ],
       })
@@ -112,7 +113,12 @@ export const PublishInformation: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Publish information'} />
             {(loadingAsset && !asset) || !asset ? (
@@ -133,10 +139,6 @@ export const PublishInformation: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Publish Information'}
-              description={mintHelper}
-            />
           </VStack>
         </Flex>
       </Sidebar>

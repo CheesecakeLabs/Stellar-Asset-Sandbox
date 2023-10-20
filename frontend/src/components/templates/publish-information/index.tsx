@@ -9,20 +9,28 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
+import { ItemToml } from './components/item-toml'
+import { SelectAnchorType } from './components/select-anchor-type'
 import { AssetHeader } from 'components/atoms'
 
 interface IPublishInformationTemplate {
   onSubmit(
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>,
-    isAssetAnchored: boolean
+    isAssetAnchored: boolean,
+    isUnlimited: boolean,
+    setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   tomlData: Hooks.UseAssetsTypes.ITomlFile | undefined
+}
+
+export interface IOption {
+  readonly label: string
+  readonly value: string
 }
 
 export const PublishInformationTemplate: React.FC<
@@ -36,24 +44,43 @@ export const PublishInformationTemplate: React.FC<
   } = useForm()
 
   const [isAssetAnchored, setIsAssetAnchored] = useState(false)
+  const [isUnlimited, setIsUnlimited] = useState(false)
 
-  useEffect(() => {
-    const currency = tomlData?.CURRENCIES?.find(
+  const anchorTypes = [
+    'FIAT',
+    'Crypto',
+    'NFT',
+    'Stock',
+    'Bond',
+    'Commodity',
+    'Realestate',
+  ]
+
+  const getCurrency = useCallback(():
+    | Hooks.UseAssetsTypes.ICurrencies
+    | undefined => {
+    return tomlData?.CURRENCIES?.find(
       currency =>
         currency.code === asset.code &&
         currency.issuer === asset.issuer.key.publicKey
     )
+  }, [asset.code, asset.issuer.key.publicKey, tomlData?.CURRENCIES])
+
+  useEffect(() => {
+    const currency = getCurrency()
 
     if (currency) {
       setValue('desc', currency.desc)
       setValue('attestation_of_reserve', currency.attestation_of_reserve)
+      setValue('max_number', currency.max_number)
+      setIsUnlimited(currency.is_unlimited)
       if (currency.is_asset_anchored) {
         setIsAssetAnchored(currency.is_asset_anchored)
         setValue('anchor_asset_type', currency.anchor_asset_type)
         setValue('anchor_asset', currency.anchor_asset)
       }
     }
-  }, [asset.code, asset.issuer.key.publicKey, setValue, tomlData])
+  }, [getCurrency, setValue])
 
   return (
     <Flex flexDir="column" w="full">
@@ -62,7 +89,7 @@ export const PublishInformationTemplate: React.FC<
         <Box p="1rem" w="full">
           <form
             onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue, isAssetAnchored)
+              onSubmit(data, isAssetAnchored, isUnlimited, setValue)
             })}
           >
             <FormControl isInvalid={errors?.amount !== undefined}>
@@ -76,54 +103,98 @@ export const PublishInformationTemplate: React.FC<
               />
             </FormControl>
 
-            <FormControl mt="1.5rem">
-              <Flex justifyContent="space-between" w="full" px="0.25rem">
-                <FormLabel>Attestation of reserve</FormLabel>
-              </Flex>
+            <ItemToml
+              title={'Attestation of reserve'}
+              description={
+                'URL to attestation or other proof, evidence, or verification of reserves, such as third-party audits.'
+              }
+            >
               <Input
                 placeholder="URL"
                 autoComplete="off"
                 {...register('attestation_of_reserve')}
               />
-            </FormControl>
+            </ItemToml>
 
-            <Checkbox
-              variant="highlight"
-              me="1rem"
-              mt="1.5rem"
-              isChecked={isAssetAnchored}
-              onChange={(event): void => {
-                setIsAssetAnchored(event.target.checked)
-              }}
+            <ItemToml
+              title={'Is anchored'}
+              description={
+                'true if token can be redeemed for underlying asset, otherwise false'
+              }
             >
-              Is anchored?
-            </Checkbox>
+              <Checkbox
+                variant="highlight"
+                me="1rem"
+                isChecked={isAssetAnchored}
+                onChange={(event): void => {
+                  setIsAssetAnchored(event.target.checked)
+                }}
+              >
+                Is anchored?
+              </Checkbox>
+            </ItemToml>
 
             {isAssetAnchored && (
               <>
-                <FormControl mt="1.5rem">
-                  <Flex justifyContent="space-between" w="full" px="0.25rem">
-                    <FormLabel>Anchor asset type</FormLabel>
-                  </Flex>
-                  <Input
-                    placeholder="fiat, crypto, nft..."
-                    autoComplete="off"
-                    {...register('anchor_asset_type')}
+                <ItemToml
+                  title={'Anchor asset type'}
+                  description={
+                    'Type of asset anchored. Can be fiat, crypto, nft, stock, bond, commodity, realestate, or other.'
+                  }
+                >
+                  <SelectAnchorType
+                    anchorTypes={anchorTypes}
+                    setValue={setValue}
+                    currentType={getCurrency()?.anchor_asset_type}
                   />
-                </FormControl>
+                </ItemToml>
 
-                <FormControl mt="1.5rem">
-                  <Flex justifyContent="space-between" w="full" px="0.25rem">
-                    <FormLabel>Anchor asset</FormLabel>
-                  </Flex>
+                <ItemToml
+                  title={'Anchor asset'}
+                  description={
+                    'If anchored token, code / symbol for asset that token is anchored to. E.g. USD, BTC, SBUX, Address of real-estate investment property.'
+                  }
+                >
                   <Input
                     placeholder="Asset code"
                     autoComplete="off"
                     {...register('anchor_asset')}
                   />
-                </FormControl>
+                </ItemToml>
               </>
             )}
+
+            <ItemToml
+              title={'Is unlimited'}
+              description={
+                "The number of tokens is dilutable at the issuer's discretion"
+              }
+            >
+              <Checkbox
+                variant="highlight"
+                me="1rem"
+                isChecked={isUnlimited}
+                onChange={(event): void => {
+                  setIsUnlimited(event.target.checked)
+                }}
+              >
+                Is unlimited?
+              </Checkbox>
+            </ItemToml>
+
+            <ItemToml
+              title={'Max number'}
+              description={
+                'Max number of tokens, if there will never be more than max_number tokens'
+              }
+            >
+              <Input
+                placeholder="Max number"
+                type="number"
+                autoComplete="off"
+                {...register('max_number')}
+              />
+            </ItemToml>
 
             <Flex justifyContent="flex-end">
               <Button

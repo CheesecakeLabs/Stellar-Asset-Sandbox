@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -24,6 +30,8 @@ import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 export const DistributeAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   const { distribute, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -158,7 +166,18 @@ export const DistributeAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {!isLargerThanMd && (
+            <ActionHelper
+              title={'About Distribute'}
+              description={distributeHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Distribute'} />
             {(loadingAsset && !asset) || !asset ? (
@@ -180,10 +199,12 @@ export const DistributeAsset: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Distribute'}
-              description={distributeHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Distribute'}
+                description={distributeHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>
