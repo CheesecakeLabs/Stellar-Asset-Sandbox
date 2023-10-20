@@ -1,12 +1,14 @@
 import { Container, Flex, Tag, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
+import { havePermission } from 'utils'
 import { STELLAR_EXPERT_ASSET } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
 import { AssetImage } from './components/asset-image'
+import { Permissions } from 'components/enums/permissions'
 import { LinkIcon, WalletIcon } from 'components/icons'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
@@ -19,6 +21,7 @@ interface IAssetHomeTemplate {
   asset: Hooks.UseAssetsTypes.IAssetDto
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
   chartPeriod: TChartPeriod
+  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
   selectedFile: File | null
   setSelectedFile: Dispatch<SetStateAction<File | null>>
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
@@ -30,6 +33,7 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
   loadingChart,
   paymentsAsset,
   chartPeriod,
+  permissions,
   selectedFile,
   setChartPeriod,
   setSelectedFile,
@@ -45,6 +49,10 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               handleUploadImage={handleUploadImage}
+              havePermission={havePermission(
+                Permissions.MINT_ASSET,
+                permissions
+              )}
             />
             <Flex
               borderBottom="1px solid"

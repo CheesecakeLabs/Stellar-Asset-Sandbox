@@ -31,6 +31,7 @@ export const AssetHome: React.FC = () => {
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { loadingAsset, getAssetById, updateImage } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -103,7 +104,7 @@ export const AssetHome: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper
               title={'About Assets'}
               description={assetHomeHelper}
@@ -120,6 +121,7 @@ export const AssetHome: React.FC = () => {
                 loadingChart={loadingChart}
                 paymentsAsset={paymentsAsset}
                 chartPeriod={chartPeriod}
+                permissions={userPermissions}
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}
                 setChartPeriod={setChartPeriod}

@@ -35,6 +35,7 @@ export const MintAsset: React.FC = () => {
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingChart, getPaymentsByAssetId } = useDashboards()
@@ -142,7 +143,7 @@ export const MintAsset: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper title={'About Mint'} description={mintHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">

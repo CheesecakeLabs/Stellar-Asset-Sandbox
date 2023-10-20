@@ -10,6 +10,7 @@ import { ModalUploadImage } from '../modal-upload-image'
 
 interface IAssetImage {
   asset: Hooks.UseAssetsTypes.IAssetDto
+  havePermission: boolean
   selectedFile: File | null
   setSelectedFile: Dispatch<SetStateAction<File | null>>
   handleUploadImage(): Promise<boolean>
@@ -18,6 +19,7 @@ interface IAssetImage {
 export const AssetImage: React.FC<IAssetImage> = ({
   asset,
   selectedFile,
+  havePermission,
   setSelectedFile,
   handleUploadImage,
 }) => {
@@ -48,28 +50,30 @@ export const AssetImage: React.FC<IAssetImage> = ({
             getCurrencyIcon(asset.code, '2.5rem')
           )}
         </Flex>
-        <Flex
-          pos="absolute"
-          zIndex="100"
-          cursor="pointer"
-          w="full"
-          h="full"
-          justifyContent="flex-end"
-          onClick={onOpen}
-        >
+        {havePermission && (
           <Flex
-            bg="gray.200"
-            borderRadius="full"
-            w="20px"
-            h="20px"
-            fill="black.600"
-            _dark={{ fill: 'white', bg: 'black.800' }}
-            justifyContent="center"
-            alignItems="center"
+            pos="absolute"
+            zIndex="100"
+            cursor="pointer"
+            w="full"
+            h="full"
+            justifyContent="flex-end"
+            onClick={onOpen}
           >
-            <EditIcon width="12px" height="12px" />
+            <Flex
+              bg="gray.200"
+              borderRadius="full"
+              w="20px"
+              h="20px"
+              fill="black.600"
+              _dark={{ fill: 'white', bg: 'black.800' }}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <EditIcon width="12px" height="12px" />
+            </Flex>
           </Flex>
-        </Flex>
+        )}
       </Flex>
     </>
   )

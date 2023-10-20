@@ -33,6 +33,7 @@ export const AuthorizeAccount: React.FC = () => {
   const [vaultsUnauthorized, setVaultsUnauthorized] =
     useState<Hooks.UseVaultsTypes.IVault[]>()
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { authorize, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
@@ -153,7 +154,7 @@ export const AuthorizeAccount: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper
               title={'About Authorize'}
               description={authorizeHelper}

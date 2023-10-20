@@ -31,6 +31,7 @@ export const DistributeAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { distribute, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
@@ -172,7 +173,7 @@ export const DistributeAsset: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper
               title={'About Distribute'}
               description={distributeHelper}

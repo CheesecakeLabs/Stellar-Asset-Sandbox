@@ -31,6 +31,7 @@ export const FreezeAccount: React.FC = () => {
   const [vaultsStatusList, setVaultsStatusList] =
     useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { updateAuthFlags, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
@@ -151,7 +152,7 @@ export const FreezeAccount: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper title={'About Freeze'} description={freezeHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">

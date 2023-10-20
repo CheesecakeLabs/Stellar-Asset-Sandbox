@@ -35,6 +35,7 @@ export const BurnAsset: React.FC = () => {
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { burn, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -142,7 +143,7 @@ export const BurnAsset: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper title={'About Burn'} description={burnHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">

@@ -29,6 +29,7 @@ import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 export const ClawbackAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { clawback, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -121,7 +122,7 @@ export const ClawbackAsset: React.FC = () => {
           justifyContent="center"
           gap="1.5rem"
         >
-          {!isLargerThanMd && (
+          {isSmallerThanMd && (
             <ActionHelper
               title={'About Clawback'}
               description={clawbackHelper}
