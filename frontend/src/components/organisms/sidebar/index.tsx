@@ -46,6 +46,7 @@ const linkItems: ILinkItemProps[] = [
     name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    comingSoon: true
   },
   {
     name: 'Treasury',
