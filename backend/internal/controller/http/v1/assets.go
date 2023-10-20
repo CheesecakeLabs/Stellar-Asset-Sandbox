@@ -50,6 +50,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/:id/image", r.uploadAssetImage)
 		h.POST("/generate-toml", r.generateTOML)
 		h.PUT("/update-toml", r.updateTOML)
+		h.GET("/toml-data", r.getTomlData)
 	}
 }
 
@@ -879,7 +880,7 @@ func (r *assetsRoutes) generateTOML(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "invalid request body: %s", err)
 		return
 	}
-
+	fmt.Printf(request.Currencies[len(request.Currencies)-1].Description)
 	toml, err := r.as.CreateToml(request)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error creating TOML", err)
@@ -932,4 +933,23 @@ func (r *assetsRoutes) updateTOML(c *gin.Context) {
 	}
 
 	c.Data(http.StatusOK, "application/toml", []byte(toml))
+}
+
+// @Summary Get TOML data
+// @Description Get TOML data
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       asset_issuer path string true "Asset issuer"
+// @Success     200 {object} entity.TomlData
+// @Failure     500 {object} response
+// @Router      /assets/toml [get]
+func (r *assetsRoutes) getTomlData(c *gin.Context) {
+	tomlContent, err := r.as.GetTomlData()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, tomlContent)
 }

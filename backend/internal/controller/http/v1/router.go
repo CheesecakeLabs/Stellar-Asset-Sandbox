@@ -86,9 +86,6 @@ func NewRouter(
 		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase)
 		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase)
 		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase)
+		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 	}
-
-	// Toml Route
-	handler.Use(CORSMiddlewareAllowAllOrigins()) // Allow all origins for the toml
-	newAssetTomlRoutes(handler.Group("/"), walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 }

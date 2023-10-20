@@ -20,9 +20,10 @@ func updateFieldsIfEmpty(fields []FieldConfig) {
 func appendIfNotExists[T any](existing []T, newItems []T, equals func(T, T) bool) []T {
 	for _, newItem := range newItems {
 		found := false
-		for _, item := range existing {
+		for index, item := range existing {
 			if equals(item, newItem) {
 				found = true
+				existing[index] = newItem
 				break
 			}
 		}
@@ -41,7 +42,7 @@ func appendIfNotExistsPrincipal(existing []entity.Principal, newItems []entity.P
 
 func appendIfNotExistsCurrency(existing []entity.Currency, newItems []entity.Currency) []entity.Currency {
 	return appendIfNotExists(existing, newItems, func(item1, item2 entity.Currency) bool {
-		return item1.Code == item2.Code
+		return item1.Code == item2.Code && item1.Issuer == item2.Issuer
 	})
 }
 

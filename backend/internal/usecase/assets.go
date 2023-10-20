@@ -145,3 +145,17 @@ func (uc *AssetUseCase) UpdateToml(updatedToml entity.TomlData) (string, error) 
 
 	return tomlCreated, err
 }
+
+func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
+	tomlDb, err := uc.tRepo.GetToml()
+	if err != nil {
+		return entity.TomlData{}, fmt.Errorf("AssetUseCase - GetTomlData - uc.repo.GetToml: %w", err)
+	}
+
+	tomParsed, err := uc.tInt.RetrieveToml(tomlDb) // Parse old toml data
+	if err != nil {
+		return entity.TomlData{}, fmt.Errorf("AssetUseCase - GetTomlData - uc.tInt.RetrieveToml: %w", err)
+	}
+
+	return tomParsed, err
+}
