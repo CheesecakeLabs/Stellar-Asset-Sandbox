@@ -76,6 +76,8 @@ services:
       KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-generatedKeypairs}
       KAFKA_SIGN_CONSUMER_TOPICS: ${KAFKA_SIGN_CONSUMER_TOPICS:-signEnvelope}
       KAFKA_SIGN_PRODUCER_TOPIC: ${KAFKA_SIGN_PRODUCER_TOPIC:-signedEnvelopes}
+      KAFKA_SIGN_SOROBAN_CONSUMER_TOPICS: ${KAFKA_SIGN_SOROBAN_CONSUMER_TOPICS:-signSorobanEnvelope}
+      KAFKA_SIGN_SOROBAN_PRODUCER_TOPIC: ${KAFKA_SIGN_SOROBAN_PRODUCER_TOPIC:-signedSorobanEnvelopes}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
       PG_USER: ${PG_USER:-postgres}
@@ -133,27 +135,27 @@ services:
       retries: 20
 
   #Kafka - Schema Registry#
-  schema_registry:
-    profiles: ["all", "kafka", "starlabs", "kms"]
-    image: confluentinc/cp-schema-registry:7.1.2
-    container_name: schema_registry
-    ports:
-      - "8085:8085"
-    environment:
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
-      SCHEMA_REGISTRY_HOST_NAME: schema_registry
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zoo1:2181
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
-      SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,OPTIONS"
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092
-    healthcheck:
-      start_period: 10s
-      interval: 10s
-      retries: 20
-      test: curl --user superUser:superUser --fail --silent --insecure http://schema_registry:8085/subjects --output /dev/null || exit 1
-    depends_on:
-      kafka1:
-        condition: service_healthy
+  # schema_registry:
+  #   profiles: ["all", "kafka", "starlabs", "kms"]
+  #   image: confluentinc/cp-schema-registry:7.1.2
+  #   container_name: schema_registry
+  #   ports:
+  #     - "8085:8085"
+  #   environment:
+  #     SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
+  #     SCHEMA_REGISTRY_HOST_NAME: schema_registry
+  #     SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zoo1:2181
+  #     SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN: "*"
+  #     SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS: "GET,POST,PUT,OPTIONS"
+  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092
+  #   healthcheck:
+  #     start_period: 10s
+  #     interval: 10s
+  #     retries: 20
+  #     test: curl --user superUser:superUser --fail --silent --insecure http://schema_registry:8085/subjects --output /dev/null || exit 1
+  #   depends_on:
+  #     kafka1:
+  #       condition: service_healthy
 
   #Kafka - Init#
   kafka_init:
