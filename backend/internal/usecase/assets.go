@@ -3,18 +3,25 @@ package usecase
 import (
 	"fmt"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 )
 
 type AssetUseCase struct {
 	aRepo AssetRepoInterface
 	wRepo WalletRepoInterface
+	tInt  TomlInterface
+	tRepo TomlRepoInterface
+	cfg   config.Horizon
 }
 
-func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface) *AssetUseCase {
+func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tInt TomlInterface, tRepo TomlRepoInterface, cfg config.Horizon) *AssetUseCase {
 	return &AssetUseCase{
 		aRepo: aRepo,
 		wRepo: wRepo,
+		tInt:  tInt,
+		tRepo: tRepo,
+		cfg:   cfg,
 	}
 }
 
@@ -80,4 +87,75 @@ func (uc *AssetUseCase) GetImage(assetId string) ([]byte, error) {
 		return nil, fmt.Errorf("ImageUseCase - GetImage - uc.aRepo.GetAssetImage: %w", err)
 	}
 	return image, nil
+}
+
+func (uc *AssetUseCase) CreateToml(req entity.TomlData) (string, error) {
+	tomlCreated, err := uc.tInt.GenerateToml(req, uc.cfg)
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - CreateToml - uc.tInt.GenerateToml: %w", err)
+	}
+
+	// Save the new toml data in the database
+	_, err = uc.tRepo.CreateToml(tomlCreated)
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.repo.CreateToml: %w", err)
+	}
+
+	return tomlCreated, err
+}
+
+func (uc *AssetUseCase) RetrieveToml() (string, error) {
+	toml, err := uc.tRepo.GetToml()
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - RetrieveToml - uc.repo.GetToml: %w", err)
+	}
+
+	return toml, err
+}
+
+func (uc *AssetUseCase) UpdateToml(updatedToml entity.TomlData) (string, error) {
+	// Get old toml data in the database
+	oldTomlDb, err := uc.tRepo.GetToml()
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - RetrieveToml - uc.repo.GetToml: %w", err)
+	}
+
+	oldTomParsed, err := uc.tInt.RetrieveToml(oldTomlDb) // Parse old toml data
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.tInt.GenerateToml: %w", err)
+	}
+
+	// Update old toml data with new data
+	newTomlParsed, err := uc.tInt.UpdateTomlData(oldTomParsed, updatedToml)
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.tInt.GenerateToml: %w", err)
+	}
+
+	// Parse the new toml data in a TOML string
+	tomlCreated, err := uc.tInt.GenerateToml(newTomlParsed, uc.cfg)
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - CreateToml - uc.tInt.GenerateToml: %w", err)
+	}
+
+	// Save the new toml data in the database
+	_, err = uc.tRepo.CreateToml(tomlCreated)
+	if err != nil {
+		return "", fmt.Errorf("AssetUseCase - UpdateToml - uc.repo.CreateToml: %w", err)
+	}
+
+	return tomlCreated, err
+}
+
+func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
+	tomlDb, err := uc.tRepo.GetToml()
+	if err != nil {
+		return entity.TomlData{}, fmt.Errorf("AssetUseCase - GetTomlData - uc.repo.GetToml: %w", err)
+	}
+
+	tomParsed, err := uc.tInt.RetrieveToml(tomlDb) // Parse old toml data
+	if err != nil {
+		return entity.TomlData{}, fmt.Errorf("AssetUseCase - GetTomlData - uc.tInt.RetrieveToml: %w", err)
+	}
+
+	return tomParsed, err
 }

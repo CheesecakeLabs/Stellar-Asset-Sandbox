@@ -246,6 +246,3 @@ func TestVaultUseCaseCreate(t *testing.T) {
 		})
 	}
 }
-
-func TestsVaultUseCaseUpdateVault(t *testing.T) {
-}

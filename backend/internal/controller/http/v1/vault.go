@@ -57,7 +57,7 @@ type UpdateVaultAssetRequest struct {
 // @Tags  	    Vault
 // @Accept      json
 // @Produce     json
-// @Param       request body CreateVaultRequest true "Vault info"
+// @Param       request body CreateVaultRequest true "CreateVaultRequest"
 // @Success     200 {object} entity.Vault
 // @Failure     400 {object} response
 // @Failure     404 {object} response
