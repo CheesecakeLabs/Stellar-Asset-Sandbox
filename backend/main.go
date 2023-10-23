@@ -10,6 +10,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/kafka"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 func main() {
@@ -18,6 +19,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Config error: %s", err)
 	}
+	// Toml
+	tRepo := toml.NewTomlGenerator()
 
 	// Postgres
 	pg, err := postgres.New(cfg.PG)
@@ -71,5 +74,5 @@ func main() {
 	}
 	go signConn.Run(cfg, entity.SignChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer)
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo)
 }

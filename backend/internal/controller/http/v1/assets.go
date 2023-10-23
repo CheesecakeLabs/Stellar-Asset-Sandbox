@@ -24,6 +24,14 @@ type assetsRoutes struct {
 	l  usecase.LogTransactionUseCase
 }
 
+func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
+	r := &assetsRoutes{w, as, m, a, l}
+	h := handler.Group("/").Use()
+	{
+		h.GET("/.well-known/stellar.toml", r.retrieveToml)
+	}
+}
+
 func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
 	r := &assetsRoutes{w, as, m, a, l}
 
@@ -40,6 +48,9 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/transfer", r.transferAsset)
 		h.GET("/:id", r.getAssetById)
 		h.POST("/:id/image", r.uploadAssetImage)
+		h.POST("/generate-toml", r.generateTOML)
+		h.PUT("/update-toml", r.updateTOML)
+		h.GET("/toml-data", r.getTomlData)
 	}
 }
 
@@ -271,6 +282,30 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	})
 	if err != nil {
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
+		return
+	}
+
+	// Set TOML data
+	var tomlData entity.TomlData
+	tomlData.Currencies = []entity.Currency{
+		{
+			Code:   asset.Code,
+			Issuer: asset.Issuer.Key.PublicKey,
+			Name:   asset.Name,
+		},
+	}
+
+	if asset.Id == 1 {
+		_, err = r.as.CreateToml(tomlData)
+		if err != nil {
+			errorResponse(c, http.StatusNotFound, "error to create TOML ", err)
+			return
+		}
+	}
+
+	_, err = r.as.UpdateToml(tomlData)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "error to update TOML ", err)
 		return
 	}
 
@@ -827,4 +862,94 @@ func (r *assetsRoutes) getAssetImage(c *gin.Context) {
 	}
 
 	c.Data(http.StatusOK, "image/png", image)
+}
+
+// @Summary Create a TOML file
+// @Description Create a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body entity.TomlData true "TOML info"
+// @Success     200 {object} entity.TomlData
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/generate-toml [post]
+func (r *assetsRoutes) generateTOML(c *gin.Context) {
+	var request entity.TomlData
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid request body: %s", err)
+		return
+	}
+	fmt.Printf(request.Currencies[len(request.Currencies)-1].Description)
+	toml, err := r.as.CreateToml(request)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error creating TOML", err)
+		return
+	}
+
+	c.Data(http.StatusOK, "application/toml", []byte(toml))
+}
+
+// @Summary Retrieve a TOML file
+// @Description Retrieve a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       asset_issuer path string true "Asset issuer"
+// @Success     200 {object} entity.TomlData
+// @Failure     500 {object} response
+// @Router      /.well-known/stellar.toml [get]
+func (r *assetsRoutes) retrieveToml(c *gin.Context) {
+	tomlContent, err := r.as.RetrieveToml()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML", err)
+		return
+	}
+
+	c.Data(http.StatusOK, "text/plain", []byte(tomlContent))
+}
+
+// @Summary Update a TOML file
+// @Description Update a TOML file
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body entity.TomlData true "TOML info"
+// @Success     200 {object} entity.TomlData
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/update-toml [put]
+func (r *assetsRoutes) updateTOML(c *gin.Context) {
+	var request entity.TomlData
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	toml, err := r.as.UpdateToml(request)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating TOML", err)
+		return
+	}
+
+	c.Data(http.StatusOK, "application/toml", []byte(toml))
+}
+
+// @Summary Get TOML data
+// @Description Get TOML data
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       asset_issuer path string true "Asset issuer"
+// @Success     200 {object} entity.TomlData
+// @Failure     500 {object} response
+// @Router      /assets/toml [get]
+func (r *assetsRoutes) getTomlData(c *gin.Context) {
+	tomlContent, err := r.as.GetTomlData()
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, tomlContent)
 }

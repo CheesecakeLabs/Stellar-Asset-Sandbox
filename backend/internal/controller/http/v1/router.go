@@ -4,14 +4,28 @@ import (
 	"net/http"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
+	docs "github.com/CheesecakeLabs/token-factory-v2/backend/docs"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
-	docs "github.com/CheesecakeLabs/token-factory-v2/backend/docs"
 )
+
+func CORSMiddlewareAllowAllOrigins() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "*")
+		c.Header("Access-Control-Allow-Methods", "*")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
+}
 
 func CORSMiddleware(cfg config.HTTP) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -32,7 +46,7 @@ func CORSMiddleware(cfg config.HTTP) gin.HandlerFunc {
 // Swagger spec:
 // @title       Token Factory API
 // @version     1.0
-// @BasePath    /v1
+// @BasePath    /
 func NewRouter(
 	handler *gin.Engine,
 	pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface,
@@ -60,6 +74,7 @@ func NewRouter(
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 	// Routers
 	handler.Use(CORSMiddleware(cfg)) // Alow only frontend origin
+	handler.Use(CORSMiddleware(cfg)) // Alow only frontend origin
 	groupV1 := handler.Group("/v1")
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc)
@@ -72,5 +87,6 @@ func NewRouter(
 		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase)
 		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase)
 		newSorobanRoutes(groupV1, walletUseCase, messengerController, authUseCase)
+		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc)
 	}
 }

@@ -3,6 +3,7 @@ package usecase
 import (
 	"time"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 )
 
@@ -67,6 +68,17 @@ type (
 		GetPermissions() ([]entity.Permission, error)
 		DeleteRolePermission(entity.RolePermissionRequest) (entity.RolePermissionRequest, error)
 		CreateRolePermission(entity.RolePermissionRequest) (entity.RolePermissionRequest, error)
+	}
+
+	TomlInterface interface {
+		GenerateToml(entity.TomlData, config.Horizon) (string, error)
+		RetrieveToml(string) (entity.TomlData, error)
+		UpdateTomlData(entity.TomlData, entity.TomlData) (entity.TomlData, error)
+	}
+
+	TomlRepoInterface interface {
+		CreateToml(string) (string, error)
+		GetToml() (string, error)
 	}
 
 	VaultCategoryRepoInterface interface {

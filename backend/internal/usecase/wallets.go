@@ -53,3 +53,11 @@ func (uc *WalletUseCase) Update(data entity.Wallet) (entity.Wallet, error) {
 	}
 	return wallet, nil
 }
+
+func (uc *WalletUseCase) GetWalletsByType(wType string) ([]entity.Wallet, error) {
+	wallets, err := uc.repo.GetWallets(wType)
+	if err != nil {
+		return nil, fmt.Errorf("WalletUseCase - GetAll - uc.repo.GetAllWallets: %w", err)
+	}
+	return wallets, nil
+}

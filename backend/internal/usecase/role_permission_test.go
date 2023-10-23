@@ -11,16 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var validateError = errors.New("error")
-
-type rolePermissionTest struct {
-	name   string
-	roleId int
-	mock   func()
-	res    interface{}
-	err    error
-}
-
 func TestRolePermissionUseCase_Validate(t *testing.T) {
 	t.Helper()
 

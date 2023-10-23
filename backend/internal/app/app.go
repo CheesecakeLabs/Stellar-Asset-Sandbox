@@ -17,10 +17,11 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator) {
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -34,6 +35,9 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	assetUc := usecase.NewAssetUseCase(
 		repo.NewAssetRepo(pg),
 		repo.NewWalletRepo(pg),
+		tRepo,
+		repo.NewTomlRepo(pg),
+		cfg.Horizon,
 	)
 	roleUc := usecase.NewRoleUseCase(
 		repo.NewRoleRepo(pg),
