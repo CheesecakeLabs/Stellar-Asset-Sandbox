@@ -61,10 +61,9 @@ func (r *sorobanRoutes) signTransaction(c *gin.Context) {
 
 		request.WalletPk = sponsor.Key.PublicKey
 	}
-
 	res, err := r.m.SendMessage(entity.SignChannel, entity.SignTransactionRequest{
-		PublicKey: request.WalletPk,
-		Envelope:  request.Envelope,
+		PublicKeys: []string{request.WalletPk},
+		Envelope:   request.Envelope,
 	})
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)

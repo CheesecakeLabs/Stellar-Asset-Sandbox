@@ -77,9 +77,9 @@ type (
 	}
 
 	SignTransactionRequest struct {
-		Id        int    `json:"id"`
-		Envelope  string `json:"envelope"`
-		PublicKey string `json:"publicKey"`
+		Id         int      `json:"id"`
+		Envelope   string   `json:"envelope"`
+		PublicKeys []string `json:"publicKeys"`
 	}
 
 	SorobanTransactionResponse struct {
