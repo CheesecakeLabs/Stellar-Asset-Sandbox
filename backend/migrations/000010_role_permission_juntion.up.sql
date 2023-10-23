@@ -5,7 +5,7 @@ CREATE TABLE RolePermissionJunction (
     CONSTRAINT FK_role 
         FOREIGN KEY (role_id) REFERENCES Role (id),
     CONSTRAINT FK_permission 
-        FOREIGN KEY (permission_id) REFERENCES Permission (id)
+        FOREIGN KEY (permission_id) REFERENCES Permission (id) ON DELETE CASCADE
 );
 
 insert into rolepermissionjunction (role_id, permission_id) values (1, 1);
