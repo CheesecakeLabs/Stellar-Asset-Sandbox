@@ -469,7 +469,6 @@ definitions:
         type: string
     required:
     - envelope
-    - wallet_pk
     type: object
   v1.SubmitTransactionRequest:
     properties:

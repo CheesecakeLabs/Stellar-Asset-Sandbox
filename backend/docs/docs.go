@@ -2676,8 +2676,7 @@ const docTemplate = `{
         "v1.SignedTransactionRequest": {
             "type": "object",
             "required": [
-                "envelope",
-                "wallet_pk"
+                "envelope"
             ],
             "properties": {
                 "envelope": {
