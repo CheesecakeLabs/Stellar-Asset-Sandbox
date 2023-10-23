@@ -82,6 +82,11 @@ type (
 		PublicKey string `json:"publicKey"`
 	}
 
+	SorobanTransactionResponse struct {
+		Id       int    `json:"id"`
+		Envelope string `json:"envelope"`
+	}
+
 	SubmitRequest struct {
 		Id       int    `json:"id"`
 		Envelope string `json:"envelope"`
