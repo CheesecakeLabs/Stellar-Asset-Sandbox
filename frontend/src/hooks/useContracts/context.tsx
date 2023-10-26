@@ -1,12 +1,20 @@
-import { SetStateAction, createContext, useCallback, useState } from 'react'
+import { SetStateAction, createContext, useCallback, useState } from 'react';
 
-import freighter from '@stellar/freighter-api'
-import axios from 'axios'
-import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
-import { MessagesError } from 'utils/constants/messages-error'
-import { mockContracts } from 'utils/mockups'
 
-import * as certificatesOfDeposit from '../../soroban'
+
+import freighter from '@stellar/freighter-api';
+import axios from 'axios';
+import { MessagesError } from 'utils/constants/messages-error';
+import { mockContracts } from 'utils/mockups';
+
+
+
+import { http } from 'interfaces/http';
+
+
+
+import * as certificatesOfDeposit from '../../soroban';
+
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -30,12 +38,16 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     Hooks.UseContractsTypes.IContract | undefined
   >()
 
-  const createContract = async (): Promise<
-    Hooks.UseContractsTypes.IContract | undefined
-  > => {
+  const createContract = async (
+    params: Hooks.UseContractsTypes.IContractRequest
+  ): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
     setLoading(true)
     try {
-      return mockContracts[0]
+      const response = await http.post(`contract`, params)
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -46,10 +58,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getContracts = useCallback(async (): Promise<void> => {
+  const getContracts = useCallback(async (): Promise<
+    Hooks.UseContractsTypes.IContract[] | undefined
+  > => {
     setLoading(true)
     try {
-      setContracts(mockContracts)
+      const response = await http.get(`contract/list`)
+      const data = response.data
+      if (data) {
+        setContracts(data)
+        return data
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -82,11 +101,11 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      await certificateOfDepositClient.deposit({
+     /* await certificateOfDepositClient.deposit({
         amount: amount * BigInt(10000000),
         address: address,
         signerSecret: signerSecret,
-      })
+      })*/
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
@@ -106,7 +125,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string
   ): void => {
-    certificatesOfDeposit
+    /*certificatesOfDeposit
       .getPosition({
         address: address,
       })
@@ -115,14 +134,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       .catch(() => {
         setIsDepositing(false)
-      })
+      })*/
   }
 
   const getYield = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string
   ): void => {
-    certificatesOfDeposit
+    /*certificatesOfDeposit
       .getEstimatedYield({
         address: address,
       })
@@ -131,14 +150,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       .catch(() => {
         setIsDepositing(false)
-      })
+      })*/
   }
 
   const getTime = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string
   ): void => {
-    certificatesOfDeposit
+    /*certificatesOfDeposit
       .getTimeLeft({
         address: address,
       })
@@ -147,7 +166,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       .catch(() => {
         setIsDepositing(false)
-      })
+      })*/
   }
 
   const getAccount = (
@@ -162,7 +181,8 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     updatePosition: void,
     signerSecret: string
   ): Promise<boolean> => {
-    setIsWithdrawing(true)
+    return true
+    /*setIsWithdrawing(true)
     try {
       await certificatesOfDeposit.withdraw(
         {
@@ -182,7 +202,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       throw new Error(MessagesError.errorOccurred)
     } finally {
       setIsWithdrawing(false)
-    }
+    }*/
   }
 
   return (

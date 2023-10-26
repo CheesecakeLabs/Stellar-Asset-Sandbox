@@ -1,5 +1,6 @@
+import { Buffer } from 'buffer';
 import * as SorobanClient from 'soroban-client';
-import { ContractSpec, SorobanRpc, xdr, hash } from 'soroban-client';
+import { ContractSpec, SorobanRpc, xdr, hash, TransactionBuilder, assembleTransaction, Server, Asset, StrKey, OperationOptions, Operation } from 'soroban-client';
 
 
 
@@ -7,10 +8,6 @@ import { FREIGHTER } from './Freighter';
 import { SELECTED_NETWORK } from './StellarHelpers';
 import { sorobanConfig } from './constants';
 
-
-const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
-  allowHttp: true,
-})
 
 type BuildSorobanTxArgs = {
   contractId: string
@@ -33,6 +30,10 @@ export const buildSorobanTx = async ({
     >
   | SorobanClient.FeeBumpTransaction
 > => {
+  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
+    allowHttp: true,
+  })
+
   const invokeArgs = spec.funcArgsToScVals(method, args)
   const sourceAccount = await server.getAccount(sourcePk)
   const contract = new SorobanClient.Contract(contractId)
@@ -64,6 +65,10 @@ export const simulateSorobanTx = async ({
 }: BuildSorobanTxArgs): Promise<
   SorobanRpc.SimulateTransactionSuccessResponse | undefined
 > => {
+  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
+    allowHttp: true,
+  })
+
   const invokeArgs = spec.funcArgsToScVals(method, args)
   const sourceAccount = await server.getAccount(sourcePk)
   const contract = new SorobanClient.Contract(contractId)
@@ -111,6 +116,10 @@ export const submitSorobanTx = async (
   | SorobanClient.SorobanRpc.GetTransactionResponse
   | SorobanClient.SorobanRpc.GetTransactionStatus
 > => {
+  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
+    allowHttp: true,
+  })
+
   try {
     const response: SorobanRpc.SendTransactionResponse =
       await server.sendTransaction(signedTx)
@@ -185,16 +194,12 @@ export const invokeSoroban = async (
   return submitSorobanTx(signedTx)
 }
 
-export const wrapClassicAsset = async (wrapArgs: {
+const getContractId = (wrapArgs: {
   assetCode: string
   assetIssuerPk: string
-}): Promise<string> => {
-  const asset = new SorobanClient.Asset(
-    wrapArgs.assetCode,
-    wrapArgs.assetIssuerPk
-  )
+}): string => {
+  const asset = new Asset(wrapArgs.assetCode, wrapArgs.assetIssuerPk)
   const xdrAsset = asset.toXDRObject()
-
   const networkId = hash(Buffer.from(SELECTED_NETWORK.passphrase))
   const preimage = xdr.HashIdPreimage.envelopeTypeContractId(
     new xdr.HashIdPreimageContractId({
@@ -204,9 +209,18 @@ export const wrapClassicAsset = async (wrapArgs: {
     })
   )
 
-  const contractId = SorobanClient.StrKey.encodeContract(hash(preimage.toXDR()))
+  const contractId = StrKey.encodeContract(hash(preimage.toXDR()))
 
-  console.log(contractId)
+  return contractId
+}
+
+const getContractOperation = (wrapArgs: {
+  assetCode: string
+  assetIssuerPk: string
+}): xdr.Operation<Operation.InvokeHostFunction> => {
+  const asset = new Asset(wrapArgs.assetCode, wrapArgs.assetIssuerPk)
+  const xdrAsset = asset.toXDRObject()
+
   const createContractArgs = new xdr.CreateContractArgs({
     contractIdPreimage:
       xdr.ContractIdPreimage.contractIdPreimageFromAsset(xdrAsset),
@@ -214,33 +228,107 @@ export const wrapClassicAsset = async (wrapArgs: {
   })
 
   const func =
-    SorobanClient.xdr.HostFunction.hostFunctionTypeCreateContract(
-      createContractArgs
-    )
-  const options: SorobanClient.OperationOptions.InvokeHostFunction = {
+    xdr.HostFunction.hostFunctionTypeCreateContract(createContractArgs)
+  const options: OperationOptions.InvokeHostFunction = {
     func,
     auth: [],
   }
-  const operation = SorobanClient.Operation.invokeHostFunction(options)
+  const operation = Operation.invokeHostFunction(options)
+  return operation
+}
 
-  const sourceAccount = await server.getAccount(sponsor)
-
-  const transaction = new SorobanClient.TransactionBuilder(sourceAccount, {
-    fee: sorobanConfig.fee,
-    networkPassphrase: sorobanConfig.network.passphrase,
+const getSourceAccount = (
+  publicKey: string
+): Promise<SorobanClient.Account> => {
+  const rpc = new Server(sorobanConfig.network.rpc, {
+    allowHttp: true,
   })
-    .addOperation(operation)
-    .setTimeout(sorobanConfig.txTimeout)
-    .build()
+  return rpc.getAccount(publicKey)
+}
 
+const wrapClassicAsset = async (
+  operation: xdr.Operation<Operation.InvokeHostFunction>,
+  sourceAccount: SorobanClient.Account
+): Promise<string> => {
   try {
-    const preparedTransaction = await server.prepareTransaction(transaction)
-    const signedTx = await signWithSecret(preparedTransaction, sponsor)
+    const rpc = new Server(sorobanConfig.network.rpc, {
+      allowHttp: true,
+    })
 
-    await submitSorobanTx(signedTx)
-    return contractId
+    const txBuilder = new TransactionBuilder(sourceAccount, {
+      fee: sorobanConfig.fee,
+      networkPassphrase: sorobanConfig.network.passphrase,
+    })
+
+    txBuilder.addOperation(operation)
+    txBuilder.setTimeout(sorobanConfig.txTimeout)
+    const tx = txBuilder.build()
+    console.log(tx.toXDR())
+
+    const simulatedTransaction = await rpc.simulateTransaction(tx)
+    const preppedTx = assembleTransaction(
+      tx,
+      sorobanConfig.network.passphrase,
+      simulatedTransaction
+    ).build()
+
+    const preppedTxXdr = preppedTx.toXDR()
+    console.log(preppedTxXdr)
+
+    return preppedTxXdr
   } catch (e) {
     console.log('Wraping of asset ${wrapArgs.code} failed: ', e)
     throw e
   }
+}
+
+const submitSoroban = async (
+  txHash: string
+): Promise<
+  | SorobanClient.SorobanRpc.GetTransactionResponse
+  | SorobanClient.SorobanRpc.GetTransactionStatus
+> => {
+  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
+    allowHttp: true,
+  })
+
+  try {
+    console.log(txHash)
+    let updatedTransaction = await server.getTransaction(txHash)
+
+    const waitUntil = new Date(
+      Date.now() + sorobanConfig.txTimeout * 1000
+    ).valueOf()
+
+    const waitTime = 1000
+
+    const initial = Date.now()
+    while (
+      Date.now() < waitUntil &&
+      updatedTransaction.status ===
+        SorobanClient.SorobanRpc.GetTransactionStatus.NOT_FOUND
+    ) {
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+
+      updatedTransaction = await server.getTransaction(txHash)
+    }
+
+    const final = Date.now()
+
+    console.log('Duration ' + (final - initial))
+
+    return updatedTransaction
+  } catch (e) {
+    console.log('Error during transaction submission: ')
+    console.log(e)
+    return SorobanClient.SorobanRpc.GetTransactionStatus.FAILED
+  }
+}
+
+export const SorobanService = {
+  wrapClassicAsset,
+  getContractOperation,
+  getContractId,
+  getSourceAccount,
+  submitSoroban
 }

@@ -19,17 +19,17 @@ import { newContractHelper } from 'utils/constants/helpers'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { toNumber } from 'utils/formatter'
 
+import { SelectVault } from './components/select-vault'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 import { SelectAsset } from 'components/molecules/select-asset'
-import { SelectVault } from 'components/molecules/select-vault'
 
 interface IContractsCreateTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    walletVault: string | undefined,
-    asset: Hooks.UseAssetsTypes.IAssetDto | undefined
+    asset: Hooks.UseAssetsTypes.IAssetDto,
+    vault: Hooks.UseVaultsTypes.IVault
   ): Promise<void>
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
@@ -43,7 +43,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
   assets,
 }) => {
   const [errorSubmit] = useState<string | null>(null)
-  const [walletVault, setWalletVault] = useState<string>()
+  const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault>()
   const [asset, setAsset] = useState<
     Hooks.UseAssetsTypes.IAssetDto | undefined
   >()
@@ -79,13 +79,14 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
           <Box p="1rem">
             <form
               onSubmit={handleSubmit(data => {
-                onSubmit(data, setValue, walletVault, asset)
+                if (!asset || !vault) return
+                onSubmit(data, setValue, asset, vault)
               })}
             >
               <Flex flexDir={{ md: 'row', sm: 'column' }} gap="1.5rem">
                 <FormControl>
                   <FormLabel>Vault</FormLabel>
-                  <SelectVault vaults={vaults} setWallet={setWalletVault} />
+                  <SelectVault vaults={vaults} setVault={setVault} />
                 </FormControl>
 
                 <FormControl>
@@ -133,12 +134,25 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 <FormControl>
                   <FormLabel>Term</FormLabel>
                   <Input
-                    placeholder="Select Date and Time"
-                    size="md"
-                    type="datetime-local"
-                    {...register('yield_rate', {
+                    type="number"
+                    placeholder="Term"
+                    {...register('term', {
                       required: true,
                     })}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Penalty rate</FormLabel>
+                  <Input
+                    as={NumericFormat}
+                    decimalScale={7}
+                    thousandSeparator=","
+                    placeholder="Penalty rate"
+                    autoComplete="off"
+                    value={getValues('penalty_rate')}
+                    onChange={(event): void => {
+                      setValue('penalty_rate', toNumber(event.target.value))
+                    }}
                   />
                 </FormControl>
               </Flex>
