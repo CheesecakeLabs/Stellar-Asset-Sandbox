@@ -3,6 +3,7 @@ package repo
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
@@ -144,4 +145,39 @@ func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
 	}
 
 	return user, nil
+}
+
+// SetResetToken updates the reset token and its expiry for a user
+func (r UserRepo) SetResetToken(email string, token string, expiry time.Time) error {
+	stmt := `UPDATE UserAccount SET reset_token=$2, reset_token_expiry=$3 WHERE email = $1`
+	_, err := r.Db.Exec(stmt, email, token, expiry)
+	if err != nil {
+		return fmt.Errorf("UserRepo - SetResetToken - db.Exec: %w", err)
+	}
+	return nil
+}
+
+// ValidateResetToken checks if the provided reset token is valid and hasn't expired
+func (r UserRepo) ValidateResetToken(email string, token string) (bool, error) {
+	stmt := `SELECT reset_token, reset_token_expiry FROM UserAccount WHERE email = $1`
+	var storedToken string
+	var storedExpiry time.Time
+	err := r.Db.QueryRow(stmt, email).Scan(&storedToken, &storedExpiry)
+	if err != nil {
+		return false, fmt.Errorf("UserRepo - ValidateResetToken - db.Query: %w", err)
+	}
+	if token != storedToken || time.Now().After(storedExpiry) {
+		return false, nil
+	}
+	return true, nil
+}
+
+// UpdateUserPassword updates the user's password
+func (r UserRepo) UpdateUserPassword(email string, newPassword string) error {
+	stmt := `UPDATE UserAccount SET password=$2 WHERE email = $1`
+	_, err := r.Db.Exec(stmt, email, newPassword)
+	if err != nil {
+		return fmt.Errorf("UserRepo - UpdateUserPassword - db.Exec: %w", err)
+	}
+	return nil
 }

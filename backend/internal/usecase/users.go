@@ -1,7 +1,11 @@
 package usecase
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"golang.org/x/crypto/bcrypt"
@@ -19,6 +23,15 @@ func NewUserUseCase(r UserRepo, k string) *UserUseCase {
 		repo:         r,
 		jwtSecretKey: k,
 	}
+}
+
+func (uc *UserUseCase) generateResetToken() (string, error) {
+	token := make([]byte, 16)
+	_, err := rand.Read(token)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(token), nil
 }
 
 // History - getting translate history from store.
@@ -69,6 +82,7 @@ func (uc *UserUseCase) HashPassword(password string) (string, error) {
 	return string(bytes), nil
 }
 
+// CheckPassword checks if the provided password matches the user's password
 func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(providedPassword))
 	if err != nil {
@@ -77,6 +91,7 @@ func (uc *UserUseCase) CheckPassword(user entity.User, providedPassword string) 
 	return nil
 }
 
+// GetUserByToken returns the user with the given token
 func (uc *UserUseCase) GetUserByToken(token string) (user entity.User, err error) {
 	user, err = uc.repo.GetUserByToken(token)
 	if err != nil {
@@ -85,6 +100,7 @@ func (uc *UserUseCase) GetUserByToken(token string) (user entity.User, err error
 	return user, nil
 }
 
+// GetAllUsers returns all users
 func (uc *UserUseCase) GetAllUsers() ([]entity.UserResponse, error) {
 	users, err := uc.repo.GetAllUsers()
 	if err != nil {
@@ -102,6 +118,7 @@ func (uc *UserUseCase) EditUsersRole(userRole entity.UserRole) error {
 	return nil
 }
 
+// GetProfile returns the user's profile information
 func (uc *UserUseCase) GetProfile(token string) (entity.UserResponse, error) {
 	profile, err := uc.repo.GetProfile(token)
 	if err != nil {
@@ -109,4 +126,43 @@ func (uc *UserUseCase) GetProfile(token string) (entity.UserResponse, error) {
 	}
 
 	return profile, nil
+}
+
+// RequestPasswordReset generates a reset token and sends an email to the user
+func (uc *UserUseCase) RequestPasswordReset(email string) error {
+	// Generate a reset token
+	token := generateResetToken()
+	expiry := time.Now().Add(1 * time.Hour) // Token valid for 1 hour
+
+	// Store the reset token and its expiry in the database
+	err := uc.repo.SetResetToken(email, token, expiry)
+	if err != nil {
+		return err
+	}
+
+	// TODO: Send an email to the user with the reset link containing the token
+
+	return nil
+}
+
+// ValidateResetToken checks if the provided token is valid and hasn't expired
+func (uc *UserUseCase) ValidateResetToken(email string, token string) (bool, error) {
+	// TODO: Fetch the stored token and expiration time from the database for the given email
+
+	// Compare the provided token with the stored token
+	if token != storedToken {
+		return false, errors.New("Invalid token")
+	}
+
+	// Check if the token has expired
+	if time.Now().After(storedExpirationTime) {
+		return false, errors.New("Token has expired")
+	}
+
+	return true, nil
+}
+
+// UpdatePassword updates the user's password in the database
+func (uc *UserUseCase) UpdatePassword(email string, newPassword string) error {
+	return uc.repo.UpdateUserPassword(email, newPassword)
 }
