@@ -87,6 +87,6 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	// Shutdown
 	err := httpServer.Shutdown()
 	if err != nil {
-		l.Fatal("app - Run - httpServer.Shutdown", err)
+		l.Fatal("app - Run - httpServer.Shutdown: %v", err)
 	}
 }

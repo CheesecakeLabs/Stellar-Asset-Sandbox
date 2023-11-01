@@ -89,5 +89,9 @@ func (l *Logger) Error(err error, message string, args ...interface{}) {
 }
 
 func (l *Logger) Fatal(message string, args ...interface{}) {
-	l.logger.Fatal().Msgf(message, args...)
+	if len(args) > 0 {
+		l.logger.Fatal().Msgf(message, args...)
+	} else {
+		l.logger.Fatal().Msg(message)
+	}
 }
