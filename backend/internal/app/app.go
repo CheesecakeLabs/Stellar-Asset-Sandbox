@@ -81,7 +81,7 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	case s := <-interrupt:
 		l.Warn(s.String())
 	case err := <-httpServer.Notify():
-		l.Error(err.Error())
+		l.Error(err, "app - Run - httpServer.Notify")
 	}
 
 	// Shutdown

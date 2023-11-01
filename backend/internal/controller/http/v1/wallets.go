@@ -143,7 +143,7 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 	fundRes := res.Message.(entity.HorizonResponse)
 
 	if fundRes.StatusCode != 200 {
-		r.l.Error("http - v1 - fund wallet - fundRes.StatusCode != 200")
+		r.l.Error(err, "http - v1 - fund wallet - fundRes.StatusCode != 200")
 		errorResponse(c, http.StatusInternalServerError, "friendbot error", err)
 		return
 	}
