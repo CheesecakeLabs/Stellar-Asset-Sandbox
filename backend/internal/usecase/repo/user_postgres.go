@@ -17,27 +17,25 @@ func New(pg *postgres.Postgres) UserRepo {
 }
 
 func (r UserRepo) GetUser(email string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE email='%s'`, email)
+	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE email='%s' LIMIT 1`, email)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("UserRepo - GetUser - db.Query: %w", err)
 	}
-
 	defer rows.Close()
 
-	for rows.Next() {
-		var user entity.User
-
-		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
-		if err != nil {
-			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
-		}
-
-		return user, nil
+	if !rows.Next() {
+		return entity.User{}, nil // No matching user found.
 	}
 
-	return entity.User{}, nil
+	var user entity.User
+	err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
+	if err != nil {
+		return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
+	}
+
+	return user, nil
 }
 
 func (r UserRepo) CreateUser(user entity.User) error {

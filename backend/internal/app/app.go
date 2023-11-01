@@ -79,9 +79,9 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	select {
 	case s := <-interrupt:
-		l.Warn("app - Run - signal.Notify", s)
+		l.Warn(s.String())
 	case err := <-httpServer.Notify():
-		l.Warn("app - Run - httpServer.Notify", err)
+		l.Error(err.Error())
 	}
 
 	// Shutdown

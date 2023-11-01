@@ -19,7 +19,10 @@ func newMockProducer() *mockProducer {
 
 func (p *mockProducer) Produce(key string, value interface{}) error {
 	go func() {
-		notify.Post(key, mockResponse)
+		err := notify.Post(key, mockResponse)
+		if err != nil {
+			panic(err)
+		}
 	}()
 	return nil
 }
