@@ -135,6 +135,21 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
+	}
+
 	sponsorID := request.SponsorId
 	if sponsorID == 0 {
 		sponsorID = _sponsorId
@@ -268,20 +283,6 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - create asset - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - create asset - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
-	}
-
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -347,8 +348,22 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
+	}
+
 	sponsorID := request.SponsorId
-	var err error
 	if sponsorID == 0 {
 		_, err = r.w.Get(_sponsorId)
 	} else {
@@ -391,20 +406,6 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - mint asset - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - mint asset - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
-	}
-
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -444,6 +445,21 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.logger.Error(err, "http - v1 - burn asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 		return
 	}
 
@@ -492,20 +508,6 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 
 	}
 
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - burn asset - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - burn asset - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
-	}
-
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -546,6 +548,21 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.logger.Error(err, "http - v1 - transfer asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 		return
 	}
 
@@ -600,20 +617,6 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - transfer asset - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - transfer asset - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
-	}
-
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -657,9 +660,24 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		return
 	}
 
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
+		return
+	}
+
 	sponsorID := request.SponsorId
 	var sponsor entity.Wallet
-	var err error
+
 	if sponsorID == 0 {
 		sponsor, err = r.w.Get(_sponsorId)
 	} else {
@@ -706,21 +724,6 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		return
 	}
 
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - clawback asset - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - clawback asset - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
-		return
-	}
-
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -759,6 +762,21 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.logger.Error(err, "http - v1 - update auth flags - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	token := c.Request.Header.Get("Authorization")
+	user, err := r.a.GetUserByToken(token)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - get user by token")
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	userID, err := strconv.Atoi(user.ID)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - parse user id")
+		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 		return
 	}
 
@@ -812,20 +830,6 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
-	}
-
-	token := c.Request.Header.Get("Authorization")
-	user, err := r.a.GetUserByToken(token)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - update auth flags - get user by token")
-		errorResponse(c, http.StatusNotFound, "user not found", err)
-		return
-	}
-
-	userID, err := strconv.Atoi(user.ID)
-	if err != nil {
-		r.logger.Error(err, "http - v1 - update auth flags - parse user id")
-		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
