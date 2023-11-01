@@ -135,13 +135,15 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		})
 	}
 
+	Id := generateID()
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
 		Operations: ops,
 	})
 	if err != nil {
-		r.l.Error(err, "http - v1 - create vault - SendMessage")
+		r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -352,13 +354,15 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		}
 	}
 
+	Id := generateID()
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, vault.Wallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		r.l.Error(err, "http - v1 - update vault asset - SendMessage")
+		r.l.Error(err, fmt.Sprintf("http - v1 - update vault - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}

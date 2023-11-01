@@ -217,13 +217,15 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		})
 	}
 
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
 	})
 	if err != nil {
-		r.logger.Error(err, "http - v1 - create asset - send message")
+		r.logger.Error(err, fmt.Sprintf("http - v1 - create asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -376,13 +378,15 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 			Origin: asset.Issuer.Key.PublicKey,
 		},
 	}
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		r.logger.Error(err, "http - v1 - mint asset - send message")
+		r.logger.Error(err, fmt.Sprintf("http - v1 - mint asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -474,12 +478,15 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		},
 	}
 
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
+		r.logger.Error(err, fmt.Sprintf("http - v1 - burn asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
@@ -580,13 +587,15 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		},
 	}
 
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		r.logger.Error(err, "http - v1 - transfer asset - send message")
+		r.logger.Error(err, fmt.Sprintf("http - v1 - transfer asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -684,13 +693,15 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		},
 	}
 
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
-		r.logger.Error(err, "http - v1 - clawback asset - send message")
+		r.logger.Error(err, fmt.Sprintf("http - v1 - clawback asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -789,13 +800,15 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		return
 	}
 
+	Id := generateID()
 	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {
-		r.logger.Error(err, "http - v1 - update auth flags - send message")
+		r.logger.Error(err, fmt.Sprintf("http - v1 - update auth flags- send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
