@@ -28,36 +28,54 @@ var _ Interface = (*Logger)(nil)
 // New creates and returns a new Logger.
 func New(level string) *Logger {
 	var lvl zerolog.Level
+	switch strings.ToLower(level) {
+	case "debug":
+		lvl = zerolog.DebugLevel
+	case "info":
+		lvl = zerolog.InfoLevel
+	case "warn":
+		lvl = zerolog.WarnLevel
+	case "error":
+		lvl = zerolog.ErrorLevel
+	default:
+		lvl = zerolog.InfoLevel
+	}
+
 	zerolog.SetGlobalLevel(lvl)
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	// Customize the output format and add coloring
+	// Determine if the application is running in a terminal
+	isTerminal := os.Getenv("TERM") != ""
+
+	// Create a ConsoleWriter if running in a terminal
 	output := zerolog.ConsoleWriter{
 		Out:        os.Stderr,
 		TimeFormat: time.RFC3339,
-		NoColor:    false, // Setting NoColor to false enables color output
+		NoColor:    !isTerminal, // Disable color if not running in a terminal
 	}
 
-	// Customize the level colors if needed
-	output.FormatLevel = func(i interface{}) string {
-		var l string
-		if ll, ok := i.(string); ok {
-			switch strings.ToLower(ll) {
-			case "debug":
-				l = "\033[34mDEBUG\033[0m" // Blue
-			case "info":
-				l = "\033[32mINFO\033[0m" // Green
-			case "warn":
-				l = "\033[33mWARN\033[0m" // Yellow
-			case "error":
-				l = "\033[31mERROR\033[0m" // Red
-			case "fatal":
-				l = "\033[35mFATAL\033[0m" // Magenta
-			default:
-				l = "\033[37m" + strings.ToUpper(ll) + "\033[0m" // White for others
+	if isTerminal {
+		// Customize the level colors if needed
+		output.FormatLevel = func(i interface{}) string {
+			var l string
+			if ll, ok := i.(string); ok {
+				switch strings.ToLower(ll) {
+				case "debug":
+					l = "\033[34mDEBUG\033[0m" // Blue
+				case "info":
+					l = "\033[32mINFO\033[0m" // Green
+				case "warn":
+					l = "\033[33mWARN\033[0m" // Yellow
+				case "error":
+					l = "\033[31mERROR\033[0m" // Red
+				case "fatal":
+					l = "\033[35mFATAL\033[0m" // Magenta
+				default:
+					l = "\033[37m" + strings.ToUpper(ll) + "\033[0m" // White for others
+				}
 			}
+			return l
 		}
-		return l
 	}
 
 	// Set up the logger with the console writer
