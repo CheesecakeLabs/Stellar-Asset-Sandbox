@@ -44,10 +44,8 @@ func (r UserRepo) CreateUser(user entity.User) error {
 	stmt := `INSERT INTO UserAccount (name, password, role_id, email, token) VALUES ($1, $2, $3, $4, $5)`
 	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId, user.Email, user.Token)
 	if err != nil {
-		panic(err)
-		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
 	}
-	fmt.Println("User created successfully")
 	return nil
 }
 
@@ -56,7 +54,6 @@ func (r UserRepo) UpdateToken(id string, token string) error {
 	stmt := `UPDATE UserAccount SET token=$2 WHERE id = $1`
 	_, err := r.Db.Exec(stmt, id, token)
 	if err != nil {
-		// panic(err)
 		return fmt.Errorf("UserRepo - UpdateToken - db.Exec: %w", err)
 	}
 	return nil
@@ -125,7 +122,6 @@ func (r UserRepo) EditUsersRole(id_user string, role_id string) error {
 	stmt := `UPDATE UserAccount SET role_id=$2 WHERE id = $1`
 	_, err := r.Db.Exec(stmt, id_user, role_id)
 	if err != nil {
-		// panic(err)
 		return fmt.Errorf("UserRepo - EditUsersRole - db.Exec: %w", err)
 	}
 	return nil

@@ -8,6 +8,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,23 +18,24 @@ const (
 )
 
 type assetsRoutes struct {
-	w  usecase.WalletUseCase
-	as usecase.AssetUseCase
-	m  HTTPControllerMessenger
-	a  usecase.AuthUseCase
-	l  usecase.LogTransactionUseCase
+	w      usecase.WalletUseCase
+	as     usecase.AssetUseCase
+	m      HTTPControllerMessenger
+	a      usecase.AuthUseCase
+	l      usecase.LogTransactionUseCase
+	logger *logger.Logger
 }
 
-func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
-	r := &assetsRoutes{w, as, m, a, l}
+func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger) {
+	r := &assetsRoutes{w, as, m, a, l, logger}
 	h := handler.Group("/").Use()
 	{
 		h.GET("/.well-known/stellar.toml", r.retrieveToml)
 	}
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase) {
-	r := &assetsRoutes{w, as, m, a, l}
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger) {
+	r := &assetsRoutes{w, as, m, a, l, logger}
 
 	h := handler.Group("/assets")
 	h.GET("/:id/image.png", r.getAssetImage)
@@ -128,6 +130,7 @@ type UploadAssetImageRequest struct {
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - create asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -139,18 +142,21 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 2})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - create keypair")
 		errorResponse(c, http.StatusInternalServerError, "kms messaging problems", err)
 		return
 	}
 
 	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
 	if !ok || len(kpRes.PublicKeys) != 2 {
+		r.logger.Error(err, "http - v1 - create asset - unexpected kms response")
 		errorResponse(c, http.StatusInternalServerError, "unexpected kms response", err)
 		return
 	}
@@ -217,6 +223,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		Operations: ops,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - send message")
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -246,6 +253,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	if request.Image != "" {
 		asset.Image, err = base64.StdEncoding.DecodeString(request.Image)
 		if err != nil {
+			r.logger.Error(err, "http - v1 - create asset - decode image")
 			errorResponse(c, http.StatusBadRequest, "Failed to decode base64 image", err)
 			return
 		}
@@ -253,6 +261,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	asset, err = r.as.Create(asset)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - create asset")
 		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
@@ -260,12 +269,14 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
@@ -281,6 +292,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -298,6 +310,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	if asset.Id == 1 {
 		_, err = r.as.CreateToml(tomlData)
 		if err != nil {
+			r.logger.Error(err, "http - v1 - create asset - create toml")
 			errorResponse(c, http.StatusNotFound, "error to create TOML ", err)
 			return
 		}
@@ -305,6 +318,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	_, err = r.as.UpdateToml(tomlData)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - create asset - update toml")
 		errorResponse(c, http.StatusNotFound, "error to update TOML ", err)
 		return
 	}
@@ -326,6 +340,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	var request MintAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -336,12 +351,14 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 	_, err := r.w.Get(request.SponsorId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - get asset")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
@@ -363,6 +380,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		Operations: ops,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - send message")
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -370,12 +388,14 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
@@ -394,6 +414,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - mint asset - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -415,12 +436,14 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	var request BurnAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.Id)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - get asset")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
@@ -431,6 +454,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
@@ -461,12 +485,14 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
@@ -484,6 +510,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - burn asset - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -507,12 +534,14 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	var request TransferAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	sourceWallet, err := r.w.Get(request.SourceWalletID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - get source wallet")
 		errorResponse(c, http.StatusNotFound, "source wallet not found", err)
 		return
 	}
@@ -523,12 +552,14 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	}
 	_, err = r.w.Get(request.SponsorId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.AssetID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - get asset")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
@@ -551,6 +582,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		Operations: ops,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - send message")
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -558,12 +590,14 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
@@ -583,6 +617,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - transfer asset - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -604,6 +639,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	var request ClawbackAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -614,12 +650,14 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 	sponsor, err := r.w.Get(request.SponsorId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - get asset")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
@@ -644,6 +682,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		Operations: ops,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - send message")
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
@@ -651,12 +690,14 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 		return
 	}
@@ -675,6 +716,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		CurrentMainVault:  &request.CurrentMainVault,
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - clawback asset - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -696,12 +738,14 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	var request UpdateAuthFlagsRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.Get(request.Code)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - get asset")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
@@ -710,6 +754,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	if request.TrustorId != 0 {
 		trustor, err = r.w.Get(request.TrustorId)
 		if err != nil {
+			r.logger.Error(err, "http - v1 - update auth flags - get trustor")
 			errorResponse(c, http.StatusNotFound, "trustor wallet not found", err)
 			return
 		}
@@ -731,6 +776,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 
 	sponsor, err := r.w.Get(_sponsorId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
@@ -741,6 +787,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		Operations: []entity.Operation{op},
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - send message")
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 
@@ -749,12 +796,14 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	user, err := r.a.GetUserByToken(token)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - get user by token")
 		errorResponse(c, http.StatusNotFound, "user not found", err)
 		return
 	}
 
 	userID, err := strconv.Atoi(user.ID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - parse user id")
 		errorResponse(c, http.StatusNotFound, "error to parse user id", err)
 	}
 
@@ -765,6 +814,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
 	})
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update auth flags - create log transaction")
 		errorResponse(c, http.StatusNotFound, "error to create log transaction", err)
 		return
 	}
@@ -783,6 +833,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	assets, err := r.as.GetAll()
 	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - get all")
 		errorResponse(c, http.StatusInternalServerError, "error getting assets", err)
 		return
 	}
@@ -802,6 +853,7 @@ func (r *assetsRoutes) getAssetById(c *gin.Context) {
 	assetId := c.Param("id")
 	assets, err := r.as.GetById(assetId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - get asset by id - get by id")
 		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
 		return
 	}
@@ -823,6 +875,7 @@ func (r *assetsRoutes) getAssetById(c *gin.Context) {
 func (r *assetsRoutes) uploadAssetImage(c *gin.Context) {
 	var req UploadAssetImageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		r.logger.Error(err, "http - v1 - upload asset image - bind")
 		errorResponse(c, http.StatusBadRequest, "Invalid request format", err)
 		return
 	}
@@ -830,12 +883,14 @@ func (r *assetsRoutes) uploadAssetImage(c *gin.Context) {
 	// Decode the base64 string to get raw bytes
 	decodedBytes, err := base64.StdEncoding.DecodeString(req.Image)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - upload asset image - decode image")
 		errorResponse(c, http.StatusBadRequest, "Failed to decode base64 image", err)
 		return
 	}
 
 	assetId := c.Param("id")
 	if err := r.as.UploadImage(assetId, decodedBytes); err != nil {
+		r.logger.Error(err, "http - v1 - upload asset image - upload image")
 		errorResponse(c, http.StatusInternalServerError, "Failed to store the image", err)
 		return
 	}
@@ -857,6 +912,7 @@ func (r *assetsRoutes) getAssetImage(c *gin.Context) {
 	assetId := c.Param("id")
 	image, err := r.as.GetImage(assetId)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - get asset image - get image")
 		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
 		return
 	}
@@ -877,12 +933,13 @@ func (r *assetsRoutes) getAssetImage(c *gin.Context) {
 func (r *assetsRoutes) generateTOML(c *gin.Context) {
 	var request entity.TomlData
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - generate toml - bind")
 		errorResponse(c, http.StatusBadRequest, "invalid request body: %s", err)
 		return
 	}
-	fmt.Printf(request.Currencies[len(request.Currencies)-1].Description)
 	toml, err := r.as.CreateToml(request)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - generate toml - create toml")
 		errorResponse(c, http.StatusInternalServerError, "error creating TOML", err)
 		return
 	}
@@ -922,12 +979,14 @@ func (r *assetsRoutes) retrieveToml(c *gin.Context) {
 func (r *assetsRoutes) updateTOML(c *gin.Context) {
 	var request entity.TomlData
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - update toml - bind")
 		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
 		return
 	}
 
 	toml, err := r.as.UpdateToml(request)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - update toml - update toml")
 		errorResponse(c, http.StatusInternalServerError, "error updating TOML", err)
 		return
 	}
@@ -947,6 +1006,7 @@ func (r *assetsRoutes) updateTOML(c *gin.Context) {
 func (r *assetsRoutes) getTomlData(c *gin.Context) {
 	tomlContent, err := r.as.GetTomlData()
 	if err != nil {
+		r.logger.Error(err, "http - v1 - get toml data - get toml data")
 		errorResponse(c, http.StatusInternalServerError, "error retrieving TOML", err)
 		return
 	}

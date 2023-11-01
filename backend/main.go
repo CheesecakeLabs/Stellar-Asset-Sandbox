@@ -25,7 +25,7 @@ func main() {
 	// Postgres
 	pg, err := postgres.New(cfg.PG)
 	if err != nil {
-		log.Fatal(fmt.Errorf("Failed to connect to Postgres: %w", err))
+		log.Fatal(fmt.Errorf("failed to connect to Postgres: %w", err))
 	}
 	defer pg.Close()
 
@@ -33,7 +33,7 @@ func main() {
 	kpConn := kafka.New(cfg.Kafka, cfg.Kafka.CreateKpCfg.ConsumerTopics, cfg.Kafka.CreateKpCfg.ProducerTopic)
 	err = kpConn.AttemptConnect()
 	if err != nil {
-		fmt.Printf("Failed to connect to Kafka create keypair topics %s\n", err)
+		log.Fatal(fmt.Errorf("failed to connect to Kafka create keypair topics %s ", err))
 		os.Exit(1)
 	}
 	go kpConn.Run(cfg, entity.CreateKeypairChannel)
@@ -42,7 +42,7 @@ func main() {
 	horConn := kafka.New(cfg.Kafka, cfg.Kafka.HorizonCfg.ConsumerTopics, cfg.Kafka.HorizonCfg.ProducerTopic)
 	err = horConn.AttemptConnect()
 	if err != nil {
-		fmt.Printf("Failed to connect to Kafka horizon topics %s\n", err)
+		log.Fatal(fmt.Errorf("failed to connect to Kafka horizon topics %s ", err))
 		os.Exit(1)
 	}
 	go horConn.Run(cfg, entity.HorizonChannel)
@@ -51,7 +51,7 @@ func main() {
 	envConn := kafka.New(cfg.Kafka, cfg.Kafka.EnvelopeCfg.ConsumerTopics, cfg.Kafka.EnvelopeCfg.ProducerTopic)
 	err = envConn.AttemptConnect()
 	if err != nil {
-		fmt.Printf("Failed to connect to Kafka envelopee topics %s\n", err)
+		log.Fatal(fmt.Errorf("failed to connect to Kafka envelopee topics %s ", err))
 		os.Exit(1)
 	}
 	go envConn.Run(cfg, entity.EnvelopeChannel)

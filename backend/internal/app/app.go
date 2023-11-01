@@ -2,13 +2,13 @@
 package app
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	timeout "github.com/vearne/gin-timeout"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	v1 "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/v1"
@@ -16,13 +16,14 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 // Run creates objects via constructors.
 func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator) {
-	// l := logger.New(cfg.Log.Level)
+	l := logger.New(cfg.Log.Level)
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -63,7 +64,9 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	// HTTP Server
 	handler := gin.Default()
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP)
+	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
+
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),
@@ -76,14 +79,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	select {
 	case s := <-interrupt:
-		fmt.Printf("app - Run - signal: " + s.String())
+		l.Warn("app - Run - signal.Notify", s)
 	case err := <-httpServer.Notify():
-		fmt.Errorf("app - Run - httpServer.Notify: %w", err)
+		l.Warn("app - Run - httpServer.Notify", err)
 	}
 
 	// Shutdown
 	err := httpServer.Shutdown()
 	if err != nil {
-		fmt.Errorf("app - Run - httpServer.Shutdown: %w", err)
+		l.Fatal("app - Run - httpServer.Shutdown", err)
 	}
 }

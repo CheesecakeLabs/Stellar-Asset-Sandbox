@@ -12,6 +12,11 @@ type (
 		HTTP    HTTP
 		JWT     JWT
 		Horizon Horizon
+		Log     Log
+	}
+
+	Log struct {
+		Level string `env-required:"true" env:"LOG_LEVEL" env-default:"info"`
 	}
 
 	KafkaConfig struct {
