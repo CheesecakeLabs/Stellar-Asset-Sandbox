@@ -1,7 +1,7 @@
-import { ContractSpec } from 'soroban-client'
+import { ContractSpec } from 'soroban-client';
 
-export const contractId =
-  'CBYODNDK5DVH66CBA6XRKYPHJVTJBCJH2O3J5IZS744GVROWPWKPGZH7'
+
+export const contractId = 'CDTN4ZDXNYEHC5TRJPXQYOONEEVFSHEUXCI7BIR6MLEZ6JNH32LEXDXS'
 export const codWasmHash =
   'ad834c6a3e531916958f32f973aaf37369391609c59084eff3ffe861520c0023'
 

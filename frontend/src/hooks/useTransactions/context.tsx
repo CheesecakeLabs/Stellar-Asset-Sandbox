@@ -56,12 +56,31 @@ export const TransactionsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getSponsorPK = async (): Promise<string | undefined> => {
+    setLoading(true)
+    try {
+      const response = await http.get(`wallets/sponsor_pk/`)
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <TransactionsContext.Provider
       value={{
         loading,
         sign,
         submit,
+        getSponsorPK
       }}
     >
       {children}

@@ -15,7 +15,7 @@ const deposit = async (rawArgs: {
   }
 
   let invokeArgs: IInvokeSorobanArgs = {
-    contractId: 'contractId',
+    contractId: rawArgs.contractId,
     spec,
     method: Methods.deposit,
     sourcePk: rawArgs.address,
@@ -30,6 +30,158 @@ const deposit = async (rawArgs: {
   return invokeSoroban(invokeArgs)
 }
 
+const withdraw = async (rawArgs: {
+  address: string
+  accept_premature_withdraw: boolean
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  const args = {
+    address: new Address(rawArgs.address),
+    accept_premature_withdraw: rawArgs.accept_premature_withdraw,
+  }
+
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.withdraw,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
+const getEstimatedYield = async (rawArgs: {
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  const args = {
+    address: new Address(rawArgs.address),
+  }
+
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.getEstimatedYield,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
+const getPosition = async (rawArgs: {
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  const args = {
+    address: new Address(rawArgs.address),
+  }
+
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.getPosition,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
+const getEstimatedPrematureWithdraw = async (rawArgs: {
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  const args = {
+    address: new Address(rawArgs.address),
+  }
+
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.getEstimatedPrematureWithdraw,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
+const getTimeLeft = async (rawArgs: {
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  const args = {
+    address: new Address(rawArgs.address),
+  }
+
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.getEstimatedPrematureWithdraw,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
+const extendContractValidity = async (rawArgs: {
+  address: string
+  contractId: string
+  signerSecret?: string
+}): Promise<any> => {
+  let invokeArgs: IInvokeSorobanArgs = {
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.getEstimatedPrematureWithdraw,
+    sourcePk: rawArgs.address,
+  }
+
+  invokeArgs = rawArgs.signerSecret
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+    : invokeArgs
+
+  return invokeSoroban(invokeArgs)
+}
+
 export const assetControllerClient = {
   deposit,
+  withdraw,
+  getEstimatedYield,
+  getPosition,
+  getEstimatedPrematureWithdraw,
+  getTimeLeft,
+  extendContractValidity,
 }

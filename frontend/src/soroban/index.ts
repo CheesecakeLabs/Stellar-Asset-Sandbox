@@ -1,13 +1,26 @@
-import { Buffer } from 'buffer';
-import * as SorobanClient from 'soroban-client';
-import { ContractSpec, SorobanRpc, xdr, hash, TransactionBuilder, assembleTransaction, Server, Asset, StrKey, OperationOptions, Operation } from 'soroban-client';
+import axios from 'axios'
+import { Buffer } from 'buffer'
+import * as SorobanClient from 'soroban-client'
+import {
+  ContractSpec,
+  SorobanRpc,
+  xdr,
+  hash,
+  TransactionBuilder,
+  assembleTransaction,
+  Server,
+  Asset,
+  StrKey,
+  OperationOptions,
+  Operation,
+} from 'soroban-client'
+import { MessagesError } from 'utils/constants/messages-error'
 
+import { http } from 'interfaces/http'
 
-
-import { FREIGHTER } from './Freighter';
-import { SELECTED_NETWORK } from './StellarHelpers';
-import { sorobanConfig } from './constants';
-
+import { FREIGHTER } from './Freighter'
+import { SELECTED_NETWORK } from './StellarHelpers'
+import { sorobanConfig } from './constants'
 
 type BuildSorobanTxArgs = {
   contractId: string
@@ -174,6 +187,13 @@ export const invokeSoroban = async (
 > => {
   const { contractId, spec, method, sourcePk, args, sourceSk } = invokeArgs
 
+  console.log({
+    contractId,
+    spec,
+    method,
+    sourcePk,
+    args,
+  })
   const tx = await buildSorobanTx({
     contractId,
     spec,
@@ -183,7 +203,10 @@ export const invokeSoroban = async (
   })
 
   const signedTx = sourceSk
-    ? await signWithSecret(tx, sourceSk)
+    ? await sign({
+        envelope: tx.toXDR(),
+        wallet_pk: sourceSk,
+      })
     : new SorobanClient.Transaction(
         await FREIGHTER.signWithFreighter(tx.toXDR(), sourcePk),
         SELECTED_NETWORK.passphrase
@@ -191,7 +214,17 @@ export const invokeSoroban = async (
 
   // const signedTx = await signWithFreighter(tx.toXDR(), sourcePk);
 
-  return submitSorobanTx(signedTx)
+  if (signedTx) {
+    if (sourceSk) {
+      return submitSoroban(signedTx as string)
+    } else {
+      return submitSorobanTx(
+        signedTx as SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
+      )
+    }
+  } else {
+    throw new Error('invalid signedTx')
+  }
 }
 
 const getContractId = (wrapArgs: {
@@ -246,24 +279,29 @@ const getSourceAccount = (
   return rpc.getAccount(publicKey)
 }
 
-const wrapClassicAsset = async (
-  operation: xdr.Operation<Operation.InvokeHostFunction>,
-  sourceAccount: SorobanClient.Account
-): Promise<string> => {
+interface ISimulateResponse {
+  transactionData: string
+  fee: string
+}
+
+const simulate = async (
+  operation: xdr.Operation<Operation.InvokeHostFunction>
+): Promise<ISimulateResponse> => {
   try {
     const rpc = new Server(sorobanConfig.network.rpc, {
       allowHttp: true,
     })
 
-    const txBuilder = new TransactionBuilder(sourceAccount, {
+    const sourceAccount = await getSourceAccount(
+      'GA7FLYHBEVVZK6NCR7I3Y352VW4D7UNALTIZF4GDLULHA3P2CH5LM56D'
+    )
+    const tx = new TransactionBuilder(sourceAccount, {
       fee: sorobanConfig.fee,
       networkPassphrase: sorobanConfig.network.passphrase,
     })
-
-    txBuilder.addOperation(operation)
-    txBuilder.setTimeout(sorobanConfig.txTimeout)
-    const tx = txBuilder.build()
-    console.log(tx.toXDR())
+      .addOperation(operation)
+      .setTimeout(sorobanConfig.txTimeout)
+      .build()
 
     const simulatedTransaction = await rpc.simulateTransaction(tx)
     const preppedTx = assembleTransaction(
@@ -271,11 +309,54 @@ const wrapClassicAsset = async (
       sorobanConfig.network.passphrase,
       simulatedTransaction
     ).build()
+    return {
+      transactionData: (await getTransactionData(tx.toXDR())) || '',
+      fee: preppedTx.fee,
+    }
+  } catch (e) {
+    console.log('Wraping of asset ${wrapArgs.code} failed: ', e)
+    throw e
+  }
+}
 
-    const preppedTxXdr = preppedTx.toXDR()
-    console.log(preppedTxXdr)
+const getTransactionData = async (xdr: string): Promise<string | undefined> => {
+  try {
+    const response = await axios
+      .create()
+      .post(`https://soroban-testnet.stellar.org`, {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'simulateTransaction',
+        params: [xdr],
+      })
+    if (response.status === 200) {
+      return response.data.result.transactionData
+    }
+    return undefined
+  } catch (error) {
+    throw new Error(MessagesError.errorOccurred)
+  }
+}
 
-    return preppedTxXdr
+const wrapClassicAsset = async (
+  operation: xdr.Operation<Operation.InvokeHostFunction>,
+  sourceAccount: SorobanClient.Account
+): Promise<string> => {
+  try {
+    const simulated = await simulate(operation)
+
+    const tx = new TransactionBuilder(sourceAccount, {
+      fee: simulated.fee,
+      networkPassphrase: sorobanConfig.network.passphrase,
+    })
+      .addOperation(operation)
+      .setTimeout(sorobanConfig.txTimeout)
+      .setSorobanData(
+        new SorobanClient.SorobanDataBuilder(simulated.transactionData).build()
+      )
+      .build()
+
+    return tx.toXDR()
   } catch (e) {
     console.log('Wraping of asset ${wrapArgs.code} failed: ', e)
     throw e
@@ -325,10 +406,28 @@ const submitSoroban = async (
   }
 }
 
+const sign = async (
+  params: Hooks.UseTransactionsTypes.ISignRequest
+): Promise<string | undefined> => {
+  try {
+    const response = await http.post(`soroban-transactions/sign`, params)
+    if (response.status === 200) {
+      return response.data.Message.envelope
+    }
+    return undefined
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.message)
+    }
+    throw new Error(MessagesError.errorOccurred)
+  }
+}
+
 export const SorobanService = {
   wrapClassicAsset,
   getContractOperation,
   getContractId,
   getSourceAccount,
-  submitSoroban
+  submitSoroban,
+  sign,
 }

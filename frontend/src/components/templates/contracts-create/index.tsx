@@ -34,6 +34,7 @@ interface IContractsCreateTemplate {
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  creatingContract: boolean
 }
 
 export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
@@ -41,6 +42,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
   loading,
   vaults,
   assets,
+  creatingContract,
 }) => {
   const [errorSubmit] = useState<string | null>(null)
   const [vault, setVault] = useState<Hooks.UseVaultsTypes.IVault>()
@@ -162,7 +164,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   type="submit"
                   variant="primary"
                   mt="1.5rem"
-                  isLoading={loading}
+                  isLoading={creatingContract}
                 >
                   Create Contract
                 </Button>

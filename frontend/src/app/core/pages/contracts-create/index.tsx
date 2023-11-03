@@ -4,10 +4,11 @@ import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { useAssets } from 'hooks/useAssets'
 import { useContracts } from 'hooks/useContracts'
-import { useHorizon } from 'hooks/useHorizon'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
 import { SorobanService } from 'soroban'
+import { deployerClient } from 'soroban/deployer'
+import { codWasmHash } from 'soroban/deployer/constants'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from '../../../../components/enums/path-route'
@@ -18,9 +19,8 @@ export const ContractsCreate: React.FC = () => {
   const { loadingAssets, assets, getAssets } = useAssets()
   const { createContract, loading } = useContracts()
   const { vaults, getVaults, loadingVaults } = useVaults()
-  const { getAccountData } = useHorizon()
   const toast = useToast()
-  const { sign, submit } = useTransactions()
+  const { sign, submit, getSponsorPK } = useTransactions()
 
   const onSubmit = async (
     data: FieldValues,
@@ -31,20 +31,28 @@ export const ContractsCreate: React.FC = () => {
     if (!asset) return
 
     try {
+      const contractId = await SorobanService.getContractId({
+        assetCode: asset.code,
+        assetIssuerPk: asset.issuer.key.publicKey,
+      })
+
       const contract = {
         name: 'Contract',
         asset_id: asset.id.toString(),
         vault_id: vault.id.toString(),
-        address: vault.wallet.key.publicKey,
+        address: contractId,
         yield_rate: Number(data.yield_rate || 0),
         term: Number(data.term || 0),
         min_deposit: Number(data.min_deposit || 0),
         penalty_rate: Number(data.penalty_rate || 0),
       }
 
-      const sourceAccount = await SorobanService.getSourceAccount(
-        'GA7FLYHBEVVZK6NCR7I3Y352VW4D7UNALTIZF4GDLULHA3P2CH5LM56D'
-      )
+      const sponsorPK = await getSponsorPK()
+      if (!sponsorPK) {
+        throw new Error('Invalid sponsor!')
+      }
+
+      const sourceAccount = await SorobanService.getSourceAccount(sponsorPK)
 
       const operation = SorobanService.getContractOperation({
         assetCode: asset.code,
@@ -64,7 +72,21 @@ export const ContractsCreate: React.FC = () => {
           await SorobanService.submitSoroban(resultEnvelope)
         }
       }
-      return
+
+      await deployerClient.deploy({
+        deployer: vault.wallet.key.publicKey,
+        wasm_hash: codWasmHash,
+        salt: '22',
+        admin: vault.wallet.key.publicKey,
+        asset: contractId,
+        term: BigInt(contract.term),
+        compound_step: BigInt(0),
+        yield_rate: BigInt(contract.yield_rate),
+        min_deposit: BigInt(contract.min_deposit),
+        penalty_rate: BigInt(contract.penalty_rate),
+        signerSecret: vault.wallet.key.publicKey,
+      })
+
       const contractCreated = await createContract(contract)
 
       if (contractCreated) {
@@ -117,6 +139,7 @@ export const ContractsCreate: React.FC = () => {
           loading={loadingAssets || loadingVaults}
           vaults={vaults}
           assets={assets}
+          creatingContract={loading}
         />
       </Sidebar>
     </Flex>

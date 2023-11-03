@@ -27,6 +27,7 @@ declare namespace Hooks {
       loading: boolean
       sign(params: ISignRequest): Promise<string | undefined>
       submit(params: ISubmitRequest): Promise<string | undefined>
+      getSponsorPK(): Promise<string | undefined>
     }
   }
 }
