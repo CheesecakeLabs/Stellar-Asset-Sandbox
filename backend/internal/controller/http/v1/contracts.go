@@ -26,7 +26,7 @@ func newContractRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a us
 	{
 		h.GET("/:id", r.getContractById)
 		h.POST("", r.createContract)
-		h.GET("list", r.getAllContracts)
+		h.GET("/list", r.getAllContracts)
 	}
 }
 
@@ -108,7 +108,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 // @Failure     500 {object} response
 // @Router      / [get]
 func (r *contractRoutes) getAllContracts(c *gin.Context) {
-	contract, err := r.v.GetAll()
+	contract, err := r.c.GetAll()
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
