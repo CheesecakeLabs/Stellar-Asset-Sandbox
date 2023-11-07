@@ -31,12 +31,10 @@ export const fundAccountWithFriendBot = async (
       `${SELECTED_NETWORK.friendbot}?addr=${encodeURIComponent(pk)}`
     )
 
-    const responseJSON = await response.json()
+    await response.json()
 
     return true
   } catch (e) {
-    console.error('Error while initializing account with friendbot. ', e)
-
-    return false
+    throw new Error('Error while initializing account with friendbot.')
   }
 }

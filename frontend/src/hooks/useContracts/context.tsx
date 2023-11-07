@@ -1,20 +1,10 @@
 import { SetStateAction, createContext, useCallback, useState } from 'react';
-
-
-
 import freighter from '@stellar/freighter-api';
 import axios from 'axios';
 import { MessagesError } from 'utils/constants/messages-error';
 import { mockContracts } from 'utils/mockups';
-
-
-
 import { http } from 'interfaces/http';
-
-
-
-import * as certificatesOfDeposit from '../../soroban';
-
+import { certificateOfDepositClient } from 'soroban/certificate-of-deposit';
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -97,15 +87,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     amount: bigint,
     address: string,
     updatePosition: void,
+    contractId: string,
     signerSecret?: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-     /* await certificateOfDepositClient.deposit({
+      await certificateOfDepositClient.deposit({
         amount: amount * BigInt(10000000),
         address: address,
+        contractId: contractId,
         signerSecret: signerSecret,
-      })*/
+      })
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
@@ -123,50 +115,56 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const getPosition = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
+    address: string,
+    contractId: string,
   ): void => {
-    /*certificatesOfDeposit
+    certificateOfDepositClient
       .getPosition({
         address: address,
+        contractId: contractId
       })
       .then((res: SetStateAction<bigint>) => {
         update(res)
       })
       .catch(() => {
         setIsDepositing(false)
-      })*/
+      })
   }
 
   const getYield = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
+    address: string,
+    contractId: string,
   ): void => {
-    /*certificatesOfDeposit
+    certificateOfDepositClient
       .getEstimatedYield({
         address: address,
+        contractId: contractId
       })
       .then((res: SetStateAction<bigint>) => {
         update(res)
       })
       .catch(() => {
         setIsDepositing(false)
-      })*/
+      })
   }
 
   const getTime = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
+    address: string,
+    contractId: string,
   ): void => {
-    /*certificatesOfDeposit
+    certificateOfDepositClient
       .getTimeLeft({
         address: address,
+        contractId: contractId
       })
       .then((res: SetStateAction<bigint>) => {
         update(res)
       })
       .catch(() => {
         setIsDepositing(false)
-      })*/
+      })
   }
 
   const getAccount = (
@@ -179,17 +177,18 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     address: string,
     premature: boolean,
     updatePosition: void,
-    signerSecret: string
+    contractId: string,
+    signerSecret?: string
   ): Promise<boolean> => {
-    return true
-    /*setIsWithdrawing(true)
+    setIsWithdrawing(true)
     try {
-      await certificatesOfDeposit.withdraw(
+      await certificateOfDepositClient.withdraw(
         {
           address: address,
           accept_premature_withdraw: premature,
-        },
-        { secret: signerSecret }
+          contractId: contractId,
+          signerSecret: signerSecret
+        }
       )
       setIsWithdrawing(false)
       updatePosition
@@ -202,7 +201,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       throw new Error(MessagesError.errorOccurred)
     } finally {
       setIsWithdrawing(false)
-    }*/
+    }
   }
 
   return (

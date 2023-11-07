@@ -8,6 +8,7 @@ import {
 } from '@stellar/freighter-api'
 
 import { SELECTED_NETWORK, SELECTED_NETWORK as network } from './StellarHelpers'
+import { MessagesError } from 'utils/constants/messages-error'
 
 const getUserWallet = async (
   onPublicKeyReceived: (key: string) => void
@@ -21,7 +22,7 @@ const getUserWallet = async (
 
       return publicKey
     } catch (e) {
-      console.log(e)
+      throw new Error(MessagesError.errorOccurred)
     }
   }
 }
@@ -40,7 +41,7 @@ async function validateFreighterPermissions(
   // REVIEW: From what I have read from the docs, we don't need both isAllowed and setAllowed
   const allowed = await isAllowed()
   if (!allowed) {
-    setAllowed().then(res => {
+    setAllowed().then(() => {
       getUserWallet(onPublicKeyReceived)
     })
 

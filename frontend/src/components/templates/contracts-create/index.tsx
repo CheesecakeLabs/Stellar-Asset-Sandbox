@@ -8,6 +8,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Skeleton,
   Text,
   VStack,
 } from '@chakra-ui/react'
@@ -78,7 +79,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
               New Contract
             </Text>
           </Flex>
-          <Box p="1rem">
+          {loading ? <Skeleton w="full" h="16rem" /> : <Box p="1rem">
             <form
               onSubmit={handleSubmit(data => {
                 if (!asset || !vault) return
@@ -170,7 +171,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 </Button>
               </Flex>
             </form>
-          </Box>
+          </Box>}
         </Container>
       </Flex>
       <VStack mt="2.5rem">

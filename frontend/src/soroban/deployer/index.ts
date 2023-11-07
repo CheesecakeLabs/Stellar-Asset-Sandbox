@@ -31,19 +31,6 @@ const deploy = async (rawArgs: {
     penalty_rate: rawArgs.penalty_rate,
   }
 
-  console.log({
-    deployer: new Address(rawArgs.deployer),
-    wasm_hash: Buffer.from(rawArgs.wasm_hash),
-    salt: Buffer.from(rawArgs.salt),
-    admin: new Address(rawArgs.admin),
-    asset: new Address(rawArgs.asset),
-    term: rawArgs.term,
-    compound_step: rawArgs.compound_step,
-    yield_rate: rawArgs.yield_rate,
-    min_deposit: rawArgs.min_deposit,
-    penalty_rate: rawArgs.penalty_rate,
-  })
-
   let invokeArgs: IInvokeSorobanArgs = {
     contractId,
     spec,

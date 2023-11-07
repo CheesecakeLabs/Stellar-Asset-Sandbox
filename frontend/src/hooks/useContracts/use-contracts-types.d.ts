@@ -12,6 +12,7 @@ declare namespace Hooks {
       min_deposit: number
       created_at: string
       penalty_rate: number
+      address: string
     }
 
     interface IContractRequest {
@@ -45,26 +46,31 @@ declare namespace Hooks {
         amount: bigint,
         address: string,
         updatePosition: void,
+        contractId: string,
         signerSecret: string
       ): Promise<boolean>
       getPosition(
         update: React.Dispatch<React.SetStateAction<bigint>>,
-        address: string
+        address: string,
+        contractId: string
       ): void
       getYield(
         update: React.Dispatch<React.SetStateAction<bigint>>,
-        address: string
+        address: string,
+        contractId: string
       ): void
       getTime(
         update: React.Dispatch<React.SetStateAction<bigint>>,
-        address: string
+        address: string,
+        contractId: string
       ): void
       getAccount(update: React.Dispatch<React.SetStateAction<string>>): void
       withdraw(
         address: string,
         premature: boolean,
         updatePosition: void,
-        signerSecret: string
+        contractId: string,
+        signerSecret?: string
       ): Promise<boolean>
     }
   }

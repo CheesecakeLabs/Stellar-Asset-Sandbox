@@ -176,7 +176,7 @@ const extendContractValidity = async (rawArgs: {
   return invokeSoroban(invokeArgs)
 }
 
-export const assetControllerClient = {
+export const certificateOfDepositClient = {
   deposit,
   withdraw,
   getEstimatedYield,

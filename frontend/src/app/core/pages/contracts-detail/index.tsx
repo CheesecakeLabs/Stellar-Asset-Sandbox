@@ -34,12 +34,12 @@ export const ContractsDetail: React.FC = () => {
   const secretKey = 'SBBMN3QPHH7UYPHEPXXVTLAIYLOIPDGRNW65TTN2ANBWSLNW6NYH2OZW'
 
   const updatePosition = useCallback((): void => {
-    if (!pauseProcess) {
-      getPosition(setUserPosition, userAccount)
-      getYield(setUserYield, userAccount)
-      getTime(setTime, userAccount)
+    if (!pauseProcess && contract) {
+      getPosition(setUserPosition, userAccount, contract.address)
+      getYield(setUserYield, userAccount, contract.address)
+      getTime(setTime, userAccount, contract.address)
     }
-  }, [getPosition, getTime, getYield, pauseProcess, userAccount])
+  }, [getPosition, getTime, getYield, pauseProcess, userAccount, contract])
 
   const updatePositionPeriodically = useCallback((): void => {
     setInterval(updatePosition, 1000)
@@ -66,11 +66,14 @@ export const ContractsDetail: React.FC = () => {
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
+    if (!contract) return
+
     try {
       const isSuccess = await deposit(
         BigInt(data.amount),
         userAccount,
         updatePosition(),
+        contract.address,
         secretKey
       )
       setUserDeposit(data.amount)
@@ -99,13 +102,15 @@ export const ContractsDetail: React.FC = () => {
   }
 
   const onSubmitWithdraw = async (isPremature: boolean): Promise<void> => {
+    if (!contract) return
+
     try {
       setPauseProcess(isPremature)
       const isSuccess = await withdraw(
         userAccount,
         true,
         updatePosition(),
-        secretKey
+        contract.address
       )
 
       if (isSuccess) {
