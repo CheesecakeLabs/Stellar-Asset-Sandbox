@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/bitly/go-notify"
@@ -108,4 +109,10 @@ func createLogDescription(transaction int, assetCode string, setFlags, clearFlag
 	default:
 		return "Unrecognized transaction type"
 	}
+}
+
+// Generate ID
+func generateID() int {
+	currentTimeInMillis := int(time.Now().UnixNano() / int64(time.Millisecond))
+	return currentTimeInMillis
 }

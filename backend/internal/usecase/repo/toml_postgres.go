@@ -29,7 +29,10 @@ func (r TomlRepoInterface) CreateToml(content string) (string, error) {
 func (r TomlRepoInterface) GetToml() (string, error) {
 	var res string
 	stmt := `SELECT content FROM toml ORDER BY id DESC LIMIT 1;`
-	r.Db.QueryRow(stmt).Scan(&res)
+	err := r.Db.QueryRow(stmt).Scan(&res)
+	if err != nil {
+		return "", fmt.Errorf("AssetRepo - GetToml - db.QueryRow: %w", err)
+	}
 
 	return res, nil
 }

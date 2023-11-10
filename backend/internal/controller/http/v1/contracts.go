@@ -7,6 +7,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,12 +17,13 @@ type contractRoutes struct {
 	c  usecase.ContractUseCase
 	v  usecase.VaultUseCase
 	as usecase.AssetUseCase
+	l  *logger.Logger
 }
 
 func newContractRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, c usecase.ContractUseCase, v usecase.VaultUseCase,
-	as usecase.AssetUseCase,
+	as usecase.AssetUseCase, l *logger.Logger,
 ) {
-	r := &contractRoutes{m, a, c, v, as}
+	r := &contractRoutes{m, a, c, v, as, l}
 	h := handler.Group("/contract").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("/:id", r.getContractById)
@@ -57,24 +59,28 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - create contract - ShouldBindJSON")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	asset, err := r.as.GetById(request.AssetId)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create contract - GetById")
 		errorResponse(c, http.StatusNotFound, "asset not found", err)
 		return
 	}
 
 	vaultId, err := strconv.Atoi(request.VaultId)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create contract - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 
 	vault, err := r.v.GetById(vaultId)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create contract - GetById")
 		errorResponse(c, http.StatusNotFound, "vault not found", err)
 		return
 	}
@@ -92,6 +98,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 
 	contract, err = r.c.Create(contract)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create contract - Create")
 		errorResponse(c, http.StatusNotFound, fmt.Sprintf("error: %s", err.Error()), err)
 		return
 	}
@@ -110,6 +117,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 func (r *contractRoutes) getAllContracts(c *gin.Context) {
 	contract, err := r.v.GetAll()
 	if err != nil {
+		r.l.Error(err, "http - v1 - get all contracts - GetAll")
 		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
 	}
@@ -130,11 +138,13 @@ func (r *contractRoutes) getContractById(c *gin.Context) {
 
 	vaultId, err := strconv.Atoi(idStr)
 	if err != nil {
+		r.l.Error(err, "http - v1 - get contract by id - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 	contract, err := r.v.GetById(vaultId)
 	if err != nil {
+		r.l.Error(err, "http - v1 - get contract by id - GetById")
 		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
 	}

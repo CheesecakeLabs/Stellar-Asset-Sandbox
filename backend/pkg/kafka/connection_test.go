@@ -63,7 +63,10 @@ func TestAttemptConnect(t *testing.T) {
 		Value:          []byte(value),
 		Headers:        []kafka.Header{{Key: "Transaction.Type", Value: []byte("CreatePayment")}},
 	}, deliveryChan)
-
+	if err != nil {
+		// Handle the error appropriately
+		log.Fatalf("Failed to produce message: %v", err)
+	}
 	e := <-deliveryChan
 	m := e.(*kafka.Message)
 
