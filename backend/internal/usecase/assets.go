@@ -159,3 +159,12 @@ func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
 
 	return tomParsed, err
 }
+
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
+	assets, err := uc.aRepo.GetPaginatedAssets(page, limit)
+	if err != nil {
+		return nil, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
+	}
+
+	return assets, nil
+}

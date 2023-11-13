@@ -38,7 +38,6 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 	r := &assetsRoutes{w, as, m, a, l, logger}
 
 	h := handler.Group("/assets")
-	h.GET("/:id/image.png", r.getAssetImage)
 	h.Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllAssets)
@@ -53,6 +52,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/generate-toml", r.generateTOML)
 		h.PUT("/update-toml", r.updateTOML)
 		h.GET("/toml-data", r.getTomlData)
+		h.GET("/:id/image.png", r.getAssetImage)
 	}
 }
 
@@ -848,22 +848,52 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 }
 
 // @Summary Get all assets
-// @Description Get all assets
-// @Tags  	    Assets
+// @Description Get all assets with optional pagination
+// @Tags        Assets
 // @Accept      json
 // @Produce     json
+// @Param       page query int false "Page number"
+// @Param       limit query int false "Number of items per page"
 // @Success     200 {object} []entity.Asset
 // @Failure     500 {object} response
 // @Router      /assets [get]
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
-	assets, err := r.as.GetAll()
-	if err != nil {
-		r.logger.Error(err, "http - v1 - get all assets - get all")
-		errorResponse(c, http.StatusInternalServerError, "error getting assets", err)
-		return
-	}
+	pageQuery := c.Query("page")
+	limitQuery := c.Query("limit")
 
-	c.JSON(http.StatusOK, assets)
+	if pageQuery != "" && limitQuery != "" {
+		// Parse query parameters for pagination
+		page, err := strconv.Atoi(pageQuery)
+		if err != nil {
+			errorResponse(c, http.StatusBadRequest, "Invalid page parameter", err)
+			return
+		}
+		limit, err := strconv.Atoi(limitQuery)
+		if err != nil {
+			errorResponse(c, http.StatusBadRequest, "Invalid limit parameter", err)
+			return
+		}
+
+		// Fetch paginated assets
+		assets, err := r.as.GetPaginatedAssets(page, limit)
+		if err != nil {
+			r.logger.Error(err, "http - v1 - get all assets - get paginated")
+			errorResponse(c, http.StatusInternalServerError, "error getting paginated assets", err)
+			return
+		}
+
+		c.JSON(http.StatusOK, assets)
+	} else {
+		// Fetch all assets
+		assets, err := r.as.GetAll()
+		if err != nil {
+			r.logger.Error(err, "http - v1 - get all assets - get all")
+			errorResponse(c, http.StatusInternalServerError, "error getting all assets", err)
+			return
+		}
+
+		c.JSON(http.StatusOK, assets)
+	}
 }
 
 // @Summary Get asset by id
