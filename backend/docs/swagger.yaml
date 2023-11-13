@@ -51,82 +51,82 @@ definitions:
     type: object
   entity.Currency:
     properties:
-      anchorAsset:
+      anchor_asset:
         type: string
-      anchorAssetType:
+      anchor_asset_type:
         type: string
-      approvalCriteria:
+      approval_criteria:
         type: string
-      approvalServer:
+      approval_server:
         type: string
-      attestationOfReserve:
+      attestation_of_reserve:
         type: string
       code:
         type: string
-      collateralAddressMessages:
+      collateral_address_messages:
         items:
           type: string
         type: array
-      collateralAddressSignatures:
+      collateral_address_signatures:
         items:
           type: string
         type: array
-      collateralAddresses:
+      collateral_addresses:
         items:
           type: string
         type: array
       conditions:
         type: string
-      description:
+      desc:
         type: string
-      displayDecimals:
+      display_decimals:
         type: integer
-      fixedNumber:
+      fixed_number:
         type: integer
       image:
         type: string
-      isAssetAnchored:
+      is_asset_anchored:
         type: boolean
-      isUnlimited:
+      is_unlimited:
         type: boolean
       issuer:
         type: string
-      maxNumber:
+      max_number:
         type: integer
       name:
         type: string
-      redemptionInstructions:
+      redemption_instructions:
         type: string
       regulated:
         type: boolean
     type: object
   entity.Documentation:
     properties:
-      orgDBA:
+      ORG_DBA:
         type: string
-      orgDescription:
+      ORG_DESCRIPTION:
         type: string
-      orgGithub:
+      ORG_GITHUB:
         type: string
-      orgKeybase:
+      ORG_KEYBASE:
         type: string
-      orgLogo:
+      ORG_LOGO:
         type: string
-      orgName:
+      ORG_NAME:
         type: string
-      orgOfficialEmail:
+      ORG_OFFICIAL_EMAIL:
         type: string
-      orgPhoneNumber:
+      ORG_PHONE_NUMBER:
         type: string
-      orgPhoneNumberAttestation:
+      ORG_PHONE_NUMBER_ATTESTATION:
         type: string
-      orgPhysicalAddress:
+      ORG_PHYSICAL_ADDRESS:
         type: string
-      orgPhysicalAddressAttestation:
+      ORG_PHYSICAL_ADDRESS_ATTESTATION:
         type: string
-      orgTwitter:
+      ORG_TWITTER:
         type: string
-      orgURL:
+      ORG_URL:
         type: string
     type: object
   entity.Key:
@@ -197,7 +197,7 @@ definitions:
         type: string
       github:
         type: string
-      idphotoHash:
+      id_photo_hash:
         type: string
       keybase:
         type: string
@@ -205,7 +205,7 @@ definitions:
         type: string
       twitter:
         type: string
-      verificationPhotoHash:
+      verification_photo_hash:
         type: string
     type: object
   entity.Role:
@@ -269,35 +269,35 @@ definitions:
     type: object
   entity.TomlData:
     properties:
-      accounts:
+      ACCOUNTS:
         items:
           type: string
         type: array
-      currencies:
+      CURRENCIES:
         items:
           $ref: '#/definitions/entity.Currency'
         type: array
-      documentation:
+      DOCUMENTATION:
         $ref: '#/definitions/entity.Documentation'
-      federationServer:
+      FEDERATION_SERVER:
         type: string
-      horizonURL:
+      HORIZON_URL:
         type: string
-      networkPassphrase:
+      NETWORK_PASSPHRASE:
         type: string
-      principals:
+      PRINCIPALS:
         items:
           $ref: '#/definitions/entity.Principal'
         type: array
-      signingKey:
+      SIGNING_KEY:
         type: string
-      transferServer:
+      TRANSFER_SERVER:
         type: string
-      validators:
+      VALIDATORS:
         items:
           $ref: '#/definitions/entity.Validator'
         type: array
-      version:
+      VERSION:
         type: string
     type: object
   entity.User:
@@ -352,15 +352,15 @@ definitions:
     type: object
   entity.Validator:
     properties:
-      alias:
+      ALIAS:
         type: string
-      displayName:
+      DISPLAY_NAME:
         type: string
-      history:
+      HISTORY:
         type: string
-      host:
+      HOST:
         type: string
-      publicKey:
+      PUBLIC_KEY:
         type: string
     type: object
   entity.Vault:
@@ -774,7 +774,16 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all assets
+      description: Get all assets with optional pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -1046,6 +1055,31 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Mint an asset
+      tags:
+      - Assets
+  /assets/toml:
+    get:
+      consumes:
+      - application/json
+      description: Get TOML data
+      parameters:
+      - description: Asset issuer
+        in: path
+        name: asset_issuer
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get TOML data
       tags:
       - Assets
   /assets/transfer:
