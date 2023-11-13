@@ -76,6 +76,7 @@ services:
       KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-generatedKeypairs}
       KAFKA_SIGN_CONSUMER_TOPICS: ${KAFKA_SIGN_CONSUMER_TOPICS:-signEnvelope}
       KAFKA_SIGN_PRODUCER_TOPIC: ${KAFKA_SIGN_PRODUCER_TOPIC:-signedEnvelopes}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
       PG_USER: ${PG_USER:-postgres}
@@ -224,6 +225,7 @@ services:
       KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-signEnvelope}
       KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-signedEnvelopes}
       KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-submitResponse}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
     depends_on:
       kafka1:
         condition: service_healthy
