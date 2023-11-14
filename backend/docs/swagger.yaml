@@ -1180,6 +1180,40 @@ paths:
       summary: Create a new contract
       tags:
       - Contract
+  /contracts:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all contracts, with optional pagination
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Contract'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all contracts
+      tags:
+      - Contract
   /log_transactions:
     get:
       consumes:
