@@ -1916,7 +1916,7 @@ const docTemplate = `{
         },
         "/vault/list": {
             "get": {
-                "description": "Get all vault",
+                "description": "Retrieve a list of all vaults, with optional pagination",
                 "consumes": [
                     "application/json"
                 ],
@@ -1926,7 +1926,21 @@ const docTemplate = `{
                 "tags": [
                     "Vault"
                 ],
-                "summary": "Get all vault",
+                "summary": "Get all vaults",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page for pagination",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1937,8 +1951,14 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }

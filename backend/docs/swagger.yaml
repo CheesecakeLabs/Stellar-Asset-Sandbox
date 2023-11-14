@@ -1977,7 +1977,16 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all vault
+      description: Retrieve a list of all vaults, with optional pagination
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page for pagination
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -1987,11 +1996,15 @@ paths:
             items:
               $ref: '#/definitions/entity.Vault'
             type: array
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Invalid query parameters
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Get all vault
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all vaults
       tags:
       - Vault
   /wallets:
