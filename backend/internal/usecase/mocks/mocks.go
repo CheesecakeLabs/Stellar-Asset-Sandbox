@@ -1071,6 +1071,21 @@ func (mr *MockContractRepoInterfaceMockRecorder) GetContracts() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContracts", reflect.TypeOf((*MockContractRepoInterface)(nil).GetContracts))
 }
 
+// GetPaginatedContracts mocks base method.
+func (m *MockContractRepoInterface) GetPaginatedContracts(arg0, arg1 int) ([]entity.Contract, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPaginatedContracts", arg0, arg1)
+	ret0, _ := ret[0].([]entity.Contract)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPaginatedContracts indicates an expected call of GetPaginatedContracts.
+func (mr *MockContractRepoInterfaceMockRecorder) GetPaginatedContracts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedContracts", reflect.TypeOf((*MockContractRepoInterface)(nil).GetPaginatedContracts), arg0, arg1)
+}
+
 // MockLogTransactionRepoInterface is a mock of LogTransactionRepoInterface interface.
 type MockLogTransactionRepoInterface struct {
 	ctrl     *gomock.Controller
