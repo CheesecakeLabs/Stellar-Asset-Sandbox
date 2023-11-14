@@ -943,6 +943,21 @@ func (mr *MockVaultRepoInterfaceMockRecorder) DeleteVault(arg0 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).DeleteVault), arg0)
 }
 
+// GetPaginatedVaults mocks base method.
+func (m *MockVaultRepoInterface) GetPaginatedVaults(arg0, arg1 int) ([]entity.Vault, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPaginatedVaults", arg0, arg1)
+	ret0, _ := ret[0].([]entity.Vault)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPaginatedVaults indicates an expected call of GetPaginatedVaults.
+func (mr *MockVaultRepoInterfaceMockRecorder) GetPaginatedVaults(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedVaults", reflect.TypeOf((*MockVaultRepoInterface)(nil).GetPaginatedVaults), arg0, arg1)
+}
+
 // GetVaultById mocks base method.
 func (m *MockVaultRepoInterface) GetVaultById(id int) (entity.Vault, error) {
 	m.ctrl.T.Helper()

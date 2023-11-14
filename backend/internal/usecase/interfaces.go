@@ -94,6 +94,7 @@ type (
 		UpdateVault(entity.Vault) (entity.Vault, error)
 		GetVaultById(id int) (entity.Vault, error)
 		DeleteVault(entity.Vault) (entity.Vault, error)
+		GetPaginatedVaults(int, int) ([]entity.Vault, error)
 	}
 
 	ContractRepoInterface interface {

@@ -865,11 +865,13 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		// Parse query parameters for pagination
 		page, err := strconv.Atoi(pageQuery)
 		if err != nil {
+			r.logger.Error(err, "http - v1 - get all assets - parse page")
 			errorResponse(c, http.StatusBadRequest, "Invalid page parameter", err)
 			return
 		}
 		limit, err := strconv.Atoi(limitQuery)
 		if err != nil {
+			r.logger.Error(err, "http - v1 - get all assets - parse limit")
 			errorResponse(c, http.StatusBadRequest, "Invalid limit parameter", err)
 			return
 		}
