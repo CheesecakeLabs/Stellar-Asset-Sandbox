@@ -36,9 +36,10 @@ type CreateContractRequest struct {
 	VaultId     string `json:"vault_id"   binding:"required"  example:"1"`
 	Address     string `json:"address"   binding:"required"  example:"GSDSC..."`
 	YieldRate   int    `json:"yield_rate"   binding:"required"  example:"1"`
-	Term        int    `json:"term"   binding:"required"  example:"1"`
+	Term        int    `json:"term"   binding:"required"  example:"60"`
 	MinDeposit  int    `json:"min_deposit"   binding:"required"  example:"1"`
 	PenaltyRate int    `json:"penalty_rate"   binding:"required"  example:"1"`
+	Compound    int    `json:"compound"   binding:"required"  example:"60"`
 }
 
 // @Summary     Create a new contract
@@ -88,6 +89,7 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 		Term:        request.Term,
 		MinDeposit:  request.MinDeposit,
 		PenaltyRate: request.PenaltyRate,
+		Compound:    request.Compound,
 	}
 
 	contract, err = r.c.Create(contract)
@@ -128,12 +130,7 @@ func (r *contractRoutes) getAllContracts(c *gin.Context) {
 func (r *contractRoutes) getContractById(c *gin.Context) {
 	idStr := c.Param("id")
 
-	vaultId, err := strconv.Atoi(idStr)
-	if err != nil {
-		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
-		return
-	}
-	contract, err := r.v.GetById(vaultId)
+	contract, err := r.c.GetById(idStr)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
 		return
