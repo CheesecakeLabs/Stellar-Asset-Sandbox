@@ -16,7 +16,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
-	golang.org/x/crypto v0.11.0
+	golang.org/x/crypto v0.15.0
 )
 
 require (
@@ -66,8 +66,8 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/arch v0.4.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
@@ -77,7 +77,6 @@ require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/Eun/go-hit v0.5.23
 	github.com/bitly/go-notify v0.0.0-20130217044602-0a148b8111d6
-	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
