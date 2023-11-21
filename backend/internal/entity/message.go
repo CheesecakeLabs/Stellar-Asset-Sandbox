@@ -80,6 +80,7 @@ type (
 		Id         int      `json:"id"`
 		Envelope   string   `json:"envelope"`
 		PublicKeys []string `json:"publicKeys"`
+		Hash       string   `json:"hash"`
 	}
 
 	SorobanTransactionResponse struct {
