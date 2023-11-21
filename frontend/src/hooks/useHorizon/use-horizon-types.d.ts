@@ -142,6 +142,7 @@ declare namespace Hooks {
         assetCode: string,
         assetIssuer: string
       ): Promise<IAssetAccounts[] | undefined>
+      getLatestSequenceLedger(): Promise<number | undefined>
     }
   }
 }

@@ -24,9 +24,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const [contracts, setContracts] = useState<
     Hooks.UseContractsTypes.IContract[] | undefined
   >()
-  const [contract, setContract] = useState<
-    Hooks.UseContractsTypes.IContract | undefined
-  >()
 
   const createContract = async (
     params: Hooks.UseContractsTypes.IContractRequest
@@ -69,10 +66,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getContract = useCallback(async (): Promise<void> => {
+  const getContract = useCallback(async (id: string): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
     setLoading(true)
     try {
-      setContract(mockContracts[0])
+      const response = await http.get(`contract/${id}`)
+      const data = response.data
+      if (data) {
+        return data
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -209,7 +210,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       value={{
         loading,
         contracts,
-        contract,
         depositConfirmed,
         withdrawConfirmed,
         isDepositing,

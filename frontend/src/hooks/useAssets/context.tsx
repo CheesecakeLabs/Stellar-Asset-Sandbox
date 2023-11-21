@@ -285,6 +285,22 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const updateContractId = async (
+    assetId: number,
+    contractId: string
+  ): Promise<boolean> => {
+    try {
+      const response = await http.put(`assets/${assetId}/update-contract-id`,
+        { contract_id: contractId })
+      return response.status === 200
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    }
+  }
+
   return (
     <AssetsContext.Provider
       value={{
@@ -305,6 +321,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         retrieveToml,
         getTomlData,
         updateImage,
+        updateContractId
       }}
     >
       {children}

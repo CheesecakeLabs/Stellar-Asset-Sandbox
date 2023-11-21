@@ -9,7 +9,7 @@ const admin = {
 export const sorobanConfig = {
   network: { ...networks.testnet },
   txTimeout: 30,
-  fee: "1000000",
+  fee: "100000000",
   retryTime: 1, //seconds
   admin,
 } as const;

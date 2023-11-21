@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Address, I128 } from '../constants'
-import { IInvokeSorobanArgs, invokeSoroban } from '../index'
+import { IInvokeSorobanArgs, SorobanService } from '../index'
 import { Methods, spec } from './constants'
 
 const deposit = async (rawArgs: {
@@ -27,7 +27,7 @@ const deposit = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const withdraw = async (rawArgs: {
@@ -54,7 +54,7 @@ const withdraw = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const getEstimatedYield = async (rawArgs: {
@@ -79,7 +79,7 @@ const getEstimatedYield = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const getPosition = async (rawArgs: {
@@ -104,7 +104,7 @@ const getPosition = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const getEstimatedPrematureWithdraw = async (rawArgs: {
@@ -129,7 +129,7 @@ const getEstimatedPrematureWithdraw = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const getTimeLeft = async (rawArgs: {
@@ -154,7 +154,7 @@ const getTimeLeft = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 const extendContractValidity = async (rawArgs: {
@@ -173,7 +173,7 @@ const extendContractValidity = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 export const certificateOfDepositClient = {

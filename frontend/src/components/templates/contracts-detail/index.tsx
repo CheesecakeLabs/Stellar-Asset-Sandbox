@@ -16,6 +16,8 @@ import { ApyIcon, TimeIcon, WalletIcon } from 'components/icons'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 
 import { InfoCard } from '../../molecules/info-card'
+import { CompoundTime } from '../contracts-create/components/select-compound'
+import { ItemData } from './components/item-data'
 
 interface IContractsDetailTemplate {
   onSubmitWithdraw(isPremature: boolean): Promise<void>
@@ -55,91 +57,93 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
               <ContractsBreadcrumb title="Certificate Name" />
               <AccountCard account={userAccount} />
             </Flex>
-            <SimpleGrid columns={{ md: 5, sm: 2 }} spacing={3}>
-              <InfoCard
-                title={'ASSET'}
-                icon={
-                  <Box
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
-                  >
-                    {contract.asset.image ? (
-                      <Img
-                        src={base64ToImg(contract.asset.image)}
-                        w="24px"
-                        h="24px"
-                      />
-                    ) : (
-                      getCurrencyIcon(contract.asset.code, '1.5rem')
-                    )}
-                  </Box>
-                }
-                value={contract.asset.name}
-              />
-              <InfoCard
-                title={'TERM'}
-                icon={<TimeIcon />}
-                value={`${contract.term} minutes`}
-              />
-              <InfoCard
-                title={'APY'}
-                icon={<ApyIcon />}
-                value={`${contract.yield_rate}%`}
-              />
-              <InfoCard title={`COMPOUND`} value={`Every 10s`} />
-              <InfoCard
-                title={`DEPOSITED (${contract.asset.code})`}
-                icon={<WalletIcon />}
-                value={balance && balance > 0 ? toCrypto(10000 || 0) : '-'}
-              />
-            </SimpleGrid>
-            {userAccount && balance && balance > 0 ? (
-              <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={3} mt="1rem">
-                <Chart
-                  title={'BALANCE'}
-                  value={
-                    balance && balance > 0 ? toCrypto(balance / 10000000) : '-'
+            <Flex>
+              <Flex flexDir="column" minW="20rem" mr="1.5rem">
+                <ItemData
+                  title={'ASSET'}
+                  icon={
+                    <Box
+                      fill="black"
+                      stroke="black"
+                      _dark={{ fill: 'white', stroke: 'white' }}
+                    >
+                      {contract.asset.image ? (
+                        <Img
+                          src={base64ToImg(contract.asset.image)}
+                          w="24px"
+                          h="24px"
+                        />
+                      ) : (
+                        getCurrencyIcon(contract.asset.code, '1.5rem')
+                      )}
+                    </Box>
                   }
+                  value={contract.asset.name}
                 />
-                <Chart
-                  title={'DUE IN'}
-                  value={`${time ? `${time.toString()} seconds` : '-'}`}
+                <ItemData
+                  title={'TERM'}
+                  icon={<TimeIcon />}
+                  value={`${contract.term / 86400} day(s)`}
                 />
-                <Chart
-                  title={'CURRENT YIELD'}
-                  value={
-                    balance
-                      ? `${((currentYield / (10000 * 10000000)) * 100).toFixed(
+                <ItemData
+                  title={'APY'}
+                  icon={<ApyIcon />}
+                  value={`${contract.yield_rate}%, ${contract.compound === 0 ? 'simple interest, does not compound'
+                    : `every ${CompoundTime[contract.compound]}`}`}
+                />
+                <ItemData
+                  title={`DEPOSITED (${contract.asset.code})`}
+                  icon={<WalletIcon />}
+                  value={balance && balance > 0 ? toCrypto(10000 || 0) : '-'}
+                />
+              </Flex>
+              {userAccount && balance && balance > 0 ? (
+                <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={3} mt="1rem">
+                  <Chart
+                    title={'BALANCE'}
+                    value={
+                      balance && balance > 0 ? toCrypto(balance / 10000000) : '-'
+                    }
+                  />
+                  <Chart
+                    title={'DUE IN'}
+                    value={`${time ? `${time.toString()} seconds` : '-'}`}
+                  />
+                  <Chart
+                    title={'CURRENT YIELD'}
+                    value={
+                      balance
+                        ? `${((currentYield / (10000 * 10000000)) * 100).toFixed(
                           2
                         )} %`
-                      : '-'
-                  }
-                />
-              </SimpleGrid>
-            ) : (
-              <div />
-            )}
-            {userAccount &&
-              (balance && balance > 0 ? (
-                <Withdraw
-                  onSubmit={onSubmitWithdraw}
-                  contract={contract}
-                  loading={isWithdrawing}
-                  isDone={!time || time === BigInt(0)}
-                  withdrawValue={
-                    time > 0
-                      ? Number(deposit) + Number(currentYield / 2)
-                      : balance
-                  }
-                />
+                        : '-'
+                    }
+                  />
+                </SimpleGrid>
               ) : (
-                <Deposit
-                  onSubmit={onSubmitDeposit}
-                  contract={contract}
-                  loading={isDepositing}
-                />
-              ))}
+                <div />
+              )}
+              {userAccount &&
+                (balance && balance > 0 ? (
+                  <Withdraw
+                    onSubmit={onSubmitWithdraw}
+                    contract={contract}
+                    loading={isWithdrawing}
+                    isDone={!time || time === BigInt(0)}
+                    withdrawValue={
+                      time > 0
+                        ? Number(deposit) + Number(currentYield / 2)
+                        : balance
+                    }
+                  />
+                ) : (
+                  <Deposit
+                    onSubmit={onSubmitDeposit}
+                    contract={contract}
+                    loading={isDepositing}
+                  />
+                ))}
+            </Flex>
           </>
         ) : (
           <Loading />

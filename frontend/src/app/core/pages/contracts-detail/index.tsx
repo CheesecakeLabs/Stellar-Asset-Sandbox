@@ -8,11 +8,11 @@ import { MessagesError } from 'utils/constants/messages-error'
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsDetailTemplate } from 'components/templates/contracts-detail'
+import { useParams } from 'react-router-dom'
 
 export const ContractsDetail: React.FC = () => {
   const {
     loading,
-    contract,
     isDepositing,
     isWithdrawing,
     getContract,
@@ -29,6 +29,9 @@ export const ContractsDetail: React.FC = () => {
   const [time, setTime] = useState<bigint>(BigInt(0))
   const [userDeposit, setUserDeposit] = useState(0)
   const [pauseProcess, setPauseProcess] = useState(false)
+  const [contract, setContract] = useState<Hooks.UseContractsTypes.IContract>()
+
+  const { id } = useParams()
 
   const userAccount = 'GDNG5OBGQFGWWG5UQXLFQLXOH5BA3GIXQO6YNZFDUFBYSHVUX7BUU6RT'
   const secretKey = 'SBBMN3QPHH7UYPHEPXXVTLAIYLOIPDGRNW65TTN2ANBWSLNW6NYH2OZW'
@@ -59,8 +62,10 @@ export const ContractsDetail: React.FC = () => {
   }, [userAccount, userDeposit, userPosition, userYield])
 
   useEffect(() => {
-    getContract('1')
-  }, [getContract])
+    if (id) {
+      getContract(id).then(contract => setContract(contract))
+    }
+  }, [getContract, id])
 
   const onSubmitDeposit = async (
     data: FieldValues,

@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Buffer } from 'buffer'
-import { Address, I128, U64 } from 'soroban/constants'
+import { Address, I128, U32, U64 } from 'soroban/constants'
 
-import { IInvokeSorobanArgs, invokeSoroban } from '../index'
+import { IInvokeSorobanArgs, SorobanService } from '../index'
 import { contractId, Methods, spec } from './constants'
 
 const deploy = async (rawArgs: {
-  deployer: string
   wasm_hash: string
   salt: string
   admin: string
@@ -16,10 +15,10 @@ const deploy = async (rawArgs: {
   yield_rate: U64
   min_deposit: I128
   penalty_rate: U64
+  allowance_period: U32
   signerSecret?: string
 }): Promise<any> => {
   const args = {
-    deployer: new Address(rawArgs.deployer),
     wasm_hash: Buffer.from(rawArgs.wasm_hash, 'hex'),
     salt: Buffer.from(rawArgs.wasm_hash, 'hex'),
     admin: new Address(rawArgs.admin),
@@ -29,13 +28,14 @@ const deploy = async (rawArgs: {
     yield_rate: rawArgs.yield_rate,
     min_deposit: rawArgs.min_deposit,
     penalty_rate: rawArgs.penalty_rate,
+    allowance_period: rawArgs.allowance_period
   }
 
   let invokeArgs: IInvokeSorobanArgs = {
     contractId,
     spec,
     method: Methods.deploy,
-    sourcePk: rawArgs.deployer.toString(),
+    sourcePk: rawArgs.admin.toString(),
   }
 
   invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
@@ -44,7 +44,7 @@ const deploy = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourcePk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return invokeSoroban(invokeArgs)
+  return SorobanService.invokeSoroban(invokeArgs)
 }
 
 export const deployerClient = {

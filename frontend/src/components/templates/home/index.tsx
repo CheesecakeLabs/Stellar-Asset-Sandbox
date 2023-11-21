@@ -96,6 +96,7 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                           url={data.slide}
                           width="100%"
                           height="100%"
+                          config={{ youtube: { embedOptions: {width: '100%'} } }}
                         />
                       </Box>
                     </Box>

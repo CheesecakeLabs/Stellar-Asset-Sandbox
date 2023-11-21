@@ -9,7 +9,7 @@ export const networks = {
   testnet: {
     name: 'Testnet',
     passphrase:
-      'Test SDF Network ; September 2015Test SDF Network ; September 2015',
+      'Test SDF Network ; September 2015',
     rpc: 'https://soroban-testnet.stellar.org:443',
     friendbot: 'https://friendbot.stellar.org',
     horizon: 'https://horizon-testnet.stellar.org',

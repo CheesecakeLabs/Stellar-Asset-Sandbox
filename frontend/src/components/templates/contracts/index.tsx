@@ -10,6 +10,7 @@ import {
   Td,
   Button,
   Img,
+  Skeleton,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -19,9 +20,10 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
-import { Loading } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ArrowRightIcon, NewIcon } from 'components/icons'
+import { Empty } from 'components/molecules/empty'
+import { CompoundTime } from '../contracts-create/components/select-compound'
 
 interface IContractsTemplate {
   loading: boolean
@@ -48,57 +50,58 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
               navigate({ pathname: PathRoute.CONTRACT_CREATE })
             }
           >
-            New Contract
+            New Certificate of Deposit
           </Button>
         </Flex>
         <Container variant="primary" p={0} maxW="full">
-          {loading || !contracts ? (
-            <Loading />
+          {loading ? (
+            <Skeleton w="full" h="10rem" />
           ) : (
-            <Table w="full">
-              <Thead w="full">
-                <Th w="2rem" p={0} />
-                <Th>Asset</Th>
-                <Th>Contract</Th>
-                <Th>APY</Th>
-                <Th>Term</Th>
-                <Th>Compound</Th>
-                <Th>Minimum Deposit</Th>
-                <Th w="2rem" p={0} />
-              </Thead>
-              <Tbody>
-                {contracts.map(contract => (
-                  <Tr
-                    borderColor="red"
-                    cursor="pointer"
-                    onClick={(): void => {
-                      navigate(`${PathRoute.CONTRACT_DETAIL}/${contract.id}`)
-                    }}
-                  >
-                    <Td>
-                      {contract.asset.image ? (
-                        <Img
-                          src={base64ToImg(contract.asset.image)}
-                          w="32px"
-                          h="32px"
-                        />
-                      ) : (
-                        getCurrencyIcon(contract.asset.code, '2rem')
-                      )}
-                    </Td>
-                    <Td>{contract.asset.code}</Td>
-                    <Td>Contract</Td>
-                    <Td>{`${contract.yield_rate}%`}</Td>
-                    <Td>{`${contract.term}s`}</Td>
-                    <Td>Every 10s</Td>
-                    <Td>{toCrypto(contract.min_deposit)}</Td>
-                    <Td w="2rem" p={0}>
-                      <ArrowRightIcon width="12px" />
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
+            !contracts || contracts.length === 0 ? <Empty title={'No contracts created yet'} /> :
+              <Table w="full">
+                <Thead w="full">
+                  <Th w="2rem" p={0} />
+                  <Th>Asset</Th>
+                  <Th>Contract</Th>
+                  <Th>APY</Th>
+                  <Th>Term</Th>
+                  <Th>Compound</Th>
+                  <Th>Minimum Deposit</Th>
+                  <Th w="2rem" p={0} />
+                </Thead>
+                <Tbody>
+                  {contracts.map(contract => (
+                    <Tr
+                      borderColor="red"
+                      cursor="pointer"
+                      onClick={(): void => {
+                        navigate(`${PathRoute.CONTRACT_DETAIL}/${contract.id}`)
+                      }}
+                    >
+                      <Td>
+                        {contract.asset.image ? (
+                          <Img
+                            src={base64ToImg(contract.asset.image)}
+                            w="32px"
+                            h="32px"
+                          />
+                        ) : (
+                          getCurrencyIcon(contract.asset.code, '2rem')
+                        )}
+                      </Td>
+                      <Td>{contract.asset.code}</Td>
+                      <Td>Contract</Td>
+                      <Td>{`${contract.yield_rate}%`}</Td>
+                      <Td>{`${contract.term / 86400} day(s)`}</Td>
+                      <Td>{`${contract.compound === 0 ? 'Simple interest' : CompoundTime[contract.compound]}`}</Td>
+                      <Td>{toCrypto(contract.min_deposit)}</Td>
+                      <Td w="2rem" p={0}>
+                        <ArrowRightIcon width="12px" />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
           )}
         </Container>
       </Flex>

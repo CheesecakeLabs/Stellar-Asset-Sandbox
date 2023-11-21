@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { useAssets } from 'hooks/useAssets'
@@ -8,33 +8,46 @@ import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
 import { SorobanService } from 'soroban'
 import { deployerClient } from 'soroban/deployer'
-import { codWasmHash } from 'soroban/deployer/constants'
+import { allowancePeriod, codSalt, codWasmHash } from 'soroban/deployer/constants'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
+import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
+import { useNavigate } from 'react-router-dom'
+import { useHorizon } from 'hooks/useHorizon'
 
 export const ContractsCreate: React.FC = () => {
-  const { loadingAssets, assets, getAssets } = useAssets()
-  const { createContract, loading } = useContracts()
-  const { vaults, getVaults, loadingVaults } = useVaults()
-  const toast = useToast()
+  const [creatingContract, setCreatingContract] = useState(false)
+  const { loadingAssets, assets, getAssets, updateContractId } = useAssets()
+  const { createContract } = useContracts()
+  const { vaults, loadingVaults, getVaults } = useVaults()
   const { sign, submit, getSponsorPK } = useTransactions()
+  const { getLatestSequenceLedger } = useHorizon()
+  const toast = useToast()
+  const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>,
     asset: Hooks.UseAssetsTypes.IAssetDto,
-    vault: Hooks.UseVaultsTypes.IVault
+    vault: Hooks.UseVaultsTypes.IVault,
+    compoundType: TSelectCompoundType,
+    compound: number
   ): Promise<void> => {
     if (!asset) return
 
     try {
-      const contractId = await SorobanService.getContractId({
-        assetCode: asset.code,
-        assetIssuerPk: asset.issuer.key.publicKey,
-      })
+      setCreatingContract(true)
+
+      const contractId = asset.contract_id ? asset.contract_id :
+        SorobanService.getContractId({
+          assetCode: asset.code,
+          assetIssuerPk: asset.issuer.key.publicKey,
+        })
+
+      await updateContractId(asset.id, contractId)
+      const termToSeconds = Number(data.term || 0) * 86400
 
       const contract = {
         name: 'Contract',
@@ -42,9 +55,10 @@ export const ContractsCreate: React.FC = () => {
         vault_id: vault.id.toString(),
         address: contractId,
         yield_rate: Number(data.yield_rate || 0),
-        term: Number(data.term || 0),
+        term: termToSeconds,
         min_deposit: Number(data.min_deposit || 0),
         penalty_rate: Number(data.penalty_rate || 0),
+        compound: compoundType === 'Compound interest' ? compound : 0
       }
 
       const sponsorPK = await getSponsorPK()
@@ -64,36 +78,38 @@ export const ContractsCreate: React.FC = () => {
         sourceAccount
       )
 
-      const signedEnvelope = await sign({ envelope: preppedTx })
-      if (signedEnvelope) {
-        const resultEnvelope = await submit({ envelope: signedEnvelope })
+      const signedTransaction = await sign({ envelope: preppedTx })
+      if (signedTransaction) {
+        const resultEnvelope = await submit({ envelope: signedTransaction.envelope })
 
         if (resultEnvelope) {
           await SorobanService.submitSoroban(resultEnvelope)
         }
       }
 
+      const latestSequenceLedger = await getLatestSequenceLedger()
+
+      if (!latestSequenceLedger) {
+        throw new Error('Invalid latest sequence ledger!')
+      }
+
       await deployerClient.deploy({
-        deployer: vault.wallet.key.publicKey,
         wasm_hash: codWasmHash,
-        salt: '22',
+        salt: codSalt,
         admin: vault.wallet.key.publicKey,
         asset: contractId,
         term: BigInt(contract.term),
-        compound_step: BigInt(0),
+        compound_step: BigInt(compoundType === 'Compound interest' ? compound : 0),
         yield_rate: BigInt(contract.yield_rate),
         min_deposit: BigInt(contract.min_deposit),
         penalty_rate: BigInt(contract.penalty_rate),
+        allowance_period: latestSequenceLedger + allowancePeriod,
         signerSecret: vault.wallet.key.publicKey,
       })
 
       const contractCreated = await createContract(contract)
 
       if (contractCreated) {
-        setValue('yield_rate', '')
-        setValue('term', '')
-        setValue('min_deposit', '')
-        setValue('penalty_rate', '')
         toast({
           title: 'Contract created!',
           status: 'success',
@@ -101,10 +117,13 @@ export const ContractsCreate: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
         return
       }
+      setCreatingContract(false)
       toastError(MessagesError.errorOccurred)
     } catch (error) {
+      setCreatingContract(false)
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
@@ -139,7 +158,7 @@ export const ContractsCreate: React.FC = () => {
           loading={loadingAssets || loadingVaults}
           vaults={vaults}
           assets={assets}
-          creatingContract={loading}
+          creatingContract={creatingContract}
         />
       </Sidebar>
     </Flex>

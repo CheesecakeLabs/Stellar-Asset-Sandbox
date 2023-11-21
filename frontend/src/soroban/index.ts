@@ -37,8 +37,7 @@ const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
   allowHttp: true,
 })
 
-
-export const buildSorobanTx = async ({
+const buildSorobanTx = async ({
   contractId,
   spec,
   method,
@@ -59,6 +58,7 @@ export const buildSorobanTx = async ({
   const sourceAccount = await server.getAccount(sourcePk)
   const contract = new SorobanClient.Contract(contractId)
 
+  console.log(sourceAccount)
   const transaction = new SorobanClient.TransactionBuilder(sourceAccount, {
     fee: sorobanConfig.fee,
     networkPassphrase: sorobanConfig.network.passphrase,
@@ -67,9 +67,12 @@ export const buildSorobanTx = async ({
     .setTimeout(sorobanConfig.txTimeout)
     .build()
 
-  try {
-    const preparedTransaction = await server.prepareTransaction(transaction)
+  console.log(transaction)
 
+  try {
+    console.log(transaction.toXDR())
+    const preparedTransaction = await server.prepareTransaction(transaction)
+    console.log(preparedTransaction.toXDR())
     return preparedTransaction
   } catch (e) {
     console.log("Tx couldn't be prepared: ", e)
@@ -77,61 +80,7 @@ export const buildSorobanTx = async ({
   }
 }
 
-export const simulateSorobanTx = async ({
-  contractId,
-  spec,
-  method,
-  sourcePk,
-  args = [],
-}: BuildSorobanTxArgs): Promise<
-  SorobanRpc.SimulateTransactionSuccessResponse | undefined
-> => {
-  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
-    allowHttp: true,
-  })
-
-  const invokeArgs = spec.funcArgsToScVals(method, args)
-  const sourceAccount = await server.getAccount(sourcePk)
-  const contract = new SorobanClient.Contract(contractId)
-
-  const transaction = new SorobanClient.TransactionBuilder(sourceAccount, {
-    fee: sorobanConfig.fee,
-    networkPassphrase: sorobanConfig.network.passphrase,
-  })
-    .addOperation(contract.call(method, ...invokeArgs))
-    .setTimeout(sorobanConfig.txTimeout)
-    .build()
-
-  try {
-    const preparedTransaction = await server.prepareTransaction(transaction)
-
-    const simulated: SorobanRpc.SimulateTransactionResponse =
-      await server.simulateTransaction(preparedTransaction)
-
-    if (SorobanRpc.isSimulationError(simulated)) {
-      console.log('Simulation Failed! ', simulated)
-      throw new Error(simulated.error)
-    } else if (!simulated.result) {
-      console.log('Simulation Failed! ', simulated)
-      throw new Error(`invalid simulation: no result in ${simulated}`)
-    } else {
-      return simulated
-    }
-  } catch (e) {
-    console.log("Tx couldn't be prepared! ", e)
-  }
-}
-
-export const signWithSecret = async (
-  tx: SorobanClient.Transaction | SorobanClient.FeeBumpTransaction,
-  secret: string
-): Promise<SorobanClient.Transaction | SorobanClient.FeeBumpTransaction> => {
-  const signerKeypair = SorobanClient.Keypair.fromSecret(secret)
-  tx.sign(signerKeypair)
-  return tx
-}
-
-export const submitSorobanTx = async (
+const submitSorobanTx = async (
   signedTx: SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
 ): Promise<
   | SorobanClient.SorobanRpc.GetTransactionResponse
@@ -142,6 +91,7 @@ export const submitSorobanTx = async (
   })
 
   try {
+    console.log("signedTx: " + signedTx)
     const response: SorobanRpc.SendTransactionResponse =
       await server.sendTransaction(signedTx)
 
@@ -150,6 +100,7 @@ export const submitSorobanTx = async (
       throw new Error('failed transaction!')
     }
 
+    console.log(response)
     const txHash = response.hash
 
     let updatedTransaction = await server.getTransaction(txHash)
@@ -183,13 +134,13 @@ export const submitSorobanTx = async (
   }
 }
 
-export const invokeSoroban = async (
+const invokeSoroban = async (
   invokeArgs: IInvokeSorobanArgs
 ): Promise<
   | SorobanClient.SorobanRpc.GetTransactionResponse
   | SorobanClient.SorobanRpc.GetTransactionStatus
 > => {
-  const { contractId, spec, method, sourcePk, args, sourceSk } = invokeArgs
+  const { contractId, spec, method, sourcePk, args } = invokeArgs
 
   console.log({
     contractId,
@@ -198,6 +149,7 @@ export const invokeSoroban = async (
     sourcePk,
     args,
   })
+
   const tx = await buildSorobanTx({
     contractId,
     spec,
@@ -206,21 +158,22 @@ export const invokeSoroban = async (
     args,
   })
 
-  const signedTx = sourceSk
+  console.log('sourceSk: ' + sourcePk)
+  const signedTx = sourcePk
     ? await sign({
       envelope: tx.toXDR(),
-      wallet_pk: sourceSk,
-    })
-    : new SorobanClient.Transaction(
+      wallet_pk: sourcePk,
+    }) : new SorobanClient.Transaction(
       await FREIGHTER.signWithFreighter(tx.toXDR(), sourcePk),
       SELECTED_NETWORK.passphrase
     )
 
   // const signedTx = await signWithFreighter(tx.toXDR(), sourcePk);
 
+  console.log(signedTx)
   if (signedTx) {
-    if (sourceSk) {
-      return submitSoroban(signedTx as string)
+    if (sourcePk) {
+      return submitSoroban(signedTx.hash as string)
     } else {
       return submitSorobanTx(
         signedTx as SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
@@ -236,6 +189,7 @@ const getContractId = (wrapArgs: {
   assetIssuerPk: string
 }): string => {
   const asset = new Asset(wrapArgs.assetCode, wrapArgs.assetIssuerPk)
+  console.log(asset)
   const xdrAsset = asset.toXDRObject()
   const networkId = hash(Buffer.from(SELECTED_NETWORK.passphrase))
   const preimage = xdr.HashIdPreimage.envelopeTypeContractId(
@@ -338,6 +292,7 @@ const submitSoroban = async (
 
     const final = Date.now()
 
+    console.log(updatedTransaction)
     console.log('Duration ' + (final - initial))
 
     return updatedTransaction
@@ -350,11 +305,11 @@ const submitSoroban = async (
 
 const sign = async (
   params: Hooks.UseTransactionsTypes.ISignRequest
-): Promise<string | undefined> => {
+): Promise<Hooks.UseTransactionsTypes.ISignResponse | undefined> => {
   try {
     const response = await http.post(`soroban-transactions/sign`, params)
     if (response.status === 200) {
-      return response.data.Message.envelope
+      return response.data.Message
     }
     return undefined
   } catch (error) {
@@ -372,4 +327,6 @@ export const SorobanService = {
   getSourceAccount,
   submitSoroban,
   sign,
+  submitSorobanTx,
+  invokeSoroban
 }

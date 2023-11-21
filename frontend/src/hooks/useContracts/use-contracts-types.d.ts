@@ -13,6 +13,7 @@ declare namespace Hooks {
       created_at: string
       penalty_rate: number
       address: string
+      compound: number
     }
 
     interface IContractRequest {
@@ -24,6 +25,7 @@ declare namespace Hooks {
       term: number
       min_deposit: number
       penalty_rate: number
+      compound: number
     }
 
     interface IWithdrawRequest {
@@ -34,13 +36,12 @@ declare namespace Hooks {
     interface IContractsContext {
       loading: boolean
       contracts: IContract[] | undefined
-      contract: IContract | undefined
       depositConfirmed: boolean
       withdrawConfirmed: boolean
       isDepositing: boolean
       isWithdrawing: boolean
       getContracts(): Promise<Hooks.UseContractsTypes.IContract[] | undefined>
-      getContract(id: string): Promise<void>
+      getContract(id: string): Promise<IContract | undefined>
       createContract(params: IContractRequest): Promise<IContract | undefined>
       deposit(
         amount: bigint,

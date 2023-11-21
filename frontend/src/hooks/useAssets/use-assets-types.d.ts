@@ -10,6 +10,7 @@ declare namespace Hooks {
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
+      contract_id?: string
     }
 
     interface IAssetDto {
@@ -23,6 +24,7 @@ declare namespace Hooks {
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
+      contract_id?: string
     }
 
     interface IAssetRequest {
@@ -139,6 +141,10 @@ declare namespace Hooks {
       retrieveToml: () => Promise<Blob | undefined>
       getTomlData: () => Promise<ITomlFile | undefined>
       updateImage: (id: number, image: unknown) => Promise<boolean>
+      updateContractId: (
+        assetId: number,
+        contractId: string
+      ) => Promise<boolean>
     }
   }
 }

@@ -34,7 +34,7 @@ export const Deposit: React.FC<IDeposit> = ({
   } = useForm()
 
   return (
-    <Flex flexDir="column" w="full" mt="1rem">
+    <Flex flexDir="column" w="full">
       <Container variant="primary" p="0" maxW="full">
         <Flex
           alignItems="center"
