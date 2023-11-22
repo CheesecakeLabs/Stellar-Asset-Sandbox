@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"golang.org/x/crypto/bcrypt"
@@ -89,6 +90,13 @@ func (uc *UserUseCase) GetAllUsers() ([]entity.UserResponse, error) {
 	users, err := uc.repo.GetAllUsers()
 	if err != nil {
 		return users, err
+	}
+
+	for i := range users {
+		nameParts := strings.Split(users[i].Name, " ")
+		if len(nameParts) > 0 {
+			users[i].Name = nameParts[0] // Keep only the first name
+		}
 	}
 
 	return users, nil
