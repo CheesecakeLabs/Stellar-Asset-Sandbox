@@ -58,7 +58,6 @@ const buildSorobanTx = async ({
   const sourceAccount = await server.getAccount(sourcePk)
   const contract = new SorobanClient.Contract(contractId)
 
-  console.log(sourceAccount)
   const transaction = new SorobanClient.TransactionBuilder(sourceAccount, {
     fee: sorobanConfig.fee,
     networkPassphrase: sorobanConfig.network.passphrase,
@@ -67,70 +66,12 @@ const buildSorobanTx = async ({
     .setTimeout(sorobanConfig.txTimeout)
     .build()
 
-  console.log(transaction)
-
   try {
-    console.log(transaction.toXDR())
     const preparedTransaction = await server.prepareTransaction(transaction)
-    console.log(preparedTransaction.toXDR())
     return preparedTransaction
   } catch (e) {
     console.log("Tx couldn't be prepared: ", e)
     throw e
-  }
-}
-
-const submitSorobanTx = async (
-  signedTx: SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
-): Promise<
-  | SorobanClient.SorobanRpc.GetTransactionResponse
-  | SorobanClient.SorobanRpc.GetTransactionStatus
-> => {
-  const server = new SorobanClient.Server(sorobanConfig.network.rpc, {
-    allowHttp: true,
-  })
-
-  try {
-    console.log("signedTx: " + signedTx)
-    const response: SorobanRpc.SendTransactionResponse =
-      await server.sendTransaction(signedTx)
-
-    if (response.status === 'ERROR') {
-      console.log('ERROR: Tx failed!: ', response)
-      throw new Error('failed transaction!')
-    }
-
-    console.log(response)
-    const txHash = response.hash
-
-    let updatedTransaction = await server.getTransaction(txHash)
-
-    const waitUntil = new Date(
-      Date.now() + sorobanConfig.txTimeout * 1000
-    ).valueOf()
-
-    const waitTime = 1000
-
-    const initial = Date.now()
-    while (
-      Date.now() < waitUntil &&
-      updatedTransaction.status ===
-      SorobanClient.SorobanRpc.GetTransactionStatus.NOT_FOUND
-    ) {
-      await new Promise(resolve => setTimeout(resolve, waitTime))
-
-      updatedTransaction = await server.getTransaction(txHash)
-    }
-
-    const final = Date.now()
-
-    console.log('Duration ' + (final - initial))
-
-    return updatedTransaction
-  } catch (e) {
-    console.log('Error during transaction submission: ')
-    console.log(e)
-    return SorobanClient.SorobanRpc.GetTransactionStatus.FAILED
   }
 }
 
@@ -142,14 +83,6 @@ const invokeSoroban = async (
 > => {
   const { contractId, spec, method, sourcePk, args } = invokeArgs
 
-  console.log({
-    contractId,
-    spec,
-    method,
-    sourcePk,
-    args,
-  })
-
   const tx = await buildSorobanTx({
     contractId,
     spec,
@@ -158,7 +91,6 @@ const invokeSoroban = async (
     args,
   })
 
-  console.log('sourceSk: ' + sourcePk)
   const signedTx = sourcePk
     ? await sign({
       envelope: tx.toXDR(),
@@ -168,14 +100,12 @@ const invokeSoroban = async (
       SELECTED_NETWORK.passphrase
     )
 
-  // const signedTx = await signWithFreighter(tx.toXDR(), sourcePk);
-
-  console.log(signedTx)
   if (signedTx) {
     if (sourcePk) {
-      return submitSoroban(signedTx.hash as string)
+      const transaction = new SorobanClient.Transaction((signedTx as Hooks.UseTransactionsTypes.ISignResponse).envelope, sorobanConfig.network.passphrase)
+      return submitSoroban(transaction)
     } else {
-      return submitSorobanTx(
+      return submitSoroban(
         signedTx as SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
       )
     }
@@ -189,7 +119,6 @@ const getContractId = (wrapArgs: {
   assetIssuerPk: string
 }): string => {
   const asset = new Asset(wrapArgs.assetCode, wrapArgs.assetIssuerPk)
-  console.log(asset)
   const xdrAsset = asset.toXDRObject()
   const networkId = hash(Buffer.from(SELECTED_NETWORK.passphrase))
   const preimage = xdr.HashIdPreimage.envelopeTypeContractId(
@@ -260,7 +189,7 @@ const wrapClassicAsset = async (
 }
 
 const submitSoroban = async (
-  txHash: string
+  signedTx: SorobanClient.Transaction | SorobanClient.FeeBumpTransaction
 ): Promise<
   | SorobanClient.SorobanRpc.GetTransactionResponse
   | SorobanClient.SorobanRpc.GetTransactionStatus
@@ -270,7 +199,16 @@ const submitSoroban = async (
   })
 
   try {
-    console.log(txHash)
+    const response: SorobanRpc.SendTransactionResponse =
+    await server.sendTransaction(signedTx)
+
+    if (response.status === 'ERROR') {
+      console.log('ERROR: Tx failed!: ', response)
+      throw new Error('failed transaction!')
+    }
+
+    const txHash = response.hash
+
     let updatedTransaction = await server.getTransaction(txHash)
 
     const waitUntil = new Date(
@@ -292,7 +230,6 @@ const submitSoroban = async (
 
     const final = Date.now()
 
-    console.log(updatedTransaction)
     console.log('Duration ' + (final - initial))
 
     return updatedTransaction
@@ -327,6 +264,5 @@ export const SorobanService = {
   getSourceAccount,
   submitSoroban,
   sign,
-  submitSorobanTx,
   invokeSoroban
 }

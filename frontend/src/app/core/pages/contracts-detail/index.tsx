@@ -63,7 +63,10 @@ export const ContractsDetail: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      getContract(id).then(contract => setContract(contract))
+      getContract(id).then(contract => {
+        setContract(contract)
+        console.log(contract)
+      })
     }
   }, [getContract, id])
 

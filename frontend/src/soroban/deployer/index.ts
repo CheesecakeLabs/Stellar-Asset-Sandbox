@@ -20,7 +20,7 @@ const deploy = async (rawArgs: {
 }): Promise<any> => {
   const args = {
     wasm_hash: Buffer.from(rawArgs.wasm_hash, 'hex'),
-    salt: Buffer.from(rawArgs.wasm_hash, 'hex'),
+    salt: Buffer.from(rawArgs.salt),
     admin: new Address(rawArgs.admin),
     asset: new Address(rawArgs.asset),
     term: rawArgs.term,

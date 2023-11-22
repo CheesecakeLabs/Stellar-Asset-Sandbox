@@ -14,6 +14,13 @@ const deposit = async (rawArgs: {
     amount: rawArgs.amount,
   }
 
+  console.log({
+    contractId: rawArgs.contractId,
+    spec,
+    method: Methods.deposit,
+    sourcePk: rawArgs.address,
+  })
+  
   let invokeArgs: IInvokeSorobanArgs = {
     contractId: rawArgs.contractId,
     spec,

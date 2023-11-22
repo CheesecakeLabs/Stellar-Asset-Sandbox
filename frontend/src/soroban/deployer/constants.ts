@@ -1,10 +1,10 @@
 import { ContractSpec } from 'soroban-client';
-
+import { customAlphabet } from 'nanoid';
 
 export const contractId = 'CDBXYQJ5ZTHD67NRZ65VXQIJFFPF7SREUQZLNU3INOUKWRTFHJ5W7RYK'
 export const codWasmHash =
   '35ac3082ec59e1cdfb7cb10b612c526478cfe7a46032311b40f405abb886a010'
-export const codSalt = Math.floor(Math.random() * 1000000).toString()
+export const codSalt = customAlphabet('0123456789', 32);
 
 export enum Methods {
   deploy = 'deploy',
