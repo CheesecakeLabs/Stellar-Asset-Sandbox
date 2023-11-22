@@ -66,18 +66,18 @@ func (mr *MockUserRepoMockRecorder) EditUsersRole(id_user, id_role interface{}) 
 }
 
 // GetAllUsers mocks base method.
-func (m *MockUserRepo) GetAllUsers() ([]entity.UserResponse, error) {
+func (m *MockUserRepo) GetAllUsers(arg0 string) ([]entity.UserResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAllUsers")
+	ret := m.ctrl.Call(m, "GetAllUsers", arg0)
 	ret0, _ := ret[0].([]entity.UserResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAllUsers indicates an expected call of GetAllUsers.
-func (mr *MockUserRepoMockRecorder) GetAllUsers() *gomock.Call {
+func (mr *MockUserRepoMockRecorder) GetAllUsers(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsers", reflect.TypeOf((*MockUserRepo)(nil).GetAllUsers))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsers", reflect.TypeOf((*MockUserRepo)(nil).GetAllUsers), arg0)
 }
 
 // GetProfile mocks base method.
