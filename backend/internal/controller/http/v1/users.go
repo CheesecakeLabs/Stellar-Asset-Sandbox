@@ -157,15 +157,25 @@ func (r *usersRoutes) logout(c *gin.Context) {
 }
 
 // @Summary GET All Users
-// @Description List users
+// @Description List all users except the one making the request
 // @Schemes
 // @Tags user
 // @Accept json
 // @Produce json
-// @Success 200  {object} []entity.UserResponse
+// @Param Authorization header string true "User Token"
+// @Success 200 {object} []entity.UserResponse "Returns a list of all users, excluding the user who made the request"
+// @Failure 404 {object} object "User Not Found"
+// @Failure 500 {object} object "Internal Server Error"
 // @Router /users/list-users [get]
 func (r *usersRoutes) getAllUsers(c *gin.Context) {
-	users, err := r.t.GetAllUsers()
+	token := c.Request.Header.Get("Authorization")
+	requestingUser, err := r.a.GetUserByToken(token)
+	if err != nil {
+		errorResponse(c, http.StatusNotFound, "user not found", err)
+		return
+	}
+
+	users, err := r.t.GetAllUsers(requestingUser.ID)
 	if err != nil {
 		r.l.Error(err, "http - v1 - getAllUsers")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)

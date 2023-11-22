@@ -86,17 +86,16 @@ func (uc *UserUseCase) GetUserByToken(token string) (user entity.User, err error
 	return user, nil
 }
 
-func (uc *UserUseCase) GetAllUsers() ([]entity.UserResponse, error) {
-	users, err := uc.repo.GetAllUsers()
+func (uc *UserUseCase) GetAllUsers(ID string) ([]entity.UserResponse, error) {
+	users, err := uc.repo.GetAllUsers(ID)
 	if err != nil {
 		return users, err
 	}
 
+	// Iterate over users and modify the Name and Email fields
 	for i := range users {
-		nameParts := strings.Split(users[i].Name, " ")
-		if len(nameParts) > 0 {
-			users[i].Name = nameParts[0] // Keep only the first name
-		}
+		users[i].Name = formatName(users[i].Name)
+		users[i].Email = obfuscateEmail(users[i].Email)
 	}
 
 	return users, nil
@@ -117,4 +116,22 @@ func (uc *UserUseCase) GetProfile(token string) (entity.UserResponse, error) {
 	}
 
 	return profile, nil
+}
+
+// Helper function to format the name
+func formatName(name string) string {
+	nameParts := strings.Split(name, " ")
+	if len(nameParts) > 1 {
+		return nameParts[0] + " " + string(nameParts[1][0]) + "."
+	}
+	return name
+}
+
+// Helper function to obfuscate the email
+func obfuscateEmail(email string) string {
+	atIndex := strings.Index(email, "@")
+	if atIndex > 1 {
+		return string(email[0]) + strings.Repeat("*", atIndex-2) + string(email[atIndex-1:])
+	}
+	return email
 }

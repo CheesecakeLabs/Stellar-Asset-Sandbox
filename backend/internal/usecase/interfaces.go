@@ -17,7 +17,7 @@ type (
 		UpdateToken(id string, token string) error
 		ValidateToken(token string) error
 		GetUserByToken(token string) (entity.User, error)
-		GetAllUsers() ([]entity.UserResponse, error)
+		GetAllUsers(string) ([]entity.UserResponse, error)
 		EditUsersRole(id_user string, id_role string) error
 		GetProfile(token string) (entity.UserResponse, error)
 	}

@@ -87,20 +87,21 @@ func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
 	return user, nil
 }
 
-func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
+func (r UserRepo) GetAllUsers(excludeUserID string) ([]entity.UserResponse, error) {
 	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
-			 FROM UserAccount u 
-			 LEFT JOIN Role r ON u.role_id = r.id 
-			 ORDER BY u.name ASC`
+             FROM UserAccount u 
+             LEFT JOIN Role r ON u.role_id = r.id
+             WHERE u.id != $1
+             ORDER BY u.name ASC`
 
-	rows, err := r.Db.Query(stmt)
+	rows, err := r.Db.Query(stmt, excludeUserID)
 	if err != nil {
 		return nil, fmt.Errorf("UserRepo - GetAllUsers - db.Query: %w", err)
 	}
 
 	defer rows.Close()
 
-	entities := make([]entity.UserResponse, 0, _defaultEntityCap)
+	entities := make([]entity.UserResponse, 0)
 
 	for rows.Next() {
 		var user entity.UserResponse
