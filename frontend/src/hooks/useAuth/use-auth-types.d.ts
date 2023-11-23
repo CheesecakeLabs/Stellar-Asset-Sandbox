@@ -18,6 +18,8 @@ declare namespace Hooks {
       name: string
       token: string
       role_id: number
+      vault_id: number
+      vault: Hooks.UseVaultsTypes.IVault
     }
 
     interface IUserDto {
@@ -27,6 +29,8 @@ declare namespace Hooks {
       role: string
       updated_at: string
       role_id: number
+      vault_id: number
+      vault: Hooks.UseVaultsTypes.IVault
     }
 
     interface IRole {

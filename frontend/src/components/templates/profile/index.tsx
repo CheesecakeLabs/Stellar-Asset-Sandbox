@@ -14,22 +14,27 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { Loading } from 'components/atoms'
 import { EditIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
+import { useNavigate } from 'react-router-dom'
 
 interface IProfileTemplate {
   handleSignOut(): Promise<void>
-  loading: boolean
-  profile: Hooks.UseAuthTypes.IUserDto | undefined
+  handleCreateVault(): Promise<void>
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
+  loading: boolean
+  creatingVault: boolean
+  profile: Hooks.UseAuthTypes.IUserDto | undefined
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
 }
 
 export const ProfileTemplate: React.FC<IProfileTemplate> = ({
   handleSignOut,
+  handleEditRole,
+  handleCreateVault,
   loading,
   profile,
-  handleEditRole,
   loadingRoles,
+  creatingVault,
   roles,
 }) => {
   const { colorMode } = useColorMode()
@@ -102,10 +107,25 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                     />
                   </Flex>
                 </Flex>
+                <Flex
+                  borderBottom="1px solid"
+                  borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
+                  py="1rem"
+                  alignItems="center">
+                  <Text w="50%">My vault</Text>
+                  <Button
+                    variant="primary"
+                    w="max-content"
+                    onClick={handleCreateVault}
+                    isLoading={creatingVault}
+                  >
+                    {profile?.vault_id ? 'Access my vault' : 'Create my vault'}
+                  </Button>
+                </Flex>
                 <Flex pt="1rem" alignItems="center">
                   <Text w="50%">Sign out of account</Text>
                   <Button
-                    variant="primary"
+                    variant="secondary"
                     w="max-content"
                     onClick={handleSignOut}
                   >

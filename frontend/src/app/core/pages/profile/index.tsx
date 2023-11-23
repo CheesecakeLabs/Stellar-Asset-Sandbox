@@ -7,6 +7,7 @@ import { useAuth } from 'hooks/useAuth'
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ProfileTemplate } from 'components/templates/profile'
+import { useVaults } from 'hooks/useVaults'
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate()
@@ -21,10 +22,29 @@ export const Profile: React.FC = () => {
     loadingRoles,
   } = useAuth()
 
+  const { creatingVault, createVault } = useVaults()
+
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
       navigate('/login')
+    }
+  }
+
+  const handleCreateVault = async (): Promise<void> => {
+    if(profile?.vault_id){
+      navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
+      return
+    }
+    const vault = {
+      name: profile?.name || 'My vault',
+      assets_id: [],
+      owner_id: Number(profile?.id)
+    }
+
+    const vaultCreated = await createVault(vault)
+    if (vaultCreated) {
+      navigate(`${PathRoute.VAULT_DETAIL}/${vaultCreated.id}`)
     }
   }
 
@@ -55,6 +75,8 @@ export const Profile: React.FC = () => {
           handleEditRole={handleEditRole}
           roles={roles}
           loadingRoles={loadingRoles}
+          handleCreateVault={handleCreateVault}
+          creatingVault={creatingVault}
         />
       </Sidebar>
     </Flex>

@@ -9,6 +9,7 @@ import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsDetailTemplate } from 'components/templates/contracts-detail'
 import { useParams } from 'react-router-dom'
+import { useAuth } from 'hooks/useAuth'
 
 export const ContractsDetail: React.FC = () => {
   const {
@@ -20,8 +21,9 @@ export const ContractsDetail: React.FC = () => {
     getYield,
     getTime,
     withdraw,
-    deposit,
+    deposit
   } = useContracts()
+  const { profile, getProfile } = useAuth()
   const toast = useToast()
 
   const [userPosition, setUserPosition] = useState<bigint>(BigInt(0))
@@ -33,56 +35,60 @@ export const ContractsDetail: React.FC = () => {
 
   const { id } = useParams()
 
-  const userAccount = 'GDNG5OBGQFGWWG5UQXLFQLXOH5BA3GIXQO6YNZFDUFBYSHVUX7BUU6RT'
-  const secretKey = 'SBBMN3QPHH7UYPHEPXXVTLAIYLOIPDGRNW65TTN2ANBWSLNW6NYH2OZW'
+  useEffect(() => {
+    getProfile()
+  }, [getProfile])
 
   const updatePosition = useCallback((): void => {
     if (!pauseProcess && contract) {
-      getPosition(setUserPosition, userAccount, contract.address)
+      /*getPosition(setUserPosition, userAccount, contract.address)
       getYield(setUserYield, userAccount, contract.address)
-      getTime(setTime, userAccount, contract.address)
+      getTime(setTime, userAccount, contract.address)*/
     }
-  }, [getPosition, getTime, getYield, pauseProcess, userAccount, contract])
+  }, [getPosition, getTime, getYield, pauseProcess, profile, contract])
 
-  const updatePositionPeriodically = useCallback((): void => {
+  /*const updatePositionPeriodically = useCallback((): void => {
     setInterval(updatePosition, 1000)
-  }, [updatePosition])
+  }, [updatePosition])*/
 
   useEffect(() => {
-    if (userAccount) {
-      updatePositionPeriodically()
+    if (profile && contract) {
+      getPosition(updatePosition, profile.vault.wallet.key.publicKey, contract.address)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userAccount])
+  }, [profile, contract])
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (userDeposit === 0 && userPosition > 0 && userYield > 0) {
       setUserDeposit(Number(userPosition) - Number(userYield))
     }
-  }, [userAccount, userDeposit, userPosition, userYield])
+  }, [userAccount, userDeposit, userPosition, userYield])*/
 
   useEffect(() => {
     if (id) {
       getContract(id).then(contract => {
         setContract(contract)
+        if (contract && profile) {
+          getPosition(updatePosition, profile.vault.wallet.key.publicKey, contract.address)
+        }
         console.log(contract)
       })
     }
-  }, [getContract, id])
+  }, [getContract, id, profile])
 
   const onSubmitDeposit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void> => {
-    if (!contract) return
+    if (!contract || !profile?.vault) return
 
     try {
       const isSuccess = await deposit(
         BigInt(data.amount),
-        userAccount,
+        profile.vault.wallet.key.publicKey,
         updatePosition(),
         contract.address,
-        secretKey
+        profile.vault.wallet.key.publicKey
       )
       setUserDeposit(data.amount)
 
@@ -110,12 +116,12 @@ export const ContractsDetail: React.FC = () => {
   }
 
   const onSubmitWithdraw = async (isPremature: boolean): Promise<void> => {
-    if (!contract) return
+    if (!contract || !profile) return
 
     try {
       setPauseProcess(isPremature)
       const isSuccess = await withdraw(
-        userAccount,
+        profile.vault.wallet.key.publicKey,
         true,
         updatePosition(),
         contract.address
@@ -163,7 +169,7 @@ export const ContractsDetail: React.FC = () => {
           loading={loading}
           contract={contract}
           time={time}
-          userAccount={userAccount}
+          userAccount={profile?.vault.wallet.key.publicKey}
           isDepositing={isDepositing}
           isWithdrawing={isWithdrawing}
           currentYield={Number(userYield)}

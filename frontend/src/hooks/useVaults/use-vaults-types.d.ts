@@ -12,8 +12,9 @@ declare namespace Hooks {
 
     interface IVaultRequest {
       name: string
-      vault_category_id: number
+      vault_category_id?: number
       assets_id: number[]
+      owner_id?: number
     }
 
     interface IVaultCategory {

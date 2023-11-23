@@ -14,6 +14,7 @@ declare namespace Hooks {
       penalty_rate: number
       address: string
       compound: number
+      vault: Hooks.UseVaultsTypes.IVault
     }
 
     interface IContractRequest {
@@ -48,7 +49,7 @@ declare namespace Hooks {
         address: string,
         updatePosition: void,
         contractId: string,
-        signerSecret: string
+        sourcePk: string
       ): Promise<boolean>
       getPosition(
         update: React.Dispatch<React.SetStateAction<bigint>>,

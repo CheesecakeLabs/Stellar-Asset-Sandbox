@@ -67,6 +67,9 @@ const buildSorobanTx = async ({
     .build()
 
   try {
+    console.log(transaction)
+    const simulate = await server.simulateTransaction(transaction)
+    console.log(simulate)
     const preparedTransaction = await server.prepareTransaction(transaction)
     return preparedTransaction
   } catch (e) {

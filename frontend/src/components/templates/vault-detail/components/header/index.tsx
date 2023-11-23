@@ -151,7 +151,7 @@ export const Header: React.FC<IHeader> = ({
             {vault.name}
           </Text>
           <Tag
-            variant={vault.vault_category.theme || vaultCategoryTheme[0]}
+            variant={vault.vault_category?.theme || vaultCategoryTheme[0]}
             ms="1rem"
             me="0.25rem"
             textAlign="center"
@@ -159,7 +159,7 @@ export const Header: React.FC<IHeader> = ({
             fontWeight="700"
             w="fit-content"
           >
-            {vault.vault_category.name}
+            {vault.vault_category?.name || 'Personal vault'}
           </Tag>
           <Popover
             isOpen={isOpen}

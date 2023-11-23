@@ -89,7 +89,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     address: string,
     updatePosition: void,
     contractId: string,
-    signerSecret?: string
+    sourcePk: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
@@ -97,7 +97,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         amount: amount * BigInt(10000000),
         address: address,
         contractId: contractId,
-        signerSecret: signerSecret,
+        sourcePk: sourcePk,
       })
       setIsDepositing(false)
       setDepositConfirmed(true)
@@ -125,6 +125,8 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         contractId: contractId
       })
       .then((res: SetStateAction<bigint>) => {
+        console.log('position')
+        console.log(res)
         update(res)
       })
       .catch(() => {

@@ -27,6 +27,7 @@
     "enzyme": "~3.11.0",
     "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-jest-dom": "^4.0.3",
+    "feather-icons": "^4.29.1",
     "framer-motion": "^10.8.5",
     "jest-canvas-mock": "~2.4.0",
     "lodash": "~4.17.21",

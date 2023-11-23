@@ -7,7 +7,7 @@ const deposit = async (rawArgs: {
   amount: I128
   address: string
   contractId: string
-  signerSecret?: string
+  sourcePk: string
 }): Promise<any> => {
   const args = {
     address: new Address(rawArgs.address),
@@ -15,23 +15,28 @@ const deposit = async (rawArgs: {
   }
 
   console.log({
+    address: new Address(rawArgs.address),
+    amount: rawArgs.amount,
+  })
+  
+  console.log({
     contractId: rawArgs.contractId,
     spec,
     method: Methods.deposit,
     sourcePk: rawArgs.address,
   })
-  
+
   let invokeArgs: IInvokeSorobanArgs = {
     contractId: rawArgs.contractId,
     spec,
     method: Methods.deposit,
-    sourcePk: rawArgs.address,
+    sourcePk: rawArgs.sourcePk,
   }
 
   invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
 
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+  invokeArgs = rawArgs.sourcePk
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
     : invokeArgs
 
   return SorobanService.invokeSoroban(invokeArgs)
