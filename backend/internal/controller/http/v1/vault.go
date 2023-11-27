@@ -179,23 +179,55 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	c.JSON(http.StatusOK, vault)
 }
 
-// @Summary Get all vault
-// @Description Get all vault
+// @Summary Get all vaults
+// @Description Retrieve a list of all vaults, with optional pagination
 // @Tags  	    Vault
 // @Accept      json
 // @Produce     json
+// @Param       page query int false "Page number for pagination"
+// @Param       limit query int false "Number of items per page for pagination"
 // @Success     200 {object} []entity.Vault
-// @Failure     500 {object} response
+// @Failure     400 {object} response "Invalid query parameters"
+// @Failure     500 {object} response "Internal server error"
 // @Router      /vault/list [get]
 func (r *vaultRoutes) getAllVaults(c *gin.Context) {
-	vault, err := r.v.GetAll()
-	if err != nil {
-		r.l.Error(err, "http - v1 - get all vault - GetAll")
-		errorResponse(c, http.StatusInternalServerError, "error getting vault", err)
-		return
-	}
+	pageQuery := c.Query("page")
+	limitQuery := c.Query("limit")
 
-	c.JSON(http.StatusOK, vault)
+	// Check if pagination parameters are provided
+	if pageQuery != "" && limitQuery != "" {
+		page, err := strconv.Atoi(pageQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - invalid page number")
+			errorResponse(c, http.StatusBadRequest, "invalid page number", err)
+			return
+		}
+
+		limit, err := strconv.Atoi(limitQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - invalid limit")
+			errorResponse(c, http.StatusBadRequest, "invalid limit", err)
+			return
+		}
+
+		// Get paginated vaults
+		vaults, err := r.v.GetPaginatedVaults(page, limit)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - GetPaginatedVaults")
+			errorResponse(c, http.StatusInternalServerError, "error getting paginated vaults", err)
+			return
+		}
+		c.JSON(http.StatusOK, vaults)
+	} else {
+		// Get all vaults without pagination
+		vaults, err := r.v.GetAll()
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - GetAll")
+			errorResponse(c, http.StatusInternalServerError, "error getting all vaults", err)
+			return
+		}
+		c.JSON(http.StatusOK, vaults)
+	}
 }
 
 // @Summary Get vault

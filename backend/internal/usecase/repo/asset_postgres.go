@@ -210,3 +210,55 @@ func (r AssetRepo) GetAssetImage(assetId string) ([]byte, error) {
 
 	return image, nil
 }
+
+func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	query := `
+        SELECT
+            a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image,
+            d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+            dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+            i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+        FROM asset a
+        JOIN wallet d ON a.distributor_id = d.id
+        JOIN key dk ON d.id = dk.wallet_id
+        JOIN wallet i ON a.issuer_id = i.id
+        JOIN key ik ON i.id = ik.wallet_id
+        ORDER BY a.name
+        LIMIT $1 OFFSET $2;
+    `
+
+	rows, err := r.Db.Query(query, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
+	}
+	defer rows.Close()
+
+	var assets []entity.Asset
+	for rows.Next() {
+		var asset entity.Asset
+		var distributor entity.Wallet
+		var issuer entity.Wallet
+
+		err := rows.Scan(
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&distributor.Id, &distributor.Type, &distributor.Funded,
+			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
+			&issuer.Id, &issuer.Type, &issuer.Funded,
+			&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
+		}
+
+		asset.Distributor = distributor
+		asset.Issuer = issuer
+
+		assets = append(assets, asset)
+	}
+
+	return assets, nil
+}

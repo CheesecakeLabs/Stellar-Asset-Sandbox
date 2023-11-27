@@ -76,6 +76,7 @@ services:
       KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-generatedKeypairs}
       KAFKA_SIGN_CONSUMER_TOPICS: ${KAFKA_SIGN_CONSUMER_TOPICS:-signEnvelope}
       KAFKA_SIGN_PRODUCER_TOPIC: ${KAFKA_SIGN_PRODUCER_TOPIC:-signedEnvelopes}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
       PG_USER: ${PG_USER:-postgres}
@@ -168,7 +169,8 @@ services:
       KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
       KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
       KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
-
+      KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS: ${KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS:-signedEnvelopes}
+      KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS: ${KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS:-signEnvelope}
     depends_on:
       kafka1:
         condition: service_healthy
@@ -182,6 +184,8 @@ services:
       kafka-topics --create --topic $$KAFKA_ENVELOPE_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka1 cub kafka-ready -b kafka1:129092 1 20
       "
 
@@ -224,6 +228,7 @@ services:
       KAFKA_ENVELOPE_PRODUCER_TOPIC: ${KAFKA_ENVELOPE_PRODUCER_TOPIC:-signEnvelope}
       KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-signedEnvelopes}
       KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-submitResponse}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
     depends_on:
       kafka1:
         condition: service_healthy

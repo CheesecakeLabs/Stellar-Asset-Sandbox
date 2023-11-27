@@ -137,3 +137,55 @@ func (r VaultRepo) DeleteVault(data entity.Vault) (entity.Vault, error) {
 
 	return data, nil
 }
+
+// GetPaginatedVaults -.
+func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
+	// Calculate offset based on page number and limit
+	offset := (page - 1) * limit
+
+	query := `
+        SELECT 
+            v.id AS vault_id, v.name AS vault_name, v.active AS vault_active,
+            vc.id AS vault_category_id, vc.name as vault_category_name, vc.theme as vault_category_theme,
+            w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
+            wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
+        FROM vault v
+        JOIN vaultcategory vc ON v.vault_category_id = vc.id
+        JOIN wallet w ON v.wallet_id = w.id
+        JOIN key wk ON w.id = wk.wallet_id
+        WHERE v.active = 1
+        ORDER BY v.id DESC
+        OFFSET $1 LIMIT $2;
+    `
+
+	rows, err := r.Db.Query(query, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("VaultRepo - GetPaginatedVaults - Query: %w", err)
+	}
+	defer rows.Close()
+
+	vaults := []entity.Vault{}
+
+	for rows.Next() {
+		var vault entity.Vault
+		var vaultCategory entity.VaultCategory
+		var wallet entity.Wallet
+
+		err := rows.Scan(
+			&vault.Id, &vault.Name, &vault.Active,
+			&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme,
+			&wallet.Id, &wallet.Type, &wallet.Funded,
+			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("VaultRepo - GetPaginatedVaults - row.Scan: %w", err)
+		}
+
+		vault.Wallet = wallet
+		vault.VaultCategory = vaultCategory
+
+		vaults = append(vaults, vault)
+	}
+
+	return vaults, nil
+}

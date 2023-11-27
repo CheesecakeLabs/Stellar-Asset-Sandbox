@@ -106,23 +106,55 @@ func (r *contractRoutes) createContract(c *gin.Context) {
 	c.JSON(http.StatusOK, contract)
 }
 
-// @Summary Get all contract
-// @Description Get all contract
+// @Summary Get all contracts
+// @Description Retrieve a list of all contracts, with optional pagination
 // @Tags  	    Contract
 // @Accept      json
 // @Produce     json
+// @Param       page query int false "Page number for pagination"
+// @Param       limit query int false "Number of items per page for pagination"
 // @Success     200 {object} []entity.Contract
-// @Failure     500 {object} response
-// @Router      / [get]
+// @Failure     400 {object} response "Invalid query parameters"
+// @Failure     500 {object} response "Internal server error"
+// @Router      /contracts [get]
 func (r *contractRoutes) getAllContracts(c *gin.Context) {
-	contract, err := r.v.GetAll()
-	if err != nil {
-		r.l.Error(err, "http - v1 - get all contracts - GetAll")
-		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
-		return
-	}
+	pageQuery := c.Query("page")
+	limitQuery := c.Query("limit")
 
-	c.JSON(http.StatusOK, contract)
+	// Check if pagination parameters are provided
+	if pageQuery != "" && limitQuery != "" {
+		page, err := strconv.Atoi(pageQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all contracts - invalid page number")
+			errorResponse(c, http.StatusBadRequest, "invalid page number", err)
+			return
+		}
+
+		limit, err := strconv.Atoi(limitQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all contracts - invalid limit")
+			errorResponse(c, http.StatusBadRequest, "invalid limit", err)
+			return
+		}
+
+		// Get paginated contracts
+		contracts, err := r.c.GetPaginatedContracts(page, limit)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all contracts - GetPaginatedContracts")
+			errorResponse(c, http.StatusInternalServerError, "error getting paginated contracts", err)
+			return
+		}
+		c.JSON(http.StatusOK, contracts)
+	} else {
+		// Get all contracts without pagination
+		contracts, err := r.c.GetAll()
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all contracts - GetAll")
+			errorResponse(c, http.StatusInternalServerError, "error getting all contracts", err)
+			return
+		}
+		c.JSON(http.StatusOK, contracts)
+	}
 }
 
 // @Summary Get contract
