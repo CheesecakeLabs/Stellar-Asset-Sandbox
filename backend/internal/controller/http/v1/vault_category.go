@@ -6,6 +6,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,10 +14,11 @@ type vaultCategoryRoutes struct {
 	m  HTTPControllerMessenger
 	a  usecase.AuthUseCase
 	vc usecase.VaultCategoryUseCase
+	l  *logger.Logger
 }
 
-func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, vc usecase.VaultCategoryUseCase) {
-	r := &vaultCategoryRoutes{m, a, vc}
+func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, vc usecase.VaultCategoryUseCase, l *logger.Logger) {
+	r := &vaultCategoryRoutes{m, a, vc, l}
 	h := handler.Group("/vault-category").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllVaultCategories)
@@ -45,6 +47,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - create vault category - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -56,6 +59,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 
 	vaultCategory, err = r.vc.Create(vaultCategory)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create vault category - create")
 		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
@@ -74,6 +78,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 func (r *vaultCategoryRoutes) getAllVaultCategories(c *gin.Context) {
 	vaultCategories, err := r.vc.GetAll()
 	if err != nil {
+		r.l.Error(err, "http - v1 - get all vault categories - get all")
 		errorResponse(c, http.StatusInternalServerError, "error getting vault categories", err)
 		return
 	}

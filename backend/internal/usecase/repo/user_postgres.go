@@ -17,37 +17,33 @@ func New(pg *postgres.Postgres) UserRepo {
 }
 
 func (r UserRepo) GetUser(email string) (entity.User, error) {
-	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE email='%s'`, email)
+	stmt := fmt.Sprintf(`SELECT ID, Name, Password, role_id, Email FROM UserAccount WHERE email='%s' LIMIT 1`, email)
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
 		return entity.User{}, fmt.Errorf("UserRepo - GetUser - db.Query: %w", err)
 	}
-
 	defer rows.Close()
 
-	for rows.Next() {
-		var user entity.User
-
-		err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
-		if err != nil {
-			return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
-		}
-
-		return user, nil
+	if !rows.Next() {
+		return entity.User{}, nil // No matching user found.
 	}
 
-	return entity.User{}, nil
+	var user entity.User
+	err = rows.Scan(&user.ID, &user.Name, &user.Password, &user.RoleId, &user.Email)
+	if err != nil {
+		return entity.User{}, fmt.Errorf("UserRepo - GetUser - rows.Scan: %w", err)
+	}
+
+	return user, nil
 }
 
 func (r UserRepo) CreateUser(user entity.User) error {
 	stmt := `INSERT INTO UserAccount (name, password, role_id, email, token) VALUES ($1, $2, $3, $4, $5)`
 	_, err := r.Db.Exec(stmt, user.Name, user.Password, user.RoleId, user.Email, user.Token)
 	if err != nil {
-		panic(err)
-		// return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
+		return fmt.Errorf("UserRepo - CreateUser - db.Exec: %w", err)
 	}
-	fmt.Println("User created successfully")
 	return nil
 }
 
@@ -56,7 +52,6 @@ func (r UserRepo) UpdateToken(id string, token string) error {
 	stmt := `UPDATE UserAccount SET token=$2 WHERE id = $1`
 	_, err := r.Db.Exec(stmt, id, token)
 	if err != nil {
-		// panic(err)
 		return fmt.Errorf("UserRepo - UpdateToken - db.Exec: %w", err)
 	}
 	return nil
@@ -125,7 +120,6 @@ func (r UserRepo) EditUsersRole(id_user string, role_id string) error {
 	stmt := `UPDATE UserAccount SET role_id=$2 WHERE id = $1`
 	_, err := r.Db.Exec(stmt, id_user, role_id)
 	if err != nil {
-		// panic(err)
 		return fmt.Errorf("UserRepo - EditUsersRole - db.Exec: %w", err)
 	}
 	return nil

@@ -7,6 +7,7 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,12 +18,13 @@ type vaultRoutes struct {
 	vc usecase.VaultCategoryUseCase
 	w  usecase.WalletUseCase
 	as usecase.AssetUseCase
+	l  logger.Interface
 }
 
 func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, v usecase.VaultUseCase, vc usecase.VaultCategoryUseCase,
-	w usecase.WalletUseCase, as usecase.AssetUseCase,
+	w usecase.WalletUseCase, as usecase.AssetUseCase, l logger.Interface,
 ) {
-	r := &vaultRoutes{m, a, v, vc, w, as}
+	r := &vaultRoutes{m, a, v, vc, w, as, l}
 	h := handler.Group("/vault").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("/:id", r.getVaultById)
@@ -69,6 +71,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - create vault - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -78,7 +81,8 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	if request.VaultCategoryId != nil {
 		vaultCategory, err = r.vc.GetById(*request.VaultCategoryId)
 		if err != nil {
-			errorResponse(c, http.StatusNotFound, "source wallet not found", err)
+		    r.l.Error(err, "http - v1 - create vault - vault category")
+			errorResponse(c, http.StatusNotFound, "vault category not found", err)
 			return
 		}
 	}
@@ -87,18 +91,21 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 
 	sponsor, err := r.w.Get(sponsorID)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create vault - Get Wallet")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
 
 	res, err := r.m.SendMessage(entity.CreateKeypairChannel, entity.CreateKeypairRequest{Amount: 1})
 	if err != nil {
+		r.l.Error(err, "http - v1 - create vault - SendMessage")
 		errorResponse(c, http.StatusInternalServerError, "kms messaging problems", err)
 		return
 	}
 
 	kpRes, ok := res.Message.(entity.CreateKeypairResponse)
 	if !ok || len(kpRes.PublicKeys) != 1 {
+		r.l.Error(err, "http - v1 - create vault - SendMessage")
 		errorResponse(c, http.StatusInternalServerError, "unexpected kms response", err)
 		return
 	}
@@ -117,6 +124,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	for _, assetId := range request.AssetsId {
 		asset, err := r.as.GetById(strconv.Itoa(assetId))
 		if err != nil {
+			r.l.Error(err, "http - v1 - create vault - Get Asset")
 			errorResponse(c, http.StatusNotFound, "asset not found", err)
 			return
 		}
@@ -132,17 +140,21 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		})
 	}
 
+	Id := generateID()
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
 		Operations: ops,
 	})
 	if err != nil {
+		r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 	_, ok = res.Message.(entity.EnvelopeResponse)
 	if !ok {
+		r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
 		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
 		return
 	}
@@ -165,6 +177,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 
 	vault, err = r.v.Create(vault)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create vault - Create Vault")
 		errorResponse(c, http.StatusNotFound, fmt.Sprintf("error: %s", err.Error()), err)
 		return
 	}
@@ -172,22 +185,55 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	c.JSON(http.StatusOK, vault)
 }
 
-// @Summary Get all vault
-// @Description Get all vault
+// @Summary Get all vaults
+// @Description Retrieve a list of all vaults, with optional pagination
 // @Tags  	    Vault
 // @Accept      json
 // @Produce     json
+// @Param       page query int false "Page number for pagination"
+// @Param       limit query int false "Number of items per page for pagination"
 // @Success     200 {object} []entity.Vault
-// @Failure     500 {object} response
+// @Failure     400 {object} response "Invalid query parameters"
+// @Failure     500 {object} response "Internal server error"
 // @Router      /vault/list [get]
 func (r *vaultRoutes) getAllVaults(c *gin.Context) {
-	vault, err := r.v.GetAll()
-	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "error getting vault", err)
-		return
-	}
+	pageQuery := c.Query("page")
+	limitQuery := c.Query("limit")
 
-	c.JSON(http.StatusOK, vault)
+	// Check if pagination parameters are provided
+	if pageQuery != "" && limitQuery != "" {
+		page, err := strconv.Atoi(pageQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - invalid page number")
+			errorResponse(c, http.StatusBadRequest, "invalid page number", err)
+			return
+		}
+
+		limit, err := strconv.Atoi(limitQuery)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - invalid limit")
+			errorResponse(c, http.StatusBadRequest, "invalid limit", err)
+			return
+		}
+
+		// Get paginated vaults
+		vaults, err := r.v.GetPaginatedVaults(page, limit)
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - GetPaginatedVaults")
+			errorResponse(c, http.StatusInternalServerError, "error getting paginated vaults", err)
+			return
+		}
+		c.JSON(http.StatusOK, vaults)
+	} else {
+		// Get all vaults without pagination
+		vaults, err := r.v.GetAll()
+		if err != nil {
+			r.l.Error(err, "http - v1 - get all vaults - GetAll")
+			errorResponse(c, http.StatusInternalServerError, "error getting all vaults", err)
+			return
+		}
+		c.JSON(http.StatusOK, vaults)
+	}
 }
 
 // @Summary Get vault
@@ -202,12 +248,14 @@ func (r *vaultRoutes) getVaultById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		r.l.Error(err, "http - v1 - get vault by id - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 
 	vault, err := r.v.GetById(id)
 	if err != nil {
+		r.l.Error(err, "http - v1 - get vault by id - GetById")
 		errorResponse(c, http.StatusInternalServerError, "error getting vault", err)
 		return
 	}
@@ -242,12 +290,14 @@ func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		r.l.Error(err, "http - v1 - update vault category - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 
 	var request UpdateVaultCategoryRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - update vault category - Bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -256,9 +306,11 @@ func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 	existingVault, err := r.v.GetById(id)
 	if err != nil {
 		if err.Error() == "VaultRepo - GetVaultById - Vault not found" {
+			r.l.Error(err, "http - v1 - update vault category - GetById")
 			errorResponse(c, http.StatusNotFound, "vault not found", err)
 			return
 		}
+		r.l.Error(err, "http - v1 - update vault category - GetById")
 		errorResponse(c, http.StatusInternalServerError, "error finding vault", err)
 		return
 	}
@@ -269,6 +321,7 @@ func (r *vaultRoutes) updateVaultCategory(c *gin.Context) {
 
 	updatedVault, err := r.v.UpdateVault(existingVault)
 	if err != nil {
+		r.l.Error(err, "http - v1 - update vault category - UpdateVault")
 		errorResponse(c, http.StatusInternalServerError, "error updating vault category", err)
 		return
 	}
@@ -293,12 +346,14 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		r.l.Error(err, "http - v1 - update vault asset - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
 
 	var request []UpdateVaultAssetRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - update vault asset - Bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -306,12 +361,14 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 	// Get the vault by its ID and the asset by its ID
 	vault, err := r.v.GetById(id)
 	if err != nil {
+		r.l.Error(err, "http - v1 - update vault asset - GetById")
 		errorResponse(c, http.StatusNotFound, "vault not found", err)
 		return
 	}
 
 	sponsor, err := r.w.Get(_sponsorId)
 	if err != nil {
+		r.l.Error(err, "http - v1 - update vault asset - Get Wallet")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
 		return
 	}
@@ -345,18 +402,22 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		}
 	}
 
+	Id := generateID()
 	res, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, vault.Wallet.Key.PublicKey},
 		Operations: ops,
 	})
 	if err != nil {
+		r.l.Error(err, fmt.Sprintf("http - v1 - update vault - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
 	}
 
 	_, ok := res.Message.(entity.EnvelopeResponse)
 	if !ok {
+		r.l.Error(err, "http - v1 - update vault asset - Parse Envelope Response")
 		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
 		return
 	}
@@ -380,6 +441,7 @@ func (r *vaultRoutes) deleteVault(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		r.l.Error(err, "http - v1 - delete vault - Atoi")
 		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
 		return
 	}
@@ -388,9 +450,11 @@ func (r *vaultRoutes) deleteVault(c *gin.Context) {
 	existingVault, err := r.v.GetById(id)
 	if err != nil {
 		if err.Error() == "VaultRepo - GetVaultById - Vault not found" {
+			r.l.Error(err, "http - v1 - delete vault - GetById")
 			errorResponse(c, http.StatusNotFound, "vault not found", err)
 			return
 		}
+		r.l.Error(err, "http - v1 - delete vault - GetById")
 		errorResponse(c, http.StatusInternalServerError, "error finding vault", err)
 		return
 	}
@@ -400,6 +464,7 @@ func (r *vaultRoutes) deleteVault(c *gin.Context) {
 
 	deletedVault, err := r.v.DeleteVault(existingVault)
 	if err != nil {
+		r.l.Error(err, "http - v1 - delete vault - DeleteVault")
 		errorResponse(c, http.StatusInternalServerError, "error delete vault", err)
 		return
 	}

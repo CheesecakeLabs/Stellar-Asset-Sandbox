@@ -49,6 +49,7 @@ type (
 		GetAssetById(string) (entity.Asset, error)
 		StoreAssetImage(string, []byte) error
 		GetAssetImage(string) ([]byte, error)
+		GetPaginatedAssets(int, int) ([]entity.Asset, error)
 		UpdateContractId(string, string) error
 	}
 
@@ -94,12 +95,14 @@ type (
 		UpdateVault(entity.Vault) (entity.Vault, error)
 		GetVaultById(id int) (entity.Vault, error)
 		DeleteVault(entity.Vault) (entity.Vault, error)
+		GetPaginatedVaults(int, int) ([]entity.Vault, error)
 	}
 
 	ContractRepoInterface interface {
 		GetContracts() ([]entity.Contract, error)
 		CreateContract(entity.Contract) (entity.Contract, error)
 		GetContractById(id string) (entity.Contract, error)
+		GetPaginatedContracts(int, int) ([]entity.Contract, error)
 	}
 
 	LogTransactionRepoInterface interface {

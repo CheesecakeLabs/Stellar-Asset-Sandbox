@@ -173,6 +173,8 @@ services:
       KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
       SIGNED_SOROBAN_PRODUCER_TOPIC: ${SIGNED_SOROBAN_PRODUCER_TOPIC:-signSorobanEnvelope}
       SIGNED_SOROBAN_CONSUMER_TOPICS: ${SIGNED_SOROBAN_CONSUMER_TOPICS:-signedSorobanEnvelopes}
+      KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS: ${KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS:-signedEnvelopes}
+      KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS: ${KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS:-signEnvelope}
     depends_on:
       kafka1:
         condition: service_healthy
@@ -186,6 +188,8 @@ services:
       kafka-topics --create --topic $$KAFKA_ENVELOPE_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$SIGNED_SOROBAN_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$SIGNED_SOROBAN_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka1 cub kafka-ready -b kafka1:129092 1 20

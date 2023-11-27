@@ -170,3 +170,59 @@ func (r ContractRepo) CreateContract(data entity.Contract) (entity.Contract, err
 
 	return res, nil
 }
+
+func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract, error) {
+	offset := (page - 1) * limit
+	query := `
+		SELECT 
+			c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, 
+			c.yield_rate AS contract_yield_rate, c.term AS contract_term, 
+			c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
+			v.id AS vault_id, v.name AS vault_name,
+			vc.id AS vault_category_id, vc.name as vault_category_name,
+			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
+			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
+		FROM contracts c
+		JOIN vault v ON c.vault_id = v.id
+		JOIN vaultcategory vc ON v.vault_category_id = vc.id
+		JOIN wallet w ON v.wallet_id = w.id
+		JOIN key wk ON w.id = wk.wallet_id
+		ORDER BY c.id DESC
+		LIMIT $1 OFFSET $2;
+	`
+
+	rows, err := r.Db.Query(query, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("ContractRepo - GetPaginatedContracts - Query: %w", err)
+	}
+	defer rows.Close()
+
+	var contracts []entity.Contract
+
+	for rows.Next() {
+		var contract entity.Contract
+		var vaultCategory entity.VaultCategory
+		var vault entity.Vault
+		var wallet entity.Wallet
+
+		err := rows.Scan(
+			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate,
+			&contract.Term, &contract.MinDeposit, &contract.PenaltyRate,
+			&vault.Id, &vault.Name,
+			&vaultCategory.Id, &vaultCategory.Name,
+			&wallet.Id, &wallet.Type, &wallet.Funded,
+			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("ContractRepo - GetPaginatedContracts - row.Scan: %w", err)
+		}
+
+		vault.Wallet = wallet
+		vault.VaultCategory = vaultCategory
+		contract.Vault = vault
+
+		contracts = append(contracts, contract)
+	}
+
+	return contracts, nil
+}

@@ -167,3 +167,12 @@ func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) erro
 	}
 	return nil
 }
+
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
+	assets, err := uc.aRepo.GetPaginatedAssets(page, limit)
+	if err != nil {
+		return nil, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
+	}
+
+	return assets, nil
+}

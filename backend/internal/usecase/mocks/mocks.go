@@ -461,6 +461,21 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
 }
 
+// GetPaginatedAssets mocks base method.
+func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int) ([]entity.Asset, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPaginatedAssets", arg0, arg1)
+	ret0, _ := ret[0].([]entity.Asset)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPaginatedAssets indicates an expected call of GetPaginatedAssets.
+func (mr *MockAssetRepoInterfaceMockRecorder) GetPaginatedAssets(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetPaginatedAssets), arg0, arg1)
+}
+
 // StoreAssetImage mocks base method.
 func (m *MockAssetRepoInterface) StoreAssetImage(arg0 string, arg1 []byte) error {
 	m.ctrl.T.Helper()
@@ -928,6 +943,21 @@ func (mr *MockVaultRepoInterfaceMockRecorder) DeleteVault(arg0 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteVault", reflect.TypeOf((*MockVaultRepoInterface)(nil).DeleteVault), arg0)
 }
 
+// GetPaginatedVaults mocks base method.
+func (m *MockVaultRepoInterface) GetPaginatedVaults(arg0, arg1 int) ([]entity.Vault, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPaginatedVaults", arg0, arg1)
+	ret0, _ := ret[0].([]entity.Vault)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPaginatedVaults indicates an expected call of GetPaginatedVaults.
+func (mr *MockVaultRepoInterfaceMockRecorder) GetPaginatedVaults(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedVaults", reflect.TypeOf((*MockVaultRepoInterface)(nil).GetPaginatedVaults), arg0, arg1)
+}
+
 // GetVaultById mocks base method.
 func (m *MockVaultRepoInterface) GetVaultById(id int) (entity.Vault, error) {
 	m.ctrl.T.Helper()
@@ -1039,6 +1069,21 @@ func (m *MockContractRepoInterface) GetContracts() ([]entity.Contract, error) {
 func (mr *MockContractRepoInterfaceMockRecorder) GetContracts() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContracts", reflect.TypeOf((*MockContractRepoInterface)(nil).GetContracts))
+}
+
+// GetPaginatedContracts mocks base method.
+func (m *MockContractRepoInterface) GetPaginatedContracts(arg0, arg1 int) ([]entity.Contract, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPaginatedContracts", arg0, arg1)
+	ret0, _ := ret[0].([]entity.Contract)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPaginatedContracts indicates an expected call of GetPaginatedContracts.
+func (mr *MockContractRepoInterfaceMockRecorder) GetPaginatedContracts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedContracts", reflect.TypeOf((*MockContractRepoInterface)(nil).GetPaginatedContracts), arg0, arg1)
 }
 
 // MockLogTransactionRepoInterface is a mock of LogTransactionRepoInterface interface.
