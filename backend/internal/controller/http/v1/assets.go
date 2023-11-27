@@ -51,6 +51,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.POST("/generate-toml", r.generateTOML)
 		h.PUT("/update-toml", r.updateTOML)
 		h.GET("/toml-data", r.getTomlData)
+		h.PUT("/:id/update-contract-id", r.updateContractId)
 	}
 }
 
@@ -112,6 +113,10 @@ type UpdateAuthFlagsRequest struct {
 
 type UploadAssetImageRequest struct {
 	Image string `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
+}
+
+type UpdateContractIdRequest struct {
+	ContractId string `json:"contract_id" example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
 
 // @Summary     Create a new asset
@@ -952,4 +957,31 @@ func (r *assetsRoutes) getTomlData(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, tomlContent)
+}
+
+// @Summary Update a Contract ID
+// @Description Update a Contract ID
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body entity.UpdateContractIdRequest true "Contract ID"
+// @Success     200 {object} entity.UpdateContractIdRequest
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/update-contract-id [put]
+func (r *assetsRoutes) updateContractId(c *gin.Context) {
+	var request UpdateContractIdRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	assetId := c.Param("id")
+	err := r.as.UpdateContractId(assetId, request.ContractId)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating Contract ID", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"contract_id": request.ContractId})
 }

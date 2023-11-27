@@ -36,8 +36,9 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 
 type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
-	VaultCategoryId int    `json:"vault_category_id" binding:"required" example:"1"`
+	VaultCategoryId *int   `json:"vault_category_id" example:"1"`
 	AssetsId        []int  `json:"assets_id" binding:"required"`
+	OwnerId         *int   `json:"owner_id"`
 }
 
 type UpdateVaultCategoryRequest struct {
@@ -72,10 +73,14 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		return
 	}
 
-	vaultCategory, err := r.vc.GetById(request.VaultCategoryId)
-	if err != nil {
-		errorResponse(c, http.StatusNotFound, "source wallet not found", err)
-		return
+	var vaultCategory entity.VaultCategory
+
+	if request.VaultCategoryId != nil {
+		vaultCategory, err = r.vc.GetById(*request.VaultCategoryId)
+		if err != nil {
+			errorResponse(c, http.StatusNotFound, "source wallet not found", err)
+			return
+		}
 	}
 
 	sponsorID := _sponsorId
@@ -153,8 +158,9 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 
 	vault := entity.Vault{
 		Name:          request.Name,
-		VaultCategory: vaultCategory,
+		VaultCategory: &vaultCategory,
 		Wallet:        wallet,
+		OwnerId:       request.OwnerId,
 	}
 
 	vault, err = r.v.Create(vault)
@@ -204,6 +210,16 @@ func (r *vaultRoutes) getVaultById(c *gin.Context) {
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "error getting vault", err)
 		return
+	}
+
+	if vault.VaultCategoryId != nil {
+		vaultCategory, err := r.vc.GetById(*vault.VaultCategoryId)
+		if err != nil {
+			errorResponse(c, http.StatusInternalServerError, "error getting vault category", err)
+			return
+		}
+
+		vault.VaultCategory = &vaultCategory
 	}
 
 	c.JSON(http.StatusOK, vault)

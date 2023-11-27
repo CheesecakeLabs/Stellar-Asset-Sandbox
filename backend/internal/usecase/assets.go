@@ -159,3 +159,11 @@ func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
 
 	return tomParsed, err
 }
+
+func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) error {
+	err := uc.aRepo.UpdateContractId(assetId, contractId)
+	if err != nil {
+		return fmt.Errorf("AssetUseCase - UpdateContractId - uc.aRepo.UpdateContractId: %w", err)
+	}
+	return nil
+}

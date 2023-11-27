@@ -39,7 +39,7 @@ type CreateContractRequest struct {
 	Term        int    `json:"term"   binding:"required"  example:"60"`
 	MinDeposit  int    `json:"min_deposit"   binding:"required"  example:"1"`
 	PenaltyRate int    `json:"penalty_rate"   binding:"required"  example:"1"`
-	Compound    int    `json:"compound"   binding:"required"  example:"60"`
+	Compound    int    `json:"compound"  example:"1"`
 }
 
 // @Summary     Create a new contract

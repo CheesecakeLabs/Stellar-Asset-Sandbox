@@ -77,7 +77,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 		}
 
 		vault.Wallet = wallet
-		vault.VaultCategory = vaultCategory
+		vault.VaultCategory = &vaultCategory
 		asset.Distributor = assetDistributor
 		asset.Issuer = assetIssuer
 		contract.Asset = asset
@@ -147,7 +147,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 	}
 
 	vault.Wallet = wallet
-	vault.VaultCategory = vaultCategory
+	vault.VaultCategory = &vaultCategory
 	contract.Asset = asset
 	asset.Distributor = assetDistributor
 	asset.Issuer = assetIssuer
