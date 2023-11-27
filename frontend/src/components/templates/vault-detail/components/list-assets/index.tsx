@@ -19,7 +19,9 @@ interface IListAssets {
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   updatingVaultAssets: boolean
   changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>
-  onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
+  onUpdateVaultAssets(
+    listEdit: Hooks.UseHorizonTypes.IBalance[]
+  ): Promise<boolean>
 }
 
 export const ListAssets: React.FC<IListAssets> = ({
@@ -59,7 +61,11 @@ export const ListAssets: React.FC<IListAssets> = ({
   }
 
   const onSave = (): void => {
-    onUpdateVaultAssets(listEdit || [])
+    onUpdateVaultAssets(listEdit || []).then(success => {
+      if (success) {
+        setIsEditing(false)
+      }
+    })
   }
 
   return (

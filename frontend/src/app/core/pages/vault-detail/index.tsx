@@ -186,9 +186,9 @@ export const VaultDetail: React.FC = () => {
 
   const onUpdateVaultAssets = async (
     listEdit: Hooks.UseHorizonTypes.IBalance[]
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     try {
-      if (!vault) return
+      if (!vault) return false
 
       const assetsRemoveds =
         vault.accountData?.balances
@@ -245,16 +245,17 @@ export const VaultDetail: React.FC = () => {
             setVault(vault)
           })
         }
-
-        return
+        return isSuccess
       }
 
       toastError(MessagesError.errorOccurred)
+      return false
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
       toastError(message)
+      return false
     }
   }
 

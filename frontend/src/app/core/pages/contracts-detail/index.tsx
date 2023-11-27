@@ -1,19 +1,18 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 
+import { useAuth } from 'hooks/useAuth'
 import { useContracts } from 'hooks/useContracts'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsDetailTemplate } from 'components/templates/contracts-detail'
-import { useParams } from 'react-router-dom'
-import { useAuth } from 'hooks/useAuth'
 
 export const ContractsDetail: React.FC = () => {
   const {
-    loading,
     isDepositing,
     isWithdrawing,
     getContract,
@@ -21,13 +20,17 @@ export const ContractsDetail: React.FC = () => {
     getYield,
     getTime,
     withdraw,
-    deposit
+    deposit,
+    getEstimatedPrematureWithdraw,
   } = useContracts()
   const { profile, getProfile } = useAuth()
   const toast = useToast()
 
   const [userPosition, setUserPosition] = useState<bigint>(BigInt(0))
+  const [loadingPosition, setLoadingPosition] = useState(true)
   const [userYield, setUserYield] = useState<bigint>(BigInt(0))
+  const [estimatedPrematureWithdraw, setEstimatedPrematureWithdraw] =
+    useState<bigint>(BigInt(0))
   const [time, setTime] = useState<bigint>(BigInt(0))
   const [userDeposit, setUserDeposit] = useState(0)
   const [pauseProcess, setPauseProcess] = useState(false)
@@ -53,7 +56,46 @@ export const ContractsDetail: React.FC = () => {
 
   useEffect(() => {
     if (profile && contract) {
-      getPosition(updatePosition, profile.vault.wallet.key.publicKey, contract.address)
+      getPosition(
+        updatePosition,
+        profile.vault.wallet.key.publicKey,
+        contract.address
+      ).then(position => {
+        if (position) {
+          setUserPosition(position)
+        }
+        setLoadingPosition(false)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, contract])
+
+  useEffect(() => {
+    if (profile && contract) {
+      getYield(
+        updatePosition,
+        profile.vault.wallet.key.publicKey,
+        contract.address
+      ).then(userYield => {
+        if (userYield) {
+          setUserYield(userYield)
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, contract])
+
+  useEffect(() => {
+    if (profile && contract) {
+      getEstimatedPrematureWithdraw(
+        updatePosition,
+        profile.vault.wallet.key.publicKey,
+        contract.address
+      ).then(estimatedValue => {
+        if (estimatedValue) {
+          setEstimatedPrematureWithdraw(estimatedValue)
+        }
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, contract])
@@ -69,7 +111,11 @@ export const ContractsDetail: React.FC = () => {
       getContract(id).then(contract => {
         setContract(contract)
         if (contract && profile) {
-          getPosition(updatePosition, profile.vault.wallet.key.publicKey, contract.address)
+          getPosition(
+            updatePosition,
+            profile.vault.wallet.key.publicKey,
+            contract.address
+          )
         }
         console.log(contract)
       })
@@ -166,7 +212,9 @@ export const ContractsDetail: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SOROBAN_SMART_CONTRACTS}>
         <ContractsDetailTemplate
-          loading={loading}
+          onSubmitWithdraw={onSubmitWithdraw}
+          onSubmitDeposit={onSubmitDeposit}
+          loading={loadingPosition}
           contract={contract}
           time={time}
           userAccount={profile?.vault.wallet.key.publicKey}
@@ -174,9 +222,7 @@ export const ContractsDetail: React.FC = () => {
           isWithdrawing={isWithdrawing}
           currentYield={Number(userYield)}
           deposit={userDeposit}
-          balance={Number(userPosition)}
-          onSubmitWithdraw={onSubmitWithdraw}
-          onSubmitDeposit={onSubmitDeposit}
+          balance={userPosition}
         />
       </Sidebar>
     </Flex>

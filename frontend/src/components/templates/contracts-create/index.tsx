@@ -89,7 +89,14 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
           {loading ? <Skeleton w="full" h="16rem" /> : <Box p="1rem">
             <form
               onSubmit={handleSubmit(data => {
-                if (!asset || !vault) return
+                if (!asset) {
+                  throw new Error('Invalid asset')
+                }
+                
+                if(!vault){
+                  throw new Error('Invalid vault')
+                }
+
                 onSubmit(data, asset, vault, compoundType, compound)
               })}
             >
@@ -130,11 +137,14 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     <FormLabel>Term</FormLabel>
                     <InputGroup>
                       <Input
-                        type="number"
-                        placeholder="Term"
-                        {...register('term', {
-                          required: true,
-                        })}
+                        as={NumericFormat}
+                        placeholder="day(s)"
+                        decimalScale={0}
+                        autoComplete="off"
+                        value={getValues('term')}
+                        onChange={(event): void => {
+                          setValue('term', toNumber(event.target.value))
+                        }}
                       />
                       <InputRightAddon children='days' />
                     </InputGroup>

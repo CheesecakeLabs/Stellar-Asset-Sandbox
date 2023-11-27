@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as SorobanClient from 'soroban-client'
+
 import { Address, I128 } from '../constants'
 import { IInvokeSorobanArgs, SorobanService } from '../index'
 import { Methods, spec } from './constants'
@@ -13,18 +15,6 @@ const deposit = async (rawArgs: {
     address: new Address(rawArgs.address),
     amount: rawArgs.amount,
   }
-
-  console.log({
-    address: new Address(rawArgs.address),
-    amount: rawArgs.amount,
-  })
-  
-  console.log({
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.deposit,
-    sourcePk: rawArgs.address,
-  })
 
   let invokeArgs: IInvokeSorobanArgs = {
     contractId: rawArgs.contractId,
@@ -72,7 +62,7 @@ const withdraw = async (rawArgs: {
 const getEstimatedYield = async (rawArgs: {
   address: string
   contractId: string
-  signerSecret?: string
+  sourcePk?: string
 }): Promise<any> => {
   const args = {
     address: new Address(rawArgs.address),
@@ -87,17 +77,22 @@ const getEstimatedYield = async (rawArgs: {
 
   invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
 
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+  invokeArgs = rawArgs.sourcePk
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
     : invokeArgs
 
-  return SorobanService.invokeSoroban(invokeArgs)
+  return SorobanService.simulatedValue(
+    invokeArgs,
+    (xdr: SorobanClient.xdr.ScVal): I128 => {
+      return spec.funcResToNative('get_estimated_yield', xdr)
+    }
+  )
 }
 
 const getPosition = async (rawArgs: {
   address: string
   contractId: string
-  signerSecret?: string
+  sourcePk?: string
 }): Promise<any> => {
   const args = {
     address: new Address(rawArgs.address),
@@ -112,11 +107,16 @@ const getPosition = async (rawArgs: {
 
   invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
 
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
+  invokeArgs = rawArgs.sourcePk
+    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
     : invokeArgs
 
-  return SorobanService.invokeSoroban(invokeArgs)
+  return SorobanService.simulatedValue(
+    invokeArgs,
+    (xdr: SorobanClient.xdr.ScVal): I128 => {
+      return spec.funcResToNative('get_position', xdr)
+    }
+  )
 }
 
 const getEstimatedPrematureWithdraw = async (rawArgs: {
@@ -141,7 +141,12 @@ const getEstimatedPrematureWithdraw = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return SorobanService.invokeSoroban(invokeArgs)
+  return SorobanService.simulatedValue(
+    invokeArgs,
+    (xdr: SorobanClient.xdr.ScVal): I128 => {
+      return spec.funcResToNative('get_estimated_premature_withdraw', xdr)
+    }
+  )
 }
 
 const getTimeLeft = async (rawArgs: {

@@ -55,7 +55,9 @@ export const Withdraw: React.FC<IWithdraw> = ({
             fontWeight="600"
           >
             {`Your position hasn't reached its term. By withdrawing now you'll
-            only get ${contract?.penalty_rate}% of the yield accrued to date.`}
+            only get ${
+              (contract?.penalty_rate || 0) / 100
+            }% of the yield accrued to date.`}
           </Text>
           <form
             onSubmit={handleSubmit(() => {

@@ -40,7 +40,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
         <Box p={0} maxW="full">
           {loading ? (
             <LoaderSkeleton />
-          ) : vaults ? (
+          ) : vaults && vaults.length > 0 ? (
             <SimpleGrid columns={{ xl: 4, md: 3, sm: 2 }} spacing={5}>
               {vaults.map((vault, index) => (
                 <ItemVault key={index} vault={vault} assets={assets} />

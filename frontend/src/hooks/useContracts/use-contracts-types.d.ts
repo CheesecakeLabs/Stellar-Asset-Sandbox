@@ -55,12 +55,17 @@ declare namespace Hooks {
         update: React.Dispatch<React.SetStateAction<bigint>>,
         address: string,
         contractId: string
-      ): void
+      ): Promise<bigint | undefined>
+      getEstimatedPrematureWithdraw(
+        update: React.Dispatch<React.SetStateAction<bigint>>,
+        address: string,
+        contractId: string
+      ): Promise<bigint | undefined>
       getYield(
         update: React.Dispatch<React.SetStateAction<bigint>>,
         address: string,
         contractId: string
-      ): void
+      ): Promise<bigint | undefined>
       getTime(
         update: React.Dispatch<React.SetStateAction<bigint>>,
         address: string,

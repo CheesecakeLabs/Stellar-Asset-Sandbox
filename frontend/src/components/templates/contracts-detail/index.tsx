@@ -1,4 +1,4 @@
-import { Box, Flex, Img, SimpleGrid } from '@chakra-ui/react'
+import { Box, Flex, Img, SimpleGrid, Skeleton } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
@@ -7,17 +7,17 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
+import { CompoundTime } from '../contracts-create/components/select-compound'
 import { AccountCard } from './components/account-card'
 import { Chart } from './components/chart'
 import { Deposit } from './components/deposit'
+import { ItemData } from './components/item-data'
 import { Withdraw } from './components/withdraw'
 import { Loading } from 'components/atoms'
 import { ApyIcon, TimeIcon, WalletIcon } from 'components/icons'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 
 import { InfoCard } from '../../molecules/info-card'
-import { CompoundTime } from '../contracts-create/components/select-compound'
-import { ItemData } from './components/item-data'
 
 interface IContractsDetailTemplate {
   onSubmitWithdraw(isPremature: boolean): Promise<void>
@@ -33,7 +33,7 @@ interface IContractsDetailTemplate {
   userAccount: string
   isWithdrawing: boolean
   isDepositing: boolean
-  balance: number
+  balance: bigint
 }
 
 export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
@@ -47,11 +47,14 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   isWithdrawing,
   isDepositing,
   balance,
+  loading,
 }) => {
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        {contract ? (
+        {loading || !contract ? (
+          <Skeleton w="full" h="14rem" />
+        ) : (
           <>
             <Flex justifyContent="space-between">
               <ContractsBreadcrumb title="Certificate Name" />
@@ -88,43 +91,49 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                 <ItemData
                   title={'APY'}
                   icon={<ApyIcon />}
-                  value={`${contract.yield_rate}%, ${contract.compound === 0 ? 'simple interest, does not compound'
-                    : `every ${CompoundTime[contract.compound]}`}`}
+                  value={`${contract.yield_rate/100}%, ${
+                    contract.compound === 0
+                      ? 'simple interest, does not compound'
+                      : `every ${CompoundTime[contract.compound]}`
+                  }`}
                 />
                 <ItemData
                   title={`DEPOSITED (${contract.asset.code})`}
                   icon={<WalletIcon />}
-                  value={balance && balance > 0 ? toCrypto(10000 || 0) : '-'}
+                  value={'-'}
                 />
               </Flex>
-              {userAccount && balance && balance > 0 ? (
-                <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={3} mt="1rem">
-                  <Chart
-                    title={'BALANCE'}
-                    value={
-                      balance && balance > 0 ? toCrypto(balance / 10000000) : '-'
-                    }
-                  />
-                  <Chart
-                    title={'DUE IN'}
-                    value={`${time ? `${time.toString()} seconds` : '-'}`}
-                  />
-                  <Chart
-                    title={'CURRENT YIELD'}
-                    value={
-                      balance
-                        ? `${((currentYield / (10000 * 10000000)) * 100).toFixed(
-                          2
-                        )} %`
-                        : '-'
-                    }
-                  />
-                </SimpleGrid>
-              ) : (
-                <div />
-              )}
-              {userAccount &&
-                (balance && balance > 0 ? (
+              <Flex flexDir="column" w="full">
+                {userAccount && balance && balance > 0 ? (
+                  <Flex>
+                    <Chart
+                      title={'BALANCE'}
+                      value={
+                        balance && balance > 0
+                          ? toCrypto(Number(balance) / 10000000)
+                          : '-'
+                      }
+                    />
+                    <Chart
+                      title={'DUE IN'}
+                      value={`${time ? `${time.toString()} seconds` : '-'}`}
+                    />
+                    <Chart
+                      title={'CURRENT YIELD'}
+                      value={
+                        balance
+                          ? `${(
+                              (currentYield / (10000 * 10000000)) *
+                              100
+                            ).toFixed(2)} %`
+                          : '-'
+                      }
+                    />
+                  </Flex>
+                ) : (
+                  <div />
+                )}
+                {balance ? (
                   <Withdraw
                     onSubmit={onSubmitWithdraw}
                     contract={contract}
@@ -133,7 +142,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     withdrawValue={
                       time > 0
                         ? Number(deposit) + Number(currentYield / 2)
-                        : balance
+                        : Number(balance)
                     }
                   />
                 ) : (
@@ -142,11 +151,10 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     contract={contract}
                     loading={isDepositing}
                   />
-                ))}
+                )}
+              </Flex>
             </Flex>
           </>
-        ) : (
-          <Loading />
         )}
       </Flex>
     </Flex>

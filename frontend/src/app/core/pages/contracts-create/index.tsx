@@ -1,25 +1,28 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import * as SorobanClient from 'soroban-client'
+import { FieldValues } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useContracts } from 'hooks/useContracts'
+import { useHorizon } from 'hooks/useHorizon'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
 import { SorobanService } from 'soroban'
+import * as SorobanClient from 'soroban-client'
+import { sorobanConfig } from 'soroban/constants'
 import { deployerClient } from 'soroban/deployer'
-import { allowancePeriod, codSalt, codWasmHash } from 'soroban/deployer/constants'
+import {
+  allowancePeriod,
+  codSalt,
+  codWasmHash,
+} from 'soroban/deployer/constants'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
-import { useNavigate } from 'react-router-dom'
-import { useHorizon } from 'hooks/useHorizon'
-import { sorobanConfig } from 'soroban/constants'
-import { customAlphabet, nanoid } from 'nanoid'
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
@@ -38,22 +41,26 @@ export const ContractsCreate: React.FC = () => {
     compoundType: TSelectCompoundType,
     compound: number
   ): Promise<void> => {
-    if (!asset) return
-
+    if (!asset) {
+      throw new Error('Invalid asset')
+    }
     try {
       setCreatingContract(true)
 
-      const contractId = asset.contract_id ? asset.contract_id :
-        SorobanService.getContractId({
-          assetCode: asset.code,
-          assetIssuerPk: asset.issuer.key.publicKey,
-        })
+      const contractId = asset.contract_id
+        ? asset.contract_id
+        : SorobanService.getContractId({
+            assetCode: asset.code,
+            assetIssuerPk: asset.issuer.key.publicKey,
+          })
 
       if (!asset.contract_id) {
         await updateContractId(asset.id, contractId)
       }
 
       const termToSeconds = Number(data.term || 0) * 86400
+      const yieldRate = Number(data.yield_rate || 0) * 100
+      const penaltyRate = Number(data.penalty_rate || 0) * 100
 
       const sponsorPK = await getSponsorPK()
       if (!sponsorPK) {
@@ -75,10 +82,15 @@ export const ContractsCreate: React.FC = () => {
 
         const signedTransaction = await sign({ envelope: preppedTx })
         if (signedTransaction) {
-          const resultEnvelope = await submit({ envelope: signedTransaction.envelope })
+          const resultEnvelope = await submit({
+            envelope: signedTransaction.envelope,
+          })
 
           if (resultEnvelope) {
-            const transaction = new SorobanClient.Transaction(resultEnvelope, sorobanConfig.network.passphrase)
+            const transaction = new SorobanClient.Transaction(
+              resultEnvelope,
+              sorobanConfig.network.passphrase
+            )
             await SorobanService.submitSoroban(transaction)
           }
         }
@@ -96,16 +108,19 @@ export const ContractsCreate: React.FC = () => {
         admin: vault.wallet.key.publicKey,
         asset: contractId,
         term: BigInt(termToSeconds),
-        compound_step: BigInt(compoundType === 'Compound interest' ? compound : 0),
-        yield_rate: BigInt(Number(data.yield_rate || 0)),
+        compound_step: BigInt(
+          compoundType === 'Compound interest' ? compound : 0
+        ),
+        yield_rate: BigInt(yieldRate),
         min_deposit: BigInt(Number(data.min_deposit || 0)),
-        penalty_rate: BigInt(Number(data.penalty_rate || 0)),
+        penalty_rate: BigInt(penaltyRate),
         allowance_period: latestSequenceLedger + allowancePeriod,
         signerSecret: vault.wallet.key.publicKey,
       })
 
       if (transactionResult.status === 'SUCCESS') {
-        const transactionSuccess = transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse
+        const transactionSuccess =
+          transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse
 
         const xdr = transactionSuccess.returnValue?.toXDR('base64')
         if (!xdr) {
@@ -113,18 +128,19 @@ export const ContractsCreate: React.FC = () => {
         }
 
         const scVal = SorobanClient.xdr.ScVal.fromXDR(xdr, 'base64')
-        const contractAddress = SorobanClient.Address.fromScVal(scVal).toString()
+        const contractAddress =
+          SorobanClient.Address.fromScVal(scVal).toString()
 
         const contract = {
           name: 'Contract',
           asset_id: asset.id.toString(),
           vault_id: vault.id.toString(),
           address: contractAddress,
-          yield_rate: Number(data.yield_rate || 0),
+          yield_rate: yieldRate,
           term: termToSeconds,
           min_deposit: Number(data.min_deposit || 0),
-          penalty_rate: Number(data.penalty_rate || 0),
-          compound: compoundType === 'Compound interest' ? compound : 0
+          penalty_rate: penaltyRate,
+          compound: compoundType === 'Compound interest' ? compound : 0,
         }
 
         const contractCreated = await createContract(contract)

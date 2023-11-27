@@ -50,7 +50,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
       </Text>
       <Flex justifyContent="center">
         <Tag
-          variant={vault.vault_category.theme || vaultCategoryTheme[0]}
+          variant={vault.vault_category?.theme || vaultCategoryTheme[0]}
           mt="0.5rem"
           mb="0.75rem"
           textAlign="center"
@@ -58,7 +58,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
           fontWeight="700"
           w="fit-content"
         >
-          {vault.vault_category.name}
+          {vault.vault_category?.name}
         </Tag>
       </Flex>
 

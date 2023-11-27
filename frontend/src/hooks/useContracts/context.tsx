@@ -1,10 +1,13 @@
-import { SetStateAction, createContext, useCallback, useState } from 'react';
-import freighter from '@stellar/freighter-api';
-import axios from 'axios';
-import { MessagesError } from 'utils/constants/messages-error';
-import { mockContracts } from 'utils/mockups';
-import { http } from 'interfaces/http';
-import { certificateOfDepositClient } from 'soroban/certificate-of-deposit';
+import { position } from '@chakra-ui/react'
+import { SetStateAction, createContext, useCallback, useState } from 'react'
+
+import freighter from '@stellar/freighter-api'
+import axios from 'axios'
+import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
+import { MessagesError } from 'utils/constants/messages-error'
+import { mockContracts } from 'utils/mockups'
+
+import { http } from 'interfaces/http'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -66,23 +69,28 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getContract = useCallback(async (id: string): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
-    setLoading(true)
-    try {
-      const response = await http.get(`contract/${id}`)
-      const data = response.data
-      if (data) {
-        return data
+  const getContract = useCallback(
+    async (
+      id: string
+    ): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
+      setLoading(true)
+      try {
+        const response = await http.get(`contract/${id}`)
+        const data = response.data
+        if (data) {
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
-      }
-      throw new Error(MessagesError.errorOccurred)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    []
+  )
 
   const deposit = async (
     amount: bigint,
@@ -114,53 +122,66 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getPosition = (
+  const getPosition = async (
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
-    contractId: string,
-  ): void => {
-    certificateOfDepositClient
-      .getPosition({
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getPosition({
         address: address,
-        contractId: contractId
+        contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        console.log('position')
-        console.log(res)
-        update(res)
-      })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      console.log('position: ' + result)
+      return result
+    } catch (e) {
+      throw new Error('Invalid position')
+    }
   }
 
-  const getYield = (
+  const getYield = async (
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
-    contractId: string,
-  ): void => {
-    certificateOfDepositClient
-      .getEstimatedYield({
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getEstimatedYield({
         address: address,
-        contractId: contractId
+        contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        update(res)
+      console.log('yield: ' + result)
+      return result
+    } catch (e) {
+      throw new Error('Invalid yield')
+    }
+  }
+
+  const getEstimatedPrematureWithdraw = async (
+    update: React.Dispatch<React.SetStateAction<bigint>>,
+    address: string,
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getEstimatedPrematureWithdraw({
+        address: address,
+        contractId: contractId,
       })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      console.log('estimated premature:' + result)
+      return result
+    } catch (e) {
+      throw new Error('Invalid estimated premature withdraw')
+    }
   }
 
   const getTime = (
     update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
-    contractId: string,
+    contractId: string
   ): void => {
     certificateOfDepositClient
       .getTimeLeft({
         address: address,
-        contractId: contractId
+        contractId: contractId,
       })
       .then((res: SetStateAction<bigint>) => {
         update(res)
@@ -185,14 +206,12 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      await certificateOfDepositClient.withdraw(
-        {
-          address: address,
-          accept_premature_withdraw: premature,
-          contractId: contractId,
-          signerSecret: signerSecret
-        }
-      )
+      await certificateOfDepositClient.withdraw({
+        address: address,
+        accept_premature_withdraw: premature,
+        contractId: contractId,
+        signerSecret: signerSecret,
+      })
       setIsWithdrawing(false)
       updatePosition
       setWithdrawConfirmed(true)
@@ -225,6 +244,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         getTime,
         getAccount,
         withdraw,
+        getEstimatedPrematureWithdraw
       }}
     >
       {children}
