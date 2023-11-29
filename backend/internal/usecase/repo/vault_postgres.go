@@ -16,10 +16,10 @@ func NewVaultRepo(pg *postgres.Postgres) VaultRepo {
 	return VaultRepo{pg}
 }
 
-func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
-	query := `
+func (r VaultRepo) GetVaults(isAll bool) ([]entity.Vault, error) {
+	baseQuery := `
 		SELECT 
-			v.id AS vault_id, v.name AS vault_name, v.active AS vault_active,
+			v.id AS vault_id, v.name AS vault_name, v.active AS vault_active, v.owner_id AS owner_id,
 			vc.id AS vault_category_id, vc.name as vault_category_name, vc.theme as vault_category_theme,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
@@ -27,8 +27,15 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 		LEFT JOIN vaultcategory vc ON v.vault_category_id = vc.id
 		JOIN wallet w ON v.wallet_id = w.id
 		JOIN key wk ON w.id = wk.wallet_id
-		WHERE v.active = 1;
 	`
+
+	whereClause := `WHERE v.active = 1`
+
+	if !isAll {
+		whereClause = whereClause + ` AND v.owner_id is null`
+	}
+
+	query := baseQuery + whereClause
 
 	rows, err := r.Db.Query(query)
 	if err != nil {
@@ -46,7 +53,7 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 		var wallet entity.Wallet
 
 		err := rows.Scan(
-			&vault.Id, &vault.Name, &vault.Active,
+			&vault.Id, &vault.Name, &vault.Active, &vault.OwnerId,
 			&vaultCategoryId, &vaultCategoryName, &vaultCategoryTheme,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
@@ -73,7 +80,7 @@ func (r VaultRepo) GetVaults() ([]entity.Vault, error) {
 func (r VaultRepo) GetVaultById(id int) (entity.Vault, error) {
 	query := `
 		SELECT 
-			v.id AS vault_id, v.name AS vault_name, v.active as vault_active,
+			v.id AS vault_id, v.name AS vault_name, v.active as vault_active, v.owner_id AS owner_id,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
 		FROM vault v
@@ -88,7 +95,7 @@ func (r VaultRepo) GetVaultById(id int) (entity.Vault, error) {
 	var wallet entity.Wallet
 
 	err := row.Scan(
-		&vault.Id, &vault.Name, &vault.Active,
+		&vault.Id, &vault.Name, &vault.Active, &vault.OwnerId,
 		&wallet.Id, &wallet.Type, &wallet.Funded,
 		&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
 	)
@@ -153,7 +160,7 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
 
 	query := `
         SELECT 
-            v.id AS vault_id, v.name AS vault_name, v.active AS vault_active,
+            v.id AS vault_id, v.name AS vault_name, v.active AS vault_active, v.owner_id AS owner_id,
             vc.id AS vault_category_id, vc.name as vault_category_name, vc.theme as vault_category_theme,
             w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
             wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
@@ -180,7 +187,7 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
 		var wallet entity.Wallet
 
 		err := rows.Scan(
-			&vault.Id, &vault.Name, &vault.Active,
+			&vault.Id, &vault.Name, &vault.Active, &vault.OwnerId,
 			&vaultCategory.Id, &vaultCategory.Name, &vaultCategory.Theme,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
@@ -190,7 +197,7 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
 		}
 
 		vault.Wallet = wallet
-		vault.VaultCategory = vaultCategory
+		vault.VaultCategory = &vaultCategory
 
 		vaults = append(vaults, vault)
 	}

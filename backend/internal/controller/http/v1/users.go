@@ -17,11 +17,11 @@ type usersRoutes struct {
 	rP usecase.RolePermissionUseCase
 	v  usecase.VaultUseCase
 	// l logger.Interface
-	l  logger.Interface
+	l logger.Interface
 }
 
 func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase) {
-	r := &usersRoutes{t, a, rP, l}
+	r := &usersRoutes{t, a, rP, v, l}
 
 	h := handler.Group("/users")
 	{

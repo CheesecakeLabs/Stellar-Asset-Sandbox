@@ -85,7 +85,7 @@ func NewRouter(
 	handler.Use(CORSMiddleware(cfg, logger))
 	groupV1 := handler.Group("/v1")
 	{
-		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, vaultUc, logger)
+		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, logger, vaultUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase, logger)
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)
 		newRoleRoutes(groupV1, roleUseCase, messengerController, logger)

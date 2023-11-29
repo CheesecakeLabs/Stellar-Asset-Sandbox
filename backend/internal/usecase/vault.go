@@ -33,8 +33,8 @@ func (uc *VaultUseCase) Create(data entity.Vault) (entity.Vault, error) {
 	return vault, nil
 }
 
-func (uc *VaultUseCase) GetAll() ([]entity.Vault, error) {
-	vault, err := uc.vRepo.GetVaults()
+func (uc *VaultUseCase) GetAll(isAll bool) ([]entity.Vault, error) {
+	vault, err := uc.vRepo.GetVaults(isAll)
 	if err != nil {
 		return nil, fmt.Errorf("VaultUseCase - GetAll - uc.repo.GetVault: %w", err)
 	}

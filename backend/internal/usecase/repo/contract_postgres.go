@@ -21,7 +21,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 		SELECT 
 			c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, c.yield_rate AS contract_yield_rate, 
 			c.term AS contract_term, c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
-			c.compound AS contract_compound, v.id AS vault_id, v.name AS vault_name,
+			c.compound AS contract_compound, c.created_at AS contract_created_at, v.id AS vault_id, v.name AS vault_name,
 			vc.id AS vault_category_id, vc.name as vault_category_name,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
@@ -61,7 +61,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 
 		err := rows.Scan(
 			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
-			&contract.PenaltyRate, &contract.Compound,
+			&contract.PenaltyRate, &contract.Compound, &contract.CreatedAt,
 			&vault.Id, &vault.Name,
 			&vaultCategory.Id, &vaultCategory.Name,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
@@ -94,7 +94,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 	SELECT 
 		c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, c.yield_rate AS contract_yield_rate, 
 		c.term AS contract_term, c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
-		c.compound AS contract_compound, v.id AS vault_id, v.name AS vault_name,
+		c.compound AS contract_compound, c.created_at AS contract_created_at, v.id AS vault_id, v.name AS vault_name,
 		vc.id AS vault_category_id, vc.name as vault_category_name,
 		w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 		wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
@@ -128,7 +128,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 
 	err := row.Scan(
 		&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
-		&contract.PenaltyRate, &contract.Compound,
+		&contract.PenaltyRate, &contract.Compound, &contract.CreatedAt,
 		&vault.Id, &vault.Name,
 		&vaultCategory.Id, &vaultCategory.Name,
 		&wallet.Id, &wallet.Type, &wallet.Funded,
@@ -178,6 +178,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 			c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, 
 			c.yield_rate AS contract_yield_rate, c.term AS contract_term, 
 			c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
+			c.compound AS contract_compound, c.created_at AS contract_created_at,
 			v.id AS vault_id, v.name AS vault_name,
 			vc.id AS vault_category_id, vc.name as vault_category_name,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
@@ -207,7 +208,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 
 		err := rows.Scan(
 			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate,
-			&contract.Term, &contract.MinDeposit, &contract.PenaltyRate,
+			&contract.Term, &contract.MinDeposit, &contract.PenaltyRate, &contract.Compound, &contract.CreatedAt,
 			&vault.Id, &vault.Name,
 			&vaultCategory.Id, &vaultCategory.Name,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
@@ -218,7 +219,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 		}
 
 		vault.Wallet = wallet
-		vault.VaultCategory = vaultCategory
+		vault.VaultCategory = &vaultCategory
 		contract.Vault = vault
 
 		contracts = append(contracts, contract)

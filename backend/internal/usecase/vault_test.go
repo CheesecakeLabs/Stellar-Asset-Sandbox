@@ -45,7 +45,7 @@ func TestVaultUseCaseList(t *testing.T) {
 		Wallet: entity.Wallet{
 			Type: entity.SponsorType,
 		},
-		VaultCategory: entity.VaultCategory{
+		VaultCategory: &entity.VaultCategory{
 			Id:   1,
 			Name: "Some Category",
 		},
@@ -57,7 +57,7 @@ func TestVaultUseCaseList(t *testing.T) {
 		Wallet: entity.Wallet{
 			Type: entity.IssuerType,
 		},
-		VaultCategory: entity.VaultCategory{
+		VaultCategory: &entity.VaultCategory{
 			Id:   2,
 			Name: "Another Category",
 		},
@@ -119,7 +119,7 @@ func TestVaultUseCaseGetById(t *testing.T) {
 		Wallet: entity.Wallet{
 			Type: entity.SponsorType,
 		},
-		VaultCategory: entity.VaultCategory{
+		VaultCategory: &entity.VaultCategory{
 			Id:   1,
 			Name: "Some Category",
 		},
@@ -131,7 +131,7 @@ func TestVaultUseCaseGetById(t *testing.T) {
 		Wallet: entity.Wallet{
 			Type: entity.IssuerType,
 		},
-		VaultCategory: entity.VaultCategory{
+		VaultCategory: &entity.VaultCategory{
 			Id:   2,
 			Name: "Another Category",
 		},
@@ -192,7 +192,7 @@ func TestVaultUseCaseCreate(t *testing.T) {
 		Wallet: entity.Wallet{
 			Type: entity.SponsorType,
 		},
-		VaultCategory: entity.VaultCategory{
+		VaultCategory: &entity.VaultCategory{
 			Id:   1,
 			Name: "Some Category",
 		},

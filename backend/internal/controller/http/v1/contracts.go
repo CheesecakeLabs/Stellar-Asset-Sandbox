@@ -173,13 +173,7 @@ func (r *contractRoutes) getContractById(c *gin.Context) {
 	contract, err := r.c.GetById(idStr)
 	if err != nil {
 		r.l.Error(err, "http - v1 - get contract by id - Atoi")
-		errorResponse(c, http.StatusBadRequest, "invalid vault ID", err)
-		return
-	}
-	contract, err := r.v.GetById(vaultId)
-	if err != nil {
-		r.l.Error(err, "http - v1 - get contract by id - GetById")
-		errorResponse(c, http.StatusInternalServerError, "error getting contract", err)
+		errorResponse(c, http.StatusBadRequest, "invalid contract ID", err)
 		return
 	}
 

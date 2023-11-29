@@ -81,7 +81,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	if request.VaultCategoryId != nil {
 		vaultCategory, err = r.vc.GetById(*request.VaultCategoryId)
 		if err != nil {
-		    r.l.Error(err, "http - v1 - create vault - vault category")
+			r.l.Error(err, "http - v1 - create vault - vault category")
 			errorResponse(c, http.StatusNotFound, "vault category not found", err)
 			return
 		}
@@ -199,6 +199,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 	pageQuery := c.Query("page")
 	limitQuery := c.Query("limit")
+	isAll := c.Query("all") == "all"
 
 	// Check if pagination parameters are provided
 	if pageQuery != "" && limitQuery != "" {
@@ -226,7 +227,7 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 		c.JSON(http.StatusOK, vaults)
 	} else {
 		// Get all vaults without pagination
-		vaults, err := r.v.GetAll()
+		vaults, err := r.v.GetAll(isAll)
 		if err != nil {
 			r.l.Error(err, "http - v1 - get all vaults - GetAll")
 			errorResponse(c, http.StatusInternalServerError, "error getting all vaults", err)
