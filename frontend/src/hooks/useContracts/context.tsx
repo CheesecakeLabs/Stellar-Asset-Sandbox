@@ -95,7 +95,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const deposit = async (
     amount: bigint,
     address: string,
-    updatePosition: void,
     contractId: string,
     sourcePk: string
   ): Promise<boolean> => {
@@ -110,7 +109,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
-      updatePosition
       return true
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -123,7 +121,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   }
 
   const getPosition = async (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
     contractId: string
   ): Promise<bigint | undefined> => {
@@ -132,7 +129,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         address: address,
         contractId: contractId,
       })
-      console.log('position: ' + result)
       return result
     } catch (e) {
       throw new Error('Invalid position')
@@ -140,7 +136,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   }
 
   const getYield = async (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
     contractId: string
   ): Promise<bigint | undefined> => {
@@ -149,7 +144,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         address: address,
         contractId: contractId,
       })
-      console.log('yield: ' + result)
       return result
     } catch (e) {
       throw new Error('Invalid yield')
@@ -157,38 +151,34 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   }
 
   const getEstimatedPrematureWithdraw = async (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
     address: string,
     contractId: string
   ): Promise<bigint | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getEstimatedPrematureWithdraw({
-        address: address,
-        contractId: contractId,
-      })
-      console.log('estimated premature:' + result)
+      const result =
+        await certificateOfDepositClient.getEstimatedPrematureWithdraw({
+          address: address,
+          contractId: contractId,
+        })
       return result
     } catch (e) {
       throw new Error('Invalid estimated premature withdraw')
     }
   }
 
-  const getTime = (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
+  const getTimeLeft = async (
     address: string,
     contractId: string
-  ): void => {
-    certificateOfDepositClient
-      .getTimeLeft({
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getTimeLeft({
         address: address,
         contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        update(res)
-      })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      return result
+    } catch (e) {
+      throw new Error('Invalid time left')
+    }
   }
 
   const getAccount = (
@@ -200,7 +190,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const withdraw = async (
     address: string,
     premature: boolean,
-    updatePosition: void,
     contractId: string,
     signerSecret?: string
   ): Promise<boolean> => {
@@ -213,7 +202,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         signerSecret: signerSecret,
       })
       setIsWithdrawing(false)
-      updatePosition
       setWithdrawConfirmed(true)
       return true
     } catch (error) {
@@ -241,10 +229,10 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         deposit,
         getPosition,
         getYield,
-        getTime,
+        getTimeLeft,
         getAccount,
         withdraw,
-        getEstimatedPrematureWithdraw
+        getEstimatedPrematureWithdraw,
       }}
     >
       {children}

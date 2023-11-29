@@ -1,10 +1,17 @@
-import { useColorMode } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Flex, useColorMode, Tag } from '@chakra-ui/react'
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react'
 import Select from 'react-select'
 
 export interface IOption {
   readonly label: string
   readonly value: string
+  readonly isPersonal: boolean
   readonly disabled: boolean
 }
 
@@ -17,11 +24,13 @@ interface ISelectVault {
 const createOption = (
   label: string,
   value: string,
-  isDisabled: boolean
+  isDisabled: boolean,
+  isPersonal: boolean
 ): IOption => ({
   label,
   value: value,
   disabled: isDisabled,
+  isPersonal: isPersonal,
 })
 
 export const SelectVault: React.FC<ISelectVault> = ({
@@ -37,12 +46,13 @@ export const SelectVault: React.FC<ISelectVault> = ({
       createOption(
         vault.name,
         vault.wallet.key.publicKey,
-        vault.isUnauthorized || false
+        vault.isUnauthorized || false,
+        vault.owner_id !== null
       )
     )
 
     let ops = distributorWallet
-      ? [createOption('Asset Issuer', distributorWallet, false)]
+      ? [createOption('Asset Issuer', distributorWallet, false, false)]
       : []
     if (listVaults) {
       ops = [...ops, ...listVaults]
@@ -51,11 +61,21 @@ export const SelectVault: React.FC<ISelectVault> = ({
     setOptions(ops || [])
   }, [distributorWallet, vaults])
 
+  const formatGroupLabel = (data: IOption): ReactNode => (
+    <Flex justifyContent="space-between">
+      <span>{data.label}</span>
+      <Tag variant={data.isPersonal ? 'blue_moonstone' : 'green'}>
+        {data.isPersonal ? 'Personal' : 'Public'}
+      </Tag>
+    </Flex>
+  )
+
   return (
     <Select
       options={options}
       onChange={(newValue): void => setWallet(newValue?.value)}
       isOptionDisabled={(option): boolean => option.disabled}
+      formatOptionLabel={formatGroupLabel}
       styles={{
         control: baseStyles => ({
           ...baseStyles,

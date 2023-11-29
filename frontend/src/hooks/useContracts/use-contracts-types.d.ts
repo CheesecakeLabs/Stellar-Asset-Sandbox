@@ -34,6 +34,14 @@ declare namespace Hooks {
       amount: number
     }
 
+    interface IContractData {
+      position: number
+      deposited: number
+      yield: number
+      estimatedPrematureWithdraw: number
+      timeLeft: number
+    }
+
     interface IContractsContext {
       loading: boolean
       contracts: IContract[] | undefined
@@ -47,35 +55,23 @@ declare namespace Hooks {
       deposit(
         amount: bigint,
         address: string,
-        updatePosition: void,
         contractId: string,
         sourcePk: string
       ): Promise<boolean>
       getPosition(
-        update: React.Dispatch<React.SetStateAction<bigint>>,
         address: string,
         contractId: string
       ): Promise<bigint | undefined>
       getEstimatedPrematureWithdraw(
-        update: React.Dispatch<React.SetStateAction<bigint>>,
         address: string,
         contractId: string
       ): Promise<bigint | undefined>
-      getYield(
-        update: React.Dispatch<React.SetStateAction<bigint>>,
-        address: string,
-        contractId: string
-      ): Promise<bigint | undefined>
-      getTime(
-        update: React.Dispatch<React.SetStateAction<bigint>>,
-        address: string,
-        contractId: string
-      ): void
+      getYield(address: string, contractId: string): Promise<bigint | undefined>
+      getTimeLeft(address: string, contractId: string): Promise<bigint | undefined>
       getAccount(update: React.Dispatch<React.SetStateAction<string>>): void
       withdraw(
         address: string,
         premature: boolean,
-        updatePosition: void,
         contractId: string,
         signerSecret?: string
       ): Promise<boolean>

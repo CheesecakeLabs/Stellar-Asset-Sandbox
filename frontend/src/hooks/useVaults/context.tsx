@@ -45,31 +45,40 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     [toast]
   )
 
-  const getVaults = useCallback(async (): Promise<
-    Hooks.UseVaultsTypes.IVault[] | undefined
-  > => {
-    setLoadingVaults(true)
-    try {
-      const response = await http.get(`vault/list`)
-      const data = response.data
-      if (data) {
-        await Promise.all(
-          data.map(async (vault: Hooks.UseVaultsTypes.IVault) => {
-            const accountData = await getAccountData(vault.wallet.key.publicKey)
-            vault.accountData = accountData
-          })
+  const getVaults = useCallback(
+    async (
+      isAll?: boolean
+    ): Promise<Hooks.UseVaultsTypes.IVault[] | undefined> => {
+      setLoadingVaults(true)
+      try {
+        const response = await http.get(`vault/list`, {
+          params: { all: isAll ? 'all' : '' },
+        })
+        const data = response.data
+        if (data) {
+          await Promise.all(
+            data.map(async (vault: Hooks.UseVaultsTypes.IVault) => {
+              const accountData = await getAccountData(
+                vault.wallet.key.publicKey
+              )
+              vault.accountData = accountData
+            })
+          )
+          setVaults(data)
+          return data
+        }
+      } catch (error) {
+        toastError(
+          axios.isAxiosError(error)
+            ? error.message
+            : MessagesError.errorOccurred
         )
-        setVaults(data)
-        return data
+      } finally {
+        setLoadingVaults(false)
       }
-    } catch (error) {
-      toastError(
-        axios.isAxiosError(error) ? error.message : MessagesError.errorOccurred
-      )
-    } finally {
-      setLoadingVaults(false)
-    }
-  }, [getAccountData, toastError])
+    },
+    [getAccountData, toastError]
+  )
 
   const getVaultCategories = useCallback(async (): Promise<
     Hooks.UseVaultsTypes.IVaultCategory[] | undefined

@@ -161,7 +161,7 @@ const getTimeLeft = async (rawArgs: {
   let invokeArgs: IInvokeSorobanArgs = {
     contractId: rawArgs.contractId,
     spec,
-    method: Methods.getEstimatedPrematureWithdraw,
+    method: Methods.getTimeLeft,
     sourcePk: rawArgs.address,
   }
 
@@ -171,7 +171,12 @@ const getTimeLeft = async (rawArgs: {
     ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
     : invokeArgs
 
-  return SorobanService.invokeSoroban(invokeArgs)
+  return SorobanService.simulatedValue(
+    invokeArgs,
+    (xdr: SorobanClient.xdr.ScVal): I128 => {
+      return spec.funcResToNative('get_time_left', xdr)
+    }
+  )
 }
 
 const extendContractValidity = async (rawArgs: {

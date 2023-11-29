@@ -8,6 +8,7 @@ declare namespace Hooks {
       accountData: Hooks.UseHorizonTypes.IAccount | undefined
       active: 0 | 1
       isUnauthorized?: boolean
+      owner_id: number
     }
 
     interface IVaultRequest {
@@ -55,7 +56,7 @@ declare namespace Hooks {
       updatingVault: boolean
       updatingVaultAssets: boolean
       deletingVault: boolean
-      getVaults: () => Promise<IVaults[] | undefined>
+      getVaults: (isAll?: boolean) => Promise<IVaults[] | undefined>
       getVaultCategories: () => Promise<IVaultCategory[] | undefined>
       createVault: (vault: IVaultRequest) => Promise<IVault | undefined>
       createVaultCategory: (

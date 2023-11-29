@@ -18,7 +18,7 @@ export const ContractsDetail: React.FC = () => {
     getContract,
     getPosition,
     getYield,
-    getTime,
+    getTimeLeft,
     withdraw,
     deposit,
     getEstimatedPrematureWithdraw,
@@ -26,15 +26,11 @@ export const ContractsDetail: React.FC = () => {
   const { profile, getProfile } = useAuth()
   const toast = useToast()
 
-  const [userPosition, setUserPosition] = useState<bigint>(BigInt(0))
   const [loadingPosition, setLoadingPosition] = useState(true)
-  const [userYield, setUserYield] = useState<bigint>(BigInt(0))
-  const [estimatedPrematureWithdraw, setEstimatedPrematureWithdraw] =
-    useState<bigint>(BigInt(0))
-  const [time, setTime] = useState<bigint>(BigInt(0))
-  const [userDeposit, setUserDeposit] = useState(0)
   const [pauseProcess, setPauseProcess] = useState(false)
   const [contract, setContract] = useState<Hooks.UseContractsTypes.IContract>()
+  const [contractData, setContractData] =
+    useState<Hooks.UseContractsTypes.IContractData>()
 
   const { id } = useParams()
 
@@ -42,85 +38,57 @@ export const ContractsDetail: React.FC = () => {
     getProfile()
   }, [getProfile])
 
-  const updatePosition = useCallback((): void => {
-    if (!pauseProcess && contract) {
-      /*getPosition(setUserPosition, userAccount, contract.address)
-      getYield(setUserYield, userAccount, contract.address)
-      getTime(setTime, userAccount, contract.address)*/
-    }
-  }, [getPosition, getTime, getYield, pauseProcess, profile, contract])
+  const loadContractData = async (): Promise<void> => {
+    console.log('carregou')
+    if (profile && contract) {
+      const wallet = profile.vault.wallet.key.publicKey
 
-  /*const updatePositionPeriodically = useCallback((): void => {
-    setInterval(updatePosition, 1000)
-  }, [updatePosition])*/
+      const position =
+        ((await getPosition(wallet, contract.address)) || BigInt(0)) /
+        BigInt(10000000)
+
+      const userYield =
+        ((await getYield(wallet, contract.address)) || BigInt(0)) /
+        BigInt(10000000)
+
+      const estimatedPrematureWithdraw = await getEstimatedPrematureWithdraw(
+        wallet,
+        contract.address
+      )
+
+      const timeLeft = await getTimeLeft(wallet, contract.address)
+
+      setContractData({
+        position: Number(position),
+        deposited: Number(position) - Number(userYield),
+        yield: Number(userYield || 0),
+        estimatedPrematureWithdraw: Number(estimatedPrematureWithdraw || 0),
+        timeLeft: Number(timeLeft),
+      })
+
+      setLoadingPosition(false)
+    }
+  }
 
   useEffect(() => {
-    if (profile && contract) {
-      getPosition(
-        updatePosition,
-        profile.vault.wallet.key.publicKey,
-        contract.address
-      ).then(position => {
-        if (position) {
-          setUserPosition(position)
-        }
-        setLoadingPosition(false)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadContractData()
   }, [profile, contract])
-
-  useEffect(() => {
-    if (profile && contract) {
-      getYield(
-        updatePosition,
-        profile.vault.wallet.key.publicKey,
-        contract.address
-      ).then(userYield => {
-        if (userYield) {
-          setUserYield(userYield)
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, contract])
-
-  useEffect(() => {
-    if (profile && contract) {
-      getEstimatedPrematureWithdraw(
-        updatePosition,
-        profile.vault.wallet.key.publicKey,
-        contract.address
-      ).then(estimatedValue => {
-        if (estimatedValue) {
-          setEstimatedPrematureWithdraw(estimatedValue)
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, contract])
-
-  /*useEffect(() => {
-    if (userDeposit === 0 && userPosition > 0 && userYield > 0) {
-      setUserDeposit(Number(userPosition) - Number(userYield))
-    }
-  }, [userAccount, userDeposit, userPosition, userYield])*/
 
   useEffect(() => {
     if (id) {
       getContract(id).then(contract => {
         setContract(contract)
-        if (contract && profile) {
-          getPosition(
-            updatePosition,
-            profile.vault.wallet.key.publicKey,
-            contract.address
-          )
-        }
-        console.log(contract)
       })
     }
   }, [getContract, id, profile])
+
+  const updatePeriodically = useCallback((): void => {
+    setInterval(loadContractData, 60000)
+  }, [loadContractData])
+
+  useEffect(() => {
+    updatePeriodically()
+  }, [])
 
   const onSubmitDeposit = async (
     data: FieldValues,
@@ -132,13 +100,12 @@ export const ContractsDetail: React.FC = () => {
       const isSuccess = await deposit(
         BigInt(data.amount),
         profile.vault.wallet.key.publicKey,
-        updatePosition(),
         contract.address,
         profile.vault.wallet.key.publicKey
       )
-      setUserDeposit(data.amount)
 
       if (isSuccess) {
+        loadContractData()
         setValue('amount', '')
 
         toast({
@@ -169,12 +136,11 @@ export const ContractsDetail: React.FC = () => {
       const isSuccess = await withdraw(
         profile.vault.wallet.key.publicKey,
         true,
-        updatePosition(),
         contract.address
       )
 
       if (isSuccess) {
-        setUserDeposit(0)
+        loadContractData()
         toast({
           title: 'Withdraw success!',
           status: 'success',
@@ -216,13 +182,10 @@ export const ContractsDetail: React.FC = () => {
           onSubmitDeposit={onSubmitDeposit}
           loading={loadingPosition}
           contract={contract}
-          time={time}
           userAccount={profile?.vault.wallet.key.publicKey}
           isDepositing={isDepositing}
           isWithdrawing={isWithdrawing}
-          currentYield={Number(userYield)}
-          deposit={userDeposit}
-          balance={userPosition}
+          contractData={contractData}
         />
       </Sidebar>
     </Flex>
