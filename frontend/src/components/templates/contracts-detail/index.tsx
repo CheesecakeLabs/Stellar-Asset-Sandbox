@@ -1,4 +1,4 @@
-import { Container, Flex, Skeleton, Text } from '@chakra-ui/react'
+import { Container, Flex, Skeleton } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
@@ -43,7 +43,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   history,
   deposited,
   userPermissions,
-  currentInVault
+  currentInVault,
 }) => {
   return (
     <Flex flexDir="column" w="full">
@@ -55,7 +55,11 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
             <Flex justifyContent="space-between">
               <ContractsBreadcrumb title="Certificate Name" />
             </Flex>
-            <Flex w="full" justifyContent="space-between" flexDir={{ base: 'column-reverse', md: 'row' }}>
+            <Flex
+              w="full"
+              justifyContent="space-between"
+              flexDir={{ base: 'column-reverse', md: 'row' }}
+            >
               <Container
                 variant="primary"
                 mr="1.5rem"

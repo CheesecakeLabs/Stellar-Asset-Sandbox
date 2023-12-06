@@ -1,5 +1,5 @@
 import { Flex, Text } from '@chakra-ui/react'
-import React, { ReactNode } from 'react'
+import React from 'react'
 
 import { ContractHistory } from '../contract-history'
 
@@ -14,13 +14,6 @@ export const WithdrawDetails: React.FC<IWithdrawDetails> = ({
   contractData,
   history,
 }) => {
-  interface ICountdown {
-    days: number
-    hours: number
-    minutes: number
-    seconds: number
-    completed: boolean
-  }
 
   return (
     <Flex flexDir="column" w="full">

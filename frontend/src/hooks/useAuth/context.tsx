@@ -193,7 +193,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [getAccountData])
 
   const getUserPermissions = useCallback(async (): Promise<
     Hooks.UseAuthTypes.IUserPermission[] | undefined

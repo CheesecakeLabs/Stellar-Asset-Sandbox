@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
@@ -13,7 +12,6 @@ import React, { ReactNode, useState } from 'react'
 import Countdown from 'react-countdown'
 import { useForm } from 'react-hook-form'
 
-import { toNumber } from 'lodash'
 import { toCrypto } from 'utils/formatter'
 
 interface IWithdraw {
@@ -49,8 +47,9 @@ export const Withdraw: React.FC<IWithdraw> = ({
   }
 
   const insuficientBalance = (): boolean => {
-    console.log(currentInVault)
-    console.log(Number(toNumber(currentInVault)))
+    if (!isDone) {
+      return contractData.estimatedPrematureWithdraw > Number(currentInVault)
+    }
     return contractData.position > Number(currentInVault)
   }
 

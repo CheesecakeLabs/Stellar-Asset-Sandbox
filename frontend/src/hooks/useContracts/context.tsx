@@ -1,5 +1,4 @@
-import { position } from '@chakra-ui/react'
-import { SetStateAction, createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useState } from 'react'
 
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
@@ -96,7 +95,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         setLoading(false)
       }
     },
-    []
+    [getAccountData]
   )
 
   const deposit = async (
@@ -218,7 +217,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       setWithdrawConfirmed(true)
       return result.status === 'SUCCESS'
     } catch (error) {
-      console.log(error)
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
       }

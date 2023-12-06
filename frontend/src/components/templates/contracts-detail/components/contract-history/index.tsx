@@ -1,7 +1,6 @@
 import { Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import { useContracts } from 'hooks/useContracts'
 import { formatDateFullClean, toCrypto } from 'utils/formatter'
 
 interface IWithdrawDetails {

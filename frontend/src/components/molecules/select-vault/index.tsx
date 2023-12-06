@@ -9,7 +9,7 @@ import React, {
 import { User } from 'react-feather'
 import Select from 'react-select'
 
-import { VaultIcon, WalletIcon } from 'components/icons'
+import { VaultIcon } from 'components/icons'
 
 export interface IOption {
   readonly label: string

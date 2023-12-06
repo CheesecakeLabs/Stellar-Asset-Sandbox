@@ -51,6 +51,7 @@ export const ContractsDetail: React.FC = () => {
         setContract(contract)
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getProfile])
 
   const loadContractData = useCallback(async (): Promise<void> => {
@@ -94,6 +95,7 @@ export const ContractsDetail: React.FC = () => {
 
       setLoadingPosition(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     contract,
     contractData?.position,
@@ -116,6 +118,7 @@ export const ContractsDetail: React.FC = () => {
     return () => {
       clearInterval(interval)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, contract])
 
   useEffect(() => {

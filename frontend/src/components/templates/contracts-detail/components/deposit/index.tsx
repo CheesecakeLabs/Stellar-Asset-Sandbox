@@ -34,7 +34,6 @@ export const Deposit: React.FC<IDeposit> = ({
   currentBalance,
 }) => {
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,

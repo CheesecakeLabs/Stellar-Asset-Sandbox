@@ -58,7 +58,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
   }
 
   return (
-    <Flex flexDir={{ base: 'row', md: 'row' }} w="full">
+    <Flex flexDir="column" w="full">
       <Text fontSize="sm" mb="0.5rem" ms="0.25rem">
         Deposit info
       </Text>
@@ -132,26 +132,28 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
                 </Text>
               </Flex>
 
-              <Flex flexDir="column" w="full">
-                <Text
-                  bg="gray.100"
-                  borderRadius="full"
-                  fontWeight="bold"
-                  fontSize="xs"
-                  px="0.75rem"
-                  py="0.25rem"
-                  w="fit-content"
-                  mb="0.15rem"
-                >
-                  Next yield in
-                </Text>
-                <Flex ms="0.5rem">
-                  <Countdown
-                    date={Date.now() + calculateNextYield() * 1000}
-                    renderer={renderer}
-                  />
+              {contract.compound > 0 && (
+                <Flex flexDir="column" w="full">
+                  <Text
+                    bg="gray.100"
+                    borderRadius="full"
+                    fontWeight="bold"
+                    fontSize="xs"
+                    px="0.75rem"
+                    py="0.25rem"
+                    w="fit-content"
+                    mb="0.15rem"
+                  >
+                    Composed in
+                  </Text>
+                  <Flex ms="0.5rem">
+                    <Countdown
+                      date={Date.now() + calculateNextYield() * 1000}
+                      renderer={renderer}
+                    />
+                  </Flex>
                 </Flex>
-              </Flex>
+              )}
             </Flex>
 
             <ContractHistory contract={contract} history={history} />
