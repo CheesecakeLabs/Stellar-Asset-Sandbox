@@ -92,7 +92,7 @@ func NewRouter(
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController, logger)
 		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc, logger)
 		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase, logger)
-		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase, logger)
+		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase, userUseCase, logger)
 		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase, logger)
 		newSorobanRoutes(groupV1, walletUseCase, messengerController, authUseCase)
 		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)

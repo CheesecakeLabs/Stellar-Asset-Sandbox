@@ -148,9 +148,9 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 
 	vault.Wallet = wallet
 	vault.VaultCategory = &vaultCategory
-	contract.Asset = asset
 	asset.Distributor = assetDistributor
 	asset.Issuer = assetIssuer
+	contract.Asset = asset
 	contract.Vault = vault
 
 	return contract, nil
@@ -226,4 +226,69 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 	}
 
 	return contracts, nil
+}
+
+func (r ContractRepo) GetHistory(userId int, contractId int) ([]entity.ContractHistory, error) {
+	query := `
+		SELECT ch.id, ch.deposited_at, ch.deposit_amount, ch.withdrawn_at, ch.withdraw_amount, ch.deposited_at 
+		FROM contractshistory ch
+		WHERE ch.user_id = $1 AND ch.contract_id = $2
+		ORDER BY ch.deposited_at DESC;
+	`
+
+	rows, err := r.Db.Query(query, userId, contractId)
+	if err != nil {
+		return nil, fmt.Errorf("ContractRepo - GetHistory - Query: %w", err)
+	}
+	defer rows.Close()
+
+	contractsHistory := []entity.ContractHistory{}
+
+	for rows.Next() {
+		var contractHistory entity.ContractHistory
+
+		err := rows.Scan(
+			&contractHistory.Id, &contractHistory.DepositedAt, &contractHistory.DepositAmount, &contractHistory.WithdrawnAt,
+			&contractHistory.WithdrawAmount, &contractHistory.DepositedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("ContractRepo - GetContractCategories - row.Scan: %w", err)
+		}
+
+		contractsHistory = append(contractsHistory, contractHistory)
+	}
+
+	return contractsHistory, nil
+}
+
+func (r ContractRepo) AddContractHistory(data entity.ContractHistory) (entity.ContractHistory, error) {
+	res := data
+	stmt := `INSERT INTO contractshistory (deposit_amount, contract_id, user_id) 
+			 VALUES ($1, $2, $3) RETURNING id;`
+
+	err := r.Db.QueryRow(stmt, data.DepositAmount, data.Contract.Id, data.User.ID).Scan(&res.Id)
+
+	if err != nil {
+		return entity.ContractHistory{}, fmt.Errorf("ContractRepo - addContractHistory - db.QueryRow: %w", err)
+	}
+
+	return res, nil
+}
+
+func (r ContractRepo) UpdateContractHistory(data entity.ContractHistory) (entity.ContractHistory, error) {
+	res := data
+	stmt := `UPDATE ContractsHistory SET withdraw_amount = $1, withdrawn_at = now() WHERE id = (
+			 SELECT id
+			 FROM ContractsHistory
+			 WHERE withdraw_amount IS NULL AND contract_id = $2 AND user_id = $3
+			 ORDER BY id DESC
+			 LIMIT 1) RETURNING id;`
+
+	err := r.Db.QueryRow(stmt, data.WithdrawAmount, data.Contract.Id, data.User.ID).Scan(&res.Id)
+
+	if err != nil {
+		return entity.ContractHistory{}, fmt.Errorf("ContractRepo - updateContractHistory - db.QueryRow: %w", err)
+	}
+
+	return res, nil
 }

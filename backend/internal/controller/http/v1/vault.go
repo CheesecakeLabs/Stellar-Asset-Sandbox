@@ -111,15 +111,33 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	}
 	walletPk := kpRes.PublicKeys[0]
 
-	ops := []entity.Operation{
-		{
-			Type:    entity.CreateAccountOp,
-			Target:  walletPk,
-			Amount:  _startingBalance,
-			Origin:  sponsor.Key.PublicKey,
-			Sponsor: sponsor.Key.PublicKey,
+	wallet, err := r.w.Create(entity.Wallet{
+		Type: entity.DistributorType,
+		Key: entity.Key{
+			PublicKey: walletPk,
+			Weight:    1,
 		},
+	})
+
+	fundRes, err := r.m.SendMessage(entity.HorizonChannel, entity.HorizonRequest{
+		Id:      wallet.Id,
+		Type:    "fundWithFriendbot",
+		Account: walletPk,
+	})
+	if err != nil {
+		r.l.Error(err, "http - v1 - fund wallet - SendMessage")
+		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
 	}
+
+	fundResult := fundRes.Message.(entity.HorizonResponse)
+
+	if fundResult.StatusCode != 200 {
+		r.l.Error(err, "http - v1 - fund wallet - fundRes.StatusCode != 200")
+		errorResponse(c, http.StatusInternalServerError, "friendbot error", err)
+		return
+	}
+
+	ops := []entity.Operation{}
 
 	for _, assetId := range request.AssetsId {
 		asset, err := r.as.GetById(strconv.Itoa(assetId))
@@ -157,15 +175,6 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
 		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
 		return
-	}
-
-	wallet := entity.Wallet{
-		Type:   entity.DistributorType,
-		Funded: true,
-		Key: entity.Key{
-			PublicKey: walletPk,
-			Weight:    1,
-		},
 	}
 
 	vault := entity.Vault{
@@ -259,16 +268,6 @@ func (r *vaultRoutes) getVaultById(c *gin.Context) {
 		r.l.Error(err, "http - v1 - get vault by id - GetById")
 		errorResponse(c, http.StatusInternalServerError, "error getting vault", err)
 		return
-	}
-
-	if vault.VaultCategoryId != nil {
-		vaultCategory, err := r.vc.GetById(*vault.VaultCategoryId)
-		if err != nil {
-			errorResponse(c, http.StatusInternalServerError, "error getting vault category", err)
-			return
-		}
-
-		vault.VaultCategory = &vaultCategory
 	}
 
 	c.JSON(http.StatusOK, vault)

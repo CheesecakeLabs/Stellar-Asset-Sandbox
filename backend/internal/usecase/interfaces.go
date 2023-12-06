@@ -103,6 +103,9 @@ type (
 		CreateContract(entity.Contract) (entity.Contract, error)
 		GetContractById(id string) (entity.Contract, error)
 		GetPaginatedContracts(int, int) ([]entity.Contract, error)
+		GetHistory(userId int, contractId int) ([]entity.ContractHistory, error)
+		AddContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)
+		UpdateContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)
 	}
 
 	LogTransactionRepoInterface interface {
