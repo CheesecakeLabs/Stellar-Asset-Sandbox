@@ -150,7 +150,8 @@ export const ContractsDetail: React.FC = () => {
 
         setValue('amount', '')
         await getProfile()
-        await getHistory(contract.id)
+        const history = await getHistory(contract.id)
+        setHistory(history)
 
         toast({
           title: 'Deposit success!',

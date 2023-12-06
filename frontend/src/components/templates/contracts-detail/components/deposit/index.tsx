@@ -40,10 +40,10 @@ export const Deposit: React.FC<IDeposit> = ({
   } = useForm()
 
   const [amount, setAmount] = useState<string>()
-  const [isLimitExceded, setLimitExceded] = useState(false)
+  const [isLimitExceeded, setLimitExceeded] = useState(false)
 
-  const limitExceded = (amount: string): void => {
-    setLimitExceded(Number(toNumber(amount)) > Number(currentBalance))
+  const limitExceeded = (amount: string): void => {
+    setLimitExceeded(Number(toNumber(amount)) > Number(currentBalance))
   }
 
   return (
@@ -100,7 +100,7 @@ export const Deposit: React.FC<IDeposit> = ({
                 autoComplete="off"
                 onChange={(target): void => {
                   setAmount(toNumber(target.currentTarget.value))
-                  limitExceded(target.currentTarget.value)
+                  limitExceeded(target.currentTarget.value)
                 }}
               />
               <FormErrorMessage>Required</FormErrorMessage>
@@ -113,7 +113,7 @@ export const Deposit: React.FC<IDeposit> = ({
               variant="primary"
               isLoading={loading}
               mt="1.5rem"
-              isDisabled={Number(currentBalance) === 0 || isLimitExceded}
+              isDisabled={Number(currentBalance) === 0 || isLimitExceeded}
             >
               Deposit
             </Button>

@@ -48,7 +48,10 @@ export const Withdraw: React.FC<IWithdraw> = ({
 
   const insuficientBalance = (): boolean => {
     if (!isDone) {
-      return contractData.estimatedPrematureWithdraw > Number(currentInVault)
+      return (
+        contractData.estimatedPrematureWithdraw / 10000000 >
+        Number(currentInVault)
+      )
     }
     return contractData.position > Number(currentInVault)
   }
