@@ -160,7 +160,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                       <TabPanels>
                         <TabPanel>
                           <FormControl mt="1.5rem">
-                            <FormLabel>Destination Vault</FormLabel>
+                            <FormLabel>Destination</FormLabel>
                             <SelectVault
                               vaults={vaults}
                               setWallet={setWallet}

@@ -1,4 +1,4 @@
-import { Flex, useColorMode, Tag } from '@chakra-ui/react'
+import { Flex, useColorMode } from '@chakra-ui/react'
 import React, {
   Dispatch,
   ReactNode,
@@ -6,7 +6,10 @@ import React, {
   useEffect,
   useState,
 } from 'react'
+import { User } from 'react-feather'
 import Select from 'react-select'
+
+import { VaultIcon, WalletIcon } from 'components/icons'
 
 export interface IOption {
   readonly label: string
@@ -62,11 +65,13 @@ export const SelectVault: React.FC<ISelectVault> = ({
   }, [distributorWallet, vaults])
 
   const formatGroupLabel = (data: IOption): ReactNode => (
-    <Flex justifyContent="space-between">
+    <Flex alignItems="center" gap="0.75rem">
+      {data.isPersonal ? (
+        <User width="16px" height="16px" fill="gray" />
+      ) : (
+        <VaultIcon width="16px" height="16px" fill="grey" />
+      )}
       <span>{data.label}</span>
-      <Tag variant={data.isPersonal ? 'blue_moonstone' : 'green'}>
-        {data.isPersonal ? 'Personal' : 'Public'}
-      </Tag>
     </Flex>
   )
 

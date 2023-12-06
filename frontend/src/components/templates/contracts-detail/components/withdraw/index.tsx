@@ -1,8 +1,19 @@
-import { Box, Button, Checkbox, Container, Flex, Text } from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { ArrowDownCircle } from 'react-feather'
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  Flex,
+  Progress,
+  Tag,
+  Text,
+} from '@chakra-ui/react'
+import React, { ReactNode, useState } from 'react'
+import Countdown from 'react-countdown'
 import { useForm } from 'react-hook-form'
 
+import { toNumber } from 'lodash'
 import { toCrypto } from 'utils/formatter'
 
 interface IWithdraw {
@@ -12,6 +23,8 @@ interface IWithdraw {
   isDone: boolean
   withdrawValue: number
   contractData: Hooks.UseContractsTypes.IContractData
+  deposited: number | undefined
+  currentInVault: string | undefined
 }
 
 export const Withdraw: React.FC<IWithdraw> = ({
@@ -21,12 +34,52 @@ export const Withdraw: React.FC<IWithdraw> = ({
   isDone,
   withdrawValue,
   contractData,
+  deposited,
+  currentInVault,
 }) => {
   const { handleSubmit } = useForm()
   const [isPremature, setIsPremature] = useState(false)
 
+  interface ICountdown {
+    days: number
+    hours: number
+    minutes: number
+    seconds: number
+    completed: boolean
+  }
+
+  const insuficientBalance = (): boolean => {
+    console.log(currentInVault)
+    console.log(Number(toNumber(currentInVault)))
+    return contractData.position > Number(currentInVault)
+  }
+
+  const renderer = ({
+    days,
+    hours,
+    minutes,
+    seconds,
+    completed,
+  }: ICountdown): ReactNode => {
+    if (completed) {
+      return 'Done'
+    } else {
+      return (
+        <span>{`${
+          days > 0 ? `${days} days` : ''
+        } ${hours}h ${minutes}min ${seconds}s`}</span>
+      )
+    }
+  }
+
+  const calculatePercentage = (): number => {
+    if (!contract?.term) return 0
+    const result = (contractData.timeLeft || 0) / contract.term
+    return 100 - result * 100
+  }
+
   return (
-    <Flex flexDir="column" w="420px">
+    <Flex flexDir="column" w={{ base: 'full', md: '640px' }}>
       <Container variant="primary" justifyContent="center" p="0" maxW="full">
         <Flex
           alignItems="center"
@@ -53,8 +106,9 @@ export const Withdraw: React.FC<IWithdraw> = ({
             mb="1.5rem"
             py="1rem"
             borderRadius="0.5rem"
+            _dark={{ bg: 'black.800' }}
           >
-            <Text fontSize="3xl" textAlign="center">
+            <Text fontSize="2xl" textAlign="center">
               {`${toCrypto(Number(contractData.position))} ${
                 contract?.asset.code
               }`}
@@ -67,11 +121,11 @@ export const Withdraw: React.FC<IWithdraw> = ({
                 px="0.75rem"
                 mt="0.25rem"
                 borderRadius="0.5rem"
-                color="#2c4afd"
+                color="purple.600"
+                _dark={{ bg: 'black.700', color: 'white' }}
               >
                 {`+${toCrypto(contractData.yield)} ${contract?.asset.code} (${(
-                  (Number(contractData.yield) /
-                    Number(contractData.deposited)) *
+                  (Number(contractData.yield) / Number(deposited)) *
                   100
                 ).toFixed(2)}%)`}
               </Text>
@@ -92,10 +146,12 @@ export const Withdraw: React.FC<IWithdraw> = ({
                 textAlign="center"
                 fontSize="xs"
                 fontWeight="600"
+                px="1rem"
+                _dark={{ bg: 'black.800', color: 'white' }}
               >
                 {`Your position hasn't reached its term. By withdrawing now you'll
             only get ${
-              (contract?.penalty_rate || 0) / 100
+              100 - (contract?.penalty_rate || 0) / 100
             }% of the yield accrued to date.`}
               </Text>
             </>
@@ -105,42 +161,89 @@ export const Withdraw: React.FC<IWithdraw> = ({
               onSubmit(isPremature)
             })}
           >
-            {/*<Flex justifyContent="space-between" alignItems="center" mt="2rem">
-              <Flex justifyContent="flex-end">
-                {!isDone && (
-                  <Checkbox
-                    fontSize="xs"
-                    me="1rem"
-                    onChange={(event): void => {
-                      setIsPremature(event.target.checked)
-                    }}
-                  >
-                    I would like to anticipate the withdrawal
-                  </Checkbox>
-                )}
+            {
+              <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                mt="2rem"
+                w="full"
+              >
+                <Flex w="full">
+                  {!isDone && (
+                    <Checkbox
+                      me="1rem"
+                      onChange={(event): void => {
+                        setIsPremature(event.target.checked)
+                      }}
+                      border="1px solid"
+                      borderColor="gray.100"
+                      w="full"
+                      padding="0.5rem"
+                    >
+                      <Box>
+                        <Text>I would like to anticipate the withdrawal</Text>
+                        <Text
+                          bg="gray.100"
+                          borderRadius="full"
+                          fontSize="xs"
+                          fontWeight="bold"
+                          px="0.5rem"
+                          py="0.25rem"
+                          w="fit-content"
+                          _dark={{ bg: 'black.800', color: 'white' }}
+                        >{`You will receive ${toCrypto(withdrawValue)} ${
+                          contract?.asset.code
+                        }`}</Text>
+                      </Box>
+                    </Checkbox>
+                  )}
+                </Flex>
               </Flex>
-            </Flex>*/}
+            }
+
+            {insuficientBalance() && (
+              <Tag variant="red" w="full" mt="1rem" justifyContent="center">
+                The vault does not currently have sufficient balance.
+              </Tag>
+            )}
+
             <Button
               w="full"
               borderRadius="1.5rem"
               type="submit"
               variant="primary"
               isLoading={loading}
+              isDisabled={(!isDone && !isPremature) || insuficientBalance()}
               px="1.25rem"
+              mt="1rem"
             >
-              <Flex justifyContent="space-between" w="full">
-                <Flex alignItems="center" gap="0.5rem">
-                  <ArrowDownCircle size="1rem" />
-                  <Text color="white" fontSize="sm">
-                    {isDone ? 'Withdraw' : 'Withdraw premature'}
-                  </Text>
-                </Flex>
-                <Text color="white">{`${toCrypto(withdrawValue)} ${
-                  contract?.asset.code
-                }`}</Text>
-              </Flex>
+              <Text color="white" fontSize="sm" w="full" textAlign="center">
+                {isDone ? 'Withdraw' : 'Withdraw premature'}
+              </Text>
             </Button>
           </form>
+
+          {!isDone && (
+            <Flex
+              flexDir="column"
+              w="full"
+              justifyContent="center"
+              alignItems="center"
+              mt="3rem"
+            >
+              <Countdown
+                date={Date.now() + (contractData.timeLeft || 0) * 1000}
+                renderer={renderer}
+              />
+              <Progress
+                value={calculatePercentage()}
+                h="0.5rem"
+                w="full"
+                borderRadius="0.5rem"
+                mt="0.25rem"
+              />
+            </Flex>
+          )}
         </Box>
       </Container>
     </Flex>

@@ -13,6 +13,11 @@ export const Button = {
           bg: 'primary.normal',
         },
       },
+      _hover: {
+        _disabled: {
+          bg: 'primary.normal',
+        },
+      },
     },
     secondary: {
       background: 'none',

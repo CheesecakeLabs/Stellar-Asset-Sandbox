@@ -1,25 +1,25 @@
-import { Box, Flex, Img, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import React, { ReactNode } from 'react'
 import Countdown from 'react-countdown'
-import { Calendar, AlertTriangle, DollarSign, Clock } from 'react-feather'
 
-import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
-import { formatDateFull, toCrypto } from 'utils/formatter'
+import { toCrypto } from 'utils/formatter'
 
-import { VaultIcon, ApyIcon, TimeIcon } from 'components/icons'
-import { CompoundTime } from 'components/templates/contracts-create/components/select-compound'
-
-import { ItemContractData } from '../item-contract-data'
+import { ContractHistory } from '../contract-history'
 
 interface IDepositDetails {
   contract: Hooks.UseContractsTypes.IContract
   contractData: Hooks.UseContractsTypes.IContractData | undefined
+  currentBalance: string
+  deposited: number | undefined
+  history: Hooks.UseContractsTypes.IHistory[] | undefined
 }
 
 export const DepositDetails: React.FC<IDepositDetails> = ({
   contract,
   contractData,
+  currentBalance,
+  history,
+  deposited,
 }) => {
   interface ICountdown {
     days: number
@@ -36,107 +36,128 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
     seconds,
     completed,
   }: ICountdown): ReactNode => {
-    if (completed) {
-      return 'Done'
-    } else {
-      return (
-        <span>{`${
-          days > 0 ? `${days} days` : ''
-        } ${hours}h ${minutes}min ${seconds}s`}</span>
-      )
+    if (contract.compound === 0) {
+      return 'Every second'
     }
+    if (completed) {
+      return '-'
+    } else if (days === 0 && hours === 0) {
+      return <Text>{`${minutes}min ${seconds}s`}</Text>
+    } else if (days === 0) {
+      return <Text>{`${hours}h ${minutes}min`}</Text>
+    }
+    return <Text>{`${days} days ${hours}h ${minutes}min`}</Text>
+  }
+
+  const calculateNextYield = (): number => {
+    if (!contractData?.timeLeft) {
+      return 0
+    }
+    const result = contractData.timeLeft % contract.compound
+    return result == 0 ? contract.compound : result
   }
 
   return (
-    <Flex
-      flexDir="column"
-      w="full"
-      maxW="full"
-      gap="0.75rem"
-      mt="0.5rem"
-      borderRadius="0.25rem"
-      p="1rem"
-    >
-      {contractData && (
-        <Flex w="full" flexDir="column">
-          <Flex mb="1.5rem">
-            <Flex flexDir="column" w="full">
-              <Text
-                bg="gray.100"
-                borderRadius="full"
-                fontWeight="bold"
-                fontSize="xs"
-                px="0.75rem"
-                py="0.25rem"
-                w="fit-content"
-                mb="0.15rem"
-              >
-                Due in
-              </Text>
-              <Box ms="0.5rem">
-                <Countdown
-                  date={Date.now() + contractData.timeLeft * 1000}
-                  renderer={renderer}
-                />
-              </Box>
+    <Flex flexDir={{ base: 'row', md: 'row' }} w="full">
+      <Text fontSize="sm" mb="0.5rem" ms="0.25rem">
+        Deposit info
+      </Text>
+      <Flex
+        flexDir="column"
+        w="full"
+        maxW="full"
+        gap="0.75rem"
+        mt="0.5rem"
+        borderRadius="0.25rem"
+        p="1rem"
+      >
+        {contractData && (
+          <Flex w="full" flexDir="column">
+            <Flex mb="1.5rem">
+              <Flex flexDir="column" w="full">
+                <Text
+                  bg="gray.100"
+                  borderRadius="full"
+                  fontWeight="bold"
+                  fontSize="xs"
+                  px="0.75rem"
+                  py="0.25rem"
+                  w="fit-content"
+                  mb="0.15rem"
+                >
+                  Deposited
+                </Text>
+                <Text ms="0.5rem">{`${toCrypto(deposited)} ${
+                  contract.asset.code
+                }`}</Text>
+              </Flex>
+
+              <Flex flexDir="column" w="full">
+                <Text
+                  bg="gray.100"
+                  borderRadius="full"
+                  fontWeight="bold"
+                  fontSize="xs"
+                  px="0.75rem"
+                  py="0.25rem"
+                  w="fit-content"
+                  mb="0.15rem"
+                >
+                  Current yield
+                </Text>
+                <Text ms="0.5rem">{`${(contractData.yield / 100).toFixed(
+                  2
+                )}%`}</Text>
+              </Flex>
             </Flex>
 
-            <Flex flexDir="column" w="full">
-              <Text
-                bg="gray.100"
-                borderRadius="full"
-                fontWeight="bold"
-                fontSize="xs"
-                px="0.75rem"
-                py="0.25rem"
-                w="fit-content"
-                mb="0.15rem"
-              >
-                Current yield
-              </Text>
-              <Text ms="0.5rem">{`${contractData.yield}%`}</Text>
+            <Flex mb="1.5rem">
+              <Flex flexDir="column" w="full">
+                <Text
+                  bg="gray.100"
+                  borderRadius="full"
+                  fontWeight="bold"
+                  fontSize="xs"
+                  px="0.75rem"
+                  py="0.25rem"
+                  w="fit-content"
+                  mb="0.15rem"
+                >
+                  Current in your vault
+                </Text>
+                <Text ms="0.5rem">
+                  {`${toCrypto(Number(currentBalance))} ${
+                    contract?.asset.code
+                  }`}
+                </Text>
+              </Flex>
+
+              <Flex flexDir="column" w="full">
+                <Text
+                  bg="gray.100"
+                  borderRadius="full"
+                  fontWeight="bold"
+                  fontSize="xs"
+                  px="0.75rem"
+                  py="0.25rem"
+                  w="fit-content"
+                  mb="0.15rem"
+                >
+                  Next yield in
+                </Text>
+                <Flex ms="0.5rem">
+                  <Countdown
+                    date={Date.now() + calculateNextYield() * 1000}
+                    renderer={renderer}
+                  />
+                </Flex>
+              </Flex>
             </Flex>
+
+            <ContractHistory contract={contract} history={history} />
           </Flex>
-
-          <Flex>
-            <Flex flexDir="column" w="full">
-              <Text
-                bg="gray.100"
-                borderRadius="full"
-                fontWeight="bold"
-                fontSize="xs"
-                px="0.75rem"
-                py="0.25rem"
-                w="fit-content"
-                mb="0.15rem"
-              >
-                Deposited
-              </Text>
-              <Text ms="0.5rem">{`${toCrypto(contractData.deposited)} ${
-                contract.asset.code
-              }`}</Text>
-            </Flex>
-
-            <Flex flexDir="column" w="full">
-              <Text
-                bg="gray.100"
-                borderRadius="full"
-                fontWeight="bold"
-                fontSize="xs"
-                px="0.75rem"
-                py="0.25rem"
-                w="fit-content"
-                mb="0.15rem"
-              >
-                Estimated premature withdraw
-              </Text>
-              <Text ms="0.5rem">{`${toCrypto(
-                contractData.estimatedPrematureWithdraw / 10000000
-              )} ${contract.asset.code}`}</Text>
-            </Flex>
-          </Flex>
-        </Flex>
-      )}
+        )}
+      </Flex>
     </Flex>
   )
 }

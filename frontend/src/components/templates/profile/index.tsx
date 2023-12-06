@@ -9,12 +9,13 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 
+import { havePermission } from 'utils'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { Loading } from 'components/atoms'
+import { Permissions } from 'components/enums/permissions'
 import { EditIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
-import { useNavigate } from 'react-router-dom'
 
 interface IProfileTemplate {
   handleSignOut(): Promise<void>
@@ -25,6 +26,7 @@ interface IProfileTemplate {
   profile: Hooks.UseAuthTypes.IUserDto | undefined
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
+  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 }
 
 export const ProfileTemplate: React.FC<IProfileTemplate> = ({
@@ -36,6 +38,7 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
   loadingRoles,
   creatingVault,
   roles,
+  userPermissions,
 }) => {
   const { colorMode } = useColorMode()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -111,16 +114,25 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                   borderBottom="1px solid"
                   borderColor={colorMode == 'light' ? 'gray.400' : 'black.800'}
                   py="1rem"
-                  alignItems="center">
-                  <Text w="50%">My vault</Text>
-                  <Button
-                    variant="primary"
-                    w="max-content"
-                    onClick={handleCreateVault}
-                    isLoading={creatingVault}
-                  >
-                    {profile?.vault_id ? 'Access my vault' : 'Create my vault'}
-                  </Button>
+                  alignItems="center"
+                >
+                  <Text w="50%">My wallet</Text>
+                  {(havePermission(
+                    Permissions.CREATE_WALLET,
+                    userPermissions
+                  ) ||
+                    profile?.vault_id) && (
+                    <Button
+                      variant="primary"
+                      w="max-content"
+                      onClick={handleCreateVault}
+                      isLoading={creatingVault}
+                    >
+                      {profile?.vault_id
+                        ? 'Access my wallet'
+                        : 'Create my wallet'}
+                    </Button>
+                  )}
                 </Flex>
                 <Flex pt="1rem" alignItems="center">
                   <Text w="50%">Sign out of account</Text>

@@ -336,7 +336,7 @@ export const VaultDetail: React.FC = () => {
       asset.code,
       asset.issuer.key.publicKey
     )
-    const vaults = await getVaults()
+    const vaults = await getVaults(true)
     const filteredVaults =
       vaults
         ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>

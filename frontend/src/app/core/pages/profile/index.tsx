@@ -3,14 +3,16 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
+import { useVaults } from 'hooks/useVaults'
+import { formatVaultName } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ProfileTemplate } from 'components/templates/profile'
-import { useVaults } from 'hooks/useVaults'
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate()
+  const { userPermissions, getUserPermissions } = useAuth()
   const {
     signOut,
     editProfile,
@@ -24,6 +26,10 @@ export const Profile: React.FC = () => {
 
   const { creatingVault, createVault } = useVaults()
 
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
@@ -32,14 +38,14 @@ export const Profile: React.FC = () => {
   }
 
   const handleCreateVault = async (): Promise<void> => {
-    if(profile?.vault_id){
+    if (profile?.vault_id) {
       navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
       return
     }
     const vault = {
-      name: profile?.name || 'My vault',
+      name: formatVaultName(profile?.name || ''),
       assets_id: [],
-      owner_id: Number(profile?.id)
+      owner_id: Number(profile?.id),
     }
 
     const vaultCreated = await createVault(vault)
@@ -69,14 +75,15 @@ export const Profile: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.PROFILE}>
         <ProfileTemplate
-          handleSignOut={handleSignOut}
           loading={loading}
           profile={profile}
-          handleEditRole={handleEditRole}
           roles={roles}
           loadingRoles={loadingRoles}
-          handleCreateVault={handleCreateVault}
           creatingVault={creatingVault}
+          userPermissions={userPermissions}
+          handleSignOut={handleSignOut}
+          handleEditRole={handleEditRole}
+          handleCreateVault={handleCreateVault}
         />
       </Sidebar>
     </Flex>

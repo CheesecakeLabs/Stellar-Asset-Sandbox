@@ -1,6 +1,7 @@
 import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import Authentication from 'app/auth/services/auth'
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   const [permissions, setPermissions] = useState<
     Hooks.UseAuthTypes.IPermission[] | undefined
   >()
+  const { getAccountData } = useHorizon()
 
   const signIn = async (
     params: Hooks.UseAuthTypes.ISignIn
@@ -166,16 +168,28 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getProfile = useCallback(async (): Promise<void> => {
+  const getProfile = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IUserDto | undefined
+  > => {
     setLoading(true)
     try {
       const response = await http.get(`users/profile`)
       const data = response.data
       if (data) {
+        if (data.vault) {
+          const accountData = await getAccountData(
+            data.vault.wallet.key.publicKey
+          )
+          data.vault.accountData = accountData
+        }
         setProfile(data)
+        return data
       }
     } catch (error) {
-      return
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
     } finally {
       setLoading(false)
     }
@@ -193,7 +207,10 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         return data
       }
     } catch (error) {
-      return
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
     } finally {
       setLoadingUserPermissions(false)
     }

@@ -159,7 +159,7 @@ export const Header: React.FC<IHeader> = ({
             fontWeight="700"
             w="fit-content"
           >
-            {vault.vault_category?.name || 'Personal vault'}
+            {vault.vault_category?.name || 'Wallet'}
           </Tag>
           <Popover
             isOpen={isOpen}

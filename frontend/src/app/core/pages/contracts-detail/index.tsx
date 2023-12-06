@@ -22,73 +22,107 @@ export const ContractsDetail: React.FC = () => {
     withdraw,
     deposit,
     getEstimatedPrematureWithdraw,
+    addContractHistory,
+    updateContractHistory,
   } = useContracts()
   const { profile, getProfile } = useAuth()
+  const { getHistory } = useContracts()
+  const { userPermissions, getUserPermissions } = useAuth()
   const toast = useToast()
 
   const [loadingPosition, setLoadingPosition] = useState(true)
-  const [pauseProcess, setPauseProcess] = useState(false)
   const [contract, setContract] = useState<Hooks.UseContractsTypes.IContract>()
   const [contractData, setContractData] =
     useState<Hooks.UseContractsTypes.IContractData>()
+  const [history, setHistory] = useState<Hooks.UseContractsTypes.IHistory[]>()
+  const [currentInVault, setCurrentInVault] = useState<string>()
 
   const { id } = useParams()
 
   useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
+  useEffect(() => {
     getProfile()
+
+    if (id) {
+      getContract(id).then(contract => {
+        setContract(contract)
+      })
+    }
   }, [getProfile])
 
-  const loadContractData = async (): Promise<void> => {
-    console.log('carregou')
+  const loadContractData = useCallback(async (): Promise<void> => {
     if (profile && contract) {
       const wallet = profile.vault.wallet.key.publicKey
 
+      let timeLeft = contractData?.timeLeft
+
       const position =
-        ((await getPosition(wallet, contract.address)) || BigInt(0)) /
-        BigInt(10000000)
+        Number((await getPosition(wallet, contract.address)) || 0) / 10000000
 
       const userYield =
-        ((await getYield(wallet, contract.address)) || BigInt(0)) /
-        BigInt(10000000)
+        Number((await getYield(wallet, contract.address)) || 0) / 10000000
 
       const estimatedPrematureWithdraw = await getEstimatedPrematureWithdraw(
         wallet,
         contract.address
       )
 
-      const timeLeft = await getTimeLeft(wallet, contract.address)
+      if (!timeLeft) {
+        timeLeft =
+          position > 0
+            ? Number((await getTimeLeft(wallet, contract.address)) || 0)
+            : 0
+      }
 
       setContractData({
         position: Number(position),
-        deposited: Number(position) - Number(userYield),
         yield: Number(userYield || 0),
         estimatedPrematureWithdraw: Number(estimatedPrematureWithdraw || 0),
         timeLeft: Number(timeLeft),
       })
 
+      setCurrentInVault(
+        contract?.vault.accountData?.balances.find(
+          balance =>
+            balance.asset_code === contract?.asset?.code &&
+            balance.asset_issuer === contract?.asset?.issuer.key.publicKey
+        )?.balance
+      )
+
       setLoadingPosition(false)
     }
-  }
+  }, [
+    contract,
+    contractData?.position,
+    contractData?.timeLeft,
+    getEstimatedPrematureWithdraw,
+    getPosition,
+    getTimeLeft,
+    getYield,
+    profile,
+  ])
 
-  useEffect(() => {
-    loadContractData()
-  }, [profile, contract])
-
-  useEffect(() => {
-    if (id) {
-      getContract(id).then(contract => {
-        setContract(contract)
-      })
-    }
-  }, [getContract, id, profile])
-
-  const updatePeriodically = useCallback((): void => {
-    setInterval(loadContractData, 60000)
+  const updatePeriodically = useCallback((): NodeJS.Timer => {
+    return setInterval(loadContractData, 3000)
   }, [loadContractData])
 
   useEffect(() => {
-    updatePeriodically()
-  }, [])
+    const interval = updatePeriodically()
+    loadContractData()
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [profile, contract])
+
+  useEffect(() => {
+    if (contract) {
+      getHistory(contract.id).then(history => setHistory(history))
+    }
+  }, [getHistory, contract])
 
   const onSubmitDeposit = async (
     data: FieldValues,
@@ -106,7 +140,14 @@ export const ContractsDetail: React.FC = () => {
 
       if (isSuccess) {
         loadContractData()
+        await addContractHistory({
+          deposit_amount: Number(data.amount),
+          contract_id: contract.id,
+        })
+
         setValue('amount', '')
+        await getProfile()
+        await getHistory(contract.id)
 
         toast({
           title: 'Deposit success!',
@@ -128,11 +169,10 @@ export const ContractsDetail: React.FC = () => {
     }
   }
 
-  const onSubmitWithdraw = async (isPremature: boolean): Promise<void> => {
+  const onSubmitWithdraw = async (): Promise<void> => {
     if (!contract || !profile) return
 
     try {
-      setPauseProcess(isPremature)
       const isSuccess = await withdraw(
         profile.vault.wallet.key.publicKey,
         true,
@@ -141,6 +181,11 @@ export const ContractsDetail: React.FC = () => {
 
       if (isSuccess) {
         loadContractData()
+        await updateContractHistory({
+          withdraw_amount: contractData?.position || 0,
+          contract_id: contract.id,
+        })
+        await getProfile()
         toast({
           title: 'Withdraw success!',
           status: 'success',
@@ -153,13 +198,11 @@ export const ContractsDetail: React.FC = () => {
       }
 
       toastError(MessagesError.errorOccurred)
-      setPauseProcess(false)
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
       toastError(message)
-      setPauseProcess(false)
     }
   }
 
@@ -174,6 +217,20 @@ export const ContractsDetail: React.FC = () => {
     })
   }
 
+  const getCurrentBalance = (): string => {
+    return (
+      profile?.vault?.accountData?.balances.find(
+        balance =>
+          balance.asset_code === contract?.asset?.code &&
+          balance.asset_issuer === contract?.asset?.issuer.key.publicKey
+      )?.balance || ''
+    )
+  }
+
+  const getDepositedValue = (): number | undefined => {
+    return history ? history[0]?.deposit_amount : undefined
+  }
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.SOROBAN_SMART_CONTRACTS}>
@@ -186,6 +243,11 @@ export const ContractsDetail: React.FC = () => {
           isDepositing={isDepositing}
           isWithdrawing={isWithdrawing}
           contractData={contractData}
+          currentBalance={getCurrentBalance()}
+          history={history}
+          deposited={getDepositedValue()}
+          userPermissions={userPermissions}
+          currentInVault={currentInVault}
         />
       </Sidebar>
     </Flex>

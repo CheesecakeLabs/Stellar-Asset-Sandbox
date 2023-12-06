@@ -118,7 +118,6 @@ export const ContractsCreate: React.FC = () => {
         signerSecret: vault.wallet.key.publicKey,
       })
 
-      console.log(transactionResult)
       if (transactionResult.status === 'SUCCESS') {
         const transactionSuccess =
           transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse

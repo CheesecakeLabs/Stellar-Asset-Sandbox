@@ -36,10 +36,27 @@ declare namespace Hooks {
 
     interface IContractData {
       position: number
-      deposited: number
       yield: number
       estimatedPrematureWithdraw: number
-      timeLeft: number
+      timeLeft?: number
+    }
+
+    interface IHistory {
+      id: number
+      deposited_at: string
+      deposit_amount: number
+      withdrawn_at: string | undefined
+      withdraw_amount: number | undefined
+    }
+
+    interface IHistoryRequest {
+      deposit_amount: number
+      contract_id: number
+    }
+
+    interface IHistoryUpdate {
+      withdraw_amount: number
+      contract_id: number
     }
 
     interface IContractsContext {
@@ -67,7 +84,10 @@ declare namespace Hooks {
         contractId: string
       ): Promise<bigint | undefined>
       getYield(address: string, contractId: string): Promise<bigint | undefined>
-      getTimeLeft(address: string, contractId: string): Promise<bigint | undefined>
+      getTimeLeft(
+        address: string,
+        contractId: string
+      ): Promise<bigint | undefined>
       getAccount(update: React.Dispatch<React.SetStateAction<string>>): void
       withdraw(
         address: string,
@@ -75,6 +95,11 @@ declare namespace Hooks {
         contractId: string,
         signerSecret?: string
       ): Promise<boolean>
+      getHistory(
+        contractId: number
+      ): Promise<Hooks.UseContractsTypes.IHistory[] | undefined>
+      addContractHistory(params: IHistoryRequest): Promise<IHistory | undefined>
+      updateContractHistory(params: IHistoryUpdate): Promise<IHistory | undefined>
     }
   }
 }

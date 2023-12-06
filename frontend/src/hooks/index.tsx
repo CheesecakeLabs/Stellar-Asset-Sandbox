@@ -14,8 +14,8 @@ interface IProps {
 
 export const AppProvider: React.FC<IProps> = ({ children }) => {
   return (
-    <AuthProvider>
-      <HorizonProvider>
+    <HorizonProvider>
+      <AuthProvider>
         <TransactionsProvider>
           <AssetsProvider>
             <DashboardsProvider>
@@ -25,7 +25,7 @@ export const AppProvider: React.FC<IProps> = ({ children }) => {
             </DashboardsProvider>
           </AssetsProvider>
         </TransactionsProvider>
-      </HorizonProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </HorizonProvider>
   )
 }

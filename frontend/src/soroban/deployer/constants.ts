@@ -1,9 +1,9 @@
 import { ContractSpec } from 'soroban-client';
 import { customAlphabet } from 'nanoid';
 
-export const contractId = 'CDBXYQJ5ZTHD67NRZ65VXQIJFFPF7SREUQZLNU3INOUKWRTFHJ5W7RYK'
+export const contractId = 'CBITSMRFR43VVEMOEKE2DDS6CLGB3RE62M5T2M4QWPY5HT5DNFLPFSPP'
 export const codWasmHash =
-  '35ac3082ec59e1cdfb7cb10b612c526478cfe7a46032311b40f405abb886a010'
+  'e48a04ba66f600902355bbfd4d152e82bdf64bc2fd8cbd9149a54e56123d7ecb'
 export const codSalt = customAlphabet('0123456789', 32);
 
 export enum Methods {

@@ -131,13 +131,13 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
       <Flex flexDir={{ base: 'column', md: 'row' }} w="full" gap={3} mt="1rem">
         <InfoCard
           title={`Total Supply`}
-          icon={<WalletIcon />}
+          icon={<WalletIcon fill="gray"/>}
           value={toCrypto(Number(asset.assetData?.amount || 0))}
           helper={TooltipsData.totalSupply}
         />
         <InfoCard
           title={`Main Vault`}
-          icon={<WalletIcon />}
+          icon={<WalletIcon fill="gray" />}
           value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
           helper={TooltipsData.mainVault}
         />

@@ -66,7 +66,7 @@ declare namespace Hooks {
       signOut: () => Promise<boolean>
       getRoles: () => Promise<Hooks.UseAuthTypes.IRole[] | undefined>
       getAllUsers: () => Promise<void>
-      getProfile: () => Promise<void>
+      getProfile: () => Promise<IUserDto | undefined>
       editUsersRole: (params: IUserRole) => Promise<boolean>
       getUserPermissions: () => Promise<
         Hooks.UseAuthTypes.IUserPermission[] | undefined

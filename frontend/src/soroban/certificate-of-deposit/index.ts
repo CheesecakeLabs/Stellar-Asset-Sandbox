@@ -78,7 +78,7 @@ const getEstimatedYield = async (rawArgs: {
   invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
 
   invokeArgs = rawArgs.sourcePk
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
+    ? { ...invokeArgs, ...{ sourcePk: rawArgs.sourcePk } }
     : invokeArgs
 
   return SorobanService.simulatedValue(

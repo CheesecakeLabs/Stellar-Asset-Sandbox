@@ -34,9 +34,9 @@ export const VaultCreate: React.FC = () => {
         vault_category_id: vaultCategoryId,
         assets_id: assetsId,
       }
-      const assetForged = await createVault(vault)
+      const vaultCreated = await createVault(vault)
 
-      if (assetForged) {
+      if (vaultCreated) {
         toast({
           title: 'Success!',
           description: `You created ${name}`,
