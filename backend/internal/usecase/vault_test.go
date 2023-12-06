@@ -68,7 +68,7 @@ func TestVaultUseCaseList(t *testing.T) {
 			name: "list - two vaults",
 			req:  nil,
 			mock: func() {
-				vr.EXPECT().GetVaults().Return([]entity.Vault{vault1, vault2}, nil)
+				vr.EXPECT().GetVaults(true).Return([]entity.Vault{vault1, vault2}, nil)
 			},
 			res: []entity.Vault{vault1, vault2},
 			err: nil,
@@ -77,7 +77,7 @@ func TestVaultUseCaseList(t *testing.T) {
 			name: "list - empty",
 			req:  nil,
 			mock: func() {
-				vr.EXPECT().GetVaults().Return([]entity.Vault{}, nil)
+				vr.EXPECT().GetVaults(true).Return([]entity.Vault{}, nil)
 			},
 			res: []entity.Vault{},
 			err: nil,
@@ -86,7 +86,7 @@ func TestVaultUseCaseList(t *testing.T) {
 			name: "list - database error",
 			req:  nil,
 			mock: func() {
-				vr.EXPECT().GetVaults().Return(nil, dbError)
+				vr.EXPECT().GetVaults(true).Return(nil, dbError)
 			},
 			res: []entity.Vault(nil),
 			err: dbError,
@@ -98,7 +98,7 @@ func TestVaultUseCaseList(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, err := u.GetAll()
+			res, err := u.GetAll(true)
 
 			require.EqualValues(t, tc.res, res)
 			if tc.err == nil {
