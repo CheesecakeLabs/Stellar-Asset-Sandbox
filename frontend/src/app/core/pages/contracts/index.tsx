@@ -10,11 +10,15 @@ import { ContractsTemplate } from 'components/templates/contracts'
 
 export const Contracts: React.FC = () => {
   const { loading, getContracts, contracts } = useContracts()
-  const { userPermissions, getUserPermissions } = useAuth()
+  const { userPermissions, profile, getProfile, getUserPermissions } = useAuth()
 
   useEffect(() => {
     getContracts()
   }, [getContracts])
+
+  useEffect(() => {
+    getProfile()
+  }, [getProfile])
 
   useEffect(() => {
     getUserPermissions()
@@ -27,6 +31,7 @@ export const Contracts: React.FC = () => {
           loading={loading}
           contracts={contracts}
           userPermissions={userPermissions}
+          profile={profile}
         />
       </Sidebar>
     </Flex>

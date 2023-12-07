@@ -31,12 +31,14 @@ interface IContractsTemplate {
   loading: boolean
   contracts: Hooks.UseContractsTypes.IContract[] | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  profile: Hooks.UseAuthTypes.IUserDto | undefined
 }
 
 export const ContractsTemplate: React.FC<IContractsTemplate> = ({
   loading,
   contracts,
   userPermissions,
+  profile,
 }) => {
   const navigate = useNavigate()
 
@@ -47,17 +49,18 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Certificate of Deposits
           </Text>
-          {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) && (
-            <Button
-              variant="primary"
-              leftIcon={<NewIcon />}
-              onClick={(): void =>
-                navigate({ pathname: PathRoute.CONTRACT_CREATE })
-              }
-            >
-              New Certificate of Deposit
-            </Button>
-          )}
+          {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) &&
+            profile?.vault_id && (
+              <Button
+                variant="primary"
+                leftIcon={<NewIcon />}
+                onClick={(): void =>
+                  navigate({ pathname: PathRoute.CONTRACT_CREATE })
+                }
+              >
+                New Certificate of Deposit
+              </Button>
+            )}
         </Flex>
         <Container variant="primary" p={0} maxW="full">
           {loading ? (
