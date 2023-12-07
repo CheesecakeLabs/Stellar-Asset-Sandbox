@@ -49,7 +49,7 @@ type (
 		GetAssetById(string) (entity.Asset, error)
 		StoreAssetImage(string, []byte) error
 		GetAssetImage(string) ([]byte, error)
-		GetPaginatedAssets(int, int) ([]entity.Asset, error)
+		GetPaginatedAssets(int, int) ([]entity.Asset, int, error)
 	}
 
 	// Role -.
