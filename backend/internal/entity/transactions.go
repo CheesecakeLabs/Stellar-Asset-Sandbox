@@ -10,4 +10,6 @@ const (
 	SetTrustLineFlagsOp             = "setTrustLineFlags"
 	FundWithFriendbotHor            = "fundWithFriendbot"
 	ClawbackOp                      = "clawback"
+	SubmitTransaction               = "submitTransaction"
+	SignTransaction                 = "signTransaction"
 )

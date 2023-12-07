@@ -3,7 +3,7 @@ version: "3.7"
 services:
   postgres:
     container_name: postgres
-    profiles: ["all", "starlabs", "tests", "kafka"]
+    profiles: [ "all", "starlabs", "tests", "kafka" ]
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -19,14 +19,14 @@ services:
       test:
         [
           "CMD-SHELL",
-          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"
         ]
       interval: 10s
       timeout: 3s
       retries: 3
 
   tfv2_frontend:
-    profiles: ["all", "frontend"]
+    profiles: [ "all", "frontend" ]
     container_name: tfv2_frontend
     build:
       context: ./frontend
@@ -45,7 +45,7 @@ services:
 
   backend:
     platform: linux/amd64
-    profiles: ["all", "tests"]
+    profiles: [ "all", "tests" ]
     container_name: token-factory-v2
     build:
       context: ./backend
@@ -61,7 +61,7 @@ services:
 
   stellar-kms:
     platform: linux/amd64
-    profiles: ["all", "starlabs", "tests"]
+    profiles: [ "all", "starlabs", "tests" ]
     container_name: kms
     build:
       context: ./stellar-kms
@@ -76,13 +76,15 @@ services:
       KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KMS_KAFKA_PRODUCER_TOPIC:-generatedKeypairs}
       KAFKA_SIGN_CONSUMER_TOPICS: ${KAFKA_SIGN_CONSUMER_TOPICS:-signEnvelope}
       KAFKA_SIGN_PRODUCER_TOPIC: ${KAFKA_SIGN_PRODUCER_TOPIC:-signedEnvelopes}
-      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      KAFKA_SIGN_SOROBAN_CONSUMER_TOPICS: ${KAFKA_SIGN_SOROBAN_CONSUMER_TOPICS:-signSorobanEnvelope}
+      KAFKA_SIGN_SOROBAN_PRODUCER_TOPIC: ${KAFKA_SIGN_SOROBAN_PRODUCER_TOPIC:-signedSorobanEnvelopes}
       PG_HOST: ${PG_HOST:-postgres}
       PG_PORT: ${PG_PORT:-5432}
       PG_USER: ${PG_USER:-postgres}
       PG_PASSWORD: ${PG_PASSWORD:-password}
       PG_DB_NAME: ${PG_DATABASE:-postgres}
       MASTER_KEY: ${MASTER_KEY:-da52f130e6fd477256b0c554aba89503}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,7 +92,7 @@ services:
         condition: service_healthy
 
   zoo1:
-    profiles: ["all", "starlabs", "tests", "kafka"]
+    profiles: [ "all", "starlabs", "tests", "kafka" ]
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zoo1
     container_name: zoo1
@@ -102,7 +104,7 @@ services:
       ZOOKEEPER_SERVERS: zoo1:2888:3888
 
   kafka1:
-    profiles: ["all", "starlabs", "tests", "kafka"]
+    profiles: [ "all", "starlabs", "tests", "kafka" ]
     image: confluentinc/cp-kafka:7.3.2
     hostname: kafka1
     container_name: kafka1
@@ -135,7 +137,7 @@ services:
 
   #Kafka - Schema Registry#
   schema_registry:
-    profiles: ["all", "kafka", "starlabs", "kms"]
+    profiles: [ "all", "kafka", "starlabs", "kms" ]
     image: confluentinc/cp-schema-registry:7.1.2
     container_name: schema_registry
     ports:
@@ -158,10 +160,10 @@ services:
 
   #Kafka - Init#
   kafka_init:
-    profiles: ["all", "kafka", "starlabs", "kms"]
+    profiles: [ "all", "kafka", "starlabs", "kms" ]
     image: confluentinc/cp-kafka:7.1.2
     container_name: kafka_init
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: [ "/bin/sh", "-c" ]
     environment:
       KAFKA_CREATE_KP_PRODUCER_TOPIC: ${KAFKA_CREATE_KP_PRODUCER_TOPIC:-generateKeypair}
       KAFKA_CREATE_KP_CONSUMER_TOPICS: ${KAFKA_CREATE_KP_CONSUMER_TOPICS:-generatedKeypairs}
@@ -169,6 +171,8 @@ services:
       KAFKA_ENVELOPE_CONSUMER_TOPICS: ${KAFKA_ENVELOPE_CONSUMER_TOPICS:-submitResponse}
       KAFKA_HORIZON_PRODUCER_TOPIC: ${KAFKA_HORIZON_PRODUCER_TOPIC:-horizonRequest}
       KAFKA_HORIZON_CONSUMER_TOPICS: ${KAFKA_HORIZON_CONSUMER_TOPICS:-horizonResponse}
+      SIGNED_SOROBAN_PRODUCER_TOPIC: ${SIGNED_SOROBAN_PRODUCER_TOPIC:-signSorobanEnvelope}
+      SIGNED_SOROBAN_CONSUMER_TOPICS: ${SIGNED_SOROBAN_CONSUMER_TOPICS:-signedSorobanEnvelopes}
       KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS: ${KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS:-signedEnvelopes}
       KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS: ${KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS:-signEnvelope}
     depends_on:
@@ -186,12 +190,14 @@ services:
       kafka-topics --create --topic $$KAFKA_HORIZON_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_SIGNED_ENVELOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka-topics --create --topic $$KAFKA_HORIZON_SIGN_ENVLOPES_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$SIGNED_SOROBAN_PRODUCER_TOPIC --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
+      kafka-topics --create --topic $$SIGNED_SOROBAN_CONSUMER_TOPICS --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka1:19092
       kafka1 cub kafka-ready -b kafka1:129092 1 20
       "
 
   # Kafka - UI#
   kafka_ui:
-    profiles: ["all", "kafka", "starlabs", "kms"]
+    profiles: [ "all", "kafka", "starlabs", "kms" ]
     image: provectuslabs/kafka-ui
     container_name: kafka_ui
     ports:
@@ -211,7 +217,7 @@ services:
   #Starlabs Service#
   starlabs:
     platform: linux/amd64
-    profiles: ["all", "starlabs", "tests"]
+    profiles: [ "all", "starlabs", "tests" ]
     container_name: starlabs
     build:
       context: ./starlabs
@@ -229,12 +235,13 @@ services:
       KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-signedEnvelopes}
       KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-submitResponse}
       LOG_LEVEL: ${LOG_LEVEL:-debug}
+
     depends_on:
       kafka1:
         condition: service_healthy
 
   integration:
-    profiles: ["tests"]
+    profiles: [ "tests" ]
     platform: linux/amd64
     build:
       context: ./backend

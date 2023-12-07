@@ -23,6 +23,7 @@ func newWalletsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, m HTTPC
 		h.GET("", r.list)
 		h.POST("", r.create)
 		h.POST("fund/", r.fundWallet)
+		h.GET("sponsor_pk/", r.getSponsorPublicKey)
 	}
 }
 
@@ -157,4 +158,22 @@ func (r *walletsRoutes) fundWallet(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, wallet)
+}
+
+// @Summary     Get Sponsor Public Key
+// @Description Get Sponsor Public Key
+// @Tags  	    Wallets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} string
+// @Failure     500 {object} response
+// @Router      /wallets/sponsor_pk/ [get]
+func (r *walletsRoutes) getSponsorPublicKey(c *gin.Context) {
+	sponsor, err := r.w.Get(_sponsorId)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, sponsor.Key.PublicKey)
 }

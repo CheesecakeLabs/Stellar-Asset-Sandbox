@@ -38,8 +38,9 @@ func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a useca
 
 type CreateVaultRequest struct {
 	Name            string `json:"name" binding:"required" example:"Treasury"`
-	VaultCategoryId int    `json:"vault_category_id" binding:"required" example:"1"`
+	VaultCategoryId *int   `json:"vault_category_id" example:"1"`
 	AssetsId        []int  `json:"assets_id" binding:"required"`
+	OwnerId         *int   `json:"owner_id"`
 }
 
 type UpdateVaultCategoryRequest struct {
@@ -75,11 +76,15 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		return
 	}
 
-	vaultCategory, err := r.vc.GetById(request.VaultCategoryId)
-	if err != nil {
-		r.l.Error(err, "http - v1 - create vault - vault category")
-		errorResponse(c, http.StatusNotFound, "source wallet not found", err)
-		return
+	var vaultCategory entity.VaultCategory
+
+	if request.VaultCategoryId != nil {
+		vaultCategory, err = r.vc.GetById(*request.VaultCategoryId)
+		if err != nil {
+			r.l.Error(err, "http - v1 - create vault - vault category")
+			errorResponse(c, http.StatusNotFound, "vault category not found", err)
+			return
+		}
 	}
 
 	sponsorID := _sponsorId
@@ -106,15 +111,33 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	}
 	walletPk := kpRes.PublicKeys[0]
 
-	ops := []entity.Operation{
-		{
-			Type:    entity.CreateAccountOp,
-			Target:  walletPk,
-			Amount:  _startingBalance,
-			Origin:  sponsor.Key.PublicKey,
-			Sponsor: sponsor.Key.PublicKey,
+	wallet, err := r.w.Create(entity.Wallet{
+		Type: entity.DistributorType,
+		Key: entity.Key{
+			PublicKey: walletPk,
+			Weight:    1,
 		},
+	})
+
+	fundRes, err := r.m.SendMessage(entity.HorizonChannel, entity.HorizonRequest{
+		Id:      wallet.Id,
+		Type:    "fundWithFriendbot",
+		Account: walletPk,
+	})
+	if err != nil {
+		r.l.Error(err, "http - v1 - fund wallet - SendMessage")
+		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
 	}
+
+	fundResult := fundRes.Message.(entity.HorizonResponse)
+
+	if fundResult.StatusCode != 200 {
+		r.l.Error(err, "http - v1 - fund wallet - fundRes.StatusCode != 200")
+		errorResponse(c, http.StatusInternalServerError, "friendbot error", err)
+		return
+	}
+
+	ops := []entity.Operation{}
 
 	for _, assetId := range request.AssetsId {
 		asset, err := r.as.GetById(strconv.Itoa(assetId))
@@ -135,38 +158,34 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		})
 	}
 
-	Id := generateID()
-	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
-		Id:         Id,
-		MainSource: sponsor.Key.PublicKey,
-		PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
-		Operations: ops,
-	})
-	if err != nil {
-		r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
-		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-		return
-	}
-	_, ok = res.Message.(entity.EnvelopeResponse)
-	if !ok {
-		r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
-		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-		return
-	}
+	if len(ops) > 0 {
+		Id := generateID()
+		res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+			Id:         Id,
+			MainSource: sponsor.Key.PublicKey,
+			PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
+			Operations: ops,
+		})
 
-	wallet := entity.Wallet{
-		Type:   entity.DistributorType,
-		Funded: true,
-		Key: entity.Key{
-			PublicKey: walletPk,
-			Weight:    1,
-		},
+		if err != nil {
+			r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
+			errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+			return
+		}
+
+		_, ok = res.Message.(entity.EnvelopeResponse)
+		if !ok {
+			r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
+			errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
+			return
+		}
 	}
 
 	vault := entity.Vault{
 		Name:          request.Name,
-		VaultCategory: vaultCategory,
+		VaultCategory: &vaultCategory,
 		Wallet:        wallet,
+		OwnerId:       request.OwnerId,
 	}
 
 	vault, err = r.v.Create(vault)
@@ -193,6 +212,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 	pageQuery := c.Query("page")
 	limitQuery := c.Query("limit")
+	isAll := c.Query("all") == "all"
 
 	// Check if pagination parameters are provided
 	if pageQuery != "" && limitQuery != "" {
@@ -220,7 +240,7 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 		c.JSON(http.StatusOK, vaults)
 	} else {
 		// Get all vaults without pagination
-		vaults, err := r.v.GetAll()
+		vaults, err := r.v.GetAll(isAll)
 		if err != nil {
 			r.l.Error(err, "http - v1 - get all vaults - GetAll")
 			errorResponse(c, http.StatusInternalServerError, "error getting all vaults", err)

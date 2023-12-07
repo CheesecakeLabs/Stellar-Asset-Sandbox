@@ -11,4 +11,5 @@ type Contract struct {
 	MinDeposit  int    `json:"min_deposit" db:"min_deposit"`
 	PenaltyRate int    `json:"penalty_rate" db:"penalty_rate"`
 	CreatedAt   string `json:"created_at" db:"created_at"`
+	Compound    int    `json:"compound" db:"compound"`
 }

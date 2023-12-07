@@ -37,7 +37,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -64,7 +64,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 		var issuer entity.Wallet
 
 		err := rows.Scan(
-			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -86,7 +86,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type,a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type,a.code as asset_code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -106,7 +106,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 	var issuer entity.Wallet
 
 	err := row.Scan(
-		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -139,7 +139,7 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -159,7 +159,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	var issuer entity.Wallet
 
 	err := row.Scan(
-		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -211,8 +211,23 @@ func (r AssetRepo) GetAssetImage(assetId string) ([]byte, error) {
 	return image, nil
 }
 
+func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
+	stmt := `
+    	UPDATE asset
+    	SET contract_id = $2
+    	WHERE id = $1
+	`
+
+	_, err := r.Db.Exec(stmt, assetId, contractId)
+	if err != nil {
+		return fmt.Errorf("AssetRepo - UpdateContractId - Db.Exec: %w", err)
+	}
+
+	return nil
+}
+
 func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
-	// Calculate the offset
+	// Calculate the offset	// Calculate offset
 	offset := (page - 1) * limit
 
 	// Query to count the total number of assets

@@ -1,0 +1,1 @@
+ALTER TABLE contracts ADD COLUMN compound INT DEFAULT 0;

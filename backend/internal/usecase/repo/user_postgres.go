@@ -126,13 +126,14 @@ func (r UserRepo) EditUsersRole(id_user string, role_id string) error {
 }
 
 func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
-	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
+	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email, v.id as vault_id
 			 FROM UserAccount u 
 			 LEFT JOIN Role r ON u.role_id = r.id 
+			 LEFT JOIN Vault v ON u.id = v.owner_id
 			 WHERE u.token = $1`
 
 	var user entity.UserResponse
-	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email)
+	err := r.Db.QueryRow(stmt, token).Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email, &user.VaultId)
 	if err != nil {
 		return entity.UserResponse{}, fmt.Errorf("UserRepo - GetProfile - db.Query: %w", err)
 	}

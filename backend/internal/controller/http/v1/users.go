@@ -15,11 +15,13 @@ type usersRoutes struct {
 	t  usecase.UserUseCase
 	a  usecase.AuthUseCase
 	rP usecase.RolePermissionUseCase
-	l  logger.Interface
+	v  usecase.VaultUseCase
+	// l logger.Interface
+	l logger.Interface
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface) {
-	r := &usersRoutes{t, a, rP, l}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase) {
+	r := &usersRoutes{t, a, rP, v, l}
 
 	h := handler.Group("/users")
 	{
@@ -216,6 +218,16 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 		r.l.Error(err, "http - v1 - getProfile - GetProfile")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
+	}
+
+	if profile.VaultId != nil {
+		vault, err := r.v.GetById(*profile.VaultId)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		profile.Vault = &vault
 	}
 
 	c.JSON(http.StatusOK, profile)
