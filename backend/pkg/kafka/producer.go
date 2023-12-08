@@ -26,12 +26,11 @@ func (p *Producer) Produce(key string, value interface{}) error {
 
 	if err != nil {
 		//return fmt.Errorf("Producer - Produce - p.exec.Produce: %v", err)
-		str1 := []byte(key)
-		str2 := key
-		str3 := value
-		str4 := valueMarshalled
-		return fmt.Errorf(fmt.Sprintf("%s%s%s%s", str1,
-			str2, str3, str4), err)
+		str1 := p.Topic
+		str2 := value
+		str3 := valueMarshalled
+		return fmt.Errorf(fmt.Sprintf("%s %s %s", str1,
+			str2, str3), err)
 	}
 
 	return nil
