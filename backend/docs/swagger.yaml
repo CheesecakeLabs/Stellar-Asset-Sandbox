@@ -590,6 +590,15 @@ definitions:
     - code
     - id
     type: object
+  v1.PaginatedAssetsResponse:
+    properties:
+      assets:
+        items:
+          $ref: '#/definitions/entity.Asset'
+        type: array
+      totalPages:
+        type: integer
+    type: object
   v1.RolePermissionRequest:
     properties:
       is_add:
@@ -809,9 +818,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/entity.Asset'
-            type: array
+            $ref: '#/definitions/v1.PaginatedAssetsResponse'
         "500":
           description: Internal Server Error
           schema:
