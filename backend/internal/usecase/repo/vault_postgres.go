@@ -29,13 +29,14 @@ func (r VaultRepo) GetVaults(isAll bool) ([]entity.Vault, error) {
 		JOIN key wk ON w.id = wk.wallet_id
 	`
 
-	whereClause := `WHERE v.active = 1`
+	whereClause := ` WHERE v.active = 1`
+	orderClause := ` ORDER BY v.name ASC`
 
 	if !isAll {
 		whereClause = whereClause + ` AND v.owner_id is null`
 	}
 
-	query := baseQuery + whereClause
+	query := baseQuery + whereClause + orderClause
 
 	rows, err := r.Db.Query(query)
 	if err != nil {
