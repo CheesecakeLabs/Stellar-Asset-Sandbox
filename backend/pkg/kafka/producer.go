@@ -25,12 +25,7 @@ func (p *Producer) Produce(key string, value interface{}) error {
 	}, nil)
 
 	if err != nil {
-		//return fmt.Errorf("Producer - Produce - p.exec.Produce: %v", err)
-		str1 := p.Topic
-		str2 := value
-		str3 := valueMarshalled
-		return fmt.Errorf(fmt.Sprintf("%s %s %s", str1,
-			str2, str3), err)
+		return fmt.Errorf("Producer - Produce - p.exec.Produce: %v", err)
 	}
 
 	return nil
