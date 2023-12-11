@@ -10,28 +10,49 @@ import { TokenManagementTemplate } from 'components/templates/token-management'
 
 export const TokenManagement: React.FC = () => {
   const [loading, setLoading] = useState(true)
-  const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[]>()
-  const { getAssets } = useAssets()
+  const [pagedAssets, setPagedAssets] =
+    useState<Hooks.UseAssetsTypes.IPagedAssets>()
+  const { getPagedAssets } = useAssets()
   const { userPermissions, getUserPermissions } = useAuth()
+  const [page, setPage] = useState(1)
+
+  const LIMIT = 10
 
   useEffect(() => {
-    getAssets().then(assets => {
-      setAssets(assets)
+    getPagedAssets({
+      page: page,
+      limit: LIMIT,
+    }).then(pagedAssets => {
+      setPagedAssets(pagedAssets)
       setLoading(false)
     })
-  }, [getAssets])
+  }, [getPagedAssets, page])
 
   useEffect(() => {
     getUserPermissions()
   }, [getUserPermissions])
+
+  const changePage = (pageSelected: number): void => {
+    getPagedAssets({
+      page: pageSelected,
+      limit: LIMIT,
+    }).then(pagedAssets => {
+      setPagedAssets(pagedAssets)
+      setLoading(false)
+      setPage(pageSelected)
+    })
+  }
 
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <TokenManagementTemplate
           loading={loading}
-          assets={assets}
+          assets={pagedAssets?.assets}
           userPermissions={userPermissions}
+          page={page}
+          totalPages={pagedAssets?.totalPages || 1}
+          changePage={changePage}
         />
       </Sidebar>
     </Flex>

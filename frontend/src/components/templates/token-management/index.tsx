@@ -32,6 +32,8 @@ import {
   BackIcon,
   BlockIcon,
   JoinIcon,
+  NavLeftIcon,
+  NavRightIcon,
 } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
@@ -39,12 +41,18 @@ interface ITokenManagementTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  page: number
+  totalPages: number
+  changePage(page: number): void
 }
 
 export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
   loading,
   assets,
   userPermissions,
+  page,
+  totalPages,
+  changePage,
 }) => {
   const navigate = useNavigate()
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
@@ -153,6 +161,61 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
         ) : (
           <Empty title="No forged assets" />
         )}
+        <Flex justifyContent="flex-end">
+          <Flex w="fit-content" alignItems="center">
+            <Button
+              variant={'menuButton'}
+              border="0"
+              w="min-content"
+              leftIcon={
+                <Flex w="1rem" justifyContent="center">
+                  <NavLeftIcon />
+                </Flex>
+              }
+              isDisabled={page === 1}
+              onClick={(): void => {
+                changePage(page - 1)
+              }}
+            >
+              Previous
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              pageNumber => (
+                <Container
+                  w="fit-content"
+                  h="fit-content"
+                  cursor="pointer"
+                  borderRadius="full"
+                  bg={page === pageNumber ? 'gray.200' : undefined}
+                  _dark={{
+                    bg: page === pageNumber ? 'black.700' : undefined,
+                  }}
+                  onClick={(): void => {
+                    changePage(pageNumber)
+                  }}
+                >
+                  <Text fontSize="sm">{pageNumber}</Text>
+                </Container>
+              )
+            )}
+            <Button
+              variant={'menuButton'}
+              border="0"
+              w="min-content"
+              rightIcon={
+                <Flex w="1rem" justifyContent="center">
+                  <NavRightIcon />
+                </Flex>
+              }
+              isDisabled={page === totalPages}
+              onClick={(): void => {
+                changePage(page + 1)
+              }}
+            >
+              Next
+            </Button>
+          </Flex>
+        </Flex>
       </Flex>
     </Flex>
   )

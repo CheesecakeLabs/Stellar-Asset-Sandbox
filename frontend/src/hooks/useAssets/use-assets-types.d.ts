@@ -27,6 +27,11 @@ declare namespace Hooks {
       contract_id?: string
     }
 
+    interface IPagedAssets {
+      assets: IAssetDto[]
+      totalPages: number
+    }
+
     interface IAssetRequest {
       amount?: number
       asset_type: number
@@ -145,6 +150,10 @@ declare namespace Hooks {
         assetId: number,
         contractId: string
       ) => Promise<boolean>
+      getPagedAssets: (args: {
+        page: number
+        limit: number
+      }) => Promise<IPagedAssets | undefined>
     }
   }
 }

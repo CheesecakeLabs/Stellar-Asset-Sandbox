@@ -152,6 +152,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     try {
       const response = await http.get(`assets`)
       const data = response.data
+
       if (data) {
         await Promise.all(
           data.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
@@ -174,6 +175,42 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       setLoadingAssets(false)
     }
   }, [getAssetData])
+
+  const getPagedAssets = useCallback(
+    async (args: {
+      page: number
+      limit: number
+    }): Promise<Hooks.UseAssetsTypes.IPagedAssets | undefined> => {
+      setLoadingAssets(true)
+      try {
+        const response = await http.get(
+          `assets?page=${args.page}&limit=${args.limit}`
+        )
+        const data = response.data
+
+        if (data) {
+          await Promise.all(
+            data.assets.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
+              const assetData = await getAssetData(
+                asset.code,
+                asset.issuer.key.publicKey
+              )
+              asset.assetData = assetData
+            })
+          )
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingAssets(false)
+      }
+    },
+    [getAssetData]
+  )
 
   const getAssetById = useCallback(
     async (id: string): Promise<Hooks.UseAssetsTypes.IAssetDto | undefined> => {
@@ -290,8 +327,9 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     contractId: string
   ): Promise<boolean> => {
     try {
-      const response = await http.put(`assets/${assetId}/update-contract-id`,
-        { contract_id: contractId })
+      const response = await http.put(`assets/${assetId}/update-contract-id`, {
+        contract_id: contractId,
+      })
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -321,7 +359,8 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         retrieveToml,
         getTomlData,
         updateImage,
-        updateContractId
+        updateContractId,
+        getPagedAssets
       }}
     >
       {children}
