@@ -226,10 +226,25 @@ func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
 	return nil
 }
 
-func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
-	// Calculate offset
+func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+	// Calculate the offset	// Calculate offset
 	offset := (page - 1) * limit
 
+	// Query to count the total number of assets
+	countQuery := `
+        SELECT COUNT(*)
+        FROM asset;
+    `
+	var totalAssets int
+	err := r.Db.QueryRow(countQuery).Scan(&totalAssets)
+	if err != nil {
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Count Query: %w", err)
+	}
+
+	// Calculate total pages
+	totalPages := (totalAssets + limit - 1) / limit
+
+	// Query to fetch paginated assets
 	query := `
         SELECT
             a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image,
@@ -248,7 +263,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 
 	rows, err := r.Db.Query(query, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -266,7 +281,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 			&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
+			return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
 		}
 
 		asset.Distributor = distributor
@@ -275,5 +290,5 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 		assets = append(assets, asset)
 	}
 
-	return assets, nil
+	return assets, totalPages, nil
 }

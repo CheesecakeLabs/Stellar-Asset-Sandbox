@@ -142,10 +142,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Asset"
-                            }
+                            "$ref": "#/definitions/v1.PaginatedAssetsResponse"
                         }
                     },
                     "500": {
@@ -3152,6 +3149,20 @@ const docTemplate = `{
                 "sponsor_id": {
                     "type": "integer",
                     "example": 2
+                }
+            }
+        },
+        "v1.PaginatedAssetsResponse": {
+            "type": "object",
+            "properties": {
+                "assets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Asset"
+                    }
+                },
+                "totalPages": {
+                    "type": "integer"
                 }
             }
         },

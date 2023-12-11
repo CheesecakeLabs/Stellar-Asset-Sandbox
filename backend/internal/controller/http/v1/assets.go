@@ -117,6 +117,11 @@ type UploadAssetImageRequest struct {
 	Image string `json:"image"        example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
 
+type PaginatedAssetsResponse struct {
+	Assets     []entity.Asset `json:"assets"`
+	TotalPages int            `json:"totalPages"`
+}
+
 type UpdateContractIdRequest struct {
 	ContractId string `json:"contract_id" example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
 }
@@ -859,7 +864,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 // @Produce     json
 // @Param       page query int false "Page number"
 // @Param       limit query int false "Number of items per page"
-// @Success     200 {object} []entity.Asset
+// @Success     200 {object} PaginatedAssetsResponse
 // @Failure     500 {object} response
 // @Router      /assets [get]
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
@@ -882,14 +887,17 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		}
 
 		// Fetch paginated assets
-		assets, err := r.as.GetPaginatedAssets(page, limit)
+		assets, totalPages, err := r.as.GetPaginatedAssets(page, limit)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - get all assets - get paginated")
 			errorResponse(c, http.StatusInternalServerError, "error getting paginated assets", err)
 			return
 		}
 
-		c.JSON(http.StatusOK, assets)
+		c.JSON(http.StatusOK, PaginatedAssetsResponse{
+			Assets:     assets,
+			TotalPages: totalPages,
+		})
 	} else {
 		// Fetch all assets
 		assets, err := r.as.GetAll()

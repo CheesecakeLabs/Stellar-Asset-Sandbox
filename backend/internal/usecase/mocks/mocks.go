@@ -462,12 +462,13 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
 }
 
 // GetPaginatedAssets mocks base method.
-func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int) ([]entity.Asset, error) {
+func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int) ([]entity.Asset, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPaginatedAssets", arg0, arg1)
 	ret0, _ := ret[0].([]entity.Asset)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetPaginatedAssets indicates an expected call of GetPaginatedAssets.
