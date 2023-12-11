@@ -160,10 +160,6 @@ func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
 	return tomParsed, err
 }
 
-<<<<<<< HEAD
-func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
-	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit)
-=======
 func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) error {
 	err := uc.aRepo.UpdateContractId(assetId, contractId)
 	if err != nil {
@@ -172,9 +168,8 @@ func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) erro
 	return nil
 }
 
-func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
-	assets, err := uc.aRepo.GetPaginatedAssets(page, limit)
->>>>>>> soroban-transactions
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit)
 	if err != nil {
 		return nil, 0, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
 	}
