@@ -74,6 +74,7 @@ export const Deposit: React.FC<IDeposit> = ({
             py="0.25rem"
             alignItems="center"
             gap="0.5rem"
+            stroke="black"
             _dark={{ bg: 'black.800', color: 'white' }}
           >
             {contract?.asset?.image ? (

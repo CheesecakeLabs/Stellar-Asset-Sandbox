@@ -112,7 +112,7 @@ export const ContractsCreate: React.FC = () => {
           compoundType === 'Compound interest' ? compound : 0
         ),
         yield_rate: BigInt(yieldRate),
-        min_deposit: BigInt(Number(data.min_deposit || 0)),
+        min_deposit: BigInt(Number(data.min_deposit || 0) * 10000000),
         penalty_rate: BigInt(penaltyRate),
         allowance_period: latestSequenceLedger + allowancePeriod,
         signerSecret: vault.wallet.key.publicKey,

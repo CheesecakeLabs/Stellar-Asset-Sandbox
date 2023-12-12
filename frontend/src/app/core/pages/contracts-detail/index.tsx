@@ -56,7 +56,7 @@ export const ContractsDetail: React.FC = () => {
 
   const loadContractData = useCallback(async (): Promise<void> => {
     if (profile && contract) {
-      const wallet = profile.vault.wallet.key.publicKey
+      const wallet = profile.vault?.wallet.key.publicKey
 
       let timeLeft = contractData?.timeLeft
 
@@ -189,6 +189,7 @@ export const ContractsDetail: React.FC = () => {
           withdraw_amount: contractData?.position || 0,
           contract_id: contract.id,
         })
+        getHistory(contract.id).then(history => setHistory(history))
         await getProfile()
         toast({
           title: 'Withdraw success!',
@@ -243,7 +244,7 @@ export const ContractsDetail: React.FC = () => {
           onSubmitDeposit={onSubmitDeposit}
           loading={loadingPosition}
           contract={contract}
-          userAccount={profile?.vault.wallet.key.publicKey}
+          userAccount={profile?.vault?.wallet?.key.publicKey}
           isDepositing={isDepositing}
           isWithdrawing={isWithdrawing}
           contractData={contractData}
