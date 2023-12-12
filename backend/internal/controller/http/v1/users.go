@@ -151,7 +151,7 @@ func (r *usersRoutes) logout(c *gin.Context) {
 		return
 	}
 
-	err = r.a.UpdateToken(user.ID, "")
+	err = r.a.UpdateToken(user.ID, user.ID)
 	if err != nil {
 		r.l.Error(err, "http - v1 - logout - UpdateToken")
 		errorResponse(c, http.StatusInternalServerError, "error updating token", err)
