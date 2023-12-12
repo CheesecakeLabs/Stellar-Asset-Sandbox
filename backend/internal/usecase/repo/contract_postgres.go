@@ -40,6 +40,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 		JOIN key dk ON d.id = dk.wallet_id
 		JOIN wallet i ON a.issuer_id = i.id
 		JOIN key ik ON i.id = ik.wallet_id
+		ORDER BY c.id DESC
 	`
 
 	rows, err := r.Db.Query(query)

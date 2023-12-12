@@ -143,13 +143,15 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 // @Failure 500 {object} response
 // @Router /user/logout [post]
 func (r *usersRoutes) logout(c *gin.Context) {
-	var user entity.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		r.l.Error(err, "http - v1 - logout - ShouldBindJSON")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+	token := c.GetHeader("Authorization")
+	user, err := r.t.GetUserByToken(token)
+	if err != nil {
+		r.l.Error(err, "http - v1 - getUserByToken - GetUserByToken")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}
-	err := r.a.UpdateToken(user.Email, "")
+
+	err = r.a.UpdateToken(user.ID, "")
 	if err != nil {
 		r.l.Error(err, "http - v1 - logout - UpdateToken")
 		errorResponse(c, http.StatusInternalServerError, "error updating token", err)
