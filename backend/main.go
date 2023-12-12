@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/app"
@@ -57,6 +58,8 @@ func main() {
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
 	// Kafka submit transaction connection
+	fmt.Printf("cfg.Kafka.SubmitTransactionCfg.ProducerTopic:" + cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
+	fmt.Printf(strings.Join(cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, ""))
 	submitConn := kafka.New(cfg.Kafka, cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
 	err = submitConn.AttemptConnect()
 	if err != nil {
