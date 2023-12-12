@@ -58,14 +58,14 @@ func main() {
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
 	// Kafka submit transaction connection
-	fmt.Println("cfg.Kafka.SubmitTransactionCfg.ProducerTopic: " + cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
-	fmt.Println("cfg.Kafka.SubmitTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, ""))
-	fmt.Println("cfg.Kafka.SignTransactionCfg.ProducerTopic: " + cfg.Kafka.SignTransactionCfg.ProducerTopic)
-	fmt.Println("cfg.Kafka.SignTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SignTransactionCfg.ConsumerTopics, ""))
-	fmt.Println("cfg.Kafka.EnvelopeCfg.ProducerTopic: " + cfg.Kafka.EnvelopeCfg.ProducerTopic)
-	fmt.Println("cfg.Kafka.EnvelopeCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.EnvelopeCfg.ConsumerTopics, ""))
-	fmt.Println("cfg.Kafka.HorizonCfg.ProducerTopic: " + cfg.Kafka.HorizonCfg.ProducerTopic)
-	fmt.Println("cfg.Kafka.HorizonCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.HorizonCfg.ConsumerTopics, ""))
+	log.Println("cfg.Kafka.SubmitTransactionCfg.ProducerTopic: " + cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
+	log.Println("cfg.Kafka.SubmitTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, ""))
+	log.Println("cfg.Kafka.SignTransactionCfg.ProducerTopic: " + cfg.Kafka.SignTransactionCfg.ProducerTopic)
+	log.Println("cfg.Kafka.SignTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SignTransactionCfg.ConsumerTopics, ""))
+	log.Println("cfg.Kafka.EnvelopeCfg.ProducerTopic: " + cfg.Kafka.EnvelopeCfg.ProducerTopic)
+	log.Println("cfg.Kafka.EnvelopeCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.EnvelopeCfg.ConsumerTopics, ""))
+	log.Println("cfg.Kafka.HorizonCfg.ProducerTopic: " + cfg.Kafka.HorizonCfg.ProducerTopic)
+	log.Println("cfg.Kafka.HorizonCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.HorizonCfg.ConsumerTopics, ""))
 	submitConn := kafka.New(cfg.Kafka, cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
 	err = submitConn.AttemptConnect()
 	if err != nil {
