@@ -48,6 +48,10 @@ type (
 	JWT struct {
 		SecretKey string `env-required:"true" env:"JWT_SECRET_KEY"`
 	}
+
+	AWS struct {
+		BucketName string `env-required:"true" env:"AWS_BUCKET_NAME"`
+	}
 )
 
 // NewConfig returns app config.
