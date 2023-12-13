@@ -23,9 +23,10 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
 
-import { UploadImage } from '../../molecules/upload-image'
 import { RadioCard } from 'components/atoms'
 import { HelpIcon } from 'components/icons'
+
+import { UploadImage } from '../../molecules/upload-image'
 
 interface IForgeAssetTemplate {
   onSubmit(
@@ -274,8 +275,10 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         defaultValue={typesAsset[0].id}
                         className="asset-type"
                       >
-                        {typesAsset.map(typeAsset => (
-                          <option value={typeAsset.id}>{typeAsset.name}</option>
+                        {typesAsset.map((typeAsset, index) => (
+                          <option value={typeAsset.id} key={index}>
+                            {typeAsset.name}
+                          </option>
                         ))}
                       </Select>
                     </FormControl>
@@ -286,8 +289,9 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               <FormControl>
                 <FormLabel mt="1.5rem">Control mechanisms</FormLabel>
                 <Flex flexDir="column">
-                  {assetFlags.map(assetFlag => (
+                  {assetFlags.map((assetFlag, index) => (
                     <RadioCard
+                      key={index}
                       register={register}
                       title={assetFlag.title}
                       description={assetFlag.description}

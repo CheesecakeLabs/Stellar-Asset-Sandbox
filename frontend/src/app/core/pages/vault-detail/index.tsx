@@ -272,7 +272,7 @@ export const VaultDetail: React.FC = () => {
 
   useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
-    getAssets()
+    getAssets(true)
   }, [getAssets, getVaults])
 
   useEffect(() => {

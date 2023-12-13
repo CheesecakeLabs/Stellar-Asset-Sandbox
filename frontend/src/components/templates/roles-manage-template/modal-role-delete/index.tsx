@@ -105,9 +105,13 @@ export const ModalRoleDelete: React.FC<IModalRoleDelete> = ({
                         setRoleSelected(Number(event.target.value))
                       }}
                     >
-                      {roles.filter(filterRole => filterRole.id !== role.id).map(role => (
-                        <option value={role.id}>{role.name}</option>
-                      ))}
+                      {roles
+                        .filter(filterRole => filterRole.id !== role.id)
+                        .map((role, index) => (
+                          <option value={role.id} key={index}>
+                            {role.name}
+                          </option>
+                        ))}
                     </Select>
                     <FormErrorMessage>
                       Select new role to replace users with current role

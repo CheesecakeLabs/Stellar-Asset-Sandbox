@@ -145,36 +145,41 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getAssets = useCallback(async (): Promise<
-    Hooks.UseAssetsTypes.IAssetDto[] | undefined
-  > => {
-    setLoadingAssets(true)
-    try {
-      const response = await http.get(`assets`)
-      const data = response.data
+  const getAssets = useCallback(
+    async (
+      connectHorizon?: boolean
+    ): Promise<Hooks.UseAssetsTypes.IAssetDto[] | undefined> => {
+      setLoadingAssets(true)
+      try {
+        const response = await http.get(`assets`)
+        const data = response.data
 
-      if (data) {
-        await Promise.all(
-          data.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
-            const assetData = await getAssetData(
-              asset.code,
-              asset.issuer.key.publicKey
+        if (data) {
+          if (connectHorizon) {
+            await Promise.all(
+              data.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
+                const assetData = await getAssetData(
+                  asset.code,
+                  asset.issuer.key.publicKey
+                )
+                asset.assetData = assetData
+              })
             )
-            asset.assetData = assetData
-          })
-        )
-        setAssets(data)
-        return data
+          }
+          setAssets(data)
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingAssets(false)
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
-      }
-      throw new Error(MessagesError.errorOccurred)
-    } finally {
-      setLoadingAssets(false)
-    }
-  }, [getAssetData])
+    },
+    [getAssetData]
+  )
 
   const getPagedAssets = useCallback(
     async (args: {
@@ -360,7 +365,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         getTomlData,
         updateImage,
         updateContractId,
-        getPagedAssets
+        getPagedAssets,
       }}
     >
       {children}

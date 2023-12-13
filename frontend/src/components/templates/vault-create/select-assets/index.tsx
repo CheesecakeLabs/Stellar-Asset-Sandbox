@@ -17,8 +17,9 @@ export const SelectAssets: React.FC<ISelectAssets> = ({
 }) => {
   return (
     <Flex flexDir="column">
-      {assets?.map(asset => (
+      {assets?.map((asset, index) => (
         <Flex
+          key={index}
           justifyContent="space-between"
           alignItems="center"
           borderBottom="1px solid"

@@ -75,8 +75,8 @@ export const LastPayments: React.FC<ILastPayments> = ({
                 <Th>To</Th>
               </Thead>
               <Tbody>
-                {transactions?.map(transaction => (
-                  <Tr>
+                {transactions?.map((transaction, index) => (
+                  <Tr key={index}>
                     {isLargerThanMd && (
                       <Td>
                         {transaction.asset.image ? (

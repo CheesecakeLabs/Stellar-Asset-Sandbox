@@ -80,6 +80,47 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData, toastError]
   )
 
+  const getPagedVaults = useCallback(
+    async (
+      args: {
+        page: number
+        limit: number
+      },
+      isAll?: boolean
+    ): Promise<Hooks.UseVaultsTypes.IPagedVaults | undefined> => {
+      setLoadingVaults(true)
+      try {
+        const response = await http.get(
+          `vault/list?page=${args.page}&limit=${args.limit}`,
+          {
+            params: { all: isAll ? 'all' : '' },
+          }
+        )
+        const data = response.data
+        if (data) {
+          await Promise.all(
+            data.vaults.map(async (vault: Hooks.UseVaultsTypes.IVault) => {
+              const accountData = await getAccountData(
+                vault.wallet.key.publicKey
+              )
+              vault.accountData = accountData
+            })
+          )
+          return data
+        }
+      } catch (error) {
+        toastError(
+          axios.isAxiosError(error)
+            ? error.message
+            : MessagesError.errorOccurred
+        )
+      } finally {
+        setLoadingVaults(false)
+      }
+    },
+    [getAccountData, toastError]
+  )
+
   const getVaultCategories = useCallback(async (): Promise<
     Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   > => {
@@ -293,6 +334,7 @@ export const VaultsProvider: React.FC<IProps> = ({ children }) => {
         deleteVault,
         filterVaultsByStatus,
         vaultsToStatusName,
+        getPagedVaults
       }}
     >
       {children}

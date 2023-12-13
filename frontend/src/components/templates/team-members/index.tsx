@@ -7,6 +7,7 @@ import {
   Text,
   Th,
   Thead,
+  Tr,
 } from '@chakra-ui/react'
 import React from 'react'
 
@@ -67,14 +68,17 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
           ) : (
             <Table w="full" variant="list">
               <Thead w="full">
-                <Th>ID</Th>
-                <Th>Member</Th>
-                <Th>Role</Th>
-                <Th w="1rem" p={0}></Th>
+                <Tr>
+                  <Th>ID</Th>
+                  <Th>Member</Th>
+                  <Th>Role</Th>
+                  <Th w="1rem" p={0}></Th>
+                </Tr>
               </Thead>
               <Tbody>
-                {users.map(user => (
+                {users.map((user, index) => (
                   <ItemUser
+                    key={index}
                     user={user}
                     loading={loading}
                     handleEditRole={handleEditRole}

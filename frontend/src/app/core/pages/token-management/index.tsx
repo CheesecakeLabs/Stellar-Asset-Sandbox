@@ -51,7 +51,7 @@ export const TokenManagement: React.FC = () => {
           loading={loading}
           assets={pagedAssets?.assets}
           userPermissions={userPermissions}
-          page={page}
+          currentPage={page}
           totalPages={pagedAssets?.totalPages || 1}
           changePage={changePage}
         />

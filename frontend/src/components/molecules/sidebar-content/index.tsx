@@ -64,8 +64,8 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
             w="4rem"
           />
         </Flex>
-        {items.map(item => (
-          <Box key={item.name}>
+        {items.map((item, index) => (
+          <Box key={index}>
             <NavItem
               icon={item.icon}
               path={item.path}

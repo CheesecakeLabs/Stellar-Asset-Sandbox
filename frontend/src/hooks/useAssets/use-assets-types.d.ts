@@ -140,7 +140,7 @@ declare namespace Hooks {
       updateAuthFlags: (params: IFreezeRequest) => Promise<boolean>
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
-      getAssets: () => Promise<IAssetDto[] | undefined>
+      getAssets: (connectHorizon?: boolean) => Promise<IAssetDto[] | undefined>
       getAssetById: (id: string) => Promise<IAssetDto | undefined>
       generateToml: (params: ITomlData) => Promise<boolean>
       retrieveToml: () => Promise<Blob | undefined>

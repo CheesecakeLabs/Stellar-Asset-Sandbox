@@ -52,8 +52,8 @@ export const VaultsStatusList: React.FC<IVaultsStatusList> = ({
             <Th>Status</Th>
           </Thead>
           <Tbody>
-            {vaultsStatus?.map(vaultStatus => (
-              <Tr>
+            {vaultsStatus?.map((vaultStatus, index) => (
+              <Tr key={index}>
                 <Td>{vaultStatus.name}</Td>
                 <Td>
                   <Flex alignItems="center" gap={3}>

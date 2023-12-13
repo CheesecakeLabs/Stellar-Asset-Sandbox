@@ -92,16 +92,16 @@ export const Overview: React.FC<IOverview> = ({
                     ))}
                   </Thead>
                   <Tbody>
-                    {permissions?.map(permission => (
-                      <Tr>
+                    {permissions?.map((permission, index) => (
+                      <Tr key={index}>
                         <Td>
                           <Text fontSize="sm">{permission.name}</Text>
                           <Text fontSize="xs" maxW="400px">
                             {permission.description}
                           </Text>
                         </Td>
-                        {roles?.map(role => (
-                          <Td fill="primary.normal">
+                        {roles?.map((role, index) => (
+                          <Td fill="primary.normal" key={index}>
                             <Flex w="full" justifyContent="center">
                               {havePermissionByRole(permission.id, role.id) && (
                                 <CircleCheckIcon />

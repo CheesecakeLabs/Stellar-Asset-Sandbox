@@ -186,7 +186,7 @@ export const ContractsCreate: React.FC = () => {
   }
 
   useEffect(() => {
-    getAssets()
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {

@@ -46,6 +46,11 @@ declare namespace Hooks {
       isAuthorized: boolean
     }
 
+    interface IPagedVaults {
+      vaults: IVault[]
+      totalPages: number
+    }
+
     interface IVaultsContext {
       loadingVault: boolean
       loadingVaults: boolean
@@ -80,6 +85,13 @@ declare namespace Hooks {
         assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
         asset: Hooks.UseAssetsTypes.IAssetDto
       ) => Hooks.UseVaultsTypes.IVaultAccountName[]
+      getPagedVaults: (
+        args: {
+          page: number
+          limit: number
+        },
+        isAll?: boolean
+      ) => Promise<Hooks.UseVaultsTypes.IPagedVaults | undefined>
     }
   }
 }

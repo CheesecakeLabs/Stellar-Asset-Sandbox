@@ -8,6 +8,7 @@ import {
   Text,
   Th,
   Thead,
+  Tr,
   useDisclosure,
 } from '@chakra-ui/react'
 import React from 'react'
@@ -84,14 +85,17 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             ) : (
               <Table w="full" variant="list">
                 <Thead w="full">
-                  <Th>Role name</Th>
-                  <Th justifyContent="flex-end" display="flex">
-                    Actions
-                  </Th>
+                  <Tr>
+                    <Th>Role name</Th>
+                    <Th justifyContent="flex-end" display="flex">
+                      Actions
+                    </Th>
+                  </Tr>
                 </Thead>
                 <Tbody>
-                  {roles?.map(role => (
+                  {roles?.map((role, index) => (
                     <ItemRole
+                      key={index}
                       role={role}
                       loading={creatingRole || updatingRole || deletingRole}
                       roles={roles}

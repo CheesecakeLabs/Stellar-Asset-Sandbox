@@ -61,7 +61,7 @@ export const VaultCreate: React.FC = () => {
     getVaultCategories().then(vaultCategories =>
       setVaultCategories(vaultCategories)
     )
-    getAssets()
+    getAssets(true)
   }, [getAssets, getVaultCategories])
 
   const toastError = (message: string): void => {

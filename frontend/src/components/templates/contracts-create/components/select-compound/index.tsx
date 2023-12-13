@@ -7,7 +7,7 @@ export enum CompoundTime {
   '1 hour' = 3600,
   '24 hours' = 86400,
   '7 days' = 604800,
-  '30 days' = 18144000
+  '30 days' = 18144000,
 }
 
 interface ISelectCompound {
@@ -15,13 +15,28 @@ interface ISelectCompound {
   setCompound: Dispatch<SetStateAction<CompoundTime>>
 }
 
-export const SelectCompound: React.FC<ISelectCompound> = ({ compound, setCompound }) => {
+export const SelectCompound: React.FC<ISelectCompound> = ({
+  compound,
+  setCompound,
+}) => {
   return (
     <Container variant="primary" p="0" h="2rem">
       <Flex>
-        {[CompoundTime['10 min'], CompoundTime['30 min'], CompoundTime['1 hour'], CompoundTime['24 hours'], CompoundTime['7 days'], CompoundTime['30 days']]
-          .map(time => <Button
-            variant={CompoundTime[compound] === CompoundTime[time] ? 'menuButtonSelected' : 'menuButton'}
+        {[
+          CompoundTime['10 min'],
+          CompoundTime['30 min'],
+          CompoundTime['1 hour'],
+          CompoundTime['24 hours'],
+          CompoundTime['7 days'],
+          CompoundTime['30 days'],
+        ].map((time, index) => (
+          <Button
+            key={index}
+            variant={
+              CompoundTime[compound] === CompoundTime[time]
+                ? 'menuButtonSelected'
+                : 'menuButton'
+            }
             bg={compound === time ? 'black.800' : undefined}
             borderRadius="0.25rem"
             border={0}
@@ -34,8 +49,8 @@ export const SelectCompound: React.FC<ISelectCompound> = ({ compound, setCompoun
             justifyContent="center"
           >
             {CompoundTime[time]}
-          </Button>)}
-
+          </Button>
+        ))}
       </Flex>
     </Container>
   )

@@ -12,7 +12,7 @@ import {
   Text,
   useMediaQuery,
 } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChevronDown } from 'react-feather'
 import { useNavigate } from 'react-router-dom'
 
@@ -37,8 +37,9 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = ({ onOpen }) => {
   const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+  const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[]>()
   const { profile, getProfile } = useAuth()
-  const { assets, getAssets } = useAssets()
+  const { getAssets } = useAssets()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
   }, [getProfile])
 
   useEffect(() => {
-    getAssets()
+    getAssets().then(assets => setAssets(assets))
   }, [getAssets])
 
   const findAsset = (
