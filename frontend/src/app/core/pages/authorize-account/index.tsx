@@ -130,7 +130,7 @@ export const AuthorizeAccount: React.FC = () => {
   }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
-    getVaults()
+    getVaults(true)
   }, [getVaults])
 
   useEffect(() => {
