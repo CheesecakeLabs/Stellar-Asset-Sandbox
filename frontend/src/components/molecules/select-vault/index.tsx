@@ -64,7 +64,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
     setOptions(ops || [])
   }, [distributorWallet, vaults])
 
-  const formatGroupLabel = (data: IOption): ReactNode => (
+  const formatLabel = (data: IOption): ReactNode => (
     <Flex alignItems="center" gap="0.75rem">
       {data.isPersonal ? (
         <User width="16px" height="16px" fill="gray" />
@@ -80,7 +80,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
       options={options}
       onChange={(newValue): void => setWallet(newValue?.value)}
       isOptionDisabled={(option): boolean => option.disabled}
-      formatOptionLabel={formatGroupLabel}
+      formatOptionLabel={formatLabel}
       styles={{
         control: baseStyles => ({
           ...baseStyles,

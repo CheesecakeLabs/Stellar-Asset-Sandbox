@@ -59,15 +59,11 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
 
   return (
     <Flex flexDir="column" w="full">
-      <Text fontSize="sm" mb="0.5rem" ms="0.25rem">
-        Deposit info
-      </Text>
       <Flex
         flexDir="column"
         w="full"
         maxW="full"
         gap="0.75rem"
-        mt="0.5rem"
         borderRadius="0.25rem"
         p="1rem"
       >
@@ -103,7 +99,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
                   w="fit-content"
                   mb="0.15rem"
                 >
-                  Current yield
+                  Accrued Yield
                 </Text>
                 <Text ms="0.5rem">{`${(contractData.yield / 100).toFixed(
                   2
@@ -144,7 +140,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
                     w="fit-content"
                     mb="0.15rem"
                   >
-                    Composed in
+                    Compounds in
                   </Text>
                   <Flex ms="0.5rem">
                     <Countdown

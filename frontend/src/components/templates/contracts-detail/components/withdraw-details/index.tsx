@@ -14,18 +14,13 @@ export const WithdrawDetails: React.FC<IWithdrawDetails> = ({
   contractData,
   history,
 }) => {
-
   return (
     <Flex flexDir="column" w="full">
-      <Text fontSize="sm" mb="0.5rem" ms="0.25rem">
-        Deposit info
-      </Text>
       <Flex
         flexDir="column"
         w="full"
         maxW="full"
         gap="0.75rem"
-        mt="0.5rem"
         borderRadius="0.25rem"
         p="1rem"
       >

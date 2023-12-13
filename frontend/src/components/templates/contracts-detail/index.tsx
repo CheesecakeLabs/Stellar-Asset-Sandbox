@@ -3,6 +3,7 @@ import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { havePermission } from 'utils'
+import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { ContractInfo } from './components/contract-info'
 import { Deposit } from './components/deposit'
@@ -18,6 +19,8 @@ interface IContractsDetailTemplate {
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
+  accessWallet(): void
+  accessProfile(): void
   contractData: Hooks.UseContractsTypes.IContractData | undefined
   contract: Hooks.UseContractsTypes.IContract | undefined
   loading: boolean
@@ -29,11 +32,15 @@ interface IContractsDetailTemplate {
   deposited: number | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
   currentInVault: string | undefined
+  hasAssetInVault: boolean
+  hasWallet: boolean
 }
 
 export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   onSubmitWithdraw,
   onSubmitDeposit,
+  accessWallet,
+  accessProfile,
   contract,
   contractData,
   isWithdrawing,
@@ -44,10 +51,12 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   deposited,
   userPermissions,
   currentInVault,
+  hasAssetInVault,
+  hasWallet,
 }) => {
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW="full" alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         {loading || !contract ? (
           <Skeleton w="full" h="14rem" />
         ) : (
@@ -69,8 +78,6 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                 maxW="full"
                 gap="2rem"
               >
-                <ContractInfo contract={contract} />
-
                 {contractData?.position &&
                 havePermission(
                   Permissions.INVEST_CERTIFICATE,
@@ -90,6 +97,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     history={history}
                   />
                 )}
+                <ContractInfo contract={contract} />
               </Container>
               {contractData?.position ? (
                 <Withdraw
@@ -99,7 +107,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                   isDone={!contractData.timeLeft || contractData.timeLeft === 0}
                   withdrawValue={
                     contractData.timeLeft && contractData.timeLeft > 0
-                      ? Number(contractData.position)
+                      ? Number(contractData.estimatedPrematureWithdraw)
                       : Number(contractData.position)
                   }
                   contractData={contractData}
@@ -109,9 +117,13 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
               ) : (
                 <Deposit
                   onSubmit={onSubmitDeposit}
+                  accessWallet={accessWallet}
+                  accessProfile={accessProfile}
                   contract={contract}
                   loading={isDepositing}
                   currentBalance={currentBalance}
+                  hasAssetInVault={hasAssetInVault}
+                  hasWallet={hasWallet}
                 />
               )}
             </Flex>

@@ -1,7 +1,7 @@
 import { Flex, useToast } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 import { useContracts } from 'hooks/useContracts'
@@ -38,6 +38,7 @@ export const ContractsDetail: React.FC = () => {
   const [currentInVault, setCurrentInVault] = useState<string>()
 
   const { id } = useParams()
+  const navigate = useNavigate()
 
   useEffect(() => {
     getUserPermissions()
@@ -66,10 +67,10 @@ export const ContractsDetail: React.FC = () => {
       const userYield =
         Number((await getYield(wallet, contract.address)) || 0) / 10000000
 
-      const estimatedPrematureWithdraw = await getEstimatedPrematureWithdraw(
-        wallet,
-        contract.address
-      )
+      const estimatedPrematureWithdraw =
+        Number(
+          (await getEstimatedPrematureWithdraw(wallet, contract.address)) || 0
+        ) / 10000000
 
       if (!timeLeft) {
         timeLeft =
@@ -236,21 +237,43 @@ export const ContractsDetail: React.FC = () => {
     return history ? history[0]?.deposit_amount : undefined
   }
 
+  const hasAssetInVault = (): boolean => {
+    return (
+      profile?.vault?.accountData?.balances.find(
+        balance =>
+          balance.asset_code === contract?.asset.code &&
+          balance.asset_issuer === contract?.asset.issuer.key.publicKey
+      ) !== undefined
+    )
+  }
+
+  const accessWallet = (): void => {
+    navigate(`${PathRoute.VAULT_DETAIL}/${profile?.vault_id}`)
+  }
+
+  const accessProfile = (): void => {
+    navigate(`${PathRoute.PROFILE}`)
+  }
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.SOROBAN_SMART_CONTRACTS}>
         <ContractsDetailTemplate
           onSubmitWithdraw={onSubmitWithdraw}
           onSubmitDeposit={onSubmitDeposit}
+          currentBalance={getCurrentBalance()}
+          deposited={getDepositedValue()}
+          hasAssetInVault={hasAssetInVault()}
+          accessWallet={accessWallet}
+          accessProfile={accessProfile}
+          hasWallet={profile?.vault_id !== undefined}
           loading={loadingPosition}
           contract={contract}
           userAccount={profile?.vault?.wallet?.key.publicKey}
           isDepositing={isDepositing}
           isWithdrawing={isWithdrawing}
           contractData={contractData}
-          currentBalance={getCurrentBalance()}
           history={history}
-          deposited={getDepositedValue()}
           userPermissions={userPermissions}
           currentInVault={currentInVault}
         />

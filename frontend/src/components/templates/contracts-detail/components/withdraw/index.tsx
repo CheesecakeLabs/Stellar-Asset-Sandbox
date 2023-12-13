@@ -220,7 +220,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
               mt="1rem"
             >
               <Text color="white" fontSize="sm" w="full" textAlign="center">
-                {isDone ? 'Withdraw' : 'Withdraw premature'}
+                {isDone ? 'Withdraw' : 'Withdraw with penalty'}
               </Text>
             </Button>
           </form>

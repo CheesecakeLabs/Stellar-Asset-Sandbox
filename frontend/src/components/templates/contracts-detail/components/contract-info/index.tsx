@@ -20,9 +20,6 @@ export const ContractInfo: React.FC<IContractInfo> = ({ contract }) => {
 
   return (
     <Flex flexDir="column">
-      <Text fontSize="sm" mb="0.5rem" ms="0.25rem">
-        Contract details
-      </Text>
       <Flex
         flexDir="column"
         alignItems="center"

@@ -31,6 +31,7 @@ export const ContractsCreate: React.FC = () => {
   const { vaults, loadingVaults, getVaults } = useVaults()
   const { sign, submit, getSponsorPK } = useTransactions()
   const { getLatestSequenceLedger } = useHorizon()
+
   const toast = useToast()
   const navigate = useNavigate()
 

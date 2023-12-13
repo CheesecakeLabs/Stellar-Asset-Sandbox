@@ -22,16 +22,24 @@ interface IDeposit {
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
+  accessWallet(): void
+  accessProfile(): void
   contract: Hooks.UseContractsTypes.IContract | undefined
   loading: boolean
   currentBalance: string
+  hasAssetInVault: boolean
+  hasWallet: boolean
 }
 
 export const Deposit: React.FC<IDeposit> = ({
   onSubmit,
+  accessWallet,
+  accessProfile,
   loading,
   contract,
   currentBalance,
+  hasAssetInVault,
+  hasWallet,
 }) => {
   const {
     formState: { errors },
@@ -62,64 +70,120 @@ export const Deposit: React.FC<IDeposit> = ({
             {`Deposit ${contract?.asset.code}`}
           </Text>
         </Flex>
-        <Flex w="full" alignItems="center" flexDir="column" mt="1.5rem">
-          <Text fontSize="xs">Current in my wallet</Text>
-          <Flex
-            bg="gray.100"
-            borderRadius="full"
-            mb="0.5rem"
-            mt="0.25rem"
-            w="fit-content"
-            px="0.75rem"
-            py="0.25rem"
-            alignItems="center"
-            gap="0.5rem"
-            stroke="black"
-            _dark={{ bg: 'black.800', color: 'white' }}
-          >
-            {contract?.asset?.image ? (
-              <Img src={base64ToImg(contract.asset.image)} w="16px" h="16px" />
-            ) : (
-              getCurrencyIcon(contract?.asset.code || '', '1rem')
-            )}
-            {`${toCrypto(Number(currentBalance))} ${contract?.asset.code}`}
-          </Flex>
-        </Flex>
-        <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              data.amount = amount
-              onSubmit(data, setValue)
-            })}
-          >
-            <FormControl isInvalid={errors?.amount !== undefined}>
-              <Input
-                as={NumericFormat}
-                decimalScale={7}
-                thousandSeparator=","
-                placeholder="Amount to deposit..."
-                autoComplete="off"
-                onChange={(target): void => {
-                  setAmount(toNumber(target.currentTarget.value))
-                  limitExceeded(target.currentTarget.value)
-                }}
-              />
-              <FormErrorMessage>Required</FormErrorMessage>
-            </FormControl>
-
+        {!hasWallet ? (
+          <Flex flexDir="column" p="1rem" alignItems="center">
+            <Text
+              bg="gray.100"
+              borderRadius="full"
+              mb="0.5rem"
+              mt="0.25rem"
+              w="fit-content"
+              px="0.75rem"
+              py="0.25rem"
+              alignItems="center"
+            >
+              You don't have a wallet yet
+            </Text>
             <Button
               w="full"
               borderRadius="1.5rem"
-              type="submit"
               variant="primary"
-              isLoading={loading}
               mt="1.5rem"
-              isDisabled={Number(currentBalance) === 0 || isLimitExceeded}
+              onClick={accessProfile}
             >
-              Deposit
+              Access my profile
             </Button>
-          </form>
-        </Box>
+          </Flex>
+        ) : hasAssetInVault ? (
+          <>
+            <Flex w="full" alignItems="center" flexDir="column" mt="1.5rem">
+              <Text fontSize="xs">Current in my wallet</Text>
+              <Flex
+                bg="gray.100"
+                borderRadius="full"
+                mb="0.5rem"
+                mt="0.25rem"
+                w="fit-content"
+                px="0.75rem"
+                py="0.25rem"
+                alignItems="center"
+                gap="0.5rem"
+                stroke="black"
+                _dark={{ bg: 'black.800', color: 'white' }}
+              >
+                {contract?.asset?.image ? (
+                  <Img
+                    src={base64ToImg(contract.asset.image)}
+                    w="16px"
+                    h="16px"
+                  />
+                ) : (
+                  getCurrencyIcon(contract?.asset.code || '', '1rem')
+                )}
+                {`${toCrypto(Number(currentBalance))} ${contract?.asset.code}`}
+              </Flex>
+            </Flex>
+            <Box p="1rem">
+              <form
+                onSubmit={handleSubmit(data => {
+                  data.amount = amount
+                  onSubmit(data, setValue)
+                })}
+              >
+                <FormControl isInvalid={errors?.amount !== undefined}>
+                  <Input
+                    as={NumericFormat}
+                    decimalScale={7}
+                    thousandSeparator=","
+                    placeholder="Amount to deposit..."
+                    autoComplete="off"
+                    onChange={(target): void => {
+                      setAmount(toNumber(target.currentTarget.value))
+                      limitExceeded(target.currentTarget.value)
+                    }}
+                  />
+                  <FormErrorMessage>Required</FormErrorMessage>
+                </FormControl>
+
+                <Button
+                  w="full"
+                  borderRadius="1.5rem"
+                  type="submit"
+                  variant="primary"
+                  isLoading={loading}
+                  mt="1.5rem"
+                  isDisabled={Number(currentBalance) === 0 || isLimitExceeded}
+                >
+                  Deposit
+                </Button>
+              </form>
+            </Box>
+          </>
+        ) : (
+          <Flex flexDir="column" p="1rem" alignItems="center">
+            <Text
+              bg="gray.100"
+              borderRadius="full"
+              mb="0.5rem"
+              mt="0.25rem"
+              w="fit-content"
+              px="0.75rem"
+              py="0.25rem"
+              alignItems="center"
+            >
+              You don't have this asset in your account
+            </Text>
+            <Button
+              w="full"
+              borderRadius="1.5rem"
+              variant="primary"
+              mt="1.5rem"
+              onClick={accessWallet}
+            >
+              Access my wallet
+            </Button>
+          </Flex>
+        )}
       </Container>
     </Flex>
   )
