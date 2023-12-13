@@ -13,7 +13,7 @@ type AwsConnection struct {
 }
 
 // Initialize a session with AWS
-func NewAwsService(cfg config.AWS) (*AwsConnection, error) {
+func New(cfg config.AWS) (*AwsConnection, error) {
 	sess, err := session.NewSession()
 	if err != nil {
 		return &AwsConnection{}, err

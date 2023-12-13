@@ -116,4 +116,9 @@ type (
 		SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error)
 		LogTransactionSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error)
 	}
+
+	// Asset Service
+	AssetServiceInterface interface {
+		UploadAssetImage(string, []byte) (string, error)
+	}
 )

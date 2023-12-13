@@ -15,6 +15,8 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/service"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/aws"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
@@ -22,8 +24,9 @@ import (
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, pAws *aws.AwsConnection) {
 	l := logger.New(cfg.Log.Level)
+
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -34,13 +37,16 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	walletUc := usecase.NewWalletUseCase(
 		repo.NewWalletRepo(pg),
 	)
+
 	assetUc := usecase.NewAssetUseCase(
 		repo.NewAssetRepo(pg),
 		repo.NewWalletRepo(pg),
 		tRepo,
 		repo.NewTomlRepo(pg),
 		cfg.Horizon,
+		service.NewAssetService(pAws),
 	)
+
 	roleUc := usecase.NewRoleUseCase(
 		repo.NewRoleRepo(pg),
 	)

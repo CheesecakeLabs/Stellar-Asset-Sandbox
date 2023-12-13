@@ -13,6 +13,7 @@ type (
 		JWT     JWT
 		Horizon Horizon
 		Log     Log
+		AWS     AWS
 	}
 
 	Log struct {

@@ -129,6 +129,8 @@ type UploadAssetImageRequest struct {
 // @Router      /assets [post]
 func (r *assetsRoutes) createAsset(c *gin.Context) {
 	var request CreateAssetRequest
+	var imageBytes []byte
+
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.logger.Error(err, "http - v1 - create asset - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
@@ -268,7 +270,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 
 	if request.Image != "" {
-		asset.Image, err = base64.StdEncoding.DecodeString(request.Image)
+		imageBytes, err = base64.StdEncoding.DecodeString(request.Image)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - create asset - decode image")
 			errorResponse(c, http.StatusBadRequest, "Failed to decode base64 image", err)
@@ -276,7 +278,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		}
 	}
 
-	asset, err = r.as.Create(asset)
+	asset, err = r.as.Create(asset, imageBytes)
 	if err != nil {
 		r.logger.Error(err, "http - v1 - create asset - create asset")
 		errorResponse(c, http.StatusNotFound, "database problems", err)

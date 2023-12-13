@@ -8,6 +8,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/app"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/aws"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/kafka"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
@@ -28,6 +29,13 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres: %w", err))
 	}
 	defer pg.Close()
+
+	// AWS Service
+	// TODO if is not production, use mock
+	awsService, err := aws.New(cfg.AWS)
+	if err != nil {
+		log.Fatal("app - Run - aws.NewAwsService: %w", err)
+	}
 
 	// Kafka create keypair connection
 	kpConn := kafka.New(cfg.Kafka, cfg.Kafka.CreateKpCfg.ConsumerTopics, cfg.Kafka.CreateKpCfg.ProducerTopic)
@@ -56,5 +64,5 @@ func main() {
 	}
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, tRepo)
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, tRepo, awsService)
 }

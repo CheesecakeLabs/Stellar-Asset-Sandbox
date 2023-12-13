@@ -8,7 +8,7 @@ type Asset struct {
 	Issuer      Wallet `json:"issuer"`
 	Amount      int    `json:"amount" example:"1000000"`
 	AssetType   string `json:"asset_type"`
-	Image       []byte `json:"image,omitempty"`
+	Image       string `json:"image,omitempty"`
 }
 
 const (

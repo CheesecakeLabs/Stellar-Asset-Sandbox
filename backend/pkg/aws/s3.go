@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-func (s *AwsConnection) uploadToS3(file []byte, filename string) (string, error) {
+func (s *AwsConnection) UploadToS3(filename string, file []byte) (string, error) {
 	uploader := s3manager.NewUploader(s.session)
 
 	result, err := uploader.Upload(&s3manager.UploadInput{
