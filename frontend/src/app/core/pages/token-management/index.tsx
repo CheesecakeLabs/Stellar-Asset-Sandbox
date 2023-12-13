@@ -33,6 +33,7 @@ export const TokenManagement: React.FC = () => {
   }, [getUserPermissions])
 
   const changePage = (pageSelected: number): void => {
+    setLoading(true)
     getPagedAssets({
       page: pageSelected,
       limit: LIMIT,

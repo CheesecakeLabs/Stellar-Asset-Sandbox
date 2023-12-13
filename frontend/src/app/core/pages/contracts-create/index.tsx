@@ -26,6 +26,8 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
+  const [isGeneratedContractId, setGeneratedContractId] = useState(false)
+
   const { loadingAssets, assets, getAssets, updateContractId } = useAssets()
   const { createContract } = useContracts()
   const { vaults, loadingVaults, getVaults } = useVaults()
@@ -75,7 +77,7 @@ export const ContractsCreate: React.FC = () => {
         assetIssuerPk: asset.issuer.key.publicKey,
       })
 
-      if (!asset.contract_id) {
+      if (!asset.contract_id && !isGeneratedContractId) {
         const preppedTx = await SorobanService.wrapClassicAsset(
           operation,
           sourceAccount
@@ -95,6 +97,7 @@ export const ContractsCreate: React.FC = () => {
             await SorobanService.submitSoroban(transaction)
           }
         }
+        setGeneratedContractId(true)
       }
 
       const latestSequenceLedger = await getLatestSequenceLedger()

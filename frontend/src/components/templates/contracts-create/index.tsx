@@ -62,7 +62,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
   const [compoundType, setCompoundType] =
     useState<TSelectCompoundType>('Simple interest')
 
-  const { handleSubmit, setValue, getValues, register } = useForm()
+  const { handleSubmit, setValue, getValues } = useForm()
 
   const filteredAssets = (): Hooks.UseAssetsTypes.IAssetDto[] | undefined => {
     return (
@@ -186,11 +186,13 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                       <FormLabel>Yield Rate</FormLabel>
                       <InputGroup>
                         <Input
-                          type="number"
+                          as={NumericFormat}
+                          decimalScale={2}
+                          autoComplete="off"
                           placeholder="Yield Rate"
-                          {...register('yield_rate', {
-                            required: true,
-                          })}
+                          onChange={(event): void => {
+                            setValue('yield_rate', toNumber(event.target.value))
+                          }}
                         />
                         <InputRightAddon children="%" />
                       </InputGroup>
@@ -201,7 +203,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                       <InputGroup>
                         <Input
                           as={NumericFormat}
-                          decimalScale={7}
+                          decimalScale={2}
                           thousandSeparator=","
                           placeholder="Penalty rate"
                           autoComplete="off"

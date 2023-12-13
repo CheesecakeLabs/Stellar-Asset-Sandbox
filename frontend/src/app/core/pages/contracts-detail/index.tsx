@@ -266,7 +266,7 @@ export const ContractsDetail: React.FC = () => {
           hasAssetInVault={hasAssetInVault()}
           accessWallet={accessWallet}
           accessProfile={accessProfile}
-          hasWallet={profile?.vault_id !== undefined}
+          hasWallet={profile?.vault_id !== null}
           loading={loadingPosition}
           contract={contract}
           userAccount={profile?.vault?.wallet?.key.publicKey}

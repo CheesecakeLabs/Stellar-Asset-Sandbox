@@ -45,6 +45,8 @@ export const Deposit: React.FC<IDeposit> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
   } = useForm()
 
   const [amount, setAmount] = useState<string>()
@@ -138,11 +140,23 @@ export const Deposit: React.FC<IDeposit> = ({
                     placeholder="Amount to deposit..."
                     autoComplete="off"
                     onChange={(target): void => {
+                      if (
+                        Number(toNumber(target.currentTarget.value)) <
+                        (contract?.min_deposit || 0)
+                      ) {
+                        setError('amount', {
+                          message: `The minimum deposit is ${contract?.min_deposit} ${contract?.asset.code}`,
+                        })
+                      } else {
+                        clearErrors('amount')
+                      }
                       setAmount(toNumber(target.currentTarget.value))
                       limitExceeded(target.currentTarget.value)
                     }}
                   />
-                  <FormErrorMessage>Required</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors?.amount?.message?.toString() || 'Required'}
+                  </FormErrorMessage>
                 </FormControl>
 
                 <Button
@@ -152,7 +166,12 @@ export const Deposit: React.FC<IDeposit> = ({
                   variant="primary"
                   isLoading={loading}
                   mt="1.5rem"
-                  isDisabled={Number(currentBalance) === 0 || isLimitExceeded}
+                  isDisabled={
+                    Number(currentBalance) === 0 ||
+                    isLimitExceeded ||
+                    !amount ||
+                    errors?.amount !== undefined
+                  }
                 >
                   Deposit
                 </Button>
