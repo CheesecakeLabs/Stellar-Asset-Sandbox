@@ -106,7 +106,7 @@ export const AuthorizeAccount: React.FC = () => {
         asset.code,
         asset.issuer.key.publicKey
       )
-      const vaults = await getVaults()
+      const vaults = await getVaults(true)
       const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
       const vaultsUnauthorized = filterVaultsByStatus(
         vaults,
