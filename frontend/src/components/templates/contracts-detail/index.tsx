@@ -3,7 +3,7 @@ import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
 import { havePermission } from 'utils'
-import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { MAX_PAGE_WIDTH_FULL } from 'utils/constants/sizes'
 
 import { ContractInfo } from './components/contract-info'
 import { Deposit } from './components/deposit'
@@ -56,7 +56,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
 }) => {
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
+      <Flex maxW={MAX_PAGE_WIDTH_FULL} alignSelf="center" flexDir="column" w="full">
         {loading || !contract ? (
           <Skeleton w="full" h="14rem" />
         ) : (
