@@ -37,7 +37,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -64,7 +64,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 		var issuer entity.Wallet
 
 		err := rows.Scan(
-			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -86,7 +86,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type,a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type,a.code as asset_code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -106,7 +106,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 	var issuer entity.Wallet
 
 	err := row.Scan(
-		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -127,7 +127,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
+	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image ) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
 	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType, data.Image).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
@@ -139,7 +139,7 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	query := `
 		SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image, a.contract_id,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -159,7 +159,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	var issuer entity.Wallet
 
 	err := row.Scan(
-		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image, &asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -178,14 +178,14 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	return asset, nil
 }
 
-func (r AssetRepo) StoreAssetImage(assetId string, imageBytes []byte) error {
+func (r AssetRepo) StoreAssetImage(assetId string, image string) error {
 	stmt := `
     	UPDATE asset 
     	SET image = $2
     	WHERE id = $1
 	`
 
-	_, err := r.Db.Exec(stmt, assetId, imageBytes)
+	_, err := r.Db.Exec(stmt, assetId, image)
 	if err != nil {
 		return fmt.Errorf("AssetRepo - StoreAssetImage - Db.Exec: %w", err)
 	}
@@ -211,10 +211,40 @@ func (r AssetRepo) GetAssetImage(assetId string) ([]byte, error) {
 	return image, nil
 }
 
-func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
-	// Calculate offset
+func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
+	stmt := `
+    	UPDATE asset
+    	SET contract_id = $2
+    	WHERE id = $1
+	`
+
+	_, err := r.Db.Exec(stmt, assetId, contractId)
+	if err != nil {
+		return fmt.Errorf("AssetRepo - UpdateContractId - Db.Exec: %w", err)
+	}
+
+	return nil
+}
+
+func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+	// Calculate the offset	// Calculate offset
 	offset := (page - 1) * limit
 
+	// Query to count the total number of assets
+	countQuery := `
+        SELECT COUNT(*)
+        FROM asset;
+    `
+	var totalAssets int
+	err := r.Db.QueryRow(countQuery).Scan(&totalAssets)
+	if err != nil {
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Count Query: %w", err)
+	}
+
+	// Calculate total pages
+	totalPages := (totalAssets + limit - 1) / limit
+
+	// Query to fetch paginated assets
 	query := `
         SELECT
             a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, a.image,
@@ -233,7 +263,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 
 	rows, err := r.Db.Query(query, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -251,7 +281,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 			&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
+			return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
 		}
 
 		asset.Distributor = distributor
@@ -260,5 +290,5 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, erro
 		assets = append(assets, asset)
 	}
 
-	return assets, nil
+	return assets, totalPages, nil
 }

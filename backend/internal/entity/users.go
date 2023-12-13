@@ -18,6 +18,8 @@ type (
 		Role      string `json:"role" db:"role"`
 		Email     string `json:"email" db:"email"`
 		RoleId    int    `json:"role_id" db:"role_id"`
+		VaultId   *int   `json:"vault_id"`
+		Vault     *Vault `json:"vault,omitempty"`
 	}
 
 	UserRole struct {

@@ -57,7 +57,7 @@ func CORSMiddleware(cfg config.HTTP, l *logger.Logger) gin.HandlerFunc {
 // @BasePath    /
 func NewRouter(
 	handler *gin.Engine,
-	pKp, pHor, pEnv entity.ProducerInterface,
+	pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface,
 	authUseCase usecase.AuthUseCase,
 	userUseCase usecase.UserUseCase,
 	walletUseCase usecase.WalletUseCase,
@@ -72,7 +72,7 @@ func NewRouter(
 	logger *logger.Logger,
 ) {
 	// Messenger
-	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv)
+	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv, pSub, pSig)
 	// Options Gin
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -85,15 +85,16 @@ func NewRouter(
 	handler.Use(CORSMiddleware(cfg, logger))
 	groupV1 := handler.Group("/v1")
 	{
-		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, logger)
+		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, logger, vaultUc)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase, logger)
 		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)
 		newRoleRoutes(groupV1, roleUseCase, messengerController, logger)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController, logger)
 		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc, logger)
 		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase, logger)
-		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase, logger)
+		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase, userUseCase, logger)
 		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase, logger)
+		newSorobanRoutes(groupV1, walletUseCase, messengerController, authUseCase)
 		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)
 	}
 }

@@ -42,7 +42,7 @@ func (uc *AssetUseCase) Create(data entity.Asset, imageBytes []byte) (entity.Ass
 
 	// Upload image to S3 if exists
 	if len(imageBytes) > 0 {
-		assetImage, err := uc.awsService.UploadAssetImage(data.Code, imageBytes)
+		assetImage, err := uc.awsService.UploadAssetImage(fmt.Sprint(data.Id), imageBytes)
 		if err != nil {
 			return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 		}
@@ -85,7 +85,12 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 }
 
 func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
-	err := uc.aRepo.StoreAssetImage(assetId, imageBytes)
+	assetImage, err := uc.awsService.UploadAssetImage(assetId, imageBytes)
+	if err != nil {
+		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
+	}
+
+	err = uc.aRepo.StoreAssetImage(assetId, assetImage)
 	if err != nil {
 		return fmt.Errorf("ImageUseCase - UploadImage - uc.aRepo.StoreAssetImage: %w", err)
 	}
@@ -171,11 +176,19 @@ func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
 	return tomParsed, err
 }
 
-func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
-	assets, err := uc.aRepo.GetPaginatedAssets(page, limit)
+func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) error {
+	err := uc.aRepo.UpdateContractId(assetId, contractId)
 	if err != nil {
-		return nil, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
+		return fmt.Errorf("AssetUseCase - UpdateContractId - uc.aRepo.UpdateContractId: %w", err)
+	}
+	return nil
+}
+
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit)
+	if err != nil {
+		return nil, 0, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
 	}
 
-	return assets, nil
+	return assets, totalPages, nil
 }

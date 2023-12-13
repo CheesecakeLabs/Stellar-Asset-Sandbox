@@ -1,0 +1,1 @@
+ALTER TABLE vault DROP COLUMN owner_id;

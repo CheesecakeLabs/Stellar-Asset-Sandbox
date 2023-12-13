@@ -47,9 +47,10 @@ type (
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 		GetAssetById(string) (entity.Asset, error)
-		StoreAssetImage(string, []byte) error
+		StoreAssetImage(string, string) error
 		GetAssetImage(string) ([]byte, error)
-		GetPaginatedAssets(int, int) ([]entity.Asset, error)
+		GetPaginatedAssets(int, int) ([]entity.Asset, int, error)
+		UpdateContractId(string, string) error
 	}
 
 	// Role -.
@@ -89,7 +90,7 @@ type (
 	}
 
 	VaultRepoInterface interface {
-		GetVaults() ([]entity.Vault, error)
+		GetVaults(isAll bool) ([]entity.Vault, error)
 		CreateVault(entity.Vault) (entity.Vault, error)
 		UpdateVault(entity.Vault) (entity.Vault, error)
 		GetVaultById(id int) (entity.Vault, error)
@@ -102,6 +103,9 @@ type (
 		CreateContract(entity.Contract) (entity.Contract, error)
 		GetContractById(id string) (entity.Contract, error)
 		GetPaginatedContracts(int, int) ([]entity.Contract, error)
+		GetHistory(userId int, contractId int) ([]entity.ContractHistory, error)
+		AddContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)
+		UpdateContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)
 	}
 
 	LogTransactionRepoInterface interface {

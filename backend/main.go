@@ -64,5 +64,23 @@ func main() {
 	}
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, tRepo, awsService)
+	// Kafka submit transaction connection
+	submitConn := kafka.New(cfg.Kafka, cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
+	err = submitConn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka submit transaction topics %s\n", err)
+		os.Exit(1)
+	}
+	go submitConn.Run(cfg, entity.SubmitTransactionChannel)
+
+	// Kafka Sign Transaction connection
+	signConn := kafka.New(cfg.Kafka, cfg.Kafka.SignTransactionCfg.ConsumerTopics, cfg.Kafka.SignTransactionCfg.ProducerTopic)
+	err = signConn.AttemptConnect()
+	if err != nil {
+		fmt.Printf("Failed to connect to Kafka sign transaction topics %s\n", err)
+		os.Exit(1)
+	}
+	go signConn.Run(cfg, entity.SignChannel)
+
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo, awsService)
 }
