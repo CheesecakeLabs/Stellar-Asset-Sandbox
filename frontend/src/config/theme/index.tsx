@@ -1,9 +1,8 @@
-import { extendTheme } from '@chakra-ui/react';
+import { extendTheme } from '@chakra-ui/react'
 
+import '@fontsource/inter'
 
-
-import * as components from './components';
-
+import * as components from './components'
 
 const theme = extendTheme({
   config: {
@@ -22,9 +21,9 @@ const theme = extendTheme({
     }),
   },
   fonts: {
-    body: '"Arial", sans-serif',
+    body: '"Inter", "Arial"',
     heading: '"Chakra Petch", sans-serif',
-    mono: '"Arial", sans-serif',
+    mono: '"Inter", sans-serif',
   },
   fontSizes: {
     xxs: '0.625rem', // 10px
@@ -79,13 +78,16 @@ const theme = extendTheme({
       350: '#C8C7CB',
       400: '#EEEDEF',
       500: '#f9f8f9',
-      600: '#E9E8EA',
+      600: '#EAEBEF',
+      650: '#6F6E77',
       700: '#828282',
       900: '#908E96',
     },
     blue: {
       50: '#E5F8FF',
+      100: '#7EC4CF',
       200: '#80DEFF',
+      300: '#52B2CF',
       500: '#00ABE6',
       800: '#19AECF',
     },
@@ -95,6 +97,7 @@ const theme = extendTheme({
       600: '#292d3e',
       700: '#303448',
       800: '#3a3e4d',
+      900: '#3f444e',
     },
     green: {
       500: '#17B890',
@@ -106,7 +109,9 @@ const theme = extendTheme({
       500: '#E85858',
     },
     purple: {
+      50: '#faf5ff',
       200: '#F5F2FF',
+      300: '#9CADCE',
       500: '#AA99EC',
     },
   },

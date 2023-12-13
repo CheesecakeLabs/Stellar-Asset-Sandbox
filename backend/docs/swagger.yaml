@@ -1,6 +1,11 @@
 definitions:
   entity.Asset:
     properties:
+      amount:
+        example: 1000000
+        type: integer
+      asset_type:
+        type: string
       code:
         example: USDC
         type: string
@@ -9,8 +14,120 @@ definitions:
       id:
         example: 1
         type: integer
+      image:
+        items:
+          type: integer
+        type: array
       issuer:
         $ref: '#/definitions/entity.Wallet'
+      name:
+        example: USD Coin
+        type: string
+    type: object
+  entity.Contract:
+    properties:
+      address:
+        type: string
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      min_deposit:
+        type: integer
+      name:
+        example: Smart Contract
+        type: string
+      penalty_rate:
+        type: integer
+      term:
+        type: integer
+      vault:
+        $ref: '#/definitions/entity.Vault'
+      yield_rate:
+        type: integer
+    type: object
+  entity.Currency:
+    properties:
+      anchor_asset:
+        type: string
+      anchor_asset_type:
+        type: string
+      approval_criteria:
+        type: string
+      approval_server:
+        type: string
+      attestation_of_reserve:
+        type: string
+      code:
+        type: string
+      collateral_address_messages:
+        items:
+          type: string
+        type: array
+      collateral_address_signatures:
+        items:
+          type: string
+        type: array
+      collateral_addresses:
+        items:
+          type: string
+        type: array
+      conditions:
+        type: string
+      desc:
+        type: string
+      display_decimals:
+        type: integer
+      fixed_number:
+        type: integer
+      image:
+        type: string
+      is_asset_anchored:
+        type: boolean
+      is_unlimited:
+        type: boolean
+      issuer:
+        type: string
+      max_number:
+        type: integer
+      name:
+        type: string
+      redemption_instructions:
+        type: string
+      regulated:
+        type: boolean
+    type: object
+  entity.Documentation:
+    properties:
+      ORG_DBA:
+        type: string
+      ORG_DESCRIPTION:
+        type: string
+      ORG_GITHUB:
+        type: string
+      ORG_KEYBASE:
+        type: string
+      ORG_LOGO:
+        type: string
+      ORG_NAME:
+        type: string
+      ORG_OFFICIAL_EMAIL:
+        type: string
+      ORG_PHONE_NUMBER:
+        type: string
+      ORG_PHONE_NUMBER_ATTESTATION:
+        type: string
+      ORG_PHYSICAL_ADDRESS:
+        type: string
+      ORG_PHYSICAL_ADDRESS_ATTESTATION:
+        type: string
+      ORG_TWITTER:
+        type: string
+      ORG_URL:
+        type: string
     type: object
   entity.Key:
     properties:
@@ -27,19 +144,250 @@ definitions:
         example: 3
         type: integer
     type: object
+  entity.LogTransaction:
+    properties:
+      amount:
+        example: 100000
+        type: number
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      current_main_vault:
+        example: 1000
+        type: number
+      current_supply:
+        example: 1000
+        type: number
+      date:
+        example: "2023-08-10T14:30:00Z"
+        type: string
+      description:
+        example: Mint Asset
+        type: string
+      destination_pk:
+        example: GSDC...
+        type: string
+      log_id:
+        example: 1
+        type: integer
+      origin_pk:
+        example: GSDC...
+        type: string
+      transaction_type_id:
+        example: 1
+        type: integer
+      user_id:
+        example: 42
+        type: integer
+    type: object
+  entity.Permission:
+    properties:
+      description:
+        example: description
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: name
+        type: string
+    type: object
+  entity.Principal:
+    properties:
+      email:
+        type: string
+      github:
+        type: string
+      id_photo_hash:
+        type: string
+      keybase:
+        type: string
+      name:
+        type: string
+      twitter:
+        type: string
+      verification_photo_hash:
+        type: string
+    type: object
+  entity.Role:
+    properties:
+      admin:
+        example: 1
+        type: integer
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Admin
+        type: string
+    type: object
+  entity.RoleDelete:
+    properties:
+      id:
+        example: 1
+        type: integer
+      new_users_role_id:
+        example: 1
+        type: integer
+    type: object
+  entity.RolePermissionResponse:
+    properties:
+      permission_id:
+        example: 1
+        type: integer
+      role_id:
+        example: "1"
+        type: string
+    type: object
+  entity.RoleRequest:
+    properties:
+      name:
+        example: Admin
+        type: string
+    type: object
+  entity.SumLogTransaction:
+    properties:
+      amount:
+        example:
+        - 100000
+        items:
+          type: number
+        type: array
+      asset:
+        $ref: '#/definitions/entity.Asset'
+      date:
+        example:
+        - "2023-08-10T14:30:00Z"
+        items:
+          type: string
+        type: array
+      quantity:
+        example:
+        - 1
+        items:
+          type: integer
+        type: array
+    type: object
+  entity.TomlData:
+    properties:
+      ACCOUNTS:
+        items:
+          type: string
+        type: array
+      CURRENCIES:
+        items:
+          $ref: '#/definitions/entity.Currency'
+        type: array
+      DOCUMENTATION:
+        $ref: '#/definitions/entity.Documentation'
+      FEDERATION_SERVER:
+        type: string
+      HORIZON_URL:
+        type: string
+      NETWORK_PASSPHRASE:
+        type: string
+      PRINCIPALS:
+        items:
+          $ref: '#/definitions/entity.Principal'
+        type: array
+      SIGNING_KEY:
+        type: string
+      TRANSFER_SERVER:
+        type: string
+      VALIDATORS:
+        items:
+          $ref: '#/definitions/entity.Validator'
+        type: array
+      VERSION:
+        type: string
+    type: object
   entity.User:
     properties:
-      _:
-        type: string
       created_at:
+        type: string
+      email:
         type: string
       id:
         type: string
       name:
         type: string
-      token_hash:
+      password:
+        type: string
+      role_id:
+        type: integer
+      token:
         type: string
       updated_at:
+        type: string
+    type: object
+  entity.UserPermissionResponse:
+    properties:
+      action:
+        example: Edit action
+        type: string
+      name:
+        example: Edit
+        type: string
+    type: object
+  entity.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  entity.UserRole:
+    properties:
+      id_role:
+        type: string
+      id_user:
+        type: string
+    type: object
+  entity.Validator:
+    properties:
+      ALIAS:
+        type: string
+      DISPLAY_NAME:
+        type: string
+      HISTORY:
+        type: string
+      HOST:
+        type: string
+      PUBLIC_KEY:
+        type: string
+    type: object
+  entity.Vault:
+    properties:
+      active:
+        type: integer
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      vault_category:
+        $ref: '#/definitions/entity.VaultCategory'
+      wallet:
+        $ref: '#/definitions/entity.Wallet'
+    type: object
+  entity.VaultCategory:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      theme:
+        example: blue
         type: string
     type: object
   entity.Wallet:
@@ -55,20 +403,151 @@ definitions:
         example: sponsor
         type: string
     type: object
-  v1.CreateAssetRequest:
+  v1.BurnAssetRequest:
     properties:
-      code:
-        example: USDC
+      amount:
+        example: "1000"
         type: string
-      limit:
+      current_main_vault:
         example: 1000
-        type: integer
+        type: number
+      current_supply:
+        example: 1000
+        type: number
+      id:
+        example: "001"
+        type: string
       sponsor_id:
         example: 2
         type: integer
     required:
+    - amount
+    - id
+    type: object
+  v1.ClawbackAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      current_main_vault:
+        example: 1000
+        type: number
+      current_supply:
+        example: 1000
+        type: number
+      from:
+        example: GDKIJJIKXLOM2NRMPNQZUUYK24ZPVFC6426GZAICZ6E5PQG2MIPIMB2L
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
     - code
-    - sponsor_id
+    - from
+    type: object
+  v1.CreateAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      asset_type:
+        example: security_token
+        type: string
+      code:
+        example: USDC
+        type: string
+      image:
+        example: iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///...
+        type: string
+      limit:
+        example: 1000
+        type: integer
+      name:
+        example: USDC
+        type: string
+      set_flags:
+        example:
+        - '["AUTH_REQUIRED_FLAGS"'
+        - ' "AUTH_REVOCABLE_FLAGS"'
+        - '"AUTH_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - asset_type
+    - code
+    - name
+    type: object
+  v1.CreateContractRequest:
+    properties:
+      address:
+        example: GSDSC...
+        type: string
+      asset_id:
+        example: "1"
+        type: string
+      min_deposit:
+        example: 1
+        type: integer
+      name:
+        example: Treasury
+        type: string
+      penalty_rate:
+        example: 1
+        type: integer
+      term:
+        example: 1
+        type: integer
+      vault_id:
+        example: "1"
+        type: string
+      yield_rate:
+        example: 1
+        type: integer
+    required:
+    - address
+    - asset_id
+    - min_deposit
+    - name
+    - penalty_rate
+    - term
+    - vault_id
+    - yield_rate
+    type: object
+  v1.CreateVaultCategoryRequest:
+    properties:
+      name:
+        example: Treasury
+        type: string
+      theme:
+        example: blue
+        type: string
+    required:
+    - name
+    type: object
+  v1.CreateVaultRequest:
+    properties:
+      assets_id:
+        items:
+          type: integer
+        type: array
+      name:
+        example: Treasury
+        type: string
+      vault_category_id:
+        example: 1
+        type: integer
+    required:
+    - assets_id
+    - name
+    - vault_category_id
     type: object
   v1.CreateWalletRequest:
     properties:
@@ -86,23 +565,241 @@ definitions:
     required:
     - id
     type: object
+  v1.MintAssetRequest:
+    properties:
+      amount:
+        example: "1000"
+        type: string
+      code:
+        example: USDC
+        type: string
+      current_main_vault:
+        example: 1000
+        type: number
+      current_supply:
+        example: 1000
+        type: number
+      id:
+        example: "12"
+        type: string
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - code
+    - id
+    type: object
+  v1.RolePermissionRequest:
+    properties:
+      is_add:
+        example: false
+        type: boolean
+      permission_id:
+        example: 1
+        type: integer
+      role_id:
+        example: 1
+        type: integer
+    type: object
+  v1.TransferAssetRequest:
+    properties:
+      amount:
+        example: "12"
+        type: string
+      asset_id:
+        example: "12"
+        type: string
+      current_main_vault:
+        example: 1000
+        type: number
+      current_supply:
+        example: 1000
+        type: number
+      destination_wallet_pk:
+        example: GABCD....
+        type: string
+      source_wallet_id:
+        example: 1
+        type: integer
+      sponsor_id:
+        example: 2
+        type: integer
+    required:
+    - amount
+    - asset_id
+    - destination_wallet_pk
+    - source_wallet_id
+    type: object
+  v1.UpdateAuthFlagsRequest:
+    properties:
+      clear_flags:
+        example:
+        - '["TRUST_LINE_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      code:
+        example: USDC
+        type: string
+      issuer:
+        example: 2
+        type: integer
+      set_flags:
+        example:
+        - '["TRUST_LINE_AUTHORIZED"'
+        - ' "TRUST_LINE_AUTHORIZED_TO_MAINTAIN_LIABILITIES"'
+        - '"TRUST_LINE_CLAWBACK_ENABLED"]'
+        items:
+          type: string
+        type: array
+      trustor_id:
+        example: 2
+        type: integer
+      trustor_pk:
+        example: "2"
+        type: string
+    required:
+    - code
+    - issuer
+    type: object
+  v1.UpdateVaultAssetRequest:
+    properties:
+      asset_code:
+        example: "1"
+        type: string
+      asset_issuer_pk:
+        example: "1"
+        type: string
+      is_add:
+        example: true
+        type: boolean
+      is_remove:
+        example: false
+        type: boolean
+    required:
+    - asset_code
+    - asset_issuer_pk
+    type: object
+  v1.UpdateVaultCategoryRequest:
+    properties:
+      name:
+        example: Vault 2
+        type: string
+      vault_category_id:
+        example: 1
+        type: integer
+    required:
+    - vault_category_id
+    type: object
   v1.response:
     properties:
       error:
-        example: message
+        type: string
+      message:
         type: string
     type: object
   v1.userResponse:
     properties:
-      token:
-        type: string
       user:
         $ref: '#/definitions/entity.User'
     type: object
 info:
   contact: {}
 paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Get contract
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Contract'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get contract
+      tags:
+      - Contract
+  /.well-known/stellar.toml:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a TOML file
+      parameters:
+      - description: Asset issuer
+        in: path
+        name: asset_issuer
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve a TOML file
+      tags:
+      - Assets
+  /asset:
+    get:
+      consumes:
+      - application/json
+      description: Get asset by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get asset by id
+      tags:
+      - Assets
   /assets:
+    get:
+      consumes:
+      - application/json
+      description: Get all assets with optional pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Asset'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all assets
+      tags:
+      - Assets
     post:
       consumes:
       - application/json
@@ -136,6 +833,846 @@ paths:
       summary: Create a new asset
       tags:
       - Assets
+  /assets/{id}/image:
+    post:
+      consumes:
+      - application/json
+      description: Upload a base64 encoded image for a specific asset by ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Base64 Encoded Asset Image
+        in: body
+        name: image
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Upload image for an asset
+      tags:
+      - Assets
+  /assets/{id}/image.png:
+    get:
+      description: Fetch the image of a specified asset using its ID
+      parameters:
+      - description: Asset ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Retrieve asset image
+      tags:
+      - Assets
+  /assets/auth-flags:
+    post:
+      consumes:
+      - application/json
+      description: Update the authorization flags of a trust line on Stellar
+      parameters:
+      - description: Authorization flags
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateAuthFlagsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update authorization flags of a trust line
+      tags:
+      - Assets
+  /assets/burn:
+    post:
+      consumes:
+      - application/json
+      description: Burn an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.BurnAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Burn an asset
+      tags:
+      - Assets
+  /assets/clawback:
+    post:
+      consumes:
+      - application/json
+      description: Clawback an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ClawbackAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Clawback an asset
+      tags:
+      - Assets
+  /assets/generate-toml:
+    post:
+      consumes:
+      - application/json
+      description: Create a TOML file
+      parameters:
+      - description: TOML info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TomlData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a TOML file
+      tags:
+      - Assets
+  /assets/mint:
+    post:
+      consumes:
+      - application/json
+      description: Mint an asset on Stellar
+      parameters:
+      - description: Asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.MintAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Asset'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Mint an asset
+      tags:
+      - Assets
+  /assets/toml:
+    get:
+      consumes:
+      - application/json
+      description: Get TOML data
+      parameters:
+      - description: Asset issuer
+        in: path
+        name: asset_issuer
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get TOML data
+      tags:
+      - Assets
+  /assets/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Transfer an asset between wallets on Stellar
+      parameters:
+      - description: Transfer info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.TransferAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Transfer an asset
+      tags:
+      - Assets
+  /assets/update-toml:
+    put:
+      consumes:
+      - application/json
+      description: Update a TOML file
+      parameters:
+      - description: TOML info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TomlData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TomlData'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a TOML file
+      tags:
+      - Assets
+  /contract:
+    post:
+      consumes:
+      - application/json
+      description: Create new contract
+      parameters:
+      - description: Contract info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateContractRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Contract'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new contract
+      tags:
+      - Contract
+  /contracts:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all contracts, with optional pagination
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Contract'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all contracts
+      tags:
+      - Contract
+  /log_transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs within a specific time range
+      parameters:
+      - description: Time range (e.g., last 24 hours, last 7 days, last 30 days)
+        in: query
+        name: time_range
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all transactions logs
+      tags:
+      - Log Transactions
+  /log_transactions/asset/{asset_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific asset
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Asset ID
+      tags:
+      - Log Transactions
+  /log_transactions/assets/{asset_id}/type/{transaction_type_id}/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for a specific asset, grouped by a specified
+        time frame (e.g., '1h' for 1 hour) and a specific transaction type
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      - description: Transaction type ID (e.g., '0' for all transactions, '1' for
+          type create asset '2' for mint asset)
+        in: path
+        name: transaction_type_id
+        required: true
+        type: string
+      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
+        in: path
+        name: time_frame
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sum log transaction for the specified asset
+          schema:
+            $ref: '#/definitions/entity.SumLogTransaction'
+        "400":
+          description: invalid transaction type
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts by Asset ID within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/assets/sum/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of amounts for all assets, grouped by a specified time
+        frame (e.g., '1h' for 1 hour)
+      parameters:
+      - description: Time range for the query (e.g., '24h')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for grouping (e.g., '1h'). Default is '1h'
+        in: query
+        name: time_frame
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Array of sum log transactions
+          schema:
+            items:
+              $ref: '#/definitions/entity.SumLogTransaction'
+            type: array
+        "400":
+          description: Invalid time_frame format
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of amounts for all assets within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/last_transactions/{transaction_type_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get last transactions logs for a specific transaction type
+      parameters:
+      - description: Transaction Type ID
+        in: path
+        name: transaction_type_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get last transactions
+      tags:
+      - Log Transactions
+  /log_transactions/supply/{asset_id}/{time_range}/{time_frame}:
+    get:
+      consumes:
+      - application/json
+      description: Get sum of supply for a specific asset, grouped by a specified
+        time frame (e.g., '1h' for 1 hour)
+      parameters:
+      - description: Asset ID
+        in: path
+        name: asset_id
+        required: true
+        type: integer
+      - description: Time range for the query (e.g., '24h' or '1d' '7d' '30d')
+        in: path
+        name: time_range
+        required: true
+        type: string
+      - description: Time frame for the query (e.g., '1h' '2h' '24h' '36h')
+        in: path
+        name: time_frame
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.SumLogTransaction'
+        "400":
+          description: Invalid time_frame format
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get sum of supply by Asset ID within a specific time frame
+      tags:
+      - Log Transactions
+  /log_transactions/transaction_type/{transaction_type_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific transaction type
+      parameters:
+      - description: Transaction Type ID
+        in: path
+        name: transaction_type_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by Transaction Type ID
+      tags:
+      - Log Transactions
+  /log_transactions/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions logs for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LogTransaction'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transactions logs by User ID
+      tags:
+      - Log Transactions
+  /role:
+    get:
+      consumes:
+      - application/json
+      description: List role
+      parameters:
+      - description: Type
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Role'
+            type: array
+      summary: List
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: Create a new role
+      parameters:
+      - description: Role info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.RoleRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new role
+      tags:
+      - Role
+  /role-permission:
+    put:
+      consumes:
+      - application/json
+      description: Update roles permissions
+      parameters:
+      - description: Roles permissions information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.RolePermissionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated roles permissions information
+          schema:
+            $ref: '#/definitions/v1.RolePermissionRequest'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update roles permissions'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update roles permissions
+      tags:
+      - RolesPermissions
+  /role-permission/permissions:
+    get:
+      consumes:
+      - application/json
+      description: permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Permission'
+            type: array
+      summary: Permissions
+      tags:
+      - Permissions
+  /role-permission/role-permissions:
+    get:
+      consumes:
+      - application/json
+      description: Roles permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.RolePermissionResponse'
+            type: array
+      summary: Roles permissions
+      tags:
+      - RolePermissions
+  /role-permission/user-permissions:
+    get:
+      consumes:
+      - application/json
+      description: User permissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.UserPermissionResponse'
+            type: array
+      summary: User permissions
+      tags:
+      - RolePermissions
+  /role/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a role by providing the Role ID and the updated information.
+      parameters:
+      - description: Role ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated role information
+          schema:
+            $ref: '#/definitions/entity.RoleDelete'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Role not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to delete role'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Delete a role
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      description: Update a role by providing the Role ID and the updated information.
+      parameters:
+      - description: Role ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Role info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated role information
+          schema:
+            $ref: '#/definitions/entity.Role'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Role not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update role'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a role
+      tags:
+      - Role
   /user/create:
     post:
       consumes:
@@ -196,6 +1733,314 @@ paths:
       summary: Logout User
       tags:
       - user
+  /users/edit-users-role:
+    post:
+      consumes:
+      - application/json
+      description: Edit users role
+      operationId: editUsersRole
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserRole'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Edit users role
+      tags:
+      - user
+  /users/list-users:
+    get:
+      consumes:
+      - application/json
+      description: List users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.UserResponse'
+            type: array
+      summary: GET All Users
+      tags:
+      - user
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get PRofile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserResponse'
+      summary: GET Profile
+      tags:
+      - user
+  /vault:
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: CreateVaultRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault
+      tags:
+      - Vault
+  /vault-asset/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the asset.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault asset info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultAssetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault asset information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault asset'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault asset
+      tags:
+      - Vault
+  /vault-category:
+    get:
+      consumes:
+      - application/json
+      description: Get all vault categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.VaultCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all vault categories
+      tags:
+      - Vault category
+    post:
+      consumes:
+      - application/json
+      description: Create and issue a new asset on Stellar
+      parameters:
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.VaultCategory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Create a new vault category
+      tags:
+      - Vault Category
+  /vault-category/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault category by providing the Vault Category ID and
+        the updated information.
+      parameters:
+      - description: Vault Category ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Vault Category info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateVaultCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault category information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault category not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault category'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault category
+      tags:
+      - Vault Category
+  /vault-delete/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a vault by providing the Vault ID and the updated the status.
+      parameters:
+      - description: Vault ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated vault status information
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "400":
+          description: 'Bad Request: Invalid input data'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: 'Not Found: Vault not found'
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: 'Internal Server Error: Failed to update vault status'
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a vault status
+      tags:
+      - Vault
+  /vault/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get vault
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Vault'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get vault
+      tags:
+      - Vault
+  /vault/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all vaults, with optional pagination
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page for pagination
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Vault'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Get all vaults
+      tags:
+      - Vault
   /wallets:
     get:
       consumes:

@@ -2,12 +2,13 @@
 package app
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	timeout "github.com/vearne/gin-timeout"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	v1 "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/v1"
@@ -15,13 +16,14 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
-	//l := logger.New(cfg.Log.Level)
-
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator) {
+	l := logger.New(cfg.Log.Level)
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -35,6 +37,9 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	assetUc := usecase.NewAssetUseCase(
 		repo.NewAssetRepo(pg),
 		repo.NewWalletRepo(pg),
+		tRepo,
+		repo.NewTomlRepo(pg),
+		cfg.Horizon,
 	)
 	roleUc := usecase.NewRoleUseCase(
 		repo.NewRoleRepo(pg),
@@ -43,11 +48,30 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 		repo.NewRolePermissionRepo(pg),
 		*userUc,
 	)
+	vaultCategoryUc := usecase.NewVaultCategoryUseCase(
+		repo.NewVaultCategoryRepo(pg),
+	)
+	vaultUc := usecase.NewVaultUseCase(
+		repo.NewVaultRepo(pg),
+		repo.NewWalletRepo(pg),
+	)
+	contractUc := usecase.NewContractUseCase(
+		repo.NewContractRepo(pg),
+	)
+	logUc := usecase.NewLogTransactionUseCase(
+		repo.NewLogTransactionRepo(pg),
+	)
 
 	// HTTP Server
-	handler := gin.New()
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc)
-	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
+	handler := gin.Default()
+	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
+
+	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l)
+	httpServer := httpserver.New(handler,
+		httpserver.Port(cfg.HTTP.Port),
+		httpserver.ReadTimeout(60*time.Second),
+		httpserver.WriteTimeout(60*time.Second),
+	)
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
@@ -55,14 +79,14 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	select {
 	case s := <-interrupt:
-		fmt.Printf("app - Run - signal: " + s.String())
+		l.Warn(s.String())
 	case err := <-httpServer.Notify():
-		fmt.Errorf("app - Run - httpServer.Notify: %w", err)
+		l.Error(err, "app - Run - httpServer.Notify")
 	}
 
 	// Shutdown
 	err := httpServer.Shutdown()
 	if err != nil {
-		fmt.Errorf("app - Run - httpServer.Shutdown: %w", err)
+		l.Fatal("app - Run - httpServer.Shutdown: %v", err)
 	}
 }

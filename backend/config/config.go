@@ -1,18 +1,22 @@
 package config
 
 import (
-	"log"
-
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 )
 
 type (
 	Config struct {
-		Kafka KafkaConfig
-		PG    PGConfig
-		HTTP  HTTP
-		JWT   JWT
+		Kafka   KafkaConfig
+		PG      PGConfig
+		HTTP    HTTP
+		JWT     JWT
+		Horizon Horizon
+		Log     Log
+	}
+
+	Log struct {
+		Level string `env-required:"true" env:"LOG_LEVEL" env-default:"info"`
 	}
 
 	KafkaConfig struct {
@@ -42,7 +46,8 @@ type (
 	}
 
 	HTTP struct {
-		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		Port           string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		FrontEndAdress string `env-required:"true" yaml:"front_adress" env:"HTTP_FRONT_ADRESS"`
 	}
 
 	JWT struct {
@@ -52,17 +57,53 @@ type (
 	AWS struct {
 		BucketName string `env-required:"true" env:"AWS_BUCKET_NAME"`
 	}
+
+	Horizon struct {
+		PublicAPIServer    string `env:"HORIZON_PUBLIC_API_SERVER"`
+		TestAPIServer      string `env:"HORIZON_TEST_API_SERVER"`
+		PublicNetworkPass  string `env:"PUBLIC_NETWORK_PASSPHRASE"`
+		TestNetworkPass    string `env:"TEST_NETWORK_PASSPHRASE"`
+		StellarTomlVersion string `env:"STELLAR_TOML_VERSION"`
+		HorizonURL         string `env:"HORIZON_URL"`
+		FederationServer   string `env:"FEDERATION_SERVER"`
+		TransferServer     string `env:"TRANSFER_SERVER"`
+		Documentation      Documentation
+		Principals         Principals
+	}
+
+	Documentation struct {
+		OrgName                       string `env:"ORG_NAME"`
+		OrgDBA                        string `env:"ORG_DBA"`
+		OrgURL                        string `env:"ORG_URL"`
+		OrgLogo                       string `env:"ORG_LOGO"`
+		OrgDescription                string `env:"ORG_DESCRIPTION"`
+		OrgPhysicalAddress            string `env:"ORG_PHYSICAL_ADDRESS"`
+		OrgPhysicalAddressAttestation string `env:"ORG_PHYSICAL_ADDRESS_ATTESTATION"`
+		OrgPhoneNumber                string `env:"ORG_PHONE_NUMBER"`
+		OrgPhoneNumberAttestation     string `env:"ORG_PHONE_NUMBER_ATTESTATION"`
+		OrgKeybase                    string `env:"ORG_KEYBASE"`
+		OrgTwitter                    string `env:"ORG_TWITTER"`
+		OrgGithub                     string `env:"ORG_GITHUB"`
+		OrgOfficialEmail              string `env:"ORG_OFFICIAL_EMAIL"`
+	}
+
+	Principals struct {
+		Name                  string `env:"PRINCIPALS_NAME"`
+		Email                 string `env:"PRINCIPALS_EMAIL"`
+		Keybase               string `env:"PRINCIPALS_KEYBASE"`
+		Github                string `env:"PRINCIPALS_GITHUB"`
+		Twitter               string `env:"PRINCIPALS_TWITTER"`
+		IDPhotoHash           string `env:"PRINCIPALS_ID_PHOTO_HASH"`
+		VerificationPhotoHash string `env:"PRINCIPALS_VERIFICATION_PHOTO_HASH"`
+	}
 )
 
 // NewConfig returns app config.
 func NewConfig() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	_ = godotenv.Load()
 
 	cfg := &Config{}
-	err = cleanenv.ReadEnv(cfg)
+	err := cleanenv.ReadEnv(cfg)
 	if err != nil {
 		return nil, err
 	}

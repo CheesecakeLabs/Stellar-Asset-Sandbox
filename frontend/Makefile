@@ -1,13 +1,16 @@
 #!make
-
+# TODO: fix legacy peer dependencies errors to remove `legacy-peer-deps` 
 
 help:
 	@echo "Usage: make [build|start|start_dev|test|storybook|build_storybook|lint|format_code"
 	@echo ""
 	@echo "Usage:"
+	@echo "  make clean_install     	Installs production dependencies based on package-lock.json, cleaning all previous installed dependencies"
+	@echo "  make clean_install_dev 	Installs development dependencies based on package-lock.json, cleaning all previous installed dependencies"
 	@echo "  make build  	        Builds the frontend for production and copies it to the dist folder"
 	@echo "  make start  	        Starts the frontend in production mode"
 	@echo "  make start_dev         Starts the frontend in development mode"
+	@echo "  make serve         Serve statics"
 	@echo "  make test  	        Runs the frontend tests"
 	@echo "  make coverage-test     Run tests on the project and generates a coverage report."
 	@echo "  make storybook         Starts the storybook"
@@ -19,6 +22,12 @@ help:
 setup: package.json
 	npm install --legacy-peer-deps
 
+clean_install:
+	npm ci --production
+
+clean_install_dev:
+	npm ci --legacy-peer-deps
+
 build: setup
 	npm run build
 
@@ -27,6 +36,9 @@ start: setup
 
 start_dev: setup
 	npm run start:dev
+
+serve:
+	serve -l 8000 -s build
 
 test: setup
 	npm run test

@@ -11,7 +11,7 @@ const http = axios.create({
 
 http.interceptors.request.use(
   config => {
-    const token = Authentication.getToken()
+      const token = Authentication.getToken()
     if (token && config.headers) {
       config.headers.Authorization = `${token}`
     }
@@ -29,7 +29,7 @@ http.interceptors.response.use(
     const status = error.response?.status || 500
     if (status === 401) {
       Authentication.logout()
-      window.location.href = '/login/expired'
+      window.location.href = '/sandbox/v2/login/expired'
     }
     return Promise.reject(error)
   }

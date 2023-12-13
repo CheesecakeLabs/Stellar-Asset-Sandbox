@@ -4,6 +4,7 @@ import {
   CloseButton,
   Flex,
   Spacer,
+  Tag,
   Text,
 } from '@chakra-ui/react'
 
@@ -11,16 +12,20 @@ import { NavItem } from 'components/atoms'
 import { PathRoute } from 'components/enums/path-route'
 import { ProfileIcon, SettingsIcon } from 'components/icons'
 
+import { ReactComponent as CheesecakeLogo } from 'app/core/resources/cheesecake-logo.svg'
+import { ReactComponent as Cheesecake } from 'app/core/resources/cheesecake.svg'
 import { ReactComponent as StellarLogo } from 'app/core/resources/stellar.svg'
 
 import { ILinkItemProps } from '../../organisms/sidebar'
 
 interface ISidebarProps extends BoxProps {
+  highlightMenu: PathRoute
   items: ILinkItemProps[]
   onClose: () => void
 }
 
 export const SidebarContent: React.FC<ISidebarProps> = ({
+  highlightMenu,
   items,
   onClose,
   ...rest
@@ -30,12 +35,12 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
       w={{ base: 'full', md: 60 }}
       minW="282px"
       pos="fixed"
-      h={{ sm: '100vh', md: 'calc(100vh - 5rem)' }}
+      h={{ base: '100vh', md: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
       borderColor={'gray.600'}
       pb="2rem"
       bg={{ sm: 'white', md: 'none' }}
-      _dark={{ bg: { sm: 'black.600', md: 'none' }, borderColor: 'black.800' }}
+      _dark={{ bg: { base: 'black.600' }, borderColor: 'black.800' }}
       {...rest}
       overflowY="auto"
     >
@@ -61,8 +66,27 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         </Flex>
         {items.map(item => (
           <Box key={item.name}>
-            <NavItem icon={item.icon} path={item.path}>
+            <NavItem
+              icon={item.icon}
+              path={item.path}
+              highlightMenu={highlightMenu}
+              comingSoon={item.comingSoon}
+            >
               {item.name}
+              {item.comingSoon && (
+                <Tag
+                  fontSize="10px"
+                  py={0}
+                  px="0.5rem"
+                  w="fit-content"
+                  variant="blue_sky"
+                  bg="gray.400"
+                  color="black.900"
+                  mb="0.25rem"
+                >
+                  Coming soon
+                </Tag>
+              )}
             </NavItem>
           </Box>
         ))}
@@ -71,25 +95,39 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           key={'Profile'}
           icon={<ProfileIcon />}
           path={PathRoute.PROFILE}
+          highlightMenu={highlightMenu}
         >
           Profile
         </NavItem>
         <NavItem
-          key={'Settings'}
+          key={'Administration'}
           icon={<SettingsIcon />}
           path={PathRoute.SETTINGS}
+          highlightMenu={highlightMenu}
         >
-          Settings
+          Administration
         </NavItem>
-        <Text
-          color="gray.900"
-          fontWeight="600"
-          ml="2rem"
-          fontSize="sm"
-          mt="0.5rem"
-        >
-          v2.01
-        </Text>
+        <Flex mt="1rem" alignItems="center">
+          <Flex
+            fill="black"
+            _dark={{ fill: 'white' }}
+            ms="2rem"
+            gap={3}
+            alignItems="center"
+          >
+            <CheesecakeLogo height="24px" width="24px" />
+            <Cheesecake height="24px" width="128px" />
+          </Flex>
+          <Text
+            color="gray.900"
+            fontWeight="600"
+            fontSize="sm"
+            mr="1rem"
+            ms="1rem"
+          >
+            v2.01
+          </Text>
+        </Flex>
       </Flex>
     </Box>
   )

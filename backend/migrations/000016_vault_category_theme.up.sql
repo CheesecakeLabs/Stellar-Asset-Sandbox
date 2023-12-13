@@ -1,0 +1,2 @@
+ALTER TABLE VaultCategory
+ADD COLUMN theme VARCHAR(48);

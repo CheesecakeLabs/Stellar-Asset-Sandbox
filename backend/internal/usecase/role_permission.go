@@ -35,10 +35,44 @@ func (uc *RolePermissionUseCase) Validate(token string, basePath string) (bool, 
 	return isAuthorized, nil
 }
 
-func (useCase *RolePermissionUseCase) GetRolePermissions(token string) ([]entity.RolePermissionResponse, error) {
-	roles, err := useCase.repo.GetRolePermissions(token)
+func (useCase *RolePermissionUseCase) GetUserPermissions(token string) ([]entity.UserPermissionResponse, error) {
+	roles, err := useCase.repo.GetUserPermissions(token)
 	if err != nil {
-		return nil, fmt.Errorf("RoleUseCase - RolePermissions - uc.repo.GetRolePermissions: %w", err)
+		return nil, fmt.Errorf("RolePermissionUseCase - UserPermissions - uc.repo.GetRolePermissions: %w", err)
 	}
 	return roles, nil
+}
+
+func (useCase *RolePermissionUseCase) GetRolesPermissions() ([]entity.RolePermissionResponse, error) {
+	roles, err := useCase.repo.GetRolesPermissions()
+	if err != nil {
+		return nil, fmt.Errorf("RolePermissionUseCase - RolePermissions - uc.repo.GetRolePermissions: %w", err)
+	}
+	return roles, nil
+}
+
+func (useCase *RolePermissionUseCase) GetPermissions() ([]entity.Permission, error) {
+	permissions, err := useCase.repo.GetPermissions()
+	if err != nil {
+		return nil, fmt.Errorf("RolePermissionUseCase - Permissions - uc.repo.GetPermissions: %w", err)
+	}
+	return permissions, nil
+}
+
+func (uc *RolePermissionUseCase) UpdateRolePermission(data entity.RolePermissionRequest) (entity.RolePermissionRequest, error) {
+	if data.IsAdd {
+		rolePermission, err := uc.repo.CreateRolePermission(data)
+		if err != nil {
+			return entity.RolePermissionRequest{}, fmt.Errorf("RolePermissionUseCase - UpdateRolePermission - uc.repo.CreateRolePermission(data): %w", err)
+		}
+
+		return rolePermission, nil
+	}
+
+	rolePermission, err := uc.repo.DeleteRolePermission(data)
+	if err != nil {
+		return entity.RolePermissionRequest{}, fmt.Errorf("RolePermissionUseCase - UpdateRolePermission - uc.repo.DeleteRolePermission(data): %w", err)
+	}
+
+	return rolePermission, nil
 }

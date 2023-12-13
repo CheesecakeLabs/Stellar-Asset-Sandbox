@@ -14,12 +14,13 @@ import {
   ExplorerIcon,
   HomeIcon,
   PaymentsIcon,
-  SecurityIcon,
+  VaultIcon,
 } from 'components/icons'
 import { SidebarContent } from 'components/molecules'
 import { Header } from 'components/molecules/header'
 
 interface IProps {
+  highlightMenu: PathRoute
   children: ReactNode
 }
 
@@ -28,6 +29,7 @@ export interface ILinkItemProps {
   icon: ReactNode
   path: string
   alerts?: number
+  comingSoon?: boolean
 }
 const linkItems: ILinkItemProps[] = [
   {
@@ -36,24 +38,25 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Payment Tokens',
+    name: 'Token Management',
     icon: <PaymentsIcon />,
-    path: `${PathRoute.PAYMENT_TOKENS}`,
+    path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
-    name: 'Securities Tokens',
-    icon: <SecurityIcon />,
-    path: PathRoute.SECURITIES_TOKENS,
-  },
-  {
-    name: 'Soroban Smart Contracts',
+    name: 'Smart Contracts',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    comingSoon: true,
+  },
+  {
+    name: 'Treasury',
+    icon: <VaultIcon />,
+    path: `${PathRoute.VAULTS}`,
   },
   {
     name: 'Assets Dashboard',
     icon: <DashboardIcon />,
-    path: PathRoute.ASSETS_DASHBOARD,
+    path: PathRoute.DASHBOARDS,
   },
   {
     name: 'Blockchain Explorer',
@@ -62,17 +65,19 @@ const linkItems: ILinkItemProps[] = [
   },
 ]
 
-export const Sidebar: React.FC<IProps> = ({ children }) => {
+export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box w="full">
+    <Box w="full" 
+      zIndex={101}>
       <Header onOpen={onOpen} />
       <Flex pt="5rem">
         <SidebarContent
           items={linkItems}
           onClose={(): void => onClose()}
           display={{ base: 'none', md: 'block' }}
+          highlightMenu={highlightMenu}
         />
         <Drawer
           autoFocus={false}
@@ -84,7 +89,11 @@ export const Sidebar: React.FC<IProps> = ({ children }) => {
           size="full"
         >
           <DrawerContent>
-            <SidebarContent items={linkItems} onClose={onClose} />
+            <SidebarContent
+              items={linkItems}
+              onClose={onClose}
+              highlightMenu={highlightMenu}
+            />
           </DrawerContent>
         </Drawer>
         <Box ml={{ base: 0, md: '282px' }} p="4" w="full">

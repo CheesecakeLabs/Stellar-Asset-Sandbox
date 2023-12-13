@@ -11,16 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var validateError = errors.New("error")
-
-type rolePermissionTest struct {
-	name string
-	roleId int
-	mock func()
-	res  interface{}
-	err  error
-}
-
 func TestRolePermissionUseCase_Validate(t *testing.T) {
 	t.Helper()
 
@@ -33,21 +23,21 @@ func TestRolePermissionUseCase_Validate(t *testing.T) {
 	roleRepo := mocks.NewMockRolePermissionRepoInterface(mockCtl)
 	useCase := usecase.NewRolePermissionUseCase(roleRepo, *userUseCase)
 	t.Run("Returns true when user has role", func(t *testing.T) {
-		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User {
-			ID:        "10",
-			Name:      "Marcos T",
-			RoleId:    1,
+		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User{
+			ID:     "10",
+			Name:   "Marcos T",
+			RoleId: 1,
 		}, nil)
-		
+
 		roleRepo.EXPECT().Validate("create-user", 1).Return(true, nil)
-	
+
 		isAuthorized, err := useCase.Validate("mytoken", "http://127.0.0.1/v1/create-user")
-	
+
 		assert.True(t, isAuthorized)
 		assert.NoError(t, err)
 	})
 	t.Run("Returns false when UserRepo.GetUserByToken fails", func(t *testing.T) {
-		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User { }, errors.New("Unexpected error"))
+		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User{}, errors.New("Unexpected error"))
 
 		isAuthorized, err := useCase.Validate("mytoken", "http://127.0.0.1/v1/create-user")
 
@@ -55,10 +45,10 @@ func TestRolePermissionUseCase_Validate(t *testing.T) {
 		assert.EqualError(t, err, "RolePermissionUseCase - Validate - uc.userUsecase.repo.GetUserByToken: Unexpected error")
 	})
 	t.Run("Returns false when RoleRepo.Validate fails", func(t *testing.T) {
-		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User {
-			ID:        "10",
-			Name:      "Marcos T",
-			RoleId:    2,
+		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User{
+			ID:     "10",
+			Name:   "Marcos T",
+			RoleId: 2,
 		}, nil)
 		roleRepo.EXPECT().Validate("create-user", 2).Return(false, errors.New("Unexpected error"))
 
@@ -68,16 +58,16 @@ func TestRolePermissionUseCase_Validate(t *testing.T) {
 		assert.EqualError(t, err, "RolePermissionUseCase - Validate - uc.repo.Validate: Unexpected error")
 	})
 	t.Run("Returns false when user has no role", func(t *testing.T) {
-		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User {
-			ID:        "10",
-			Name:      "Marcos T",
-			RoleId:    1,
+		userRepo.EXPECT().GetUserByToken("mytoken").Return(entity.User{
+			ID:     "10",
+			Name:   "Marcos T",
+			RoleId: 1,
 		}, nil)
-		
+
 		roleRepo.EXPECT().Validate("create-user", 1).Return(false, nil)
-	
+
 		isAuthorized, err := useCase.Validate("mytoken", "http://127.0.0.1/v1/create-user")
-	
+
 		assert.False(t, isAuthorized)
 		assert.NoError(t, err)
 	})

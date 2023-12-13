@@ -6,12 +6,12 @@ export const isDark = (colorMode: 'dark' | 'light'): boolean => {
 
 export const havePermission = (
   permission: Permissions,
-  permissions: Hooks.UseAuthTypes.IPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
 ): boolean => {
   if (!permissions) return false
   return (
     permissions.filter(
-      (item: Hooks.UseAuthTypes.IPermission) => item.name === permission
+      (item: Hooks.UseAuthTypes.IUserPermission) => item.action === permission
     ).length > 0
   )
 }
