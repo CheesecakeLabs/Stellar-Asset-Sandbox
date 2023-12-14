@@ -1341,17 +1341,17 @@ func (m *MockAssetServiceInterface) EXPECT() *MockAssetServiceInterfaceMockRecor
 	return m.recorder
 }
 
-// UploadAssetImage mocks base method.
-func (m *MockAssetServiceInterface) UploadAssetImage(arg0 string, arg1 []byte) (string, error) {
+// UploadFile mocks base method.
+func (m *MockAssetServiceInterface) UploadFile(arg0 string, arg1 []byte) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UploadAssetImage", arg0, arg1)
+	ret := m.ctrl.Call(m, "UploadFile", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UploadAssetImage indicates an expected call of UploadAssetImage.
-func (mr *MockAssetServiceInterfaceMockRecorder) UploadAssetImage(arg0, arg1 interface{}) *gomock.Call {
+// UploadFile indicates an expected call of UploadFile.
+func (mr *MockAssetServiceInterfaceMockRecorder) UploadFile(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadAssetImage", reflect.TypeOf((*MockAssetServiceInterface)(nil).UploadAssetImage), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockAssetServiceInterface)(nil).UploadFile), arg0, arg1)
 }
