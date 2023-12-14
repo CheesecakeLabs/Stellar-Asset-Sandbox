@@ -14,6 +14,7 @@ type (
 		Horizon Horizon
 		Log     Log
 		AWS     AWS
+		Deploy  Deploy
 	}
 
 	Log struct {
@@ -104,6 +105,10 @@ type (
 		Twitter               string `env:"PRINCIPALS_TWITTER"`
 		IDPhotoHash           string `env:"PRINCIPALS_ID_PHOTO_HASH"`
 		VerificationPhotoHash string `env:"PRINCIPALS_VERIFICATION_PHOTO_HASH"`
+	}
+
+	Deploy struct {
+		DeployStage string `env:"DEPLOY_STAGE"`
 	}
 )
 

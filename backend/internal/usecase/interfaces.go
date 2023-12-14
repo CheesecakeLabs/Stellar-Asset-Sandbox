@@ -123,6 +123,6 @@ type (
 
 	// Asset Service
 	AssetServiceInterface interface {
-		UploadAssetImage(string, []byte) (string, error)
+		UploadFile(string, []byte) (string, error)
 	}
 )

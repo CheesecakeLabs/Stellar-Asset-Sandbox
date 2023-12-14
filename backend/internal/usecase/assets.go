@@ -8,22 +8,22 @@ import (
 )
 
 type AssetUseCase struct {
-	aRepo      AssetRepoInterface
-	wRepo      WalletRepoInterface
-	tInt       TomlInterface
-	tRepo      TomlRepoInterface
-	cfg        config.Horizon
-	awsService AssetServiceInterface
+	aRepo          AssetRepoInterface
+	wRepo          WalletRepoInterface
+	tInt           TomlInterface
+	tRepo          TomlRepoInterface
+	cfg            config.Horizon
+	storageService AssetServiceInterface
 }
 
-func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tInt TomlInterface, tRepo TomlRepoInterface, cfg config.Horizon, awsService AssetServiceInterface) *AssetUseCase {
+func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tInt TomlInterface, tRepo TomlRepoInterface, cfg config.Horizon, storageService AssetServiceInterface) *AssetUseCase {
 	return &AssetUseCase{
-		aRepo:      aRepo,
-		wRepo:      wRepo,
-		tInt:       tInt,
-		tRepo:      tRepo,
-		cfg:        cfg,
-		awsService: awsService,
+		aRepo:          aRepo,
+		wRepo:          wRepo,
+		tInt:           tInt,
+		tRepo:          tRepo,
+		cfg:            cfg,
+		storageService: storageService,
 	}
 }
 
@@ -42,7 +42,7 @@ func (uc *AssetUseCase) Create(data entity.Asset, imageBytes []byte) (entity.Ass
 
 	// Upload image to S3 if exists
 	if len(imageBytes) > 0 {
-		assetImage, err := uc.awsService.UploadAssetImage(fmt.Sprint(data.Id), imageBytes)
+		assetImage, err := uc.storageService.UploadFile(fmt.Sprint(data.Id), imageBytes)
 		if err != nil {
 			return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 		}
@@ -85,7 +85,7 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 }
 
 func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
-	assetImage, err := uc.awsService.UploadAssetImage(assetId, imageBytes)
+	assetImage, err := uc.storageService.UploadFile(assetId, imageBytes)
 	if err != nil {
 		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 	}

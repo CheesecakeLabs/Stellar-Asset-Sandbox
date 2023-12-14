@@ -25,3 +25,7 @@ func New(cfg config.AWS) (*AwsConnection, error) {
 		bucketName:  cfg.BucketName,
 	}, nil
 }
+
+func (s *AwsConnection) UploadFile(filename string, file []byte) (string, error) {
+	return s.uploadToS3(filename, file)
+}

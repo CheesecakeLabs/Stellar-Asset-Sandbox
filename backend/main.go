@@ -10,7 +10,9 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/aws"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/kafka"
+	local "github.com/CheesecakeLabs/token-factory-v2/backend/pkg/localstorage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
@@ -30,11 +32,24 @@ func main() {
 	}
 	defer pg.Close()
 
-	// AWS Service
-	// TODO if is not production, use mock
-	awsService, err := aws.New(cfg.AWS)
-	if err != nil {
-		log.Fatal("app - Run - aws.NewAwsService: %w", err)
+	// AWS Service or LocalStorage
+	var storageService storage.StorageService
+	if cfg.Deploy.DeployStage != "local" {
+		awsConn, err := aws.New(cfg.AWS)
+		if err != nil {
+			log.Fatalf("Failed to initialize AWS connection: %v", err)
+		}
+		storageService = awsConn
+	} else {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("Failed to get current directory: %v", err)
+		}
+
+		localStorage := &local.LocalStorage{
+			BasePath: currentDir, // Use the absolute path
+		}
+		storageService = localStorage
 	}
 
 	// Kafka create keypair connection
@@ -82,5 +97,5 @@ func main() {
 	}
 	go signConn.Run(cfg, entity.SignChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo, awsService)
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo, storageService)
 }

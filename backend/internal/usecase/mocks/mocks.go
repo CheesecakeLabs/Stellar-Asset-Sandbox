@@ -478,7 +478,7 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetPaginatedAssets(arg0, arg1 inte
 }
 
 // StoreAssetImage mocks base method.
-func (m *MockAssetRepoInterface) StoreAssetImage(arg0 string, arg1 []byte) error {
+func (m *MockAssetRepoInterface) StoreAssetImage(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StoreAssetImage", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -1316,4 +1316,42 @@ func (m *MockLogTransactionRepoInterface) SumLogTransactionsByAssetID(assetID in
 func (mr *MockLogTransactionRepoInterfaceMockRecorder) SumLogTransactionsByAssetID(assetID, timeRange, timeFrame, transactionType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SumLogTransactionsByAssetID", reflect.TypeOf((*MockLogTransactionRepoInterface)(nil).SumLogTransactionsByAssetID), assetID, timeRange, timeFrame, transactionType)
+}
+
+// MockAssetServiceInterface is a mock of AssetServiceInterface interface.
+type MockAssetServiceInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockAssetServiceInterfaceMockRecorder
+}
+
+// MockAssetServiceInterfaceMockRecorder is the mock recorder for MockAssetServiceInterface.
+type MockAssetServiceInterfaceMockRecorder struct {
+	mock *MockAssetServiceInterface
+}
+
+// NewMockAssetServiceInterface creates a new mock instance.
+func NewMockAssetServiceInterface(ctrl *gomock.Controller) *MockAssetServiceInterface {
+	mock := &MockAssetServiceInterface{ctrl: ctrl}
+	mock.recorder = &MockAssetServiceInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAssetServiceInterface) EXPECT() *MockAssetServiceInterfaceMockRecorder {
+	return m.recorder
+}
+
+// UploadAssetImage mocks base method.
+func (m *MockAssetServiceInterface) UploadAssetImage(arg0 string, arg1 []byte) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UploadAssetImage", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UploadAssetImage indicates an expected call of UploadAssetImage.
+func (mr *MockAssetServiceInterfaceMockRecorder) UploadAssetImage(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadAssetImage", reflect.TypeOf((*MockAssetServiceInterface)(nil).UploadAssetImage), arg0, arg1)
 }

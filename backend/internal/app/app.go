@@ -16,15 +16,15 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/service"
-	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/aws"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, pAws *aws.AwsConnection) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, storageService storage.StorageService) {
 	l := logger.New(cfg.Log.Level)
 
 	// Use cases
@@ -44,7 +44,7 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 		tRepo,
 		repo.NewTomlRepo(pg),
 		cfg.Horizon,
-		service.NewAssetService(pAws),
+		service.NewAssetService(storageService),
 	)
 
 	roleUc := usecase.NewRoleUseCase(
