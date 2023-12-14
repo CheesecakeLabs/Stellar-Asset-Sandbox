@@ -59,6 +59,11 @@ declare namespace Hooks {
       contract_id: number
     }
 
+    interface IPagedContracts {
+      contracts: IContract[]
+      totalPages: number
+    }
+
     interface IContractsContext {
       loading: boolean
       contracts: IContract[] | undefined
@@ -67,6 +72,10 @@ declare namespace Hooks {
       isDepositing: boolean
       isWithdrawing: boolean
       getContracts(): Promise<Hooks.UseContractsTypes.IContract[] | undefined>
+      getPagedContracts(args: {
+        page: number
+        limit: number
+      }): Promise<Hooks.UseContractsTypes.IPagedContracts | undefined>
       getContract(id: string): Promise<IContract | undefined>
       createContract(params: IContractRequest): Promise<IContract | undefined>
       deposit(
@@ -99,7 +108,9 @@ declare namespace Hooks {
         contractId: number
       ): Promise<Hooks.UseContractsTypes.IHistory[] | undefined>
       addContractHistory(params: IHistoryRequest): Promise<IHistory | undefined>
-      updateContractHistory(params: IHistoryUpdate): Promise<IHistory | undefined>
+      updateContractHistory(
+        params: IHistoryUpdate
+      ): Promise<IHistory | undefined>
     }
   }
 }

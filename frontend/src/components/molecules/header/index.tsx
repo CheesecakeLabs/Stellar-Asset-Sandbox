@@ -118,7 +118,11 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
               <ChevronDown color="white" size="14px" />
             </Container>
           </PopoverTrigger>
-          <PopoverContent w="fit-content" minW="240px" _dark={{ bg: 'black.800' }}>
+          <PopoverContent
+            w="fit-content"
+            minW="240px"
+            _dark={{ bg: 'black.800' }}
+          >
             <PopoverArrow />
             <PopoverBody>
               <Text mb="0.75rem">{profile.vault.name}</Text>
@@ -152,11 +156,14 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
                         alignItems="center"
                         gap={2}
                         _dark={{ fill: 'white' }}
+                        justifyContent="flex-end"
                       >
                         <Text fontSize="xs" fontWeight="700">
                           {toCrypto(Number(balance.balance))}
                         </Text>
-                        {!balance.is_authorized && <LockIcon width="1rem" />}
+                        {!balance.is_authorized && (
+                          <LockIcon height="16px" width="16px" />
+                        )}
                       </Flex>
                     </Flex>
                   )

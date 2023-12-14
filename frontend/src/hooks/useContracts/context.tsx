@@ -69,6 +69,33 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
+  const getPagedContracts = useCallback(
+    async (args: {
+      page: number
+      limit: number
+    }): Promise<Hooks.UseContractsTypes.IPagedContracts | undefined> => {
+      setLoading(true)
+      try {
+        const response = await http.get(
+          `contract/list?page=${args.page}&limit=${args.limit}`
+        )
+        const data = response.data
+        if (data) {
+          setContracts(data)
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
+
   const getContract = useCallback(
     async (
       id: string
@@ -311,6 +338,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         getHistory,
         addContractHistory,
         updateContractHistory,
+        getPagedContracts
       }}
     >
       {children}

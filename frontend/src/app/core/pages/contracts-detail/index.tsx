@@ -25,13 +25,14 @@ export const ContractsDetail: React.FC = () => {
     addContractHistory,
     updateContractHistory,
   } = useContracts()
-  const { profile, getProfile } = useAuth()
+  const { getProfile } = useAuth()
   const { getHistory } = useContracts()
   const { userPermissions, getUserPermissions } = useAuth()
   const toast = useToast()
 
   const [loadingPosition, setLoadingPosition] = useState(true)
   const [contract, setContract] = useState<Hooks.UseContractsTypes.IContract>()
+  const [profile, setProfile] = useState<Hooks.UseAuthTypes.IUserDto>()
   const [contractData, setContractData] =
     useState<Hooks.UseContractsTypes.IContractData>()
   const [history, setHistory] = useState<Hooks.UseContractsTypes.IHistory[]>()
@@ -44,72 +45,63 @@ export const ContractsDetail: React.FC = () => {
     getUserPermissions()
   }, [getUserPermissions])
 
-  useEffect(() => {
-    getProfile()
-
-    if (id) {
-      getContract(id).then(contract => {
-        setContract(contract)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getProfile])
-
   const loadContractData = useCallback(async (): Promise<void> => {
-    if (profile && contract) {
-      const wallet = profile.vault?.wallet.key.publicKey
+    if (id) {
+      const contract = await getContract(id)
+      setContract(contract)
+      const profile = await getProfile()
+      setProfile(profile)
 
-      let timeLeft = contractData?.timeLeft
-
-      const position =
-        Number((await getPosition(wallet, contract.address)) || 0) / 10000000
-
-      const userYield =
-        Number((await getYield(wallet, contract.address)) || 0) / 10000000
-
-      const estimatedPrematureWithdraw =
-        Number(
-          (await getEstimatedPrematureWithdraw(wallet, contract.address)) || 0
-        ) / 10000000
-
-      if (!timeLeft) {
-        timeLeft =
-          position > 0
-            ? Number((await getTimeLeft(wallet, contract.address)) || 0)
-            : 0
+      if (contract) {
+        getHistory(contract.id).then(history => setHistory(history))
       }
 
-      setContractData({
-        position: Number(position),
-        yield: Number(userYield || 0),
-        estimatedPrematureWithdraw: Number(estimatedPrematureWithdraw || 0),
-        timeLeft: Number(timeLeft),
-      })
+      if (profile && contract) {
+        const wallet = profile.vault?.wallet.key.publicKey
 
-      setCurrentInVault(
-        contract?.vault.accountData?.balances.find(
-          balance =>
-            balance.asset_code === contract?.asset?.code &&
-            balance.asset_issuer === contract?.asset?.issuer.key.publicKey
-        )?.balance
-      )
+        let timeLeft = contractData?.timeLeft
 
-      setLoadingPosition(false)
+        const position =
+          Number((await getPosition(wallet, contract.address)) || 0) / 10000000
+
+        const userYield =
+          Number((await getYield(wallet, contract.address)) || 0) / 10000000
+
+        const estimatedPrematureWithdraw =
+          Number(
+            (await getEstimatedPrematureWithdraw(wallet, contract.address)) || 0
+          ) / 10000000
+
+        if (!timeLeft) {
+          timeLeft =
+            position > 0
+              ? Number((await getTimeLeft(wallet, contract.address)) || 0)
+              : 0
+        }
+
+        setContractData({
+          position: Number(position),
+          yield: Number(userYield || 0),
+          estimatedPrematureWithdraw: Number(estimatedPrematureWithdraw || 0),
+          timeLeft: Number(timeLeft),
+        })
+
+        setCurrentInVault(
+          contract?.vault.accountData?.balances.find(
+            balance =>
+              balance.asset_code === contract?.asset?.code &&
+              balance.asset_issuer === contract?.asset?.issuer.key.publicKey
+          )?.balance
+        )
+
+        setLoadingPosition(false)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    contract,
-    contractData?.position,
-    contractData?.timeLeft,
-    getEstimatedPrematureWithdraw,
-    getPosition,
-    getTimeLeft,
-    getYield,
-    profile,
-  ])
+  }, [id])
 
   const updatePeriodically = useCallback((): NodeJS.Timer => {
-    return setInterval(loadContractData, 3000)
+    return setInterval(loadContractData, 10000)
   }, [loadContractData])
 
   useEffect(() => {
@@ -120,7 +112,7 @@ export const ContractsDetail: React.FC = () => {
       clearInterval(interval)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, contract])
+  }, [])
 
   useEffect(() => {
     if (contract) {

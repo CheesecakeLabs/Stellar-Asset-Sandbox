@@ -26,19 +26,24 @@ import { PathRoute } from 'components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
 import { ArrowRightIcon, NewIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
+import { Paginator } from 'components/molecules/paginator'
 
 interface IContractsTemplate {
   loading: boolean
   contracts: Hooks.UseContractsTypes.IContract[] | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
-  profile: Hooks.UseAuthTypes.IUserDto | undefined
+  currentPage: number
+  totalPages: number
+  changePage(page: number): void
 }
 
 export const ContractsTemplate: React.FC<IContractsTemplate> = ({
   loading,
   contracts,
   userPermissions,
-  profile,
+  currentPage,
+  totalPages,
+  changePage,
 }) => {
   const navigate = useNavigate()
 
@@ -49,18 +54,17 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Certificate of Deposits
           </Text>
-          {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) &&
-            profile?.vault_id && (
-              <Button
-                variant="primary"
-                leftIcon={<NewIcon />}
-                onClick={(): void =>
-                  navigate({ pathname: PathRoute.CONTRACT_CREATE })
-                }
-              >
-                New Certificate of Deposit
-              </Button>
-            )}
+          {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) && (
+            <Button
+              variant="primary"
+              leftIcon={<NewIcon />}
+              onClick={(): void =>
+                navigate({ pathname: PathRoute.CONTRACT_CREATE })
+              }
+            >
+              New Certificate of Deposit
+            </Button>
+          )}
         </Flex>
         <Container variant="primary" p={0} maxW="full">
           {loading ? (
@@ -121,6 +125,11 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
             </Table>
           )}
         </Container>
+        <Paginator
+          changePage={changePage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       </Flex>
     </Flex>
   )
