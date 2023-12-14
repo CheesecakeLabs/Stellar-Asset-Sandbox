@@ -57,7 +57,7 @@ export const Deposit: React.FC<IDeposit> = ({
   }
 
   return (
-    <Flex flexDir="column" w="640px">
+    <Flex flexDir="column" w={{ base: 'full', md: '640px' }} mb="1rem">
       <Container variant="primary" p="0" maxW="full">
         <Flex
           alignItems="center"

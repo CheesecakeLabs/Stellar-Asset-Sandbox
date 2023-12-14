@@ -77,7 +77,12 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
   }
 
   return (
-    <Flex flexDir="row" gap="1.5rem" w="full" justifyContent="center">
+    <Flex
+      flexDir={{ base: 'column', md: 'row' }}
+      gap="1.5rem"
+      w="full"
+      justifyContent="center"
+    >
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <ContractsBreadcrumb title="New Contract" />
         {errorSubmit && (
@@ -119,7 +124,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   onSubmit(data, asset, vault, compoundType, compound)
                 })}
               >
-                <Flex flexDir={{ md: 'row', sm: 'column' }} gap="1.5rem">
+                <Flex flexDir={{ base: 'column', md: 'row' }} gap="1.5rem">
                   <FormControl>
                     <FormLabel>Vault</FormLabel>
                     <SelectVault vaults={vaults} setVault={setVault} />
@@ -135,13 +140,13 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 </Flex>
 
                 <Flex
-                  flexDir={{ md: 'row', sm: 'column' }}
+                  flexDir={{ base: 'column', md: 'row' }}
                   gap="1.5rem"
                   mt="1.5rem"
                 >
                   <Flex
                     w="full"
-                    flexDir={{ md: 'row', sm: 'column' }}
+                    flexDir={{ base: 'column', md: 'row' }}
                     gap="1.5rem"
                   >
                     <FormControl>
@@ -179,7 +184,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
 
                   <Flex
                     w="full"
-                    flexDir={{ md: 'row', sm: 'column' }}
+                    flexDir={{ base: 'column', md: 'row' }}
                     gap="1.5rem"
                   >
                     <FormControl>
@@ -222,7 +227,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 </Flex>
 
                 <Flex
-                  flexDir={{ md: 'row', sm: 'column' }}
+                  flexDir={{ base: 'column', md: 'row' }}
                   gap="1.5rem"
                   mt="1.5rem"
                   bg="gray.50"
@@ -244,13 +249,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     )}
                   </FormControl>
 
-                  <Flex
-                    w="full"
-                    flexDir="column"
-                    pt="1.5rem"
-                    mx="1rem"
-                    gap="0.5rem"
-                  >
+                  <Flex w="full" flexDir="column" pt="1.5rem" gap="0.5rem">
                     <Text fontSize="sm">
                       <b>Simple Interest:</b> Interest payment based on a
                       percentage of the deposited amount over the term period.
@@ -266,6 +265,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                 <Flex justifyContent="flex-end" mt="1rem">
                   <Button
                     type="submit"
+                    w={{ base: 'full', md: 'fit-content' }}
                     variant="primary"
                     mt="1.5rem"
                     isLoading={creatingContract}

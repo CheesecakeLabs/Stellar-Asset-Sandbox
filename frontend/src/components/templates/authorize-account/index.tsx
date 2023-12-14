@@ -101,6 +101,7 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Authorize
               </Button>

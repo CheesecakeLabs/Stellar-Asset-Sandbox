@@ -110,6 +110,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Distribute asset
               </Button>

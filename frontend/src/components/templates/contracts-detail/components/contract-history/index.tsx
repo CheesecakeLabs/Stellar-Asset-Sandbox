@@ -22,7 +22,8 @@ export const ContractHistory: React.FC<IWithdrawDetails> = ({
 
   return (
     <Flex>
-      <Flex flexDir="column" w="full">
+      <Flex flexDir="column" w="full"
+          overflowX="auto">
         <Text
           bg="gray.100"
           borderRadius="full"

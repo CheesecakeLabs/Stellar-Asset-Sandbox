@@ -90,7 +90,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   {isLargerThanSm && <Th isNumeric>Supply</Th>}
                   {isLargerThanLg && <Th>Asset type</Th>}
                   {isLargerThanMd && <Th>Controls</Th>}
-                  <Th w="2rem" p={0} />
+                  {isLargerThanMd && <Th w="2rem" p={0} />}
                 </Tr>
               </Thead>
               <Tbody>
@@ -149,9 +149,11 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                         </Flex>
                       </Td>
                     )}
-                    <Td w="2rem" p={0}>
-                      <ArrowRightIcon width="12px" />
-                    </Td>
+                    {isLargerThanMd && (
+                      <Td w="2rem" p={0}>
+                        <ArrowRightIcon width="12px" />
+                      </Td>
+                    )}
                   </Tr>
                 ))}
               </Tbody>

@@ -20,8 +20,8 @@ export const SelectCompound: React.FC<ISelectCompound> = ({
   setCompound,
 }) => {
   return (
-    <Container variant="primary" p="0" h="2rem">
-      <Flex>
+    <Container variant="primary" p="0">
+      <Flex flexDir={{ base: 'column', md: 'row' }}>
         {[
           CompoundTime['10 min'],
           CompoundTime['30 min'],

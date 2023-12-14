@@ -37,6 +37,7 @@ interface IHeader {
 
 export const Header: React.FC<IHeader> = ({ onOpen }) => {
   const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [assets, setAssets] = useState<Hooks.UseAssetsTypes.IAssetDto[]>()
   const { profile, getProfile } = useAuth()
   const { getAssets } = useAssets()
@@ -93,7 +94,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
         </Container>
       )}
       {profile?.vault_id && (
-        <Popover trigger="hover">
+        <Popover trigger={isLargerThanSm ? 'hover' : 'click'}>
           <PopoverTrigger>
             <Container
               variant="primary"
@@ -108,13 +109,22 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
               gap="0.5rem"
               cursor="pointer"
               onClick={(): void => {
-                navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
+                isLargerThanSm
+                  ? navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
+                  : undefined
               }}
             >
               <WalletIcon fill="white" width="16px" height="16px" />
-              <Text fontSize="sm" py="0.25rem" lineHeight="20px" color="white">
-                My wallet
-              </Text>
+              {isLargerThanMd && (
+                <Text
+                  fontSize="sm"
+                  py="0.25rem"
+                  lineHeight="20px"
+                  color="white"
+                >
+                  My wallet
+                </Text>
+              )}
               <ChevronDown color="white" size="14px" />
             </Container>
           </PopoverTrigger>

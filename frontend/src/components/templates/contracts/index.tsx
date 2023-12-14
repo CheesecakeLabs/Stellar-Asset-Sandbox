@@ -11,6 +11,7 @@ import {
   Button,
   Img,
   Skeleton,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -46,6 +47,9 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
   changePage,
 }) => {
   const navigate = useNavigate()
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
     <Flex flexDir="column" w="full">
@@ -62,7 +66,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                 navigate({ pathname: PathRoute.CONTRACT_CREATE })
               }
             >
-              New Certificate of Deposit
+              {isLargerThanSm ? 'New Certificate of Deposit' : 'New'}
             </Button>
           )}
         </Flex>
@@ -78,10 +82,10 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                   <Th w="2rem" p={0} />
                   <Th>Asset</Th>
                   <Th>Vault</Th>
-                  <Th>Yield %</Th>
-                  <Th>Term</Th>
-                  <Th>Compound</Th>
-                  <Th>Minimum Deposit</Th>
+                  {isLargerThanSm && <Th>Yield %</Th>}
+                  {isLargerThanMd && <Th>Term</Th>}
+                  {isLargerThanLg && <Th>Compound</Th>}
+                  {isLargerThanLg && <Th>Minimum Deposit</Th>}
                   <Th w="2rem" p={0} />
                 </Tr>
               </Thead>
@@ -108,14 +112,22 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                     </Td>
                     <Td>{contract.asset.code}</Td>
                     <Td>{contract.vault.name}</Td>
-                    <Td>{`${contract.yield_rate / 100}%`}</Td>
-                    <Td>{`${contract.term / 86400} day(s)`}</Td>
-                    <Td>{`${
-                      contract.compound === 0
-                        ? 'Simple interest'
-                        : CompoundTime[contract.compound]
-                    }`}</Td>
-                    <Td>{toCrypto(contract.min_deposit)}</Td>
+                    {isLargerThanSm && (
+                      <Td>{`${contract.yield_rate / 100}%`}</Td>
+                    )}
+                    {isLargerThanMd && (
+                      <Td>{`${contract.term / 86400} day(s)`}</Td>
+                    )}
+                    {isLargerThanLg && (
+                      <Td>{`${
+                        contract.compound === 0
+                          ? 'Simple interest'
+                          : CompoundTime[contract.compound]
+                      }`}</Td>
+                    )}
+                    {isLargerThanLg && (
+                      <Td>{toCrypto(contract.min_deposit)}</Td>
+                    )}
                     <Td w="2rem" p={0}>
                       <ArrowRightIcon width="12px" />
                     </Td>

@@ -109,6 +109,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
               variant="primary"
               mt="1.5rem"
               isLoading={loading && loadingFreeze}
+              w={{ base: 'full', md: 'fit-content' }}
               onClick={handleSubmit(data => {
                 freeze(data)
               })}
@@ -120,6 +121,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
               variant="secondary"
               mt="1.5rem"
               isLoading={loading && loadingUnfreeze}
+              w={{ base: 'full', md: 'fit-content' }}
               onClick={handleSubmit(data => {
                 unfreeze(data)
               })}

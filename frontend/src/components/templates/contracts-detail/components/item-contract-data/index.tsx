@@ -15,12 +15,18 @@ export const ItemContractData: React.FC<IItemContractData> = ({
   children,
 }) => {
   return (
-    <Flex justifyContent="space-between" w="full">
+    <Flex
+      justifyContent="space-between"
+      w="full"
+      flexDir={{ base: 'column', md: 'row' }}
+    >
       <Flex gap="0.75rem" alignItems="center" me="2rem">
         {icon}
         <Text fontSize="sm">{title}</Text>
       </Flex>
-      {children ? children : <Text fontSize="sm">{value}</Text>}
+      <Flex ms={{ base: '1.75rem', md: '0' }}>
+        {children ? children : <Text fontSize="sm">{value}</Text>}
+      </Flex>
     </Flex>
   )
 }

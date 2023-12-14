@@ -73,6 +73,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
               <Flex flexDir="column" w="full">
                 <Text
                   bg="gray.100"
+                  _dark={{ bg: 'black.800', color: 'white' }}
                   borderRadius="full"
                   fontWeight="bold"
                   fontSize="xs"
@@ -91,6 +92,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
               <Flex flexDir="column" w="full">
                 <Text
                   bg="gray.100"
+                  _dark={{ bg: 'black.800', color: 'white' }}
                   borderRadius="full"
                   fontWeight="bold"
                   fontSize="xs"
@@ -111,6 +113,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
               <Flex flexDir="column" w="full">
                 <Text
                   bg="gray.100"
+                  _dark={{ bg: 'black.800', color: 'white' }}
                   borderRadius="full"
                   fontWeight="bold"
                   fontSize="xs"
@@ -132,6 +135,7 @@ export const DepositDetails: React.FC<IDepositDetails> = ({
                 <Flex flexDir="column" w="full">
                   <Text
                     bg="gray.100"
+                    _dark={{ bg: 'black.800', color: 'white' }}
                     borderRadius="full"
                     fontWeight="bold"
                     fontSize="xs"

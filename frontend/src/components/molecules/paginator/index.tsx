@@ -1,4 +1,4 @@
-import { Button, Container, Flex, Text } from '@chakra-ui/react'
+import { Button, Container, Flex, Text, useMediaQuery } from '@chakra-ui/react'
 import React from 'react'
 
 import { NavLeftIcon, NavRightIcon } from 'components/icons'
@@ -14,6 +14,8 @@ export const Paginator: React.FC<IPaginator> = ({
   currentPage,
   totalPages,
 }) => {
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+
   return (
     <Flex justifyContent="flex-end">
       <Flex w="fit-content" alignItems="center">
@@ -33,26 +35,27 @@ export const Paginator: React.FC<IPaginator> = ({
         >
           Previous
         </Button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-          (pageNumber, index) => (
-            <Container
-              key={index}
-              w="fit-content"
-              h="fit-content"
-              cursor="pointer"
-              borderRadius="full"
-              bg={currentPage === pageNumber ? 'gray.200' : undefined}
-              _dark={{
-                bg: currentPage === pageNumber ? 'black.700' : undefined,
-              }}
-              onClick={(): void => {
-                changePage(pageNumber)
-              }}
-            >
-              <Text fontSize="sm">{pageNumber}</Text>
-            </Container>
-          )
-        )}
+        {isLargerThanSm &&
+          Array.from({ length: totalPages }, (_, i) => i + 1).map(
+            (pageNumber, index) => (
+              <Container
+                key={index}
+                w="fit-content"
+                h="fit-content"
+                cursor="pointer"
+                borderRadius="full"
+                bg={currentPage === pageNumber ? 'gray.200' : undefined}
+                _dark={{
+                  bg: currentPage === pageNumber ? 'black.700' : undefined,
+                }}
+                onClick={(): void => {
+                  changePage(pageNumber)
+                }}
+              >
+                <Text fontSize="sm">{pageNumber}</Text>
+              </Container>
+            )
+          )}
         <Button
           variant={'menuButton'}
           border="0"

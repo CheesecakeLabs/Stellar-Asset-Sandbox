@@ -23,7 +23,7 @@ export const ContractInfo: React.FC<IContractInfo> = ({ contract }) => {
       <Flex
         flexDir="column"
         alignItems="center"
-        w={{ sm: '360px', lg: 'full' }}
+        w="full"
         bg="gray.50"
         borderRadius="0.75rem"
         p="1rem"

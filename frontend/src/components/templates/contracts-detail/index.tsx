@@ -56,7 +56,12 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
 }) => {
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW={MAX_PAGE_WIDTH_FULL} alignSelf="center" flexDir="column" w="full">
+      <Flex
+        maxW={MAX_PAGE_WIDTH_FULL}
+        alignSelf="center"
+        flexDir="column"
+        w="full"
+      >
         {loading || !contract ? (
           <Skeleton w="full" h="14rem" />
         ) : (
@@ -74,10 +79,11 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                 mr="1.5rem"
                 w="full"
                 display="flex"
-                flexDir={{ base: 'row', lg: 'column-reverse' }}
                 maxW="full"
                 gap="2rem"
               >
+                <ContractInfo contract={contract} />
+                
                 {contractData?.position &&
                 havePermission(
                   Permissions.INVEST_CERTIFICATE,
@@ -97,7 +103,6 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                     history={history}
                   />
                 )}
-                <ContractInfo contract={contract} />
               </Container>
               {contractData?.position ? (
                 <Withdraw

@@ -202,6 +202,7 @@ export const PublishInformationTemplate: React.FC<
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Publish information
               </Button>

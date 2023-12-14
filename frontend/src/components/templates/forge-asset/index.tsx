@@ -156,8 +156,8 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                 onSubmit(data, setValue)
               })}
             >
-              <Flex>
-                <Flex flexDir="column" mr="1rem">
+              <Flex flexDir={{ base: 'column', md: 'row' }}>
+                <Flex flexDir="column" mr="1rem"  mb="1rem">
                   <Flex justifyContent="space-between" alignItems="center">
                     <FormLabel>Asset Icon</FormLabel>
                     {selectedFile && (
@@ -309,6 +309,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   type="submit"
                   variant="primary"
                   mt="1.5rem"
+                  w={{base: 'full', md: 'fit-content'}}
                   isLoading={loading}
                 >
                   Forge asset
