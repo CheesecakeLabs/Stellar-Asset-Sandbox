@@ -47,7 +47,7 @@ type (
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 		GetAssetById(string) (entity.Asset, error)
-		StoreAssetImage(string, []byte) error
+		StoreAssetImage(string, string) error
 		GetAssetImage(string) ([]byte, error)
 		GetPaginatedAssets(int, int) ([]entity.Asset, int, error)
 		UpdateContractId(string, string) error
@@ -119,5 +119,10 @@ type (
 		GetLastLogTransactions(transactionTypeID int) ([]entity.LogTransaction, error)
 		SumLogTransactionSupply(timeRange string, timeFrame time.Duration) ([]entity.SumLogTransactionSupply, error)
 		LogTransactionSupplyByAssetID(assetID int, timeRange string, periodInitial string, interval string) (entity.LogTransactionSupply, error)
+	}
+
+	// Asset Service
+	AssetServiceInterface interface {
+		UploadFile(string, []byte) (string, error)
 	}
 )

@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/app"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/aws"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/kafka"
+	local "github.com/CheesecakeLabs/token-factory-v2/backend/pkg/localstorage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
 )
 
@@ -29,6 +31,26 @@ func main() {
 		log.Fatal(fmt.Errorf("failed to connect to Postgres: %w", err))
 	}
 	defer pg.Close()
+
+	// AWS Service or LocalStorage
+	var storageService storage.StorageService
+	if cfg.Deploy.DeployStage != "local" {
+		awsConn, err := aws.New(cfg.AWS)
+		if err != nil {
+			log.Fatalf("Failed to initialize AWS connection: %v", err)
+		}
+		storageService = awsConn
+	} else {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("Failed to get current directory: %v", err)
+		}
+
+		localStorage := &local.LocalStorage{
+			BasePath: currentDir, // Use the absolute path
+		}
+		storageService = localStorage
+	}
 
 	// Kafka create keypair connection
 	kpConn := kafka.New(cfg.Kafka, cfg.Kafka.CreateKpCfg.ConsumerTopics, cfg.Kafka.CreateKpCfg.ProducerTopic)
@@ -58,14 +80,6 @@ func main() {
 	go envConn.Run(cfg, entity.EnvelopeChannel)
 
 	// Kafka submit transaction connection
-	log.Println("cfg.Kafka.SubmitTransactionCfg.ProducerTopic: " + cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
-	log.Println("cfg.Kafka.SubmitTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, ""))
-	log.Println("cfg.Kafka.SignTransactionCfg.ProducerTopic: " + cfg.Kafka.SignTransactionCfg.ProducerTopic)
-	log.Println("cfg.Kafka.SignTransactionCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.SignTransactionCfg.ConsumerTopics, ""))
-	log.Println("cfg.Kafka.EnvelopeCfg.ProducerTopic: " + cfg.Kafka.EnvelopeCfg.ProducerTopic)
-	log.Println("cfg.Kafka.EnvelopeCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.EnvelopeCfg.ConsumerTopics, ""))
-	log.Println("cfg.Kafka.HorizonCfg.ProducerTopic: " + cfg.Kafka.HorizonCfg.ProducerTopic)
-	log.Println("cfg.Kafka.HorizonCfg.ConsumerTopics: " + strings.Join(cfg.Kafka.HorizonCfg.ConsumerTopics, ""))
 	submitConn := kafka.New(cfg.Kafka, cfg.Kafka.SubmitTransactionCfg.ConsumerTopics, cfg.Kafka.SubmitTransactionCfg.ProducerTopic)
 	err = submitConn.AttemptConnect()
 	if err != nil {
@@ -83,5 +97,5 @@ func main() {
 	}
 	go signConn.Run(cfg, entity.SignChannel)
 
-	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo)
+	app.Run(cfg, pg, kpConn.Producer, horConn.Producer, envConn.Producer, submitConn.Producer, signConn.Producer, tRepo, storageService)
 }
