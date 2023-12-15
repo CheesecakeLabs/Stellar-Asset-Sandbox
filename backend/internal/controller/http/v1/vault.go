@@ -55,6 +55,11 @@ type UpdateVaultAssetRequest struct {
 	IsRemove      bool   `json:"is_remove"   example:"false"`
 }
 
+type PaginatedVaultsResponse struct {
+	Vaults     []entity.Vault `json:"vaults"`
+	TotalPages int            `json:"totalPages"`
+}
+
 // @Summary     Create a new vault
 // @Description Create and issue a new asset on Stellar
 // @Tags  	    Vault
@@ -231,13 +236,16 @@ func (r *vaultRoutes) getAllVaults(c *gin.Context) {
 		}
 
 		// Get paginated vaults
-		vaults, err := r.v.GetPaginatedVaults(page, limit)
+		vaults, totalPages, err := r.v.GetPaginatedVaults(page, limit)
 		if err != nil {
 			r.l.Error(err, "http - v1 - get all vaults - GetPaginatedVaults")
 			errorResponse(c, http.StatusInternalServerError, "error getting paginated vaults", err)
 			return
 		}
-		c.JSON(http.StatusOK, vaults)
+		c.JSON(http.StatusOK, PaginatedVaultsResponse{
+			Vaults:     vaults,
+			TotalPages: totalPages,
+		})
 	} else {
 		// Get all vaults without pagination
 		vaults, err := r.v.GetAll(isAll)

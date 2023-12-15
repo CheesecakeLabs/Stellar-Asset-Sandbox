@@ -43,13 +43,13 @@ func (uc *ContractUseCase) GetById(id string) (entity.Contract, error) {
 	return contract, nil
 }
 
-func (uc *ContractUseCase) GetPaginatedContracts(page int, limit int) ([]entity.Contract, error) {
-	contracts, err := uc.cRepo.GetPaginatedContracts(page, limit)
+func (uc *ContractUseCase) GetPaginatedContracts(page int, limit int) ([]entity.Contract, int, error) {
+	contracts, totalPages, err := uc.cRepo.GetPaginatedContracts(page, limit)
 	if err != nil {
-		return nil, fmt.Errorf("ContractUseCase - GetPaginatedContracts - uc.repo.GetPaginatedContracts: %w", err)
+		return nil, 0, fmt.Errorf("ContractUseCase - GetPaginatedContracts - uc.repo.GetPaginatedContracts: %w", err)
 	}
 
-	return contracts, nil
+	return contracts, totalPages, nil
 }
 
 func (uc *ContractUseCase) GetHistory(userId int, contractId int) ([]entity.ContractHistory, error) {

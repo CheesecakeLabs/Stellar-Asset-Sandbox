@@ -95,14 +95,14 @@ type (
 		UpdateVault(entity.Vault) (entity.Vault, error)
 		GetVaultById(id int) (entity.Vault, error)
 		DeleteVault(entity.Vault) (entity.Vault, error)
-		GetPaginatedVaults(int, int) ([]entity.Vault, error)
+		GetPaginatedVaults(int, int) ([]entity.Vault, int, error)
 	}
 
 	ContractRepoInterface interface {
 		GetContracts() ([]entity.Contract, error)
 		CreateContract(entity.Contract) (entity.Contract, error)
 		GetContractById(id string) (entity.Contract, error)
-		GetPaginatedContracts(int, int) ([]entity.Contract, error)
+		GetPaginatedContracts(int, int) ([]entity.Contract, int, error)
 		GetHistory(userId int, contractId int) ([]entity.ContractHistory, error)
 		AddContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)
 		UpdateContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error)

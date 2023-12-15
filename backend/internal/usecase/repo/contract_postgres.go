@@ -172,30 +172,51 @@ func (r ContractRepo) CreateContract(data entity.Contract) (entity.Contract, err
 	return res, nil
 }
 
-func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract, error) {
+func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract, int, error) {
 	offset := (page - 1) * limit
+
+	// Query to count the total number of vaults
+	countQuery := `SELECT COUNT(*) FROM contracts;`
+
+	var totalVaults int
+	err := r.Db.QueryRow(countQuery).Scan(&totalVaults)
+	if err != nil {
+		return nil, 0, fmt.Errorf("ContractRepo - GetPaginatedContracts - Count Query: %w", err)
+	}
+
+	// Calculate total pages
+	totalPages := (totalVaults + limit - 1) / limit
+
 	query := `
-		SELECT 
-			c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, 
-			c.yield_rate AS contract_yield_rate, c.term AS contract_term, 
-			c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
-			c.compound AS contract_compound, c.created_at AS contract_created_at,
-			v.id AS vault_id, v.name AS vault_name,
+			SELECT 
+			c.id AS contract_id, c.name AS contract_name, c.address AS contract_address, c.yield_rate AS contract_yield_rate, 
+			c.term AS contract_term, c.min_deposit AS contract_min_deposit, c.penalty_rate AS contract_penalty_rate,
+			c.compound AS contract_compound, c.created_at AS contract_created_at, v.id AS vault_id, v.name AS vault_name,
 			vc.id AS vault_category_id, vc.name as vault_category_name,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
-			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight
+			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
 		FROM contracts c
 		JOIN vault v ON c.vault_id = v.id
 		JOIN vaultcategory vc ON v.vault_category_id = vc.id
 		JOIN wallet w ON v.wallet_id = w.id
 		JOIN key wk ON w.id = wk.wallet_id
+		JOIN asset a ON a.id = c.asset_id
+		JOIN wallet d ON a.distributor_id = d.id
+		JOIN key dk ON d.id = dk.wallet_id
+		JOIN wallet i ON a.issuer_id = i.id
+		JOIN key ik ON i.id = ik.wallet_id
 		ORDER BY c.id DESC
 		LIMIT $1 OFFSET $2;
 	`
 
 	rows, err := r.Db.Query(query, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("ContractRepo - GetPaginatedContracts - Query: %w", err)
+		return nil, 0, fmt.Errorf("ContractRepo - GetPaginatedContracts - Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -205,28 +226,39 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 		var contract entity.Contract
 		var vaultCategory entity.VaultCategory
 		var vault entity.Vault
+		var asset entity.Asset
 		var wallet entity.Wallet
+		var assetDistributor entity.Wallet
+		var assetIssuer entity.Wallet
 
 		err := rows.Scan(
-			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate,
-			&contract.Term, &contract.MinDeposit, &contract.PenaltyRate, &contract.Compound, &contract.CreatedAt,
+			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
+			&contract.PenaltyRate, &contract.Compound, &contract.CreatedAt,
 			&vault.Id, &vault.Name,
 			&vaultCategory.Id, &vaultCategory.Name,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&assetDistributor.Id, &assetDistributor.Type, &assetDistributor.Funded,
+			&assetDistributor.Key.Id, &assetDistributor.Key.PublicKey, &assetDistributor.Key.Weight,
+			&assetIssuer.Id, &assetIssuer.Type, &assetIssuer.Funded,
+			&assetIssuer.Key.Id, &assetIssuer.Key.PublicKey, &assetIssuer.Key.Weight,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("ContractRepo - GetPaginatedContracts - row.Scan: %w", err)
+			return nil, 0, fmt.Errorf("ContractRepo - GetPaginatedContracts - row.Scan: %w", err)
 		}
 
 		vault.Wallet = wallet
 		vault.VaultCategory = &vaultCategory
+		asset.Distributor = assetDistributor
+		asset.Issuer = assetIssuer
+		contract.Asset = asset
 		contract.Vault = vault
 
 		contracts = append(contracts, contract)
 	}
 
-	return contracts, nil
+	return contracts, totalPages, nil
 }
 
 func (r ContractRepo) GetHistory(userId int, contractId int) ([]entity.ContractHistory, error) {

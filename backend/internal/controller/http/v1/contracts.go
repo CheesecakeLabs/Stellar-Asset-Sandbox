@@ -58,6 +58,11 @@ type UpdateContractHistoryRequest struct {
 	ContractId     int     `json:"contract_id"   binding:"required"  example:"GSDSC..."`
 }
 
+type PaginatedContractsResponse struct {
+	Contracts  []entity.Contract `json:"contracts"`
+	TotalPages int               `json:"totalPages"`
+}
+
 // @Summary     Create a new contract
 // @Description Create new contract
 // @Tags  	    Contract
@@ -154,13 +159,16 @@ func (r *contractRoutes) getAllContracts(c *gin.Context) {
 		}
 
 		// Get paginated contracts
-		contracts, err := r.c.GetPaginatedContracts(page, limit)
+		contracts, totalPages, err := r.c.GetPaginatedContracts(page, limit)
 		if err != nil {
 			r.l.Error(err, "http - v1 - get all contracts - GetPaginatedContracts")
 			errorResponse(c, http.StatusInternalServerError, "error getting paginated contracts", err)
 			return
 		}
-		c.JSON(http.StatusOK, contracts)
+		c.JSON(http.StatusOK, PaginatedContractsResponse{
+			Contracts:  contracts,
+			TotalPages: totalPages,
+		})
 	} else {
 		// Get all contracts without pagination
 		contracts, err := r.c.GetAll()

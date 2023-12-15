@@ -176,10 +176,23 @@ func (r VaultRepo) DeleteVault(data entity.Vault) (entity.Vault, error) {
 }
 
 // GetPaginatedVaults -.
-func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
+func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, int, error) {
 	// Calculate offset based on page number and limit
 	offset := (page - 1) * limit
 
+	// Query to count the total number of vaults
+	countQuery := `SELECT COUNT(*) FROM vault v WHERE v.active = 1 AND v.owner_id is null;`
+
+	var totalVaults int
+	err := r.Db.QueryRow(countQuery).Scan(&totalVaults)
+	if err != nil {
+		return nil, 0, fmt.Errorf("VaultRepo - GetPaginatedVaults - Count Query: %w", err)
+	}
+
+	// Calculate total pages
+	totalPages := (totalVaults + limit - 1) / limit
+
+	// Query to fetch paginated assets
 	query := `
         SELECT 
             v.id AS vault_id, v.name AS vault_name, v.active AS vault_active, v.owner_id AS owner_id,
@@ -191,13 +204,13 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
         JOIN wallet w ON v.wallet_id = w.id
         JOIN key wk ON w.id = wk.wallet_id
         WHERE v.active = 1
-        ORDER BY v.id DESC
+        ORDER BY v.name ASC
         OFFSET $1 LIMIT $2;
     `
 
 	rows, err := r.Db.Query(query, offset, limit)
 	if err != nil {
-		return nil, fmt.Errorf("VaultRepo - GetPaginatedVaults - Query: %w", err)
+		return nil, 0, fmt.Errorf("VaultRepo - GetPaginatedVaults - Query: %w", err)
 	}
 	defer rows.Close()
 
@@ -215,7 +228,7 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("VaultRepo - GetPaginatedVaults - row.Scan: %w", err)
+			return nil, 0, fmt.Errorf("VaultRepo - GetPaginatedVaults - row.Scan: %w", err)
 		}
 
 		vault.Wallet = wallet
@@ -224,5 +237,5 @@ func (r VaultRepo) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
 		vaults = append(vaults, vault)
 	}
 
-	return vaults, nil
+	return vaults, totalPages, nil
 }

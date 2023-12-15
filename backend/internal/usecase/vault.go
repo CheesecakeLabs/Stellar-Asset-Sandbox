@@ -63,11 +63,11 @@ func (uc *VaultUseCase) DeleteVault(data entity.Vault) (entity.Vault, error) {
 	return vault, nil
 }
 
-func (uc *VaultUseCase) GetPaginatedVaults(page, limit int) ([]entity.Vault, error) {
-	vault, err := uc.vRepo.GetPaginatedVaults(page, limit)
+func (uc *VaultUseCase) GetPaginatedVaults(page, limit int) ([]entity.Vault, int, error) {
+	vault, totalPages, err := uc.vRepo.GetPaginatedVaults(page, limit)
 	if err != nil {
-		return nil, fmt.Errorf("VaultUseCase - GetPaginatedVaults - uc.repo.GetPaginatedVaults: %w", err)
+		return nil, 0, fmt.Errorf("VaultUseCase - GetPaginatedVaults - uc.repo.GetPaginatedVaults: %w", err)
 	}
 
-	return vault, nil
+	return vault, totalPages, nil
 }
