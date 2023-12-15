@@ -36,7 +36,8 @@ func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, 
 	ra := mocks.NewMockAssetRepoInterface(mockCtl)
 	tg := mocks.NewMockTomlInterface(mockCtl)
 	tr := mocks.NewMockTomlRepoInterface(mockCtl)
-	u := usecase.NewAssetUseCase(ra, rw, tg, tr, config.Horizon{})
+	st := mocks.NewMockAssetServiceInterface(mockCtl)
+	u := usecase.NewAssetUseCase(ra, rw, tg, tr, config.Horizon{}, st)
 
 	return u, ra, rw, tg
 }
@@ -156,7 +157,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, err := u.Create(tc.req.(entity.Asset))
+			res, err := u.Create(tc.req.(entity.Asset), []byte{})
 
 			require.EqualValues(t, tc.res, res)
 			if tc.err == nil {

@@ -28,6 +28,7 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.Au
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
 		h.POST("/logout", r.logout)
+		h.POST("/forget-password", r.forgetPassword)
 
 		secured := h.Group("/").Use(Auth(a.ValidateToken()))
 		{
@@ -233,4 +234,15 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, profile)
+}
+
+// @Summary Forget Password
+// @Description Forget Password
+// @Schemes
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200  {object} entity.
+// @Router /users [get]
+func (r *usersRoutes) forgetPassword(c *gin.Context) {
 }
