@@ -19,7 +19,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { MobileNav } from 'components/atoms'
@@ -153,7 +152,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
                       >
                         {findAsset(balance)?.image ? (
                           <Img
-                            src={base64ToImg(findAsset(balance)?.image)}
+                            src={findAsset(balance)?.image}
                             w="24px"
                             h="24px"
                           />

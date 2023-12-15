@@ -17,7 +17,6 @@ import {
 import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { formatDateFull, formatDateFullClean, toCrypto } from 'utils/formatter'
 
 interface ILastPayments {
@@ -81,7 +80,7 @@ export const LastPayments: React.FC<ILastPayments> = ({
                       <Td>
                         {transaction.asset.image ? (
                           <Img
-                            src={base64ToImg(transaction.asset.image)}
+                            src={transaction.asset.image}
                             w="16px"
                             h="16px"
                           />

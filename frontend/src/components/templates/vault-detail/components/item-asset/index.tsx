@@ -2,7 +2,6 @@ import { Button, Flex, Img, Text, Tooltip } from '@chakra-ui/react'
 import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { ChevronRight, LockIcon } from 'components/icons'
@@ -76,7 +75,7 @@ export const ItemAsset: React.FC<IItemAsset> = ({
         _dark={{ fill: 'white', stroke: 'white' }}
       >
         {findAsset(balance)?.image ? (
-          <Img src={base64ToImg(findAsset(balance)?.image)} w="24px" h="24px" />
+          <Img src={findAsset(balance)?.image} w="24px" h="24px" />
         ) : (
           getCurrencyIcon(balance.asset_code, '1.5rem')
         )}

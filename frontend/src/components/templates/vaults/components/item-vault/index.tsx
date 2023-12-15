@@ -3,7 +3,6 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { getCurrencyIcon, vaultCategoryTheme } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -78,7 +77,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
                 <Flex alignItems="center" gap={2}>
                   {findAsset(balance)?.image ? (
                     <Img
-                      src={base64ToImg(findAsset(balance)?.image)}
+                      src={findAsset(balance)?.image}
                       w="16px"
                       h="16px"
                     />

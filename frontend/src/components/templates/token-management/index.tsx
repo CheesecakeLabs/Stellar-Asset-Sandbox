@@ -21,7 +21,6 @@ import { havePermission } from 'utils'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -104,7 +103,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   >
                     <Td>
                       {asset.image ? (
-                        <Img src={base64ToImg(asset.image)} w="32px" h="32px" />
+                        <Img src={asset.image} w="32px" h="32px" />
                       ) : (
                         getCurrencyIcon(asset.code, '2rem')
                       )}

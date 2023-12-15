@@ -14,7 +14,6 @@ import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 interface IDeposit {
@@ -115,7 +114,7 @@ export const Deposit: React.FC<IDeposit> = ({
               >
                 {contract?.asset?.image ? (
                   <Img
-                    src={base64ToImg(contract.asset.image)}
+                    src={contract.asset.image}
                     w="16px"
                     h="16px"
                   />

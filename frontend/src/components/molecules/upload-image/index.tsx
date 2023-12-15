@@ -1,5 +1,13 @@
-import { Box, Container, Heading, Input, Stack, Text } from '@chakra-ui/react'
-import { Dispatch, SetStateAction } from 'react'
+import {
+  Box,
+  Container,
+  Heading,
+  Input,
+  Stack,
+  Text,
+  useToast,
+} from '@chakra-ui/react'
+import { ChangeEvent, Dispatch, SetStateAction } from 'react'
 
 import { motion, useAnimation } from 'framer-motion'
 
@@ -17,6 +25,25 @@ export const UploadImage: React.FC<IUploadImage> = ({
   const controls = useAnimation()
   const startAnimation = (): Promise<unknown> => controls.start('hover')
   const stopAnimation = (): void => controls.stop()
+  const toast = useToast()
+
+  const validateImage = (e: ChangeEvent<HTMLInputElement>): void => {
+    if (e.target?.files && e.target?.files[0]) {
+      if (e.target?.files[0].size > 2097152) {
+        toast({
+          title: 'Error!',
+          description: 'The image must be a maximum of 2 MB',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+        return
+      }
+      setSelectedFile(e.target?.files ? e.target?.files[0] : null)
+    }
+  }
+
   return (
     <Container my="12" w="240px" m="0" mr="1.5rem" p="0">
       <Box
@@ -34,7 +61,7 @@ export const UploadImage: React.FC<IUploadImage> = ({
         initial="rest"
         animate="rest"
         whileHover="hover"
-         className="asset-icon"
+        className="asset-icon"
       >
         <Box height="100%" width="100%" position="relative">
           <Box height="100%" width="100%" display="flex" flexDirection="column">
@@ -96,9 +123,9 @@ export const UploadImage: React.FC<IUploadImage> = ({
             accept="image/*"
             onDragEnter={startAnimation}
             onDragLeave={stopAnimation}
-            onChange={(e): void =>
-              setSelectedFile(e.target?.files ? e.target?.files[0] : null)
-            }
+            onChange={(e): void => {
+              validateImage(e)
+            }}
           />
         </Box>
       </Box>

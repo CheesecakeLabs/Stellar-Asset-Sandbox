@@ -19,7 +19,6 @@ import { useNavigate } from 'react-router-dom'
 import { havePermission } from 'utils'
 import { getCurrencyIcon } from 'utils/constants/constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 import { CompoundTime } from '../contracts-create/components/select-compound'
@@ -102,7 +101,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                     <Td>
                       {contract.asset.image ? (
                         <Img
-                          src={base64ToImg(contract.asset.image)}
+                          src={contract.asset.image}
                           w="32px"
                           h="32px"
                         />

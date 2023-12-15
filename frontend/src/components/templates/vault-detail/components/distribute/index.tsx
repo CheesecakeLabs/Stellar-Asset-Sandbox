@@ -27,7 +27,6 @@ import { toCrypto, toNumber } from 'utils/formatter'
 import { Permissions } from 'components/enums/permissions'
 import { LockIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
-import { base64ToImg } from 'utils/converter'
 
 interface IDistributeVault {
   onSubmit(
@@ -128,7 +127,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                   _dark={{ fill: 'white', stroke: 'white' }}
                 >
                   {selectedAsset.image ? (
-                    <Img src={base64ToImg(selectedAsset.image)} w="32px" h="32px" />
+                    <Img src={selectedAsset.image} w="32px" h="32px" />
                   ) : (
                     getCurrencyIcon(selectedAsset.code, '2rem')
                   )}

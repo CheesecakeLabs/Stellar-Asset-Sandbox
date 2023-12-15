@@ -3,7 +3,6 @@ import React from 'react'
 import { Calendar, AlertTriangle, DollarSign, Clock } from 'react-feather'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { formatDateFull } from 'utils/formatter'
 
 import { VaultIcon, ApyIcon } from 'components/icons'
@@ -46,7 +45,7 @@ export const ContractInfo: React.FC<IContractInfo> = ({ contract }) => {
           stroke="black"
         >
           {contract.asset.image ? (
-            <Img src={base64ToImg(contract.asset.image)} w="16px" h="16px" />
+            <Img src={contract.asset.image} w="16px" h="16px" />
           ) : (
             getCurrencyIcon(contract.asset.code, '1rem')
           )}

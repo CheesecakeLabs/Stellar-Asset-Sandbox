@@ -2,7 +2,6 @@ import { Text, Container, Flex, Box, Img } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
-import { base64ToImg } from 'utils/converter'
 import { toCrypto } from 'utils/formatter'
 
 interface IAssetItem {
@@ -46,7 +45,7 @@ export const AssetItem: React.FC<IAssetItem> = ({
           _dark={{ fill: 'white', stroke: 'white' }}
         >
           {asset.image ? (
-            <Img src={base64ToImg(asset.image)} w="18px" h="18px" />
+            <Img src={asset.image} w="18px" h="18px" />
           ) : (
             getCurrencyIcon(asset.code, '1.5rem')
           )}
