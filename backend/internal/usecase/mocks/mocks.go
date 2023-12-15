@@ -959,12 +959,13 @@ func (mr *MockVaultRepoInterfaceMockRecorder) DeleteVault(arg0 interface{}) *gom
 }
 
 // GetPaginatedVaults mocks base method.
-func (m *MockVaultRepoInterface) GetPaginatedVaults(arg0, arg1 int) ([]entity.Vault, error) {
+func (m *MockVaultRepoInterface) GetPaginatedVaults(arg0, arg1 int) ([]entity.Vault, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPaginatedVaults", arg0, arg1)
 	ret0, _ := ret[0].([]entity.Vault)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetPaginatedVaults indicates an expected call of GetPaginatedVaults.
@@ -1117,12 +1118,13 @@ func (mr *MockContractRepoInterfaceMockRecorder) GetHistory(userId, contractId i
 }
 
 // GetPaginatedContracts mocks base method.
-func (m *MockContractRepoInterface) GetPaginatedContracts(arg0, arg1 int) ([]entity.Contract, error) {
+func (m *MockContractRepoInterface) GetPaginatedContracts(arg0, arg1 int) ([]entity.Contract, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPaginatedContracts", arg0, arg1)
 	ret0, _ := ret[0].([]entity.Contract)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetPaginatedContracts indicates an expected call of GetPaginatedContracts.
