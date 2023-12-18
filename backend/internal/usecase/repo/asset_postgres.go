@@ -67,6 +67,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 
 		err := rows.Scan(
 			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
+			&asset.ContractId,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -167,6 +168,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 
 	err := row.Scan(
 		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
+		&asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -211,20 +213,21 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int,
 
 	// Query to fetch paginated assets
 	query := `
-        SELECT
-            a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
-            COALESCE(a.image, '') AS image, a.contract_id,
-            d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
-            dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
-            i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
-            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
-        FROM asset a
-        JOIN wallet d ON a.distributor_id = d.id
-        JOIN key dk ON d.id = dk.wallet_id
-        JOIN wallet i ON a.issuer_id = i.id
-        JOIN key ik ON i.id = ik.wallet_id
-        ORDER BY a.name
-        LIMIT $1 OFFSET $2;
+			SELECT
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
+			COALESCE(a.image, '') AS image, a.contract_id,
+			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
+			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
+			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
+			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+		FROM asset a
+		JOIN wallet d ON a.distributor_id = d.id
+		JOIN key dk ON d.id = dk.wallet_id
+		JOIN wallet i ON a.issuer_id = i.id
+		JOIN key ik ON i.id = ik.wallet_id
+		ORDER BY a.name
+		LIMIT $1 OFFSET $2;
+
     `
 
 	rows, err := r.Db.Query(query, limit, offset)
@@ -242,6 +245,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int,
 
 		err := rows.Scan(
 			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
+			&asset.ContractId,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -251,18 +255,16 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int,
 			return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
 		}
 
-		if image.Valid {
-			asset.Image = image.String
-		} else {
+		if !image.Valid {
 			asset.Image = ""
+		} else {
+			asset.Image = image.String
 		}
-
 		asset.Distributor = distributor
 		asset.Issuer = issuer
 
 		assets = append(assets, asset)
 	}
-
 	return assets, totalPages, nil
 }
 
@@ -283,20 +285,27 @@ func (r AssetRepo) StoreAssetImage(assetId string, image string) error {
 
 func (r AssetRepo) GetAssetImage(assetId string) ([]byte, error) {
 	stmt := `
-		SELECT image
-		FROM asset
-		WHERE id = $1
-	`
+        SELECT image
+        FROM asset
+        WHERE id = $1
+    `
 
 	row := r.Db.QueryRow(stmt, assetId)
 
-	var image []byte
+	var image sql.NullString
 	err := row.Scan(&image)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("AssetRepo - GetAssetImage - asset not found: %w", err)
+		}
 		return nil, fmt.Errorf("AssetRepo - GetAssetImage - row.Scan: %w", err)
 	}
 
-	return image, nil
+	if image.Valid {
+		return []byte(image.String), nil
+	}
+
+	return nil, nil // No image found, return nil without error
 }
 
 func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
