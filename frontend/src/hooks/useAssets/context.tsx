@@ -206,7 +206,6 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
           return data
         }
       } catch (error) {
-        console.log(error)
         if (axios.isAxiosError(error)) {
           throw new Error(error.message)
         }
