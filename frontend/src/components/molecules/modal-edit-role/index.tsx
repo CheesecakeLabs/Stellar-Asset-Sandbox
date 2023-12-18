@@ -70,7 +70,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit role</ModalHeader>
+        <ModalHeader>Change role</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {loadingRoles ? (
@@ -120,7 +120,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   mt="2rem"
                   isLoading={loading}
                 >
-                  Edit role
+                  Save role
                 </Button>
               </form>
             </Box>

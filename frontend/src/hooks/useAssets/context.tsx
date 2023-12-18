@@ -193,7 +193,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         )
         const data = response.data
 
-        if (data) {
+        if (data.assets) {
           await Promise.all(
             data.assets.map(async (asset: Hooks.UseAssetsTypes.IAsset) => {
               const assetData = await getAssetData(
@@ -206,6 +206,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
           return data
         }
       } catch (error) {
+        console.log(error)
         if (axios.isAxiosError(error)) {
           throw new Error(error.message)
         }

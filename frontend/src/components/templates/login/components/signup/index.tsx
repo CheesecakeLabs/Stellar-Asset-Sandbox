@@ -106,6 +106,7 @@ export const SignUp: React.FC<ISignUp> = ({
                   required: true,
                   minLength: 3,
                 })}
+                autoComplete='off'
               />
               <FormErrorMessage>
                 Name must be more than 2 characters
@@ -118,6 +119,7 @@ export const SignUp: React.FC<ISignUp> = ({
                 type="email"
                 placeholder="Email address"
                 {...register('email', { required: true })}
+                autoComplete='off'
               />
               <FormErrorMessage>Please check the email</FormErrorMessage>
             </FormControl>

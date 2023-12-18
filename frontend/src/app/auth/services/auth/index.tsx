@@ -1,4 +1,4 @@
-const LOCAL_STORAGE_KEY = 'token-sandbox'
+const LOCAL_STORAGE_KEY = 'token-sandbox-v2'
 
 const logout = (): void => {
   localStorage.removeItem(LOCAL_STORAGE_KEY)
