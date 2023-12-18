@@ -25,7 +25,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 			vc.id AS vault_category_id, vc.name as vault_category_name,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, COALESCE(a.image, '') AS image,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -59,6 +59,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 		var wallet entity.Wallet
 		var assetDistributor entity.Wallet
 		var assetIssuer entity.Wallet
+		var image sql.NullString
 
 		err := rows.Scan(
 			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
@@ -67,7 +68,7 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 			&vaultCategory.Id, &vaultCategory.Name,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
-			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
 			&assetDistributor.Id, &assetDistributor.Type, &assetDistributor.Funded,
 			&assetDistributor.Key.Id, &assetDistributor.Key.PublicKey, &assetDistributor.Key.Weight,
 			&assetIssuer.Id, &assetIssuer.Type, &assetIssuer.Funded,
@@ -81,6 +82,11 @@ func (r ContractRepo) GetContracts() ([]entity.Contract, error) {
 		vault.VaultCategory = &vaultCategory
 		asset.Distributor = assetDistributor
 		asset.Issuer = assetIssuer
+		if !image.Valid {
+			asset.Image = ""
+		} else {
+			asset.Image = image.String
+		}
 		contract.Asset = asset
 		contract.Vault = vault
 
@@ -99,7 +105,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 		vc.id AS vault_category_id, vc.name as vault_category_name,
 		w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 		wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
-		a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+		a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, COALESCE(a.image, '') AS image,
 		d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 		dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 		i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -126,6 +132,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 	var wallet entity.Wallet
 	var assetDistributor entity.Wallet
 	var assetIssuer entity.Wallet
+	var image sql.NullString
 
 	err := row.Scan(
 		&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
@@ -134,7 +141,7 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 		&vaultCategory.Id, &vaultCategory.Name,
 		&wallet.Id, &wallet.Type, &wallet.Funded,
 		&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
-		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
 		&assetDistributor.Id, &assetDistributor.Type, &assetDistributor.Funded,
 		&assetDistributor.Key.Id, &assetDistributor.Key.PublicKey, &assetDistributor.Key.Weight,
 		&assetIssuer.Id, &assetIssuer.Type, &assetIssuer.Funded,
@@ -151,6 +158,11 @@ func (r ContractRepo) GetContractById(id string) (entity.Contract, error) {
 	vault.VaultCategory = &vaultCategory
 	asset.Distributor = assetDistributor
 	asset.Issuer = assetIssuer
+	if !image.Valid {
+		asset.Image = ""
+	} else {
+		asset.Image = image.String
+	}
 	contract.Asset = asset
 	contract.Vault = vault
 
@@ -195,7 +207,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 			vc.id AS vault_category_id, vc.name as vault_category_name,
 			w.id AS wallet_id, w.type AS wallet_type, w.funded AS wallet_funded,
 			wk.id AS wallet_key_id, wk.public_key AS wallet_key_public_key, wk.weight AS wallet_key_weight,
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, a.image,
+			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code as asset_code, COALESCE(a.image, '') AS image,
 			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
 			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
 			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -230,6 +242,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 		var wallet entity.Wallet
 		var assetDistributor entity.Wallet
 		var assetIssuer entity.Wallet
+		var image sql.NullString
 
 		err := rows.Scan(
 			&contract.Id, &contract.Name, &contract.Address, &contract.YieldRate, &contract.Term, &contract.MinDeposit,
@@ -238,7 +251,7 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 			&vaultCategory.Id, &vaultCategory.Name,
 			&wallet.Id, &wallet.Type, &wallet.Funded,
 			&wallet.Key.Id, &wallet.Key.PublicKey, &wallet.Key.Weight,
-			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &asset.Image,
+			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
 			&assetDistributor.Id, &assetDistributor.Type, &assetDistributor.Funded,
 			&assetDistributor.Key.Id, &assetDistributor.Key.PublicKey, &assetDistributor.Key.Weight,
 			&assetIssuer.Id, &assetIssuer.Type, &assetIssuer.Funded,
@@ -252,6 +265,11 @@ func (r ContractRepo) GetPaginatedContracts(page, limit int) ([]entity.Contract,
 		vault.VaultCategory = &vaultCategory
 		asset.Distributor = assetDistributor
 		asset.Issuer = assetIssuer
+		if !image.Valid {
+			asset.Image = ""
+		} else {
+			asset.Image = image.String
+		}
 		contract.Asset = asset
 		contract.Vault = vault
 
