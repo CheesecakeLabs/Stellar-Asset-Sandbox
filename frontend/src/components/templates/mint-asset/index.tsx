@@ -66,11 +66,7 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
             })}
           >
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex
-                justifyContent="space-between"
-                w="full"
-                px="0.25rem"
-              >
+              <Flex justifyContent="space-between" w="full" px="0.25rem">
                 <FormLabel>Amount to mint</FormLabel>
                 <Tooltip label={TooltipsData.mint}>
                   <HelpIcon width="20px" />
@@ -108,6 +104,7 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Mint asset
               </Button>

@@ -30,7 +30,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
         <BreadcrumbItem>
           <BreadcrumbLink
             onClick={(): void => {
-              navigate(PathRoute.HOME)
+              navigate(PathRoute.TOKEN_MANAGEMENT)
             }}
             flexDir="row"
             display="flex"

@@ -21,7 +21,6 @@ import { IChange } from 'app/core/pages/role-permissions'
 interface IRolePermissionsTemplate {
   loading: boolean
   roles: Hooks.UseAuthTypes.IRole[] | undefined
-  loadingRoles: boolean
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
   permissions: Hooks.UseAuthTypes.IPermission[] | undefined
   rolesPermissions: Hooks.UseAuthTypes.IRolePermission[] | undefined
@@ -111,22 +110,26 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           ) : (
             <Table w="full" variant="list">
               <Thead w="full">
-                <Th>Role name</Th>
-                {roles?.map(role => (
-                  <Th textAlign="center">{role.name}</Th>
-                ))}
+                <Tr>
+                  <Th>Role name</Th>
+                  {roles?.map((role, index) => (
+                    <Th textAlign="center" key={index}>
+                      {role.name}
+                    </Th>
+                  ))}
+                </Tr>
               </Thead>
               <Tbody>
-                {permissions?.map(permission => (
-                  <Tr>
+                {permissions?.map((permission, index) => (
+                  <Tr key={index}>
                     <Td>
                       <Text>{permission.name}</Text>
                       <Text fontSize="xs" maxW="400px">
                         {permission.description}
                       </Text>
                     </Td>
-                    {roles?.map(role => (
-                      <Td>
+                    {roles?.map((role, index) => (
+                      <Td key={index}>
                         <Checkbox
                           w="full"
                           justifyContent="center"

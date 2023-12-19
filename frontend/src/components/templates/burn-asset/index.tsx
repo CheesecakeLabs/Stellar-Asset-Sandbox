@@ -104,6 +104,7 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Burn asset
               </Button>

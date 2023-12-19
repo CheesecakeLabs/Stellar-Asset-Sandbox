@@ -1,9 +1,10 @@
-import { Button, Container, Text, Flex } from '@chakra-ui/react'
+import { Container, Text, Flex, useMediaQuery } from '@chakra-ui/react'
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 import { havePermission } from 'utils'
 
+import { ItemActionAsset } from 'components/atoms/item-action-asset'
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
@@ -13,6 +14,7 @@ import {
   BackIcon,
   BlockIcon,
   BurnIcon,
+  FileIcon,
   HomeIcon,
   TransferIcon,
 } from 'components/icons'
@@ -26,145 +28,103 @@ export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({
   action,
   permissions,
 }) => {
-  const navigate = useNavigate()
   const { id } = useParams()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   return (
-    <Flex w="290px" flexDir="column">
-      <Flex h="3.5rem" alignItems="center">
-        <Text fontSize="md" fontWeight="400">
-          Actions
-        </Text>
-      </Flex>
-      <Container variant="primary" p="0">
-        <Button
-          variant={
-            action === AssetActions.HOME ? 'menuButtonSelected' : 'menuButton'
-          }
-          borderTopRadius="0.25rem"
-          leftIcon={
-            <Flex w="1rem" justifyContent="center">
-              <HomeIcon />
-            </Flex>
-          }
-          isDisabled={!id}
-          onClick={(): void => {
-            navigate(`${PathRoute.ASSET_HOME}/${id}`)
-          }}
-        >
-          Asset home
-        </Button>
-        {havePermission(Permissions.MINT_ASSET, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.MINT ? 'menuButtonSelected' : 'menuButton'
-            }
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <AddIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.MINT_ASSET}/${id}`)
-            }}
-          >
-            Mint assets
-          </Button>
-        )}
-        {havePermission(Permissions.BURN_ASSET, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.BURN ? 'menuButtonSelected' : 'menuButton'
-            }
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <BurnIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.BURN_ASSET}/${id}`)
-            }}
-          >
-            Burn assets
-          </Button>
-        )}
-        {havePermission(Permissions.DISTRIBUTE_ASSET, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.DISTRIBUTE
-                ? 'menuButtonSelected'
-                : 'menuButton'
-            }
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <TransferIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.DISTRIBUTE_ASSET}/${id}`)
-            }}
-          >
-            Distribute
-          </Button>
-        )}
-        {havePermission(Permissions.AUTHORIZE_ASSET, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.AUTHORIZE
-                ? 'menuButtonSelected'
-                : 'menuButton'
-            }
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <AuthorizeIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.AUTHORIZE_ACCOUNT}/${id}`)
-            }}
-          >
-            Authorize account
-          </Button>
-        )}
-        {havePermission(Permissions.FREEZE_ACCOUNT, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.FREEZE
-                ? 'menuButtonSelected'
-                : 'menuButton'
-            }
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <BlockIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.FREEZE_ACCOUNT}/${id}`)
-            }}
-          >
-            Freeze account
-          </Button>
-        )}
-        {havePermission(Permissions.CLAWBACK_ASSET, permissions) && (
-          <Button
-            variant={
-              action === AssetActions.CLAWBACK
-                ? 'menuButtonSelected'
-                : 'menuButton'
-            }
-            borderBottomRadius="0.25rem"
-            leftIcon={
-              <Flex w="1rem" justifyContent="center">
-                <BackIcon />
-              </Flex>
-            }
-            onClick={(): void => {
-              navigate(`${PathRoute.CLAWBACK_ASSET}/${id}`)
-            }}
-          >
-            Clawback
-          </Button>
-        )}
+    <Flex w={{ base: 'full', md: '290px' }} flexDir="column">
+      {isLargerThanMd && (
+        <Flex h="3.5rem" alignItems="center">
+          <Text fontSize="md" fontWeight="400">
+            Actions
+          </Text>
+        </Flex>
+      )}
+      <Container
+        variant="primary"
+        p="0"
+        display="flex"
+        flexDir={{ base: 'row', md: 'column' }}
+        overflowX="auto"
+      >
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.HOME}
+          havePermission
+          title={'Asset home'}
+          path={`${PathRoute.ASSET_HOME}/${id}`}
+          icon={<HomeIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.MINT}
+          havePermission={havePermission(Permissions.MINT_ASSET, permissions)}
+          title={'Mint assets'}
+          path={`${PathRoute.MINT_ASSET}/${id}`}
+          icon={<AddIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.BURN}
+          havePermission={havePermission(Permissions.BURN_ASSET, permissions)}
+          title={'Burn assets'}
+          path={`${PathRoute.BURN_ASSET}/${id}`}
+          icon={<BurnIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.DISTRIBUTE}
+          havePermission={havePermission(
+            Permissions.DISTRIBUTE_ASSET,
+            permissions
+          )}
+          title={'Distribute'}
+          path={`${PathRoute.DISTRIBUTE_ASSET}/${id}`}
+          icon={<TransferIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.AUTHORIZE}
+          havePermission={havePermission(
+            Permissions.AUTHORIZE_ASSET,
+            permissions
+          )}
+          title={'Authorize account'}
+          path={`${PathRoute.AUTHORIZE_ACCOUNT}/${id}`}
+          icon={<AuthorizeIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.FREEZE}
+          havePermission={havePermission(
+            Permissions.FREEZE_ACCOUNT,
+            permissions
+          )}
+          title={'Freeze account'}
+          path={`${PathRoute.FREEZE_ACCOUNT}/${id}`}
+          icon={<BlockIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.CLAWBACK}
+          havePermission={havePermission(
+            Permissions.CLAWBACK_ASSET,
+            permissions
+          )}
+          title={'Clawback'}
+          path={`${PathRoute.CLAWBACK_ASSET}/${id}`}
+          icon={<BackIcon />}
+        />
+
+        <ItemActionAsset
+          isCurrentAction={action === AssetActions.PUBLISH_INFORMATION}
+          havePermission={havePermission(
+            Permissions.CLAWBACK_ASSET,
+            permissions
+          )}
+          title={'Publish information'}
+          path={`${PathRoute.PUBLISH_INFORMATION}/${id}`}
+          icon={<FileIcon />}
+        />
       </Container>
     </Flex>
   )

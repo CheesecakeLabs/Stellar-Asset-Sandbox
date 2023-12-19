@@ -6,6 +6,7 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
+  Img,
   Input,
   Tab,
   TabList,
@@ -125,7 +126,11 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                   stroke="black"
                   _dark={{ fill: 'white', stroke: 'white' }}
                 >
-                  {getCurrencyIcon(selectedAsset.code, '2rem')}
+                  {selectedAsset.image ? (
+                    <Img src={selectedAsset.image} w="32px" h="32px" />
+                  ) : (
+                    getCurrencyIcon(selectedAsset.code, '2rem')
+                  )}
                   <Flex flexDir="column" ms="1rem">
                     <Text fontSize="sm">{selectedAsset.code}</Text>
                     <Text fontSize="xs">{toCrypto(Number(getBalance()))}</Text>
@@ -154,7 +159,7 @@ export const DistributeVault: React.FC<IDistributeVault> = ({
                       <TabPanels>
                         <TabPanel>
                           <FormControl mt="1.5rem">
-                            <FormLabel>Destination Vault</FormLabel>
+                            <FormLabel>Destination</FormLabel>
                             <SelectVault
                               vaults={vaults}
                               setWallet={setWallet}

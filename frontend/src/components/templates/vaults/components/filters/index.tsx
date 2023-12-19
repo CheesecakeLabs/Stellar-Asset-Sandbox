@@ -21,8 +21,15 @@ export const Filters: React.FC<IFilters> = ({ vaultCategories }) => {
     >
       <FilterIcon />
       <Flex ms="1rem">
-        {vaultCategories.map(vaultCategory => (
-          <Tag fontSize="xs" fontWeight="500" mr="0.35rem" py={0} px={4}>
+        {vaultCategories.map((vaultCategory, index) => (
+          <Tag
+            fontSize="xs"
+            fontWeight="500"
+            mr="0.35rem"
+            py={0}
+            px={4}
+            key={index}
+          >
             {vaultCategory.name}
           </Tag>
         ))}

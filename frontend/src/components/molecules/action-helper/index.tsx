@@ -13,7 +13,7 @@ export const ActionHelper: React.FC<IActionHelper> = ({
   description,
 }) => {
   return (
-    <Container variant="primary" maxW="290px" mt="1rem">
+    <Container variant="primary" maxW={{ base: 'full', md: '290px' }} mt="1rem">
       <Flex justifyContent="space-between" alignItems="center" mb="0.75rem">
         <Text>{title}</Text>
         <InfoIcon />

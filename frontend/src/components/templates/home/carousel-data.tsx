@@ -2,7 +2,6 @@ import { Text, Box } from '@chakra-ui/react'
 
 import VIDEO_ASSET_MANAGEMENT from 'app/core/resources/home-videos/asset-management.mp4'
 import VIDEO_DASHBOARDS from 'app/core/resources/home-videos/dashboards.mp4'
-import VIDEO_GENERAL from 'app/core/resources/home-videos/general.mp4'
 import VIDEO_ROLES from 'app/core/resources/home-videos/roles.mp4'
 import VIDEO_SOROBAN from 'app/core/resources/home-videos/soroban.mp4'
 import VIDEO_TREASURY from 'app/core/resources/home-videos/treasury.mp4'
@@ -10,9 +9,10 @@ import VIDEO_TREASURY from 'app/core/resources/home-videos/treasury.mp4'
 export const carouselData = [
   {
     title: 'Welcome to the Stellar Asset Issuance Sandbox (Custodial Edition)!',
-    slide: VIDEO_GENERAL,
+    slide: "https://www.youtube.com/embed/F4eFUwpcEYA?si=WQJpVCXhfhR3qVa5",
     actionName: undefined,
     actionDestination: undefined,
+    isYoutube: true,
     children: (
       <Box>
         <Text>

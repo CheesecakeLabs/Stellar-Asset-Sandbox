@@ -39,7 +39,9 @@ interface IVaultDetailTemplate {
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
-  onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
+  onUpdateVaultAssets(
+    listEdit: Hooks.UseHorizonTypes.IBalance[]
+  ): Promise<boolean>
   onDeleteVault(): Promise<void>
   getPaymentsDataByLink(link: 'prev' | 'next'): void
   changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>

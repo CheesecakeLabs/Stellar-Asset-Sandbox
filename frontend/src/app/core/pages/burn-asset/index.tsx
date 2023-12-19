@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -28,6 +34,8 @@ export const BurnAsset: React.FC = () => {
   const [burnOperations, setBurnOperations] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { burn, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -129,7 +137,15 @@ export const BurnAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper title={'About Burn'} description={burnHelper} />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Burn'} />
             {(loadingAsset && !asset) || !asset ? (
@@ -155,7 +171,9 @@ export const BurnAsset: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper title={'About Burn'} description={burnHelper} />
+            {isLargerThanMd && (
+              <ActionHelper title={'About Burn'} description={burnHelper} />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

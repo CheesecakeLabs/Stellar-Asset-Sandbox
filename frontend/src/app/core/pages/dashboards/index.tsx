@@ -46,7 +46,7 @@ export const Dashboards: React.FC = () => {
   }, [chartPeriod, getPayments])
 
   useEffect(() => {
-    getAssets()
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {

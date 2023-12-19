@@ -3,12 +3,18 @@ export const Button = {
     primary: {
       background: 'primary.normal',
       color: 'white',
-      height: '2.125rem',
+      height: '2.75rem',
+      px: '2rem',
       fontWeight: '500',
       fontSize: 'sm',
       borderRadius: '0.25rem',
       _loading: {
         _hover: {
+          bg: 'primary.normal',
+        },
+      },
+      _hover: {
+        _disabled: {
           bg: 'primary.normal',
         },
       },
@@ -18,7 +24,7 @@ export const Button = {
       color: 'primary.normal',
       border: '1px solid',
       borderColor: 'primary.normal',
-      height: '2.125rem',
+      height: '2.75rem',
       fontWeight: '500',
       fontSize: 'sm',
       borderRadius: '0.25rem',

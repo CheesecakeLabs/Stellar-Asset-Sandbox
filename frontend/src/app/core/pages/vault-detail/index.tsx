@@ -186,9 +186,9 @@ export const VaultDetail: React.FC = () => {
 
   const onUpdateVaultAssets = async (
     listEdit: Hooks.UseHorizonTypes.IBalance[]
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     try {
-      if (!vault) return
+      if (!vault) return false
 
       const assetsRemoveds =
         vault.accountData?.balances
@@ -245,16 +245,17 @@ export const VaultDetail: React.FC = () => {
             setVault(vault)
           })
         }
-
-        return
+        return isSuccess
       }
 
       toastError(MessagesError.errorOccurred)
+      return false
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
       toastError(message)
+      return false
     }
   }
 
@@ -271,7 +272,7 @@ export const VaultDetail: React.FC = () => {
 
   useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
-    getAssets()
+    getAssets(true)
   }, [getAssets, getVaults])
 
   useEffect(() => {
@@ -335,7 +336,7 @@ export const VaultDetail: React.FC = () => {
       asset.code,
       asset.issuer.key.publicKey
     )
-    const vaults = await getVaults()
+    const vaults = await getVaults(true)
     const filteredVaults =
       vaults
         ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>

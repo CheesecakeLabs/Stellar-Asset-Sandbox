@@ -1,6 +1,7 @@
 import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import Authentication from 'app/auth/services/auth'
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   const [permissions, setPermissions] = useState<
     Hooks.UseAuthTypes.IPermission[] | undefined
   >()
+  const { getAccountData } = useHorizon()
 
   const signIn = async (
     params: Hooks.UseAuthTypes.ISignIn
@@ -108,13 +110,16 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getRoles = useCallback(async (): Promise<void> => {
+  const getRoles = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IRole[] | undefined
+  > => {
     setLoadingRoles(true)
     try {
       const response = await http.get(`role`)
       const data = response.data
       if (data) {
         setRoles(data)
+        return data
       }
     } catch (error) {
       return
@@ -163,31 +168,49 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getProfile = useCallback(async (): Promise<void> => {
+  const getProfile = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IUserDto | undefined
+  > => {
     setLoading(true)
     try {
       const response = await http.get(`users/profile`)
       const data = response.data
       if (data) {
+        if (data.vault) {
+          const accountData = await getAccountData(
+            data.vault.wallet.key.publicKey
+          )
+          data.vault.accountData = accountData
+        }
         setProfile(data)
+        return data
       }
     } catch (error) {
-      return
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [getAccountData])
 
-  const getUserPermissions = useCallback(async (): Promise<void> => {
+  const getUserPermissions = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IUserPermission[] | undefined
+  > => {
     setLoadingUserPermissions(true)
     try {
       const response = await http.get(`role-permissions/user-permissions`)
       const data = response.data
       if (data) {
         setUserPermissions(data)
+        return data
       }
     } catch (error) {
-      return
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
     } finally {
       setLoadingUserPermissions(false)
     }
@@ -214,13 +237,16 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getRolesPermissions = useCallback(async (): Promise<void> => {
+  const getRolesPermissions = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IRolePermission[] | undefined
+  > => {
     setLoading(true)
     try {
       const response = await http.get(`role-permissions/roles-permissions`)
       const data = response.data
       if (data) {
         setRolesPermissions(data)
+        return data
       }
     } catch (error) {
       return
@@ -229,13 +255,16 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getPermissions = useCallback(async (): Promise<void> => {
+  const getPermissions = useCallback(async (): Promise<
+    Hooks.UseAuthTypes.IPermission[] | undefined
+  > => {
     setLoading(true)
     try {
       const response = await http.get(`role-permissions/permissions`)
       const data = response.data
       if (data) {
         setPermissions(data)
+        return data
       }
     } catch (error) {
       return
@@ -363,7 +392,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         creatingRole,
         updatingRole,
         deletingRole,
-        loadingUserPermissions
+        loadingUserPermissions,
       }}
     >
       {children}

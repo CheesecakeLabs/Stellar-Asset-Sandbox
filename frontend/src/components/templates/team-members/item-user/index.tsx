@@ -68,7 +68,7 @@ export const ItemUser: React.FC<IItemUser> = ({
                     icon={<MenuDotsIcon />}
                   />
                   <MenuList>
-                    <MenuItem onClick={onOpen}>Edit role</MenuItem>
+                    <MenuItem onClick={onOpen}>Change role</MenuItem>
                   </MenuList>
                 </>
               )}

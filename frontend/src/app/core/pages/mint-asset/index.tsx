@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -28,6 +34,8 @@ export const MintAsset: React.FC = () => {
   const [burnOperations, setBurnOperations] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingChart, getPaymentsByAssetId } = useDashboards()
@@ -129,7 +137,15 @@ export const MintAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper title={'About Mint'} description={mintHelper} />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
             {(loadingAsset && !asset) || !asset ? (
@@ -155,7 +171,9 @@ export const MintAsset: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper title={'About Mint'} description={mintHelper} />
+            {isLargerThanMd && (
+              <ActionHelper title={'About Mint'} description={mintHelper} />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

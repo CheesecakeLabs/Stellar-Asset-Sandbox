@@ -14,7 +14,7 @@ export const Home: React.FC = () => {
     useAuth()
 
   useEffect(() => {
-    getAssets()
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {

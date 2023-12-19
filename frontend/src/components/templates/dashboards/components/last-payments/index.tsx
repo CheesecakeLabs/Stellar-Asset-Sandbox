@@ -12,6 +12,7 @@ import {
   Thead,
   SimpleGrid,
   useMediaQuery,
+  Img,
 } from '@chakra-ui/react'
 import React from 'react'
 
@@ -73,10 +74,20 @@ export const LastPayments: React.FC<ILastPayments> = ({
                 <Th>To</Th>
               </Thead>
               <Tbody>
-                {transactions?.map(transaction => (
-                  <Tr>
+                {transactions?.map((transaction, index) => (
+                  <Tr key={index}>
                     {isLargerThanMd && (
-                      <Td>{getCurrencyIcon(transaction.asset.code, '1rem')}</Td>
+                      <Td>
+                        {transaction.asset.image ? (
+                          <Img
+                            src={transaction.asset.image}
+                            w="16px"
+                            h="16px"
+                          />
+                        ) : (
+                          getCurrencyIcon(transaction.asset.code, '1rem')
+                        )}
+                      </Td>
                     )}
                     <Td>
                       {isLargerThanMd

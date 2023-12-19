@@ -152,8 +152,10 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                     placeholder="Select role"
                     {...register('role_id', { required: true })}
                   >
-                    {roles.map(role => (
-                      <option value={role.id}>{role.name}</option>
+                    {roles.map((role, index) => (
+                      <option value={role.id} key={index}>
+                        {role.name}
+                      </option>
                     ))}
                   </Select>
                   <FormErrorMessage>Inform the role</FormErrorMessage>

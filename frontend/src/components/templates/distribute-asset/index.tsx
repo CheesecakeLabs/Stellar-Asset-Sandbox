@@ -67,7 +67,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
             <FormControl
               isInvalid={errors?.destination_wallet_id !== undefined}
             >
-              <FormLabel>Destination Vault</FormLabel>
+              <FormLabel>Destination</FormLabel>
               <SelectVault vaults={vaults} setWallet={setWallet} />
               <FormErrorMessage>Required</FormErrorMessage>
             </FormControl>
@@ -110,6 +110,7 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Distribute asset
               </Button>

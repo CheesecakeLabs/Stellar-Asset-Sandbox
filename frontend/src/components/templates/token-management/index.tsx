@@ -12,6 +12,7 @@ import {
   Skeleton,
   Tooltip,
   useMediaQuery,
+  Img,
 } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -32,17 +33,24 @@ import {
   JoinIcon,
 } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
+import { Paginator } from 'components/molecules/paginator'
 
 interface ITokenManagementTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  currentPage: number
+  totalPages: number
+  changePage(page: number): void
 }
 
 export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
   loading,
   assets,
   userPermissions,
+  currentPage,
+  totalPages,
+  changePage,
 }) => {
   const navigate = useNavigate()
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
@@ -81,7 +89,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   {isLargerThanSm && <Th isNumeric>Supply</Th>}
                   {isLargerThanLg && <Th>Asset type</Th>}
                   {isLargerThanMd && <Th>Controls</Th>}
-                  <Th w="2rem" p={0} />
+                  {isLargerThanMd && <Th w="2rem" p={0} />}
                 </Tr>
               </Thead>
               <Tbody>
@@ -93,7 +101,13 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                       navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
                     }
                   >
-                    <Td>{getCurrencyIcon(asset.code, '2rem')}</Td>
+                    <Td>
+                      {asset.image ? (
+                        <Img src={asset.image} w="32px" h="32px" />
+                      ) : (
+                        getCurrencyIcon(asset.code, '2rem')
+                      )}
+                    </Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
                     {isLargerThanSm && (
@@ -134,9 +148,11 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                         </Flex>
                       </Td>
                     )}
-                    <Td w="2rem" p={0}>
-                      <ArrowRightIcon width="12px" />
-                    </Td>
+                    {isLargerThanMd && (
+                      <Td w="2rem" p={0}>
+                        <ArrowRightIcon width="12px" />
+                      </Td>
+                    )}
                   </Tr>
                 ))}
               </Tbody>
@@ -145,6 +161,11 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
         ) : (
           <Empty title="No forged assets" />
         )}
+        <Paginator
+          changePage={changePage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       </Flex>
     </Flex>
   )

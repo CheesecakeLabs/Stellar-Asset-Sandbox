@@ -1,4 +1,4 @@
-import { Text, Flex, Switch } from '@chakra-ui/react'
+import { Text, Flex, Switch, Img } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
@@ -16,8 +16,9 @@ export const SelectAssets: React.FC<ISelectAssets> = ({
 }) => {
   return (
     <Flex flexDir="column">
-      {assets?.map(asset => (
+      {assets?.map((asset, index) => (
         <Flex
+          key={index}
           justifyContent="space-between"
           alignItems="center"
           borderBottom="1px solid"
@@ -33,7 +34,11 @@ export const SelectAssets: React.FC<ISelectAssets> = ({
             _dark={{ fill: 'white', stroke: 'white' }}
             alignItems="center"
           >
-            {getCurrencyIcon(asset.code, '1.5rem')}{' '}
+            {asset.image ? (
+              <Img src={asset.image} w="24px" h="24px" />
+            ) : (
+              getCurrencyIcon(asset.code, '1.5rem')
+            )}
             <Text fontWeight="600" fontSize="sm">
               {asset.name}
             </Text>

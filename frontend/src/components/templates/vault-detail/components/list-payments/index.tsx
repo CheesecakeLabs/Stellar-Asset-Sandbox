@@ -141,7 +141,7 @@ export const ListPayments: React.FC<IListPayments> = ({
             </Tbody>
           </Table>
         ) : (
-          <Empty title={'No transactions in this vault'} hideIcon />
+          <Empty title={'No transactions'} hideIcon />
         )}
       </Box>
       <Flex justifyContent="flex-end">

@@ -15,11 +15,13 @@ import { Home } from '../pages/home'
 import { MintAsset } from '../pages/mint-asset'
 import { PaymentsTokens } from '../pages/payments-tokens'
 import { Profile } from '../pages/profile'
+import { PublishInformation } from '../pages/publish-information'
 import { RolePermissions } from '../pages/role-permissions'
 import { RolesManage } from '../pages/roles-manage'
 import { SandboxPage } from '../pages/sandbox-page'
 import { TeamMembers } from '../pages/team-members'
 import { TokenManagement } from '../pages/token-management'
+import { TomlFile } from '../pages/toml-file'
 import { VaultCreate } from '../pages/vault-create'
 import { VaultDetail } from '../pages/vault-detail'
 import { Vaults } from '../pages/vaults'
@@ -59,6 +61,11 @@ export const coreRoutes: AppRoute[] = [
   {
     path: `${PathRoute.FREEZE_ACCOUNT}/:id`,
     component: FreezeAccount,
+    isPrivate: true,
+  },
+  {
+    path: `${PathRoute.PUBLISH_INFORMATION}/:id`,
+    component: PublishInformation,
     isPrivate: true,
   },
   {
@@ -119,6 +126,11 @@ export const coreRoutes: AppRoute[] = [
   {
     path: PathRoute.ROLES_MANAGE,
     component: RolesManage,
+    isPrivate: true,
+  },
+  {
+    path: PathRoute.TOML_FILE,
+    component: TomlFile,
     isPrivate: true,
   },
 ]

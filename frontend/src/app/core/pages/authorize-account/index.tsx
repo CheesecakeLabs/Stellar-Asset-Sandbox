@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -26,6 +32,8 @@ export const AuthorizeAccount: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
   const [vaultsUnauthorized, setVaultsUnauthorized] =
     useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { authorize, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
@@ -98,7 +106,7 @@ export const AuthorizeAccount: React.FC = () => {
         asset.code,
         asset.issuer.key.publicKey
       )
-      const vaults = await getVaults()
+      const vaults = await getVaults(true)
       const vaultsStatusList = vaultsToStatusName(vaults, assetAccounts, asset)
       const vaultsUnauthorized = filterVaultsByStatus(
         vaults,
@@ -122,7 +130,7 @@ export const AuthorizeAccount: React.FC = () => {
   }, [filterVaults, getAssetById, id])
 
   useEffect(() => {
-    getVaults()
+    getVaults(true)
   }, [getVaults])
 
   useEffect(() => {
@@ -140,7 +148,18 @@ export const AuthorizeAccount: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper
+              title={'About Authorize'}
+              description={authorizeHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Authorize'} />
             {(loadingAsset && !asset) || !asset ? (
@@ -162,10 +181,12 @@ export const AuthorizeAccount: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Authorize'}
-              description={authorizeHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Authorize'}
+                description={authorizeHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

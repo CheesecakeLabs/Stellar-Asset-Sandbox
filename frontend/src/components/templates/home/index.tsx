@@ -88,14 +88,22 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                       w="fit-content"
                       mb="2rem"
                     >
-                      <Box w="full" h="full" top="-4px" pos="relative">
+                      <Box
+                        w={data.isYoutube ? '740px' : 'full'}
+                        h={data.isYoutube ? '420px' : 'full'}
+                        top="-4px"
+                        pos="relative"
+                      >
                         <ReactPlayer
-                          playing
+                          playing={data.isYoutube ? false : true}
                           loop
-                          muted
+                          muted={data.isYoutube ? false : true}
                           url={data.slide}
                           width="100%"
                           height="100%"
+                          config={{
+                            youtube: { embedOptions: { width: '100%' } },
+                          }}
                         />
                       </Box>
                     </Box>

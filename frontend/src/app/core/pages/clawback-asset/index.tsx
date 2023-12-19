@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -22,6 +28,9 @@ import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
 export const ClawbackAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+
   const { clawback, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
@@ -107,7 +116,18 @@ export const ClawbackAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper
+              title={'About Clawback'}
+              description={clawbackHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Clawback'} />
             {loadingAsset || !asset ? (
@@ -129,10 +149,12 @@ export const ClawbackAsset: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Clawback'}
-              description={clawbackHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Clawback'}
+                description={clawbackHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

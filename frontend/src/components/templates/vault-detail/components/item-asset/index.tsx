@@ -1,4 +1,4 @@
-import { Button, Flex, Text, Tooltip } from '@chakra-ui/react'
+import { Button, Flex, Img, Text, Tooltip } from '@chakra-ui/react'
 import React from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
@@ -33,6 +33,16 @@ export const ItemAsset: React.FC<IItemAsset> = ({
     )
   }
 
+  const findAsset = (
+    balance: Hooks.UseHorizonTypes.IBalance
+  ): Hooks.UseAssetsTypes.IAssetDto | undefined => {
+    return assets?.find(
+      asset =>
+        asset.code === balance.asset_code &&
+        asset.issuer.key.publicKey === balance.asset_issuer
+    )
+  }
+
   return (
     <Flex
       justifyContent="space-between"
@@ -64,7 +74,11 @@ export const ItemAsset: React.FC<IItemAsset> = ({
         stroke="black"
         _dark={{ fill: 'white', stroke: 'white' }}
       >
-        {getCurrencyIcon(balance.asset_code, '1.5rem')}{' '}
+        {findAsset(balance)?.image ? (
+          <Img src={findAsset(balance)?.image} w="24px" h="24px" />
+        ) : (
+          getCurrencyIcon(balance.asset_code, '1.5rem')
+        )}
         <Text fontSize="sm">{balance.asset_code}</Text>
       </Flex>
       <Flex alignItems="center" gap={2} _dark={{ fill: 'white' }}>

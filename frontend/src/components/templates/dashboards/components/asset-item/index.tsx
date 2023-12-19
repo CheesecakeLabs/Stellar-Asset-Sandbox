@@ -1,4 +1,4 @@
-import { Text, Container, Flex, Box } from '@chakra-ui/react'
+import { Text, Container, Flex, Box, Img } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
@@ -33,7 +33,7 @@ export const AssetItem: React.FC<IAssetItem> = ({
       _hover={asset.id === assetSelected?.id ? undefined : { bg: 'purple.50' }}
       _dark={
         asset.id === assetSelected?.id
-          ? { bg: 'primary.normal', border:'none' }
+          ? { bg: 'primary.normal', border: 'none' }
           : undefined
       }
     >
@@ -44,7 +44,11 @@ export const AssetItem: React.FC<IAssetItem> = ({
           stroke={asset.id === assetSelected?.id ? 'white' : 'black'}
           _dark={{ fill: 'white', stroke: 'white' }}
         >
-          {getCurrencyIcon(asset.code, '1.5rem')}
+          {asset.image ? (
+            <Img src={asset.image} w="18px" h="18px" />
+          ) : (
+            getCurrencyIcon(asset.code, '1.5rem')
+          )}
         </Box>
         <Flex ms="0.75rem" flexDir="column" w="full" h="min-content">
           <Text

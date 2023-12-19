@@ -1,17 +1,25 @@
-import { Box, Button, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, Radio, RadioGroup, Stack, Text } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form';
-import { NumericFormat } from 'react-number-format';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Radio,
+  RadioGroup,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
+import React, { useState } from 'react'
+import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
+import { toCrypto, toNumber } from 'utils/formatter'
 
-
-import { toCrypto, toNumber } from 'utils/formatter';
-
-
-
-import { AssetHeader } from 'components/atoms';
-import { SelectVault } from 'components/molecules/select-vault';
-
+import { AssetHeader } from 'components/atoms'
+import { SelectVault } from 'components/molecules/select-vault'
 
 interface IClawbackAssetTemplate {
   onSubmit(
@@ -125,6 +133,7 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Clawback
               </Button>

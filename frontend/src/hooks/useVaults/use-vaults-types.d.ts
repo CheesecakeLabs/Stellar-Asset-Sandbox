@@ -8,12 +8,14 @@ declare namespace Hooks {
       accountData: Hooks.UseHorizonTypes.IAccount | undefined
       active: 0 | 1
       isUnauthorized?: boolean
+      owner_id: number
     }
 
     interface IVaultRequest {
       name: string
-      vault_category_id: number
+      vault_category_id?: number
       assets_id: number[]
+      owner_id?: number
     }
 
     interface IVaultCategory {
@@ -44,6 +46,11 @@ declare namespace Hooks {
       isAuthorized: boolean
     }
 
+    interface IPagedVaults {
+      vaults: IVault[]
+      totalPages: number
+    }
+
     interface IVaultsContext {
       loadingVault: boolean
       loadingVaults: boolean
@@ -54,7 +61,7 @@ declare namespace Hooks {
       updatingVault: boolean
       updatingVaultAssets: boolean
       deletingVault: boolean
-      getVaults: () => Promise<IVaults[] | undefined>
+      getVaults: (isAll?: boolean) => Promise<IVaults[] | undefined>
       getVaultCategories: () => Promise<IVaultCategory[] | undefined>
       createVault: (vault: IVaultRequest) => Promise<IVault | undefined>
       createVaultCategory: (
@@ -78,6 +85,13 @@ declare namespace Hooks {
         assetAccounts: Hooks.UseHorizonTypes.IAssetAccounts[] | undefined,
         asset: Hooks.UseAssetsTypes.IAssetDto
       ) => Hooks.UseVaultsTypes.IVaultAccountName[]
+      getPagedVaults: (
+        args: {
+          page: number
+          limit: number
+        },
+        isAll?: boolean
+      ) => Promise<Hooks.UseVaultsTypes.IPagedVaults | undefined>
     }
   }
 }

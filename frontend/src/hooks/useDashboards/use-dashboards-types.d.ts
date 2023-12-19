@@ -35,6 +35,7 @@ declare namespace Hooks {
       }
       amount: number
       asset_type: string
+      image: string
     }
 
     interface ITransaction {

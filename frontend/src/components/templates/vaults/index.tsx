@@ -7,16 +7,25 @@ import { LoaderSkeleton } from './components/loader-skeleton'
 import { PathRoute } from 'components/enums/path-route'
 import { NewIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
+import { Paginator } from 'components/molecules/paginator'
 
 interface IVaultsTemplate {
   loading: boolean
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
+  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
+  currentPage: number
+  totalPages: number
+  changePage(page: number): void
 }
 
 export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
   loading,
   vaults,
+  assets,
+  currentPage,
+  totalPages,
+  changePage,
 }) => {
   const navigate = useNavigate()
 
@@ -38,16 +47,22 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
         <Box p={0} maxW="full">
           {loading ? (
             <LoaderSkeleton />
-          ) : vaults ? (
+          ) : vaults && vaults.length > 0 ? (
             <SimpleGrid columns={{ xl: 4, md: 3, sm: 2 }} spacing={5}>
               {vaults.map((vault, index) => (
-                <ItemVault key={index} vault={vault} />
+                <ItemVault key={index} vault={vault} assets={assets} />
               ))}
             </SimpleGrid>
           ) : (
             <Empty title={"You don't have any vaults yet"} />
           )}
         </Box>
+
+        <Paginator
+          changePage={changePage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       </Flex>
     </Flex>
   )

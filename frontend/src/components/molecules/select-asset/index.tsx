@@ -1,5 +1,11 @@
-import { useColorMode } from '@chakra-ui/react'
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Flex, Text, useColorMode } from '@chakra-ui/react'
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react'
 import Select from 'react-select'
 
 export interface IOption {
@@ -38,6 +44,13 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
     setOptions(ops || [])
   }, [assets])
 
+  const formatLabel = (data: IOption): ReactNode => (
+    <Flex alignItems="center" gap="0.75rem">
+      <Text fontSize="xs" minW="3rem">{data.label}</Text>
+      <Text fontSize="sm">{data.value.name}</Text>
+    </Flex>
+  )
+
   return (
     <Select
       options={options}
@@ -46,6 +59,7 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
       }}
       value={selected}
       placeholder="Select asset"
+      formatOptionLabel={formatLabel}
       styles={{
         control: baseStyles => ({
           ...baseStyles,

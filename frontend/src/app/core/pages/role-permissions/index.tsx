@@ -1,5 +1,5 @@
 import { Flex, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { MessagesError } from 'utils/constants/messages-error'
@@ -19,6 +19,7 @@ export interface IChange {
 export const RolePermissions: React.FC = () => {
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [changes, setChanges] = useState<IChange[]>([])
+  const [loading, setLoading] = useState(true)
 
   const {
     getRoles,
@@ -26,9 +27,7 @@ export const RolePermissions: React.FC = () => {
     getPermissions,
     getRolesPermissions,
     updateRolesPermissions,
-    loading,
     roles,
-    loadingRoles,
     userPermissions,
     permissions,
     rolesPermissions,
@@ -37,18 +36,18 @@ export const RolePermissions: React.FC = () => {
 
   const toast = useToast()
 
-  useEffect(() => {
-    getRoles()
-    getUserPermissions()
-  }, [getRoles, getUserPermissions])
+  const loadData = useCallback(async (): Promise<void> => {
+    setLoading(true)
+    await getRoles()
+    await getUserPermissions()
+    await getPermissions()
+    await getRolesPermissions()
+    setLoading(false)
+  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions])
 
   useEffect(() => {
-    getPermissions()
-  }, [getPermissions])
-
-  useEffect(() => {
-    getRolesPermissions()
-  }, [getRolesPermissions])
+    loadData()
+  }, [loadData])
 
   const onSubmit = async (
     params: Hooks.UseAuthTypes.IRolePermission[]
@@ -102,7 +101,6 @@ export const RolePermissions: React.FC = () => {
             <RolePermissionsTemplate
               loading={loading}
               roles={roles}
-              loadingRoles={loadingRoles}
               userPermissions={userPermissions}
               permissions={permissions}
               rolesPermissions={rolesPermissions}

@@ -1,4 +1,10 @@
-import { Flex, Skeleton, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  VStack,
+  useMediaQuery,
+  useToast,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -6,6 +12,8 @@ import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { useDashboards } from 'hooks/useDashboards'
 import { assetHomeHelper } from 'utils/constants/helpers'
+import { MessagesError } from 'utils/constants/messages-error'
+import { toBase64 } from 'utils/converter'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -21,12 +29,17 @@ export const AssetHome: React.FC = () => {
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
-  const { loadingAsset, getAssetById } = useAssets()
+  const { loadingAsset, getAssetById, updateImage } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { id } = useParams()
+
+  const toast = useToast()
 
   useEffect(() => {
     if (id) {
@@ -46,12 +59,59 @@ export const AssetHome: React.FC = () => {
     getUserPermissions()
   }, [getUserPermissions])
 
+  const handleUploadImage = async (): Promise<boolean> => {
+    if (!asset || !selectedFile) return false
+
+    try {
+      const image = await toBase64(selectedFile)
+      const isSuccess = await updateImage(asset?.id, image)
+
+      if (isSuccess) {
+        if (id) {
+          getAssetById(id).then(asset => setAsset(asset))
+        }
+        return true
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+
+    return false
+  }
+
+  const toastError = (message: string): void => {
+    toast({
+      title: 'Update logo error!',
+      description: message,
+      status: 'error',
+      duration: 9000,
+      isClosable: true,
+      position: 'top-right',
+    })
+  }
+
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper
+              title={'About Assets'}
+              description={assetHomeHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Mint'} />
+            <ManagementBreadcrumb title={'Asset home'} />
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -61,7 +121,11 @@ export const AssetHome: React.FC = () => {
                 loadingChart={loadingChart}
                 paymentsAsset={paymentsAsset}
                 chartPeriod={chartPeriod}
+                permissions={userPermissions}
+                selectedFile={selectedFile}
+                setSelectedFile={setSelectedFile}
                 setChartPeriod={setChartPeriod}
+                handleUploadImage={handleUploadImage}
               />
             )}
           </Flex>
@@ -72,10 +136,12 @@ export const AssetHome: React.FC = () => {
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Assets'}
-              description={assetHomeHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Assets'}
+                description={assetHomeHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

@@ -1,51 +1,172 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
-import { FieldValues, UseFormSetValue } from 'react-hook-form'
+import React, { useEffect, useState } from 'react'
+import { FieldValues } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
+import { useContracts } from 'hooks/useContracts'
+import { useHorizon } from 'hooks/useHorizon'
+import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
+import { SorobanService } from 'soroban'
+import * as SorobanClient from 'soroban-client'
+import { sorobanConfig } from 'soroban/constants'
+import { deployerClient } from 'soroban/deployer'
+import {
+  allowancePeriod,
+  codSalt,
+  codWasmHash,
+} from 'soroban/deployer/constants'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
+import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
 
 export const ContractsCreate: React.FC = () => {
-  const { forge, loadingAssets, assets, getAssets } = useAssets()
-  const { vaults, getVaults, loadingVaults } = useVaults()
+  const [creatingContract, setCreatingContract] = useState(false)
+  const [isGeneratedContractId, setGeneratedContractId] = useState(false)
+
+  const { loadingAssets, assets, getAssets, updateContractId } = useAssets()
+  const { createContract } = useContracts()
+  const { vaults, loadingVaults, getVaults } = useVaults()
+  const { sign, submit, getSponsorPK } = useTransactions()
+  const { getLatestSequenceLedger } = useHorizon()
+
   const toast = useToast()
   const navigate = useNavigate()
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>,
+    asset: Hooks.UseAssetsTypes.IAssetDto,
+    vault: Hooks.UseVaultsTypes.IVault,
+    compoundType: TSelectCompoundType,
+    compound: number
   ): Promise<void> => {
+    if (!asset) {
+      throw new Error('Invalid asset')
+    }
     try {
-      const asset = {
-        name: data.name,
-        code: data.code,
-        amount: data.initial_supply,
-        asset_type: data.asset_type,
-        set_flags: data.control_mechanisms,
-      }
-      const assetForged = await forge(asset)
+      setCreatingContract(true)
 
-      if (assetForged) {
-        setValue('amount', '')
-        toast({
-          title: 'Contract created!',
-          description: `You created ${data.code}`,
-          status: 'success',
-          duration: 9000,
-          isClosable: true,
-          position: 'top-right',
-        })
-        navigate(PathRoute.MINT_ASSET, { state: assetForged })
-        return
+      const contractId = asset.contract_id
+        ? asset.contract_id
+        : SorobanService.getContractId({
+            assetCode: asset.code,
+            assetIssuerPk: asset.issuer.key.publicKey,
+          })
+
+      if (!asset.contract_id) {
+        await updateContractId(asset.id, contractId)
       }
-      toastError(MessagesError.errorOccurred)
+
+      const termToSeconds = Number(data.term || 0) * 86400
+      const yieldRate = Number(data.yield_rate || 0) * 100
+      const penaltyRate = Number(data.penalty_rate || 0) * 100
+
+      const sponsorPK = await getSponsorPK()
+      if (!sponsorPK) {
+        throw new Error('Invalid sponsor!')
+      }
+
+      const sourceAccount = await SorobanService.getSourceAccount(sponsorPK)
+
+      const operation = SorobanService.getContractOperation({
+        assetCode: asset.code,
+        assetIssuerPk: asset.issuer.key.publicKey,
+      })
+
+      if (!asset.contract_id && !isGeneratedContractId) {
+        const preppedTx = await SorobanService.wrapClassicAsset(
+          operation,
+          sourceAccount
+        )
+
+        const signedTransaction = await sign({ envelope: preppedTx })
+        if (signedTransaction) {
+          const resultEnvelope = await submit({
+            envelope: signedTransaction.envelope,
+          })
+
+          if (resultEnvelope) {
+            const transaction = new SorobanClient.Transaction(
+              resultEnvelope,
+              sorobanConfig.network.passphrase
+            )
+            await SorobanService.submitSoroban(transaction)
+          }
+        }
+        setGeneratedContractId(true)
+      }
+
+      const latestSequenceLedger = await getLatestSequenceLedger()
+
+      if (!latestSequenceLedger) {
+        throw new Error('Invalid latest sequence ledger!')
+      }
+
+      const transactionResult = await deployerClient.deploy({
+        wasm_hash: codWasmHash,
+        salt: codSalt(),
+        admin: vault.wallet.key.publicKey,
+        asset: contractId,
+        term: BigInt(termToSeconds),
+        compound_step: BigInt(
+          compoundType === 'Compound interest' ? compound : 0
+        ),
+        yield_rate: BigInt(yieldRate),
+        min_deposit: BigInt(Number(data.min_deposit || 0) * 10000000),
+        penalty_rate: BigInt(penaltyRate),
+        allowance_period: latestSequenceLedger + allowancePeriod,
+        signerSecret: vault.wallet.key.publicKey,
+      })
+
+      if (transactionResult.status === 'SUCCESS') {
+        const transactionSuccess =
+          transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse
+
+        const xdr = transactionSuccess.returnValue?.toXDR('base64')
+        if (!xdr) {
+          throw new Error('Invalid transaction XDR')
+        }
+
+        const scVal = SorobanClient.xdr.ScVal.fromXDR(xdr, 'base64')
+        const contractAddress =
+          SorobanClient.Address.fromScVal(scVal).toString()
+
+        const contract = {
+          name: 'Contract',
+          asset_id: asset.id.toString(),
+          vault_id: vault.id.toString(),
+          address: contractAddress,
+          yield_rate: yieldRate,
+          term: termToSeconds,
+          min_deposit: Number(data.min_deposit || 0),
+          penalty_rate: penaltyRate,
+          compound: compoundType === 'Compound interest' ? compound : 0,
+        }
+
+        const contractCreated = await createContract(contract)
+
+        if (contractCreated) {
+          toast({
+            title: 'Contract created!',
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+            position: 'top-right',
+          })
+          navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
+          return
+        }
+      } else {
+        toastError(MessagesError.errorOccurred)
+      }
+
+      setCreatingContract(false)
     } catch (error) {
+      setCreatingContract(false)
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
@@ -65,7 +186,7 @@ export const ContractsCreate: React.FC = () => {
   }
 
   useEffect(() => {
-    getAssets()
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {
@@ -80,6 +201,7 @@ export const ContractsCreate: React.FC = () => {
           loading={loadingAssets || loadingVaults}
           vaults={vaults}
           assets={assets}
+          creatingContract={creatingContract}
         />
       </Sidebar>
     </Flex>

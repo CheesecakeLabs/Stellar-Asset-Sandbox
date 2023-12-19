@@ -1,11 +1,12 @@
-import { SetStateAction, createContext, useCallback, useState } from 'react'
+import { createContext, useCallback, useState } from 'react'
 
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
+import { useHorizon } from 'hooks/useHorizon'
+import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
 import { MessagesError } from 'utils/constants/messages-error'
-import { mockContracts } from 'utils/mockups'
 
-import * as certificatesOfDeposit from '../../soroban'
+import { http } from 'interfaces/http'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -21,20 +22,22 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const [withdrawConfirmed, setWithdrawConfirmed] = useState(false)
   const [isDepositing, setIsDepositing] = useState(false)
   const [isWithdrawing, setIsWithdrawing] = useState(false)
+  const { getAccountData } = useHorizon()
 
   const [contracts, setContracts] = useState<
     Hooks.UseContractsTypes.IContract[] | undefined
   >()
-  const [contract, setContract] = useState<
-    Hooks.UseContractsTypes.IContract | undefined
-  >()
 
-  const createContract = async (): Promise<
-    Hooks.UseContractsTypes.IContract | undefined
-  > => {
+  const createContract = async (
+    params: Hooks.UseContractsTypes.IContractRequest
+  ): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
     setLoading(true)
     try {
-      return mockContracts[0]
+      const response = await http.post(`contract`, params)
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -45,10 +48,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getContracts = useCallback(async (): Promise<void> => {
+  const getContracts = useCallback(async (): Promise<
+    Hooks.UseContractsTypes.IContract[] | undefined
+  > => {
     setLoading(true)
     try {
-      setContracts(mockContracts)
+      const response = await http.get(`contract/list`)
+      const data = response.data
+      if (data) {
+        setContracts(data)
+        return data
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -59,44 +69,80 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
-  const getContract = useCallback(async (): Promise<void> => {
-    setLoading(true)
-    try {
-      setContract(mockContracts[0])
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+  const getPagedContracts = useCallback(
+    async (args: {
+      page: number
+      limit: number
+    }): Promise<Hooks.UseContractsTypes.IPagedContracts | undefined> => {
+      setLoading(true)
+      try {
+        const response = await http.get(
+          `contract/list?page=${args.page}&limit=${args.limit}`
+        )
+        const data = response.data
+        if (data) {
+          setContracts(data)
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
       }
-      throw new Error(MessagesError.errorOccurred)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    []
+  )
+
+  const getContract = useCallback(
+    async (
+      id: string
+    ): Promise<Hooks.UseContractsTypes.IContract | undefined> => {
+      setLoading(true)
+      try {
+        const response = await http.get(`contract/${id}`)
+        const data = response.data
+        if (data) {
+          if (data.vault) {
+            const accountData = await getAccountData(
+              data.vault.wallet.key.publicKey
+            )
+            data.vault.accountData = accountData
+          }
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [getAccountData]
+  )
 
   const deposit = async (
     amount: bigint,
     address: string,
-    updatePosition: void,
-    signerSecret: string
+    contractId: string,
+    sourcePk: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      await certificatesOfDeposit.deposit(
-        {
-          amount: amount * BigInt(10000000),
-          address: address,
-        },
-        {
-          fee: 10000,
-          secondsToWait: 300,
-          signerSecret: signerSecret,
-        }
-      )
+      const result = await certificateOfDepositClient.deposit({
+        amount: amount * BigInt(10000000),
+        address: address,
+        contractId: contractId,
+        sourcePk: sourcePk,
+      })
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
-      updatePosition
-      return true
+      return result.status === 'SUCCESS'
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -107,52 +153,65 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const getPosition = (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
-  ): void => {
-    certificatesOfDeposit
-      .getPosition({
+  const getPosition = async (
+    address: string,
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getPosition({
         address: address,
+        contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        update(res)
-      })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      return result
+    } catch (e) {
+      return
+    }
   }
 
-  const getYield = (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
-  ): void => {
-    certificatesOfDeposit
-      .getEstimatedYield({
+  const getYield = async (
+    address: string,
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getEstimatedYield({
         address: address,
+        contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        update(res)
-      })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      return result
+    } catch (e) {
+      return
+    }
   }
 
-  const getTime = (
-    update: React.Dispatch<React.SetStateAction<bigint>>,
-    address: string
-  ): void => {
-    certificatesOfDeposit
-      .getTimeLeft({
+  const getEstimatedPrematureWithdraw = async (
+    address: string,
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result =
+        await certificateOfDepositClient.getEstimatedPrematureWithdraw({
+          address: address,
+          contractId: contractId,
+        })
+      return result
+    } catch (e) {
+      return
+    }
+  }
+
+  const getTimeLeft = async (
+    address: string,
+    contractId: string
+  ): Promise<bigint | undefined> => {
+    try {
+      const result = await certificateOfDepositClient.getTimeLeft({
         address: address,
+        contractId: contractId,
       })
-      .then((res: SetStateAction<bigint>) => {
-        update(res)
-      })
-      .catch(() => {
-        setIsDepositing(false)
-      })
+      return result
+    } catch (e) {
+      return
+    }
   }
 
   const getAccount = (
@@ -164,22 +223,26 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const withdraw = async (
     address: string,
     premature: boolean,
-    updatePosition: void,
-    signerSecret: string
+    contractId: string,
+    signerSecret?: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      await certificatesOfDeposit.withdraw(
-        {
-          address: address,
-          accept_premature_withdraw: premature,
-        },
-        { secret: signerSecret }
-      )
+      const result = await certificateOfDepositClient.withdraw({
+        address: address,
+        accept_premature_withdraw: premature,
+        contractId: contractId,
+        signerSecret: signerSecret,
+      })
+
+      const xdr = result.returnValue?.toXDR('base64')
+      if (!xdr) {
+        throw new Error('Invalid transaction XDR')
+      }
+
       setIsWithdrawing(false)
-      updatePosition
       setWithdrawConfirmed(true)
-      return true
+      return result.status === 'SUCCESS'
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -190,12 +253,74 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getHistory = useCallback(
+    async (
+      contractId: number
+    ): Promise<Hooks.UseContractsTypes.IHistory[] | undefined> => {
+      setLoading(true)
+      try {
+        const response = await http.get(`contract/history/${contractId}`)
+        const data = response.data
+        if (data) {
+          return data
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
+
+  const addContractHistory = async (
+    params: Hooks.UseContractsTypes.IHistoryRequest
+  ): Promise<Hooks.UseContractsTypes.IHistory | undefined> => {
+    setLoading(true)
+    try {
+      const response = await http.post(`contract/history/`, params)
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateContractHistory = async (
+    params: Hooks.UseContractsTypes.IHistoryUpdate
+  ): Promise<Hooks.UseContractsTypes.IHistory | undefined> => {
+    setLoading(true)
+    try {
+      const response = await http.put(`contract/history/`, params)
+      if (response.status === 200) {
+        return response.data
+      }
+      return undefined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <ContractsContext.Provider
       value={{
         loading,
         contracts,
-        contract,
         depositConfirmed,
         withdrawConfirmed,
         isDepositing,
@@ -206,9 +331,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         deposit,
         getPosition,
         getYield,
-        getTime,
+        getTimeLeft,
         getAccount,
         withdraw,
+        getEstimatedPrematureWithdraw,
+        getHistory,
+        addContractHistory,
+        updateContractHistory,
+        getPagedContracts
       }}
     >
       {children}

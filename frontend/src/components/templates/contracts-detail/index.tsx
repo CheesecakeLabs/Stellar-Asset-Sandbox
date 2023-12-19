@@ -1,18 +1,16 @@
-import { Box, Flex, SimpleGrid } from '@chakra-ui/react'
+import { Container, Flex, Skeleton } from '@chakra-ui/react'
 import React from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 
-import { getCurrencyIcon } from 'utils/constants/constants'
-import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
-import { toCrypto } from 'utils/formatter'
+import { havePermission } from 'utils'
+import { MAX_PAGE_WIDTH_FULL } from 'utils/constants/sizes'
 
-import { AccountCard } from './components/account-card'
-import { Chart } from './components/chart'
+import { ContractInfo } from './components/contract-info'
 import { Deposit } from './components/deposit'
-import { InfoCard } from '../../molecules/info-card'
+import { DepositDetails } from './components/deposit-details'
 import { Withdraw } from './components/withdraw'
-import { Loading } from 'components/atoms'
-import { ApyIcon, TimeIcon, WalletIcon } from 'components/icons'
+import { WithdrawDetails } from './components/withdraw-details'
+import { Permissions } from 'components/enums/permissions'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 
 interface IContractsDetailTemplate {
@@ -21,118 +19,120 @@ interface IContractsDetailTemplate {
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>
   ): Promise<void>
+  accessWallet(): void
+  accessProfile(): void
+  contractData: Hooks.UseContractsTypes.IContractData | undefined
   contract: Hooks.UseContractsTypes.IContract | undefined
   loading: boolean
-  time: bigint
-  currentYield: number
-  deposit: number
   userAccount: string
   isWithdrawing: boolean
   isDepositing: boolean
-  balance: number
+  currentBalance: string
+  history: Hooks.UseContractsTypes.IHistory[] | undefined
+  deposited: number | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  currentInVault: string | undefined
+  hasAssetInVault: boolean
+  hasWallet: boolean
 }
 
 export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   onSubmitWithdraw,
   onSubmitDeposit,
+  accessWallet,
+  accessProfile,
   contract,
-  time,
-  currentYield,
-  deposit,
-  userAccount,
+  contractData,
   isWithdrawing,
   isDepositing,
-  balance,
+  loading,
+  currentBalance,
+  history,
+  deposited,
+  userPermissions,
+  currentInVault,
+  hasAssetInVault,
+  hasWallet,
 }) => {
   return (
     <Flex flexDir="column" w="full">
-      <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        {contract ? (
+      <Flex
+        maxW={MAX_PAGE_WIDTH_FULL}
+        alignSelf="center"
+        flexDir="column"
+        w="full"
+      >
+        {loading || !contract ? (
+          <Skeleton w="full" h="14rem" />
+        ) : (
           <>
             <Flex justifyContent="space-between">
               <ContractsBreadcrumb title="Certificate Name" />
-              <AccountCard account={userAccount} />
             </Flex>
-            <SimpleGrid columns={{ md: 5, sm: 2 }} spacing={3}>
-              <InfoCard
-                title={'ASSET'}
-                icon={
-                  <Box
-                    fill="black"
-                    stroke="black"
-                    _dark={{ fill: 'white', stroke: 'white' }}
-                  >
-                    {getCurrencyIcon(contract.asset.code, '1.5rem')}{' '}
-                  </Box>
-                }
-                value={contract.asset.name}
-              />
-              <InfoCard
-                title={'TERM'}
-                icon={<TimeIcon />}
-                value={`${contract.term} minutes`}
-              />
-              <InfoCard
-                title={'APY'}
-                icon={<ApyIcon />}
-                value={`${contract.yield_rate}%`}
-              />
-              <InfoCard title={`COMPOUND`} value={`Every 10s`} />
-              <InfoCard
-                title={`DEPOSITED (${contract.asset.code})`}
-                icon={<WalletIcon />}
-                value={balance && balance > 0 ? toCrypto(10000 || 0) : '-'}
-              />
-            </SimpleGrid>
-            {userAccount && balance && balance > 0 ? (
-              <SimpleGrid columns={{ md: 3, sm: 1 }} spacing={3} mt="1rem">
-                <Chart
-                  title={'BALANCE'}
-                  value={
-                    balance && balance > 0 ? toCrypto(balance / 10000000) : '-'
-                  }
-                />
-                <Chart
-                  title={'DUE IN'}
-                  value={`${time ? `${time.toString()} seconds` : '-'}`}
-                />
-                <Chart
-                  title={'CURRENT YIELD'}
-                  value={
-                    balance
-                      ? `${((currentYield / (10000 * 10000000)) * 100).toFixed(
-                          2
-                        )} %`
-                      : '-'
-                  }
-                />
-              </SimpleGrid>
-            ) : (
-              <div />
-            )}
-            {userAccount &&
-              (balance && balance > 0 ? (
+            <Flex
+              w="full"
+              justifyContent="space-between"
+              flexDir={{ base: 'column-reverse', md: 'row' }}
+            >
+              <Container
+                variant="primary"
+                mr="1.5rem"
+                w="full"
+                display="flex"
+                maxW="full"
+                gap="2rem"
+              >
+                <ContractInfo contract={contract} />
+                
+                {contractData?.position &&
+                havePermission(
+                  Permissions.INVEST_CERTIFICATE,
+                  userPermissions
+                ) ? (
+                  <DepositDetails
+                    contract={contract}
+                    contractData={contractData}
+                    currentBalance={currentBalance}
+                    history={history}
+                    deposited={deposited}
+                  />
+                ) : (
+                  <WithdrawDetails
+                    contract={contract}
+                    contractData={contractData}
+                    history={history}
+                  />
+                )}
+              </Container>
+              {contractData?.position ? (
                 <Withdraw
                   onSubmit={onSubmitWithdraw}
                   contract={contract}
                   loading={isWithdrawing}
-                  isDone={!time || time === BigInt(0)}
+                  isDone={!contractData.timeLeft || contractData.timeLeft === 0}
                   withdrawValue={
-                    time > 0
-                      ? Number(deposit) + Number(currentYield / 2)
-                      : balance
+                    contractData.timeLeft && contractData.timeLeft > 0
+                      ? Number(contractData.estimatedPrematureWithdraw)
+                      : Number(contractData.position)
                   }
+                  contractData={contractData}
+                  deposited={deposited}
+                  currentInVault={currentInVault}
                 />
               ) : (
                 <Deposit
                   onSubmit={onSubmitDeposit}
+                  accessWallet={accessWallet}
+                  accessProfile={accessProfile}
                   contract={contract}
                   loading={isDepositing}
+                  currentBalance={currentBalance}
+                  hasAssetInVault={hasAssetInVault}
+                  hasWallet={hasWallet}
                 />
-              ))}
+              )}
+            </Flex>
           </>
-        ) : (
-          <Loading />
         )}
       </Flex>
     </Flex>

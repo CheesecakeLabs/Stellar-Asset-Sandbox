@@ -131,6 +131,23 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getLatestSequenceLedger = useCallback(
+    async (
+    ): Promise<number | undefined> => {
+      try {
+        const response = await axios.get(`${BASE_URL}/ledgers?order=desc`)
+        const data = response.data
+        return data._embedded?.records[0]?.sequence
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      }
+    },
+    []
+  )
+
   return (
     <HorizonContext.Provider
       value={{
@@ -141,6 +158,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         getAccountData,
         getPaymentsData,
         getAssetAccounts,
+        getLatestSequenceLedger
       }}
     >
       {children}
