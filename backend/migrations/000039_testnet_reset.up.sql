@@ -11,4 +11,5 @@ TRUNCATE TABLE toml CASCADE;
 
 ALTER SEQUENCE public.key_id_seq RESTART 1;
 ALTER SEQUENCE public.wallet_id_seq RESTART 1;
+ALTER SEQUENCE public.asset_id_seq RESTART 1;
 

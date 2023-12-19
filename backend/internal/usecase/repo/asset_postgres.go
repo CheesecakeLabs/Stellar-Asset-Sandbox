@@ -118,6 +118,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 	err := row.Scan(
 		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
+		&asset.ContractId,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
