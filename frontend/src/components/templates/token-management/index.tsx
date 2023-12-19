@@ -101,7 +101,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                       navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
                     }
                   >
-                    <Td>
+                    <Td minW="5rem">
                       {asset.image ? (
                         <Img src={asset.image} w="32px" h="32px" />
                       ) : (

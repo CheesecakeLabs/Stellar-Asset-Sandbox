@@ -98,13 +98,9 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                       navigate(`${PathRoute.CONTRACT_DETAIL}/${contract.id}`)
                     }}
                   >
-                    <Td>
+                    <Td minW="5rem">
                       {contract.asset.image ? (
-                        <Img
-                          src={contract.asset.image}
-                          w="32px"
-                          h="32px"
-                        />
+                        <Img src={contract.asset.image} w="32px" h="32px" />
                       ) : (
                         getCurrencyIcon(contract.asset.code, '2rem')
                       )}
