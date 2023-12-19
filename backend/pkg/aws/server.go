@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 )
@@ -14,7 +15,11 @@ type AwsConnection struct {
 
 // Initialize a session with AWS
 func New(cfg config.AWS) (*AwsConnection, error) {
-	sess, err := session.NewSession()
+	sess, err := session.NewSession(
+		&aws.Config{
+			Region: aws.String(cfg.AwsRegion),
+		},
+	)
 	if err != nil {
 		return &AwsConnection{}, err
 	}

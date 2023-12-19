@@ -66,6 +66,7 @@ type (
 
 	AWS struct {
 		BucketName string `env-required:"true" env:"AWS_BUCKET_NAME"`
+		AwsRegion  string `env:"AWS_REGION"`
 	}
 
 	Horizon struct {
