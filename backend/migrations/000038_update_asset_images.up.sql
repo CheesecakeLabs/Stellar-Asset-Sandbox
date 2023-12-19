@@ -1,0 +1,1 @@
+UPDATE asset SET image = null

@@ -8,24 +8,26 @@ import (
 )
 
 type AssetUseCase struct {
-	aRepo AssetRepoInterface
-	wRepo WalletRepoInterface
-	tInt  TomlInterface
-	tRepo TomlRepoInterface
-	cfg   config.Horizon
+	aRepo          AssetRepoInterface
+	wRepo          WalletRepoInterface
+	tInt           TomlInterface
+	tRepo          TomlRepoInterface
+	cfg            config.Horizon
+	storageService AssetServiceInterface
 }
 
-func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tInt TomlInterface, tRepo TomlRepoInterface, cfg config.Horizon) *AssetUseCase {
+func NewAssetUseCase(aRepo AssetRepoInterface, wRepo WalletRepoInterface, tInt TomlInterface, tRepo TomlRepoInterface, cfg config.Horizon, storageService AssetServiceInterface) *AssetUseCase {
 	return &AssetUseCase{
-		aRepo: aRepo,
-		wRepo: wRepo,
-		tInt:  tInt,
-		tRepo: tRepo,
-		cfg:   cfg,
+		aRepo:          aRepo,
+		wRepo:          wRepo,
+		tInt:           tInt,
+		tRepo:          tRepo,
+		cfg:            cfg,
+		storageService: storageService,
 	}
 }
 
-func (uc *AssetUseCase) Create(data entity.Asset) (entity.Asset, error) {
+func (uc *AssetUseCase) Create(data entity.Asset, imageBytes []byte) (entity.Asset, error) {
 	issuer, err := uc.wRepo.CreateWalletWithKey(data.Issuer)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.repo.CreateWalletWithKey(issuer): %w", err)
@@ -37,6 +39,15 @@ func (uc *AssetUseCase) Create(data entity.Asset) (entity.Asset, error) {
 		return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.repo.CreateWalletWithKey(dist): %w", err)
 	}
 	data.Distributor.Id = dist.Id
+
+	// Upload image to S3 if exists
+	if len(imageBytes) > 0 {
+		assetImage, err := uc.storageService.UploadFile(fmt.Sprint(data.Id), imageBytes)
+		if err != nil {
+			return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
+		}
+		data.Image = assetImage
+	}
 
 	asset, err := uc.aRepo.CreateAsset(data)
 	if err != nil {
@@ -74,7 +85,12 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 }
 
 func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
-	err := uc.aRepo.StoreAssetImage(assetId, imageBytes)
+	assetImage, err := uc.storageService.UploadFile(assetId, imageBytes)
+	if err != nil {
+		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
+	}
+
+	err = uc.aRepo.StoreAssetImage(assetId, assetImage)
 	if err != nil {
 		return fmt.Errorf("ImageUseCase - UploadImage - uc.aRepo.StoreAssetImage: %w", err)
 	}
@@ -160,11 +176,19 @@ func (uc *AssetUseCase) GetTomlData() (entity.TomlData, error) {
 	return tomParsed, err
 }
 
-func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, error) {
-	assets, err := uc.aRepo.GetPaginatedAssets(page, limit)
+func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) error {
+	err := uc.aRepo.UpdateContractId(assetId, contractId)
 	if err != nil {
-		return nil, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
+		return fmt.Errorf("AssetUseCase - UpdateContractId - uc.aRepo.UpdateContractId: %w", err)
+	}
+	return nil
+}
+
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit)
+	if err != nil {
+		return nil, 0, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
 	}
 
-	return assets, nil
+	return assets, totalPages, nil
 }

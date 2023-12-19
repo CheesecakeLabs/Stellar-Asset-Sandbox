@@ -75,4 +75,21 @@ type (
 		Account string
 		Weight  uint8
 	}
+
+	SignTransactionRequest struct {
+		Id         int      `json:"id"`
+		Envelope   string   `json:"envelope"`
+		PublicKeys []string `json:"publicKeys"`
+		Hash       string   `json:"hash"`
+	}
+
+	SorobanTransactionResponse struct {
+		Id       int    `json:"id"`
+		Envelope string `json:"envelope"`
+	}
+
+	SubmitRequest struct {
+		Id       int    `json:"id"`
+		Envelope string `json:"envelope"`
+	}
 )

@@ -1,0 +1,1 @@
+ALTER TABLE asset ADD COLUMN contract_id varchar(255);

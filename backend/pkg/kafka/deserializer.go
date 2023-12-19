@@ -23,6 +23,10 @@ func (d *Deserializer) DeserializeMessage(msg *kafka.Message, chanName string) (
 		return d.deserializeHorizonMessage(msg)
 	case entity.EnvelopeChannel:
 		return d.deserializeEnvelopeMessage(msg)
+	case entity.SignChannel:
+		return d.deserializeEnvelopSorobanTransaction(msg)
+	case entity.SubmitTransactionChannel:
+		return d.deserializeEnvelopeMessage(msg)
 	default:
 		return nil, fmt.Errorf("invalid channel name: %s", chanName)
 	}
@@ -48,6 +52,15 @@ func (d *Deserializer) deserializeHorizonMessage(msg *kafka.Message) (entity.Hor
 
 func (d *Deserializer) deserializeEnvelopeMessage(msg *kafka.Message) (entity.EnvelopeResponse, error) {
 	data := entity.EnvelopeResponse{}
+	err := d.unmarshalMessage(msg, &data)
+	if err != nil {
+		return data, fmt.Errorf("failed to deserialize envelope response: %w", err)
+	}
+	return data, nil
+}
+
+func (d *Deserializer) deserializeEnvelopSorobanTransaction(msg *kafka.Message) (entity.SignTransactionRequest, error) {
+	data := entity.SignTransactionRequest{}
 	err := d.unmarshalMessage(msg, &data)
 	if err != nil {
 		return data, fmt.Errorf("failed to deserialize envelope response: %w", err)

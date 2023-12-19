@@ -142,10 +142,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Asset"
-                            }
+                            "$ref": "#/definitions/v1.PaginatedAssetsResponse"
                         }
                     },
                     "500": {
@@ -1492,6 +1489,98 @@ const docTemplate = `{
                 }
             }
         },
+        "/soroban-transactions/sign": {
+            "post": {
+                "description": "Signed a XDR transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Soroban"
+                ],
+                "summary": "Signed Transaction",
+                "parameters": [
+                    {
+                        "description": "Signed a XDR transaction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SignedTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/soroban-transactions/submit": {
+            "post": {
+                "description": "Submit a XDR transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Soroban"
+                ],
+                "summary": "Submit Transaction",
+                "parameters": [
+                    {
+                        "description": "Submit a XDR transaction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SubmitTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Create user",
@@ -2167,6 +2256,35 @@ const docTemplate = `{
                         "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/wallets/sponsor_pk/": {
+            "get": {
+                "description": "Get Sponsor Public Key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallets"
+                ],
+                "summary": "Get Sponsor Public Key",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
@@ -3034,6 +3152,20 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.PaginatedAssetsResponse": {
+            "type": "object",
+            "properties": {
+                "assets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Asset"
+                    }
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        },
         "v1.RolePermissionRequest": {
             "type": "object",
             "properties": {
@@ -3048,6 +3180,34 @@ const docTemplate = `{
                 "role_id": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "v1.SignedTransactionRequest": {
+            "type": "object",
+            "required": [
+                "envelope"
+            ],
+            "properties": {
+                "envelope": {
+                    "type": "string",
+                    "example": "KJDSKD..."
+                },
+                "wallet_pk": {
+                    "type": "string",
+                    "example": "GDSKJG..."
+                }
+            }
+        },
+        "v1.SubmitTransactionRequest": {
+            "type": "object",
+            "required": [
+                "envelope"
+            ],
+            "properties": {
+                "envelope": {
+                    "type": "string",
+                    "example": "KJDSKD..."
                 }
             }
         },

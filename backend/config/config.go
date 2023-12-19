@@ -13,6 +13,8 @@ type (
 		JWT     JWT
 		Horizon Horizon
 		Log     Log
+		AWS     AWS
+		Deploy  Deploy
 	}
 
 	Log struct {
@@ -35,6 +37,14 @@ type (
 			ConsumerTopics []string `env:"KAFKA_HORIZON_CONSUMER_TOPICS"`
 			ProducerTopic  string   `env:"KAFKA_HORIZON_PRODUCER_TOPIC"`
 		}
+		SubmitTransactionCfg struct {
+			ConsumerTopics []string `env:"KAFKA_ENVELOPE_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_SUBMIT_TRANSACTION_PRODUCER_TOPIC"`
+		}
+		SignTransactionCfg struct {
+			ConsumerTopics []string `env:"KAFKA_SIGN_SOROBAN_TRANSACTION_CONSUMER_TOPICS"`
+			ProducerTopic  string   `env:"KAFKA_SIGN_SOROBAN_TRANSACTION_PRODUCER_TOPIC"`
+		}
 	}
 
 	PGConfig struct {
@@ -52,6 +62,11 @@ type (
 
 	JWT struct {
 		SecretKey string `env-required:"true" env:"JWT_SECRET_KEY"`
+	}
+
+	AWS struct {
+		BucketName string `env-required:"true" env:"AWS_BUCKET_NAME"`
+		AwsRegion  string `env:"AWS_REGION"`
 	}
 
 	Horizon struct {
@@ -91,6 +106,10 @@ type (
 		Twitter               string `env:"PRINCIPALS_TWITTER"`
 		IDPhotoHash           string `env:"PRINCIPALS_ID_PHOTO_HASH"`
 		VerificationPhotoHash string `env:"PRINCIPALS_VERIFICATION_PHOTO_HASH"`
+	}
+
+	Deploy struct {
+		DeployStage string `env:"DEPLOY_STAGE"`
 	}
 )
 

@@ -15,17 +15,20 @@ type usersRoutes struct {
 	t  usecase.UserUseCase
 	a  usecase.AuthUseCase
 	rP usecase.RolePermissionUseCase
-	l  logger.Interface
+	v  usecase.VaultUseCase
+	// l logger.Interface
+	l logger.Interface
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface) {
-	r := &usersRoutes{t, a, rP, l}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase) {
+	r := &usersRoutes{t, a, rP, v, l}
 
 	h := handler.Group("/users")
 	{
 		h.POST("/create", r.createUser)
 		h.POST("/login", r.autentication)
 		h.POST("/logout", r.logout)
+		h.POST("/forget-password", r.forgetPassword)
 
 		secured := h.Group("/").Use(Auth(a.ValidateToken()))
 		{
@@ -141,13 +144,15 @@ func (r *usersRoutes) autentication(c *gin.Context) {
 // @Failure 500 {object} response
 // @Router /user/logout [post]
 func (r *usersRoutes) logout(c *gin.Context) {
-	var user entity.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		r.l.Error(err, "http - v1 - logout - ShouldBindJSON")
-		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+	token := c.GetHeader("Authorization")
+	user, err := r.t.GetUserByToken(token)
+	if err != nil {
+		r.l.Error(err, "http - v1 - getUserByToken - GetUserByToken")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 		return
 	}
-	err := r.a.UpdateToken(user.Email, "")
+
+	err = r.a.UpdateToken(user.ID, user.ID)
 	if err != nil {
 		r.l.Error(err, "http - v1 - logout - UpdateToken")
 		errorResponse(c, http.StatusInternalServerError, "error updating token", err)
@@ -218,5 +223,26 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 		return
 	}
 
+	if profile.VaultId != nil {
+		vault, err := r.v.GetById(*profile.VaultId)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		profile.Vault = &vault
+	}
+
 	c.JSON(http.StatusOK, profile)
+}
+
+// @Summary Forget Password
+// @Description Forget Password
+// @Schemes
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200  {object} entity.
+// @Router /users [get]
+func (r *usersRoutes) forgetPassword(c *gin.Context) {
 }
