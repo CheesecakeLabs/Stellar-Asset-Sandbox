@@ -177,7 +177,7 @@ const getContractOperation = (wrapArgs: {
   const createContractArgs = new xdr.CreateContractArgs({
     contractIdPreimage:
       xdr.ContractIdPreimage.contractIdPreimageFromAsset(xdrAsset),
-    executable: xdr.ContractExecutable.contractExecutableToken(),
+    executable: xdr.ContractExecutable.contractExecutableStellarAsset(),
   })
 
   const func =
