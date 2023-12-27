@@ -190,19 +190,21 @@ export const Header: React.FC<IHeader> = ({
             </PopoverContent>
           </Popover>
         </Flex>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            fontSize="sm"
-            _dark={{ fill: 'white' }}
-          >
-            Actions
-          </MenuButton>
-          <MenuList>
-            <MenuItem onClick={onOpenModal}>Delete Vault</MenuItem>
-          </MenuList>
-        </Menu>
+        {!vault.owner_id && (
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              fontSize="sm"
+              _dark={{ fill: 'white' }}
+            >
+              Actions
+            </MenuButton>
+            <MenuList>
+              <MenuItem onClick={onOpenModal}>Delete Vault</MenuItem>
+            </MenuList>
+          </Menu>
+        )}
       </Flex>
     </>
   )

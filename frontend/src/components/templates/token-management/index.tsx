@@ -22,6 +22,7 @@ import { getCurrencyIcon } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { toCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
@@ -68,9 +69,10 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
             <Button
               variant="primary"
               leftIcon={<JoinIcon fill="white" />}
-              onClick={(): void =>
+              onClick={(): void => {
+                GAService.GAEvent('forge_asset_click')
                 navigate({ pathname: PathRoute.FORGE_ASSET })
-              }
+              }}
             >
               Forge asset
             </Button>
@@ -97,9 +99,10 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   <Tr
                     key={index}
                     cursor="pointer"
-                    onClick={(): void =>
+                    onClick={(): void => {
+                      GAService.GAEvent('asset_details_click')
                       navigate(`${PathRoute.ASSET_HOME}/${asset.id}`)
-                    }
+                    }}
                   >
                     <Td minW="5rem">
                       {asset.image ? (

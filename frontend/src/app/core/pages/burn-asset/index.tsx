@@ -16,6 +16,7 @@ import { havePermission } from 'utils'
 import { burnHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -44,6 +45,10 @@ export const BurnAsset: React.FC = () => {
   const { id } = useParams()
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Burn Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,

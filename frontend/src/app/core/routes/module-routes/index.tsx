@@ -36,7 +36,13 @@ const createModuleRoutes = ({
         )
       }
 
-      return <Route {...routeProps} element={React.createElement(component)} key={path}/>
+      return (
+        <Route
+          {...routeProps}
+          element={React.createElement(component)}
+          key={path}
+        />
+      )
     }
   )
 }

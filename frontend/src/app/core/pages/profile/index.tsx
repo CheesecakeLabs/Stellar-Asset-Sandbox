@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from 'hooks/useAuth'
 import { useVaults } from 'hooks/useVaults'
 import { formatVaultName } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -30,6 +31,10 @@ export const Profile: React.FC = () => {
     getUserPermissions()
   }, [getUserPermissions])
 
+  useEffect(() => {
+    GAService.GAPageView('Profile')
+  }, [])
+
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
@@ -42,6 +47,7 @@ export const Profile: React.FC = () => {
       navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
       return
     }
+    GAService.GAEvent('create_wallet_click')
     const vault = {
       name: formatVaultName(profile?.name || ''),
       assets_id: [],
