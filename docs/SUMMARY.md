@@ -7,6 +7,10 @@
 * [How to issue a token](tutorials/how-to-issue-a-token.md)
 * [Creating a treasury vault](tutorials/creating-a-treasury-vault.md)
 
+***
+
+* [Page](page.md)
+
 ## Core Functionalities
 
 * [Token Management](core-functionalities/token-management/README.md)
@@ -18,3 +22,7 @@
 * [Treasury](core-functionalities/treasury.md)
 * [Asset Dashboard](core-functionalities/asset-dashboard.md)
 * [Role-based Permissions](core-functionalities/role-based-permissions.md)
+
+## Key Concepts
+
+* [Token Main Vault](key-concepts/token-main-vault.md)
