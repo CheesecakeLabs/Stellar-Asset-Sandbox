@@ -4,7 +4,7 @@ The Token Creation feature within the Stellar Asset Issuance Sandbox provides a 
 
 This feature can be easily accessed by navigating to the 'Token Management' option from the left-side menu and then selecting the 'Forge Asset' button located at the top-right corner.
 
-<figure><img src="../../.gitbook/assets/Screenshot 2024-01-02 at 11.20.01.png" alt=""><figcaption><p>Token Creation screen</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/token-creation-screen.png" alt=""><figcaption><p>Token Creation screen</p></figcaption></figure>
 
 ## **Token Details**
 
