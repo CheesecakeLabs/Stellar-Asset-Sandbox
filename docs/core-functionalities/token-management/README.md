@@ -28,9 +28,15 @@ Accessible from the left-side menu, the 'Token Management' section provides a se
 
 <div data-full-width="false">
 
-<figure><img src="../../.gitbook/assets/Screenshot 2024-01-02 at 10.48.11.png" alt="" width="563"><figcaption><p>Token Management section</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/token-management-screen.png" alt="" width="563"><figcaption><p>Token Management section</p></figcaption></figure>
 
 </div>
 
 * Access the Token Management section from the left-side menu of the Stellar Asset Issuance Sandbox.
 * Create a new asset as per the steps described in [token-creation.md](token-creation.md "mention") or click on a token from the list to access its management area.
+
+
+
+## Related Key Concepts
+
+<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-card-target data-type="content-ref"></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td></td><td></td><td></td><td><a href="../../key-concepts/token-main-vault.md">token-main-vault.md</a></td><td></td></tr></tbody></table>
