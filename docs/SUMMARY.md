@@ -9,7 +9,11 @@
 
 ## Core Functionalities
 
-* [Token Management](core-functionalities/token-management.md)
+* [Token Management](core-functionalities/token-management/README.md)
+  * [Token Creation](core-functionalities/token-management/token-creation.md)
+  * [Supply Management](core-functionalities/token-management/supply-management.md)
+  * [Distribution](core-functionalities/token-management/distribution.md)
+  * [Access Control](core-functionalities/token-management/access-control.md)
 * [Certificate of Deposit](core-functionalities/certificate-of-deposit.md)
 * [Treasury](core-functionalities/treasury.md)
 * [Asset Dashboard](core-functionalities/asset-dashboard.md)
