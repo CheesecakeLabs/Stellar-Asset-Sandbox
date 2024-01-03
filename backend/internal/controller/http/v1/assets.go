@@ -250,6 +250,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
+		FeeBump:    distPk,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - create asset - send message %d", Id))
@@ -376,6 +377,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 
 	sponsorID := request.SponsorId
+	_ = entity.Wallet{}
 	if sponsorID == 0 {
 		_, err = r.w.Get(_sponsorId)
 	} else {
@@ -410,6 +412,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		Id:         Id,
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
+		FeeBump:    asset.Distributor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
@@ -512,6 +515,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    asset.Distributor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - burn asset - send message %d", Id))
@@ -622,6 +626,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    asset.Distributor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - transfer asset - send message %d", Id))
@@ -729,6 +734,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    asset.Distributor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - clawback asset - send message %d", Id))
@@ -836,6 +842,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
+		FeeBump:    asset.Distributor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - update auth flags- send message %d", Id))
