@@ -3,21 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
+import { FeeBumpTransaction, Transaction } from '@stellar/stellar-sdk'
+import { Buffer } from 'buffer'
 import { useAssets } from 'hooks/useAssets'
 import { useContracts } from 'hooks/useContracts'
-import { useHorizon } from 'hooks/useHorizon'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
-import { SorobanService } from 'soroban'
-import * as SorobanClient from 'soroban-client'
-import { sorobanConfig } from 'soroban/constants'
-import { deployerClient } from 'soroban/deployer'
-import {
-  allowancePeriod,
-  codSalt,
-  codWasmHash,
-} from 'soroban/deployer/constants'
-import { MessagesError } from 'utils/constants/messages-error'
+import { STELLAR_NETWORK, codWasmHash, vcRpcHandler } from 'soroban/constants'
+import { StellarPlus } from 'stellar-plus'
+import { TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -26,16 +20,21 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
-  const [isGeneratedContractId, setGeneratedContractId] = useState(false)
 
   const { loadingAssets, assets, getAssets, updateContractId } = useAssets()
   const { createContract } = useContracts()
   const { vaults, loadingVaults, getVaults } = useVaults()
-  const { sign, submit, getSponsorPK } = useTransactions()
-  const { getLatestSequenceLedger } = useHorizon()
+  const { sign, getSponsorPK } = useTransactions()
 
   const toast = useToast()
   const navigate = useNavigate()
+
+  const customSign = async (
+    tx: Transaction | FeeBumpTransaction
+  ): Promise<TransactionXdr> => {
+    const signedTransaction = await sign({ envelope: tx.toXDR() })
+    return signedTransaction?.envelope || ''
+  }
 
   const onSubmit = async (
     data: FieldValues,
@@ -50,16 +49,13 @@ export const ContractsCreate: React.FC = () => {
     try {
       setCreatingContract(true)
 
-      const contractId = asset.contract_id
-        ? asset.contract_id
-        : SorobanService.getContractId({
-            assetCode: asset.code,
-            assetIssuerPk: asset.issuer.key.publicKey,
-          })
+      const token = new StellarPlus.Asset.SACHandler({
+        code: asset.code,
+        issuerPublicKey: asset.issuer.key.publicKey,
+        network: STELLAR_NETWORK,
+      })
 
-      if (!asset.contract_id) {
-        await updateContractId(asset.id, contractId)
-      }
+      let contractId = asset.contract_id
 
       const termToSeconds = Number(data.term || 0) * 86400
       const yieldRate = Number(data.yield_rate || 0) * 100
@@ -70,98 +66,105 @@ export const ContractsCreate: React.FC = () => {
         throw new Error('Invalid sponsor!')
       }
 
-      const sourceAccount = await SorobanService.getSourceAccount(sponsorPK)
-
-      const operation = SorobanService.getContractOperation({
-        assetCode: asset.code,
-        assetIssuerPk: asset.issuer.key.publicKey,
+      const opex = new StellarPlus.Account.CustomAccountHandler({
+        STELLAR_NETWORK,
+        customSign: customSign,
+        publicKey: sponsorPK,
       })
 
-      if (!asset.contract_id && !isGeneratedContractId) {
-        const preppedTx = await SorobanService.wrapClassicAsset(
-          operation,
-          sourceAccount
-        )
+      const opexTxInvocation = {
+        header: {
+          source: opex.getPublicKey(),
+          fee: '10000000', //1 XLM as maximum fee
+          timeout: 30,
+        },
+        signers: [opex],
+      }
+      
+      if (!contractId) {
 
-        const signedTransaction = await sign({ envelope: preppedTx })
-        if (signedTransaction) {
-          const resultEnvelope = await submit({
-            envelope: signedTransaction.envelope,
-          })
+        await token.wrapAndDeploy(opexTxInvocation)
+        contractId = token.sorobanTokenHandler.getContractId()
 
-          if (resultEnvelope) {
-            const transaction = new SorobanClient.Transaction(
-              resultEnvelope,
-              sorobanConfig.network.passphrase
-            )
-            await SorobanService.submitSoroban(transaction)
-          }
+        if (!contractId) {
+          throw new Error('Error creating contract id')
         }
-        setGeneratedContractId(true)
+
+        await updateContractId(asset.id, contractId)
       }
 
-      const latestSequenceLedger = await getLatestSequenceLedger()
+      const codVault = new StellarPlus.Account.CustomAccountHandler({
+        STELLAR_NETWORK,
+        customSign: customSign,
+        publicKey: vault.wallet.key.publicKey,
+      })
 
-      if (!latestSequenceLedger) {
-        throw new Error('Invalid latest sequence ledger!')
+      const codTxInvocation = {
+        header: {
+          source: vault.wallet.key.publicKey,
+          fee: '1000000', //0.1 XLM as maximum fee
+          timeout: 30,
+        },
+        signers: [codVault],
+        feeBump: opexTxInvocation,
       }
 
-      const transactionResult = await deployerClient.deploy({
-        wasm_hash: codWasmHash,
-        salt: codSalt(),
+      const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
+        network: STELLAR_NETWORK,
+        wasmHash: codWasmHash,
+        wasm: Buffer.from(codWasmHash),
+        contractId: contractId,
+        rpcHandler: vcRpcHandler
+      })
+
+      await codClient.uploadWasm(codTxInvocation)
+      await codClient.deploy(codTxInvocation)
+
+      const sorobanHandler = new StellarPlus.SorobanHandler(STELLAR_NETWORK)
+      const expirationLedger =
+        (await sorobanHandler.server.getLatestLedger()).sequence + 200000
+
+      const codParams = {
         admin: vault.wallet.key.publicKey,
-        asset: contractId,
+        asset: asset.contract_id
+          ? asset.contract_id
+          : token.sorobanTokenHandler.getContractId(),
         term: BigInt(termToSeconds),
-        compound_step: BigInt(
+        compoundStep: BigInt(
           compoundType === 'Compound interest' ? compound : 0
         ),
-        yield_rate: BigInt(yieldRate),
-        min_deposit: BigInt(Number(data.min_deposit || 0) * 10000000),
-        penalty_rate: BigInt(penaltyRate),
-        allowance_period: latestSequenceLedger + allowancePeriod,
-        signerSecret: vault.wallet.key.publicKey,
-      })
+        yieldRate: BigInt(yieldRate),
+        minDeposit: BigInt(Number(data.min_deposit || 0) * 10000000),
+        penaltyRate: BigInt(penaltyRate),
+        allowancePeriod: expirationLedger,
+      }
 
-      if (transactionResult.status === 'SUCCESS') {
-        const transactionSuccess =
-          transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse
+      await codClient.initialize({ ...codParams, ...codTxInvocation })
 
-        const xdr = transactionSuccess.returnValue?.toXDR('base64')
-        if (!xdr) {
-          throw new Error('Invalid transaction XDR')
-        }
+      const contract = {
+        name: 'Contract',
+        asset_id: asset.id.toString(),
+        vault_id: vault.id.toString(),
+        address: token.sorobanTokenHandler.getContractId() || '',
+        yield_rate: yieldRate,
+        term: termToSeconds,
+        min_deposit: Number(data.min_deposit || 0),
+        penalty_rate: penaltyRate,
+        compound: compoundType === 'Compound interest' ? compound : 0,
+      }
 
-        const scVal = SorobanClient.xdr.ScVal.fromXDR(xdr, 'base64')
-        const contractAddress =
-          SorobanClient.Address.fromScVal(scVal).toString()
+      const contractCreated = await createContract(contract)
 
-        const contract = {
-          name: 'Contract',
-          asset_id: asset.id.toString(),
-          vault_id: vault.id.toString(),
-          address: contractAddress,
-          yield_rate: yieldRate,
-          term: termToSeconds,
-          min_deposit: Number(data.min_deposit || 0),
-          penalty_rate: penaltyRate,
-          compound: compoundType === 'Compound interest' ? compound : 0,
-        }
-
-        const contractCreated = await createContract(contract)
-
-        if (contractCreated) {
-          toast({
-            title: 'Contract created!',
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'top-right',
-          })
-          navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
-          return
-        }
-      } else {
-        toastError(MessagesError.errorOccurred)
+      if (contractCreated) {
+        toast({
+          title: 'Contract created!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+        navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
+        return
       }
 
       setCreatingContract(false)

@@ -133,12 +133,12 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      const result = await certificateOfDepositClient.deposit({
-        amount: amount * BigInt(10000000),
-        address: address,
-        contractId: contractId,
-        sourcePk: sourcePk,
-      })
+      const result = await certificateOfDepositClient.deposit(
+        amount * BigInt(10000000),
+        address,
+        contractId,
+        sourcePk
+      )
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
@@ -173,10 +173,10 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     contractId: string
   ): Promise<bigint | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getEstimatedYield({
-        address: address,
-        contractId: contractId,
-      })
+      const result = await certificateOfDepositClient.getEstimatedYield(
+        address,
+        contractId
+      )
       return result
     } catch (e) {
       return
@@ -189,10 +189,10 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<bigint | undefined> => {
     try {
       const result =
-        await certificateOfDepositClient.getEstimatedPrematureWithdraw({
-          address: address,
-          contractId: contractId,
-        })
+        await certificateOfDepositClient.getEstimatedPrematureWithdraw(
+          address,
+          contractId
+        )
       return result
     } catch (e) {
       return
@@ -204,10 +204,10 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     contractId: string
   ): Promise<bigint | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getTimeLeft({
-        address: address,
-        contractId: contractId,
-      })
+      const result = await certificateOfDepositClient.getTimeLeft(
+        address,
+        contractId
+      )
       return result
     } catch (e) {
       return
@@ -224,16 +224,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     address: string,
     premature: boolean,
     contractId: string,
-    signerSecret?: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      const result = await certificateOfDepositClient.withdraw({
-        address: address,
-        accept_premature_withdraw: premature,
-        contractId: contractId,
-        signerSecret: signerSecret,
-      })
+      const result = await certificateOfDepositClient.withdraw(
+        address,
+        premature,
+        contractId
+      )
 
       const xdr = result.returnValue?.toXDR('base64')
       if (!xdr) {
@@ -338,7 +336,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         getHistory,
         addContractHistory,
         updateContractHistory,
-        getPagedContracts
+        getPagedContracts,
       }}
     >
       {children}

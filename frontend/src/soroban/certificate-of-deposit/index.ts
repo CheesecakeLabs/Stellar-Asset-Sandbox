@@ -1,201 +1,97 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as SorobanClient from 'soroban-client'
+import * as StellarSdk from '@stellar/stellar-sdk'
+import { StellarPlus } from 'stellar-plus'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 
-import { Address, I128 } from '../constants'
-import { IInvokeSorobanArgs, SorobanService } from '../index'
-import { Methods, spec } from './constants'
+import { I128, STELLAR_NETWORK, codWasmHash } from '../constants'
+import { spec } from './constants'
 
-const deposit = async (rawArgs: {
-  amount: I128
-  address: string
-  contractId: string
+const getContract = (contractId: string): CertificateOfDepositClient => {
+  return new StellarPlus.Contracts.CertificateOfDeposit({
+    network: STELLAR_NETWORK,
+    spec: new StellarSdk.ContractSpec(spec),
+    contractId: contractId,
+    wasmHash: codWasmHash,
+  })
+}
+
+const userTxInvocation = (sourcePk: string): any => {
+  return {
+    header: {
+      source: sourcePk,
+      timeout: 30,
+    },
+    signers: [sourcePk],
+  }
+}
+
+const deposit = async (
+  amount: I128,
+  address: string,
+  contractId: string,
   sourcePk: string
-}): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-    amount: rawArgs.amount,
-  }
+): Promise<any> => {
+  const contract = getContract(contractId)
 
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.deposit,
-    sourcePk: rawArgs.sourcePk,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.sourcePk
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
-    : invokeArgs
-
-  return SorobanService.invokeSoroban(invokeArgs)
+  await contract.deposit({
+    address: address,
+    amount: amount,
+    ...userTxInvocation(sourcePk),
+  })
 }
 
-const withdraw = async (rawArgs: {
-  address: string
-  accept_premature_withdraw: boolean
+const withdraw = async (
+  address: string,
+  accept_premature_withdraw: boolean,
   contractId: string
-  signerSecret?: string
-}): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-    accept_premature_withdraw: rawArgs.accept_premature_withdraw,
-  }
+): Promise<any> => {
+  const contract = getContract(contractId)
 
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.withdraw,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
-    : invokeArgs
-
-  return SorobanService.invokeSoroban(invokeArgs)
+  await contract.withdraw({
+    address: address,
+    acceptPrematureWithdraw: accept_premature_withdraw,
+  })
 }
 
-const getEstimatedYield = async (rawArgs: {
-  address: string
+const getEstimatedYield = async (
+  address: string,
   contractId: string
-  sourcePk?: string
-}): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-  }
-
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.getEstimatedYield,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.sourcePk
-    ? { ...invokeArgs, ...{ sourcePk: rawArgs.sourcePk } }
-    : invokeArgs
-
-  return SorobanService.simulatedValue(
-    invokeArgs,
-    (xdr: SorobanClient.xdr.ScVal): I128 => {
-      return spec.funcResToNative('get_estimated_yield', xdr)
-    }
-  )
+): Promise<any> => {
+  const contract = getContract(contractId)
+  return contract.getEstimatedYield({
+    address: address,
+  })
 }
 
 const getPosition = async (rawArgs: {
   address: string
   contractId: string
-  sourcePk?: string
 }): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-  }
+  const contract = getContract(rawArgs.contractId)
 
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.getPosition,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.sourcePk
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.sourcePk } }
-    : invokeArgs
-
-  return SorobanService.simulatedValue(
-    invokeArgs,
-    (xdr: SorobanClient.xdr.ScVal): I128 => {
-      return spec.funcResToNative('get_position', xdr)
-    }
-  )
+  return contract.getPosition({
+    address: rawArgs.address,
+  })
 }
 
-const getEstimatedPrematureWithdraw = async (rawArgs: {
+const getEstimatedPrematureWithdraw = async (
+  contractId: string,
   address: string
-  contractId: string
-  signerSecret?: string
-}): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-  }
-
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.getEstimatedPrematureWithdraw,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
-    : invokeArgs
-
-  return SorobanService.simulatedValue(
-    invokeArgs,
-    (xdr: SorobanClient.xdr.ScVal): I128 => {
-      return spec.funcResToNative('get_estimated_premature_withdraw', xdr)
-    }
-  )
+): Promise<any> => {
+  const contract = getContract(contractId)
+  return contract.getEstimatedPrematureWithdraw({
+    address: address,
+  })
 }
 
-const getTimeLeft = async (rawArgs: {
-  address: string
+const getTimeLeft = async (
+  address: string,
   contractId: string
-  signerSecret?: string
-}): Promise<any> => {
-  const args = {
-    address: new Address(rawArgs.address),
-  }
-
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.getTimeLeft,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = args ? { ...invokeArgs, ...{ args: args as any } } : invokeArgs
-
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
-    : invokeArgs
-
-  return SorobanService.simulatedValue(
-    invokeArgs,
-    (xdr: SorobanClient.xdr.ScVal): I128 => {
-      return spec.funcResToNative('get_time_left', xdr)
-    }
-  )
-}
-
-const extendContractValidity = async (rawArgs: {
-  address: string
-  contractId: string
-  signerSecret?: string
-}): Promise<any> => {
-  let invokeArgs: IInvokeSorobanArgs = {
-    contractId: rawArgs.contractId,
-    spec,
-    method: Methods.getEstimatedPrematureWithdraw,
-    sourcePk: rawArgs.address,
-  }
-
-  invokeArgs = rawArgs.signerSecret
-    ? { ...invokeArgs, ...{ sourceSk: rawArgs.signerSecret } }
-    : invokeArgs
-
-  return SorobanService.invokeSoroban(invokeArgs)
+): Promise<any> => {
+  const contract = getContract(contractId)
+  return contract.getEstimatedPrematureWithdraw({
+    address: address,
+  })
 }
 
 export const certificateOfDepositClient = {
@@ -205,5 +101,4 @@ export const certificateOfDepositClient = {
   getPosition,
   getEstimatedPrematureWithdraw,
   getTimeLeft,
-  extendContractValidity,
 }
