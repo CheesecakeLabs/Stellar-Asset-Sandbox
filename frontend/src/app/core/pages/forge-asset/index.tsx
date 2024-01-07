@@ -8,6 +8,7 @@ import { useAuth } from 'hooks/useAuth'
 import { havePermission } from 'utils'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toBase64 } from 'utils/converter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
@@ -47,6 +48,7 @@ export const ForgeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('forge_asset_success')
         navigate(`${PathRoute.ASSET_HOME}/${assetForged.id}`)
         return
       }
@@ -69,6 +71,10 @@ export const ForgeAsset: React.FC = () => {
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    GAService.GAEvent('forge_asset_form_start')
   }, [])
 
   const toastError = (message: string): void => {

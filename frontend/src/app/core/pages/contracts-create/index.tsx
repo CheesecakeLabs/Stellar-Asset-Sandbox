@@ -18,6 +18,7 @@ import {
   codWasmHash,
 } from 'soroban/deployer/constants'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -157,6 +158,7 @@ export const ContractsCreate: React.FC = () => {
             isClosable: true,
             position: 'top-right',
           })
+          GAService.GAEvent('cd_form_success')
           navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
           return
         }
@@ -173,6 +175,10 @@ export const ContractsCreate: React.FC = () => {
       toastError(message)
     }
   }
+
+  useEffect(() => {
+    GAService.GAEvent('cd_form_start')
+  }, [])
 
   const toastError = (message: string): void => {
     toast({
