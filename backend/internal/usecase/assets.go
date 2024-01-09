@@ -42,7 +42,8 @@ func (uc *AssetUseCase) Create(data entity.Asset, imageBytes []byte) (entity.Ass
 
 	// Upload image to S3 if exists
 	if len(imageBytes) > 0 {
-		assetImage, err := uc.storageService.UploadFile(fmt.Sprint(data.Id), imageBytes)
+		s3Name := fmt.Sprint(data.Code, "_", data.Issuer.Key.PublicKey)
+		assetImage, err := uc.storageService.UploadFile(s3Name, imageBytes)
 		if err != nil {
 			return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 		}
