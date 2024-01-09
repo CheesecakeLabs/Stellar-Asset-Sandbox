@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -85,13 +86,14 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 	return assets, nil
 }
 
-func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
-	assetImage, err := uc.storageService.UploadFile(assetId, imageBytes)
+func (uc *AssetUseCase) UploadImage(data entity.Asset, imageBytes []byte) error {
+	s3Name := fmt.Sprint(data.Code, "_", data.Issuer.Key.PublicKey)
+	assetImage, err := uc.storageService.UploadFile(s3Name, imageBytes)
 	if err != nil {
 		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 	}
 
-	err = uc.aRepo.StoreAssetImage(assetId, assetImage)
+	err = uc.aRepo.StoreAssetImage(strconv.Itoa(data.Id), assetImage)
 	if err != nil {
 		return fmt.Errorf("ImageUseCase - UploadImage - uc.aRepo.StoreAssetImage: %w", err)
 	}
