@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { useContracts } from 'hooks/useContracts'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -17,6 +18,10 @@ export const Contracts: React.FC = () => {
     useState<Hooks.UseContractsTypes.IPagedContracts>()
 
   const LIMIT = 10
+
+  useEffect(() => {
+    GAService.GAPageView('Contracts - COD')
+  }, [])
 
   useEffect(() => {
     getPagedContracts({

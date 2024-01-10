@@ -9,6 +9,7 @@ import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -53,6 +54,10 @@ export const VaultDetail: React.FC = () => {
     deleteVault,
   } = useVaults()
   const { loadingHorizon, getPaymentsData, getAssetAccounts } = useHorizon()
+
+  useEffect(() => {
+    GAService.GAPageView('Vault detail')
+  }, [])
 
   const [selectedAsset, setSelectedAsset] =
     useState<Hooks.UseAssetsTypes.IAssetDto>()

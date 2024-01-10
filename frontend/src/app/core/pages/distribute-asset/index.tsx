@@ -17,6 +17,7 @@ import { havePermission } from 'utils'
 import { distributeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -43,6 +44,10 @@ export const DistributeAsset: React.FC = () => {
 
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Distribute Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,

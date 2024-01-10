@@ -9,6 +9,7 @@ import { SettingsOptions } from 'components/enums/settings-options'
 import { MenuSettings } from 'components/organisms/menu-settings'
 import { Sidebar } from 'components/organisms/sidebar'
 import { RolePermissionsTemplate } from 'components/templates/role-permissions-template'
+import { GAService } from 'utils/ga'
 
 export interface IChange {
   role_id: number
@@ -64,6 +65,7 @@ export const RolePermissions: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_permissions_changed')
         setChanges([])
         getRolesPermissions()
         return
