@@ -3,6 +3,7 @@ package usecase
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -87,7 +88,9 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 }
 
 func (uc *AssetUseCase) UploadImage(data entity.Asset, imageBytes []byte) error {
-	s3Name := fmt.Sprint(data.Code, "_", data.Issuer.Key.PublicKey)
+	timestamp := time.Now().Format("20060102_150405")
+	s3Name := fmt.Sprintf("%s_%s_%s", data.Code, data.Issuer.Key.PublicKey, timestamp)
+
 	assetImage, err := uc.storageService.UploadFile(s3Name, imageBytes)
 	if err != nil {
 		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
