@@ -26,6 +26,7 @@ export const VaultCreate: React.FC = () => {
 
   useEffect(() => {
     GAService.GAPageView('Vault Create')
+    GAService.GAEvent('create_vault_form_start')
   }, [])
 
   const onSubmit = async (
@@ -50,6 +51,7 @@ export const VaultCreate: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('create_vault_success')
         navigate(PathRoute.VAULTS)
         return
       }

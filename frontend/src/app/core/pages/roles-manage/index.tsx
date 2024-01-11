@@ -9,6 +9,7 @@ import { SettingsOptions } from 'components/enums/settings-options'
 import { MenuSettings } from 'components/organisms/menu-settings'
 import { Sidebar } from 'components/organisms/sidebar'
 import { RolesManageTemplate } from 'components/templates/roles-manage-template'
+import { GAService } from 'utils/ga'
 
 export const RolesManage: React.FC = () => {
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
@@ -44,6 +45,7 @@ export const RolesManage: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_created')
         getRoles()
         return true
       }
@@ -74,6 +76,7 @@ export const RolesManage: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_deleted')
         getRoles()
         return true
       }
