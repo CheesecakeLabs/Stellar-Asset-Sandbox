@@ -30,9 +30,13 @@ export const ContractsCreate: React.FC = () => {
   const navigate = useNavigate()
 
   const customSign = async (
-    tx: Transaction | FeeBumpTransaction
+    tx: Transaction | FeeBumpTransaction,
+    publicKey: string
   ): Promise<TransactionXdr> => {
-    const signedTransaction = await sign({ envelope: tx.toXDR() })
+    const signedTransaction = await sign({
+      envelope: tx.toXDR(),
+      wallet_pk: publicKey,
+    })
     return signedTransaction?.envelope || ''
   }
 
@@ -80,9 +84,8 @@ export const ContractsCreate: React.FC = () => {
         },
         signers: [opex],
       }
-      
-      if (!contractId) {
 
+      if (!contractId) {
         await token.wrapAndDeploy(opexTxInvocation)
         contractId = token.sorobanTokenHandler.getContractId()
 
@@ -112,12 +115,8 @@ export const ContractsCreate: React.FC = () => {
       const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
         network: STELLAR_NETWORK,
         wasmHash: codWasmHash,
-        wasm: Buffer.from(codWasmHash),
         contractId: contractId,
-        rpcHandler: vcRpcHandler
       })
-
-      await codClient.uploadWasm(codTxInvocation)
       await codClient.deploy(codTxInvocation)
 
       const sorobanHandler = new StellarPlus.SorobanHandler(STELLAR_NETWORK)
