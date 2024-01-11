@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -42,7 +44,8 @@ func (uc *AssetUseCase) Create(data entity.Asset, imageBytes []byte) (entity.Ass
 
 	// Upload image to S3 if exists
 	if len(imageBytes) > 0 {
-		assetImage, err := uc.storageService.UploadFile(fmt.Sprint(data.Id), imageBytes)
+		s3Name := fmt.Sprint(data.Code, "_", data.Issuer.Key.PublicKey)
+		assetImage, err := uc.storageService.UploadFile(s3Name, imageBytes)
 		if err != nil {
 			return entity.Asset{}, fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 		}
@@ -84,13 +87,16 @@ func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
 	return assets, nil
 }
 
-func (uc *AssetUseCase) UploadImage(assetId string, imageBytes []byte) error {
-	assetImage, err := uc.storageService.UploadFile(assetId, imageBytes)
+func (uc *AssetUseCase) UploadImage(data entity.Asset, imageBytes []byte) error {
+	timestamp := time.Now().Format("20060102_150405")
+	s3Name := fmt.Sprintf("%s_%s_%s", data.Code, data.Issuer.Key.PublicKey, timestamp)
+
+	assetImage, err := uc.storageService.UploadFile(s3Name, imageBytes)
 	if err != nil {
 		return fmt.Errorf("AssetUseCase - Create - uc.awsService.UploadAssetImage: %w", err)
 	}
 
-	err = uc.aRepo.StoreAssetImage(assetId, assetImage)
+	err = uc.aRepo.StoreAssetImage(strconv.Itoa(data.Id), assetImage)
 	if err != nil {
 		return fmt.Errorf("ImageUseCase - UploadImage - uc.aRepo.StoreAssetImage: %w", err)
 	}

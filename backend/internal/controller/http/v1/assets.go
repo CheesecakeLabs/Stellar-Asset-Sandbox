@@ -961,7 +961,15 @@ func (r *assetsRoutes) uploadAssetImage(c *gin.Context) {
 	}
 
 	assetId := c.Param("id")
-	if err := r.as.UploadImage(assetId, decodedBytes); err != nil {
+
+	asset, err := r.as.GetById(assetId)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get asset by id - get by id")
+		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
+		return
+	}
+
+	if err := r.as.UploadImage(asset, decodedBytes); err != nil {
 		r.logger.Error(err, "http - v1 - upload asset image - upload image")
 		errorResponse(c, http.StatusInternalServerError, "Failed to store the image", err)
 		return
