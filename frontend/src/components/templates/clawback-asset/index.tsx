@@ -46,12 +46,35 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
     handleSubmit,
     setValue,
     getValues,
+    clearErrors,
+    setError,
   } = useForm()
 
   const [wallet, setWallet] = useState<string | undefined>()
   const [typeAccount, setTypeAccount] = React.useState<'INTERNAL' | 'EXTERNAL'>(
     'INTERNAL'
   )
+
+  const handleForm = (data: FieldValues): void => {
+    clearErrors()
+    let hasError = false
+    if (!data.amount) {
+      setError('amount', { message: 'This field is required' })
+      hasError = true
+    }
+    if (typeAccount === 'INTERNAL' && !wallet) {
+      setError('wallet', { message: 'This field is required' })
+      hasError = true
+    }
+
+    if (typeAccount === 'EXTERNAL' && !data.from) {
+      setError('from', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!hasError) {
+      onSubmit(data, setValue, wallet)
+    }
+  }
 
   return (
     <Flex flexDir="column" w="full">
@@ -71,20 +94,25 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
           </Stack>
         </RadioGroup>
         <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue, wallet)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             {typeAccount === 'INTERNAL' ? (
               <FormControl isInvalid={errors?.wallet !== undefined}>
                 <FormLabel>Vault</FormLabel>
-                <SelectVault vaults={vaults} setWallet={setWallet} />
-                <FormErrorMessage>Required</FormErrorMessage>
+                <SelectVault
+                  vaults={vaults}
+                  setWallet={setWallet}
+                  clearErrors={(): void => {
+                    clearErrors('wallet')
+                  }}
+                  noOptionsMessage="No vaults or wallets with funds"
+                />
+                <FormErrorMessage>
+                  {errors?.wallet?.message?.toString()}
+                </FormErrorMessage>
               </FormControl>
             ) : (
               <FormControl
-                isInvalid={errors?.destination_wallet_id !== undefined}
+                isInvalid={errors?.from !== undefined}
               >
                 <FormLabel>Wallet</FormLabel>
                 <Input
@@ -94,7 +122,9 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                     required: true,
                   })}
                 />
-                <FormErrorMessage>Required</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors?.from?.message?.toString()}
+                </FormErrorMessage>
               </FormControl>
             )}
 
@@ -108,10 +138,13 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
+                  clearErrors('amount')
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <FormErrorMessage>
+                {errors?.amount?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
             <Text
               color="gray.900"

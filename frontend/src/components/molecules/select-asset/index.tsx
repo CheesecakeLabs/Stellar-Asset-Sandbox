@@ -18,6 +18,7 @@ interface ISelectAsset {
   selected?: IOption | null
   setAsset: Dispatch<SetStateAction<Hooks.UseAssetsTypes.IAssetDto | undefined>>
   setSelected?: Dispatch<SetStateAction<IOption | undefined | null>>
+  clearErrors?(): void
 }
 
 const createOption = (
@@ -33,6 +34,7 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
   selected,
   setAsset,
   setSelected,
+  clearErrors,
 }) => {
   const { colorMode } = useColorMode()
   const [options, setOptions] = useState<IOption[]>([])
@@ -46,7 +48,9 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
 
   const formatLabel = (data: IOption): ReactNode => (
     <Flex alignItems="center" gap="0.75rem">
-      <Text fontSize="xs" minW="3rem">{data.label}</Text>
+      <Text fontSize="xs" minW="3rem">
+        {data.label}
+      </Text>
       <Text fontSize="sm">{data.value.name}</Text>
     </Flex>
   )
@@ -55,6 +59,7 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
     <Select
       options={options}
       onChange={(newValue): void => {
+        if (clearErrors) clearErrors()
         setAsset(newValue?.value), setSelected && setSelected(newValue)
       }}
       value={selected}
