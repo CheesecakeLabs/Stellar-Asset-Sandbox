@@ -62,20 +62,28 @@ export const ContractsDetail: React.FC = () => {
         let timeLeft = contractData?.timeLeft
 
         const position =
-          Number((await getPosition(wallet, contract.address)) || 0) / 10000000
+          Number((await getPosition(wallet, contract.address, wallet)) || 0) /
+          10000000
 
         const userYield =
-          Number((await getYield(wallet, contract.address)) || 0) / 10000000
+          Number((await getYield(wallet, contract.address, wallet)) || 0) /
+          10000000
 
         const estimatedPrematureWithdraw =
           Number(
-            (await getEstimatedPrematureWithdraw(wallet, contract.address)) || 0
+            (await getEstimatedPrematureWithdraw(
+              wallet,
+              contract.address,
+              wallet
+            )) || 0
           ) / 10000000
 
         if (!timeLeft) {
           timeLeft =
             position > 0
-              ? Number((await getTimeLeft(wallet, contract.address)) || 0)
+              ? Number(
+                  (await getTimeLeft(wallet, contract.address, wallet)) || 0
+                )
               : 0
         }
 
@@ -173,7 +181,8 @@ export const ContractsDetail: React.FC = () => {
       const isSuccess = await withdraw(
         profile.vault.wallet.key.publicKey,
         true,
-        contract.address
+        contract.address,
+        profile.vault?.wallet.key.publicKey
       )
 
       if (isSuccess) {
