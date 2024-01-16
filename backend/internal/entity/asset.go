@@ -98,3 +98,8 @@ type Toml struct {
 	CreatedAt string `pg:"default:now()"`
 	UpdatedAt string `pg:"default:now()"`
 }
+
+type AssetFilter struct {
+	AssetType string `json:"asset_type"`
+	AssetName string `json:"asset_name"`
+}

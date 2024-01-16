@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
@@ -34,31 +35,52 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 	return asset, nil
 }
 
-func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
-	query := `
+func (r AssetRepo) GetAssets(filter entity.AssetFilter) ([]entity.Asset, error) {
+	queryBuilder := `
         SELECT
-            a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
+            a.id, a.name, a.asset_type, a.code, 
             COALESCE(a.image, '') AS image, a.contract_id,
-            d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
-            dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
-            i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
-            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+            d.id, d.type, d.funded,
+            dk.id, dk.public_key, dk.weight,
+            i.id, i.type, i.funded,
+            ik.id, ik.public_key, ik.weight
         FROM asset a
         JOIN wallet d ON a.distributor_id = d.id
         JOIN key dk ON d.id = dk.wallet_id
         JOIN wallet i ON a.issuer_id = i.id
         JOIN key ik ON i.id = ik.wallet_id
-        ORDER BY a.name;
     `
 
-	rows, err := r.Db.Query(query)
+	// Initialize arguments slice for query parameters
+	var args []interface{}
+
+	// Apply filters
+	if filter.AssetName != "" || filter.AssetType != "" {
+		queryBuilder += "WHERE "
+		if filter.AssetName != "" {
+			queryBuilder += "a.name = $1 "
+			args = append(args, filter.AssetName)
+		}
+		if filter.AssetType != "" {
+			if len(args) > 0 {
+				queryBuilder += "AND "
+			}
+			queryBuilder += "a.asset_type = $2 "
+			args = append(args, filter.AssetType)
+		}
+	}
+
+	// Add ordering
+	queryBuilder += "ORDER BY a.name;"
+
+	// Execute the query
+	rows, err := r.Db.Query(queryBuilder, args...)
 	if err != nil {
-		return nil, fmt.Errorf("AssetRepo - GetAssets - Query: %w", err)
+		return nil, fmt.Errorf("AssetRepo - GetAll - Query: %w", err)
 	}
 	defer rows.Close()
 
 	var assets []entity.Asset
-
 	for rows.Next() {
 		var asset entity.Asset
 		var distributor entity.Wallet
@@ -74,7 +96,7 @@ func (r AssetRepo) GetAssets() ([]entity.Asset, error) {
 			&issuer.Key.Id, &issuer.Key.PublicKey, &issuer.Key.Weight,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("AssetRepo - GetAssets - row.Scan: %w", err)
+			return nil, fmt.Errorf("AssetRepo - GetAll - row.Scan: %w", err)
 		}
 
 		if image.Valid {
@@ -194,44 +216,52 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	return asset, nil
 }
 
-func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
+func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFilter) ([]entity.Asset, int, error) {
 	// Calculate the offset
 	offset := (page - 1) * limit
 
-	// Query to count the total number of assets
-	countQuery := `
-        SELECT COUNT(*)
-        FROM asset;
+	// Start building the SQL query
+	queryBuilder := `
+        SELECT
+            a.id, a.name, a.asset_type, a.code, 
+            COALESCE(a.image, '') AS image, a.contract_id,
+            d.id, d.type, d.funded,
+            dk.id, dk.public_key, dk.weight,
+            i.id, i.type, i.funded,
+            ik.id, ik.public_key, ik.weight
+        FROM asset a
+        JOIN wallet d ON a.distributor_id = d.id
+        JOIN key dk ON d.id = dk.wallet_id
+        JOIN wallet i ON a.issuer_id = i.id
+        JOIN key ik ON i.id = ik.wallet_id
     `
-	var totalAssets int
-	err := r.Db.QueryRow(countQuery).Scan(&totalAssets)
-	if err != nil {
-		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Count Query: %w", err)
+
+	// Initialize arguments slice for query parameters
+	var args []interface{}
+
+	// Apply filters
+	whereClauses := []string{}
+	if filter.AssetName != "" {
+		whereClauses = append(whereClauses, "a.name = ?")
+		args = append(args, filter.AssetName)
+	}
+	if filter.AssetType != "" {
+		whereClauses = append(whereClauses, "a.asset_type = ?")
+		args = append(args, filter.AssetType)
+	}
+	if len(whereClauses) > 0 {
+		queryBuilder += "WHERE " + strings.Join(whereClauses, " AND ")
 	}
 
-	// Calculate total pages
-	totalPages := (totalAssets + limit - 1) / limit
-
-	// Query to fetch paginated assets
-	query := `
-			SELECT
-			a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
-			COALESCE(a.image, '') AS image, a.contract_id,
-			d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
-			dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
-			i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
-			ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
-		FROM asset a
-		JOIN wallet d ON a.distributor_id = d.id
-		JOIN key dk ON d.id = dk.wallet_id
-		JOIN wallet i ON a.issuer_id = i.id
-		JOIN key ik ON i.id = ik.wallet_id
-		ORDER BY a.name
-		LIMIT $1 OFFSET $2;
-
+	// Add ordering and pagination
+	queryBuilder += `
+        ORDER BY a.name
+        LIMIT ? OFFSET ?;
     `
+	args = append(args, limit, offset)
 
-	rows, err := r.Db.Query(query, limit, offset)
+	// Execute the query
+	rows, err := r.Db.Query(queryBuilder, args...)
 	if err != nil {
 		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Query: %w", err)
 	}
@@ -256,16 +286,38 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int,
 			return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - row.Scan: %w", err)
 		}
 
-		if !image.Valid {
-			asset.Image = ""
-		} else {
+		if image.Valid {
 			asset.Image = image.String
+		} else {
+			asset.Image = ""
 		}
+
 		asset.Distributor = distributor
 		asset.Issuer = issuer
 
 		assets = append(assets, asset)
 	}
+
+	var totalAssets int
+
+	// Check for errors after iterating through the rows
+	if err = rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - rows.Err: %w", err)
+	}
+
+	// Query to count the total number of assets after applying the filters
+	countQueryBuilder := "SELECT COUNT(*) FROM asset a "
+	if len(whereClauses) > 0 {
+		countQueryBuilder += "WHERE " + strings.Join(whereClauses, " AND ")
+	}
+	err = r.Db.QueryRow(countQueryBuilder, args...).Scan(&totalAssets)
+	if err != nil {
+		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Count Query: %w", err)
+	}
+
+	// Calculate total pages
+	totalPages := (totalAssets + limit - 1) / limit
+
 	return assets, totalPages, nil
 }
 

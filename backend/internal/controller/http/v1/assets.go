@@ -873,6 +873,15 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	pageQuery := c.Query("page")
 	limitQuery := c.Query("limit")
 
+	// Parse additional filter parameters
+	nameFilter := c.Query("name")
+	assetTypeFilter := c.Query("asset_type")
+
+	filter := entity.AssetFilter{
+		AssetName: nameFilter,
+		AssetType: assetTypeFilter,
+	}
+
 	if pageQuery != "" && limitQuery != "" {
 		// Parse query parameters for pagination
 		page, err := strconv.Atoi(pageQuery)
@@ -889,7 +898,7 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		}
 
 		// Fetch paginated assets
-		assets, totalPages, err := r.as.GetPaginatedAssets(page, limit)
+		assets, totalPages, err := r.as.GetPaginatedAssets(page, limit, filter)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - get all assets - get paginated")
 			errorResponse(c, http.StatusInternalServerError, "error getting paginated assets", err)
@@ -902,7 +911,7 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		})
 	} else {
 		// Fetch all assets
-		assets, err := r.as.GetAll()
+		assets, err := r.as.GetAll(filter)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - get all assets - get all")
 			errorResponse(c, http.StatusInternalServerError, "error getting all assets", err)
