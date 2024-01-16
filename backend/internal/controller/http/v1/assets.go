@@ -860,12 +860,14 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 }
 
 // @Summary Get all assets
-// @Description Get all assets with optional pagination
+// @Description Get all assets with optional pagination and filtering
 // @Tags        Assets
 // @Accept      json
 // @Produce     json
-// @Param       page query int false "Page number"
-// @Param       limit query int false "Number of items per page"
+// @Param       name query string false "Filter by asset name"
+// @Param       asset_type query string false "Filter by asset type"
+// @Param       page query int false "Page number for pagination"
+// @Param       limit query int false "Number of items per page for pagination"
 // @Success     200 {object} PaginatedAssetsResponse
 // @Failure     500 {object} response
 // @Router      /assets [get]
@@ -1108,8 +1110,8 @@ func (r *assetsRoutes) getTomlData(c *gin.Context) {
 // @Tags  	    Assets
 // @Accept      json
 // @Produce     json
-// @Param       request body entity.UpdateContractIdRequest true "Contract ID"
-// @Success     200 {object} entity.UpdateContractIdRequest
+// @Param       request body UpdateContractIdRequest true "Contract ID"
+// @Success     200 {object} UpdateContractIdRequest
 // @Failure     400 {object} response
 // @Failure     500 {object} response
 // @Router      /assets/update-contract-id [put]
