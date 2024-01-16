@@ -288,6 +288,17 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		}
 	}
 
+	for _, flag := range request.SetFlags {
+		switch flag {
+		case "AUTH_REQUIRED_FLAGS":
+			asset.AuthorizeRequired = true
+		case "AUTH_CLAWBACK_ENABLED":
+			asset.ClawbackEnabled = true
+		case "FREEZE_ENABLED":
+			asset.FreezeEnabled = true
+		}
+	}
+
 	asset, err = r.as.Create(asset, imageBytes)
 	if err != nil {
 		r.logger.Error(err, "http - v1 - create asset - create asset")

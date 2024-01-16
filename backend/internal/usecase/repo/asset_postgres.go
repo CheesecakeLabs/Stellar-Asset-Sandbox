@@ -378,8 +378,8 @@ func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image ) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
-	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType, data.Image).Scan(&res.Id)
+	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image, authorize_required, clawback_enabled, freeze_enabled ) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
+	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType, data.Image, data.AuthorizeRequired, data.ClawbackEnabled, data.FreezeEnabled).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
 	}
