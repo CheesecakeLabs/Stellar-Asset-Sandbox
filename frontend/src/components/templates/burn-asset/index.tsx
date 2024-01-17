@@ -53,18 +53,24 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
   } = useForm()
+
+  const handleForm = (data: FieldValues): void => {
+    if (!data.amount) {
+      setError('amount', { message: 'This field is required' })
+      return
+    }
+    onSubmit(data, setValue)
+  }
 
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="0">
         <AssetHeader asset={asset} />
         <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             <FormControl isInvalid={errors?.amount !== undefined}>
               <Flex justifyContent="space-between" w="full" px="0.25rem">
                 <FormLabel>Amount to burn</FormLabel>
@@ -80,10 +86,13 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
+                  clearErrors('amount')
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <FormErrorMessage>
+                {errors?.amount?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
             <Text
               color="gray.900"

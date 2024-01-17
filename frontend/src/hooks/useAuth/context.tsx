@@ -60,9 +60,6 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
 
       return user
     } catch (error) {
-      if (axios.isAxiosError(error) && error?.response?.status === 400) {
-        throw new Error(error.message)
-      }
       throw new Error(MessagesError.invalidCredentials)
     } finally {
       setLoading(false)
@@ -85,10 +82,20 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
 
       return user
     } catch (error) {
-      if (axios.isAxiosError(error) && error?.response?.status === 400) {
-        throw new Error(error.message)
+      if (
+        axios.isAxiosError(error) &&
+        error?.response?.data.error?.includes('useraccount_email_key')
+      ) {
+        throw new Error(
+          'Failed to register. This email address is already in use.'
+        )
       }
-      throw new Error(MessagesError.signUpFailed)
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          `${MessagesError.signUpFailed} ${error?.response?.data.message}`
+        )
+      }
+      throw new Error(`${MessagesError.signUpFailed} ${error}`)
     } finally {
       setLoading(false)
     }

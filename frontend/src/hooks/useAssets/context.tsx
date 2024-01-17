@@ -35,7 +35,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return undefined
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Forge error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -52,7 +52,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Mint error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -69,7 +69,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Burn error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -86,7 +86,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Distribute error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -103,7 +103,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Authorize error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -120,7 +120,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Freeze error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
@@ -137,7 +137,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
       return response.status === 200
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
+        throw new Error(`Clawback error! ${error?.response?.data.message}`)
       }
       throw new Error(MessagesError.errorOccurred)
     } finally {
