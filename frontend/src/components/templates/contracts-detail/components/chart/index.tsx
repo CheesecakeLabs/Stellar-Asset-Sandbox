@@ -18,9 +18,6 @@ export const Chart: React.FC<IChart> = ({ title, value }) => {
       w="full"
       maxW="full"
     >
-      <Flex justifyContent="flex-end" mb="1.25rem">
-        <HelpIcon />
-      </Flex>
       <Flex flexDir="column" alignItems="center">
         <Text fontSize="xs">{title}</Text>
         <Text fontSize="2xl" mt="0.25rem">

@@ -72,17 +72,19 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
         <Box p="1rem">
           <form onSubmit={handleSubmit(data => handleForm(data))}>
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex justifyContent="space-between" w="full" px="0.25rem">
+              <Flex w="full" px="0.25rem" alignItems="center">
                 <FormLabel>Amount to burn</FormLabel>
-                <Tooltip label={TooltipsData.burn}>
-                  <HelpIcon width="20px" />
-                </Tooltip>
+                <Box pb={2}>
+                  <Tooltip label={TooltipsData.burn}>
+                    <HelpIcon width="14px" />
+                  </Tooltip>
+                </Box>
               </Flex>
               <Input
                 as={NumericFormat}
                 decimalScale={7}
                 thousandSeparator=","
-                placeholder="Type the amount you want to burn..."
+                placeholder="Amount to burn..."
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {

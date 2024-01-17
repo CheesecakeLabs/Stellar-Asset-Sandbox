@@ -53,7 +53,7 @@ export const PublishInformationTemplate: React.FC<
     'Stock',
     'Bond',
     'Commodity',
-    'Realestate',
+    'Real estate',
   ]
 
   const getCurrency = useCallback(():
@@ -119,7 +119,7 @@ export const PublishInformationTemplate: React.FC<
             <ItemToml
               title={'Is anchored'}
               description={
-                'true if token can be redeemed for underlying asset, otherwise false'
+                'True if token can be redeemed for underlying asset, otherwise false.'
               }
             >
               <Checkbox
@@ -139,7 +139,7 @@ export const PublishInformationTemplate: React.FC<
                 <ItemToml
                   title={'Anchor asset type'}
                   description={
-                    'Type of asset anchored. Can be fiat, crypto, nft, stock, bond, commodity, realestate, or other.'
+                    'Type of asset anchored. Can be fiat, crypto, nft, stock, bond, commodity, real estate, or other.'
                   }
                 >
                   <SelectAnchorType
@@ -167,7 +167,7 @@ export const PublishInformationTemplate: React.FC<
             <ItemToml
               title={'Is unlimited'}
               description={
-                "The number of tokens is dilutable at the issuer's discretion"
+                "The number of tokens is dilutable at the issuer's discretion."
               }
             >
               <Checkbox
