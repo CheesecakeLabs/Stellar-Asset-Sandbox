@@ -4,7 +4,7 @@ import freighter from '@stellar/freighter-api'
 import { FeeBumpTransaction, Transaction } from '@stellar/stellar-sdk'
 import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
-import { STELLAR_NETWORK } from 'soroban/constants'
+import { STELLAR_NETWORK, vcRpcHandler } from 'soroban/constants'
 import { StellarPlus } from 'stellar-plus'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 import { TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
@@ -144,6 +144,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     return new StellarPlus.Contracts.CertificateOfDeposit({
       network: STELLAR_NETWORK,
       contractId: contractId,
+      rpcHandler: vcRpcHandler
     })
   }
 
@@ -180,11 +181,14 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         ...userTxInvocation(sourcePk),
       })
 
+      console.log(3)
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
       return true
-    } catch (error) {
+    } catch (error : any) {
+      console.log(error)
+      console.log(error.meta)
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
       }
