@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "@cfaester/enzyme-adapter-react-18": "^0.7.0",
+    "@craco/craco": "^7.1.0",
     "@storybook/addon-a11y": "~6.5.16",
     "@storybook/addon-actions": "~6.5.16",
     "@storybook/addon-docs": "~6.5.16",
@@ -94,13 +95,13 @@
     "sinon": "~15.0.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "craco start",
     "start:dev": "env-cmd --silent -f ./src/config/.env.local npm start",
     "start:staging": "env-cmd -f ./src/config/.env.staging npm start",
-    "build": "react-scripts build && mkdir -p build/sandbox/v2/ && cp -Rp build/static build/sandbox/v2/",
-    "test": "react-scripts test",
+    "build": "craco build && mkdir -p build/sandbox/v2/ && cp -Rp build/static build/sandbox/v2/",
+    "test": "craco test",
     "test:coverage": "npm run test -- --coverage --watchAll=false",
-    "eject": "react-scripts eject",
+    "eject": "craco eject",
     "lint:staged": "lint-staged",
     "lint": "eslint --ext .ts,.tsx src/",
     "prettier": "prettier --write src/**/*.{js,jsx,ts,tsx,json,css,scss,md}",
