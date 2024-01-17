@@ -186,9 +186,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
       return true
-    } catch (error : any) {
-      console.log(error)
-      console.log(error.meta)
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
       }
