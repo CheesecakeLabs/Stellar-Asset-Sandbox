@@ -78,8 +78,9 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
-	handler.Use(sentrygin.New(sentrygin.Options{}))
-
+	if cfg.Deploy.DeployStage == "production" {
+		handler.Use(sentrygin.New(sentrygin.Options{}))
+	}
 	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
