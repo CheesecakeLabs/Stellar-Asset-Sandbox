@@ -1,16 +1,17 @@
 import { createContext, useCallback, useState } from 'react'
 
 import freighter from '@stellar/freighter-api'
-import { FeeBumpTransaction, Transaction } from '@stellar/stellar-sdk'
 import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
-import { STELLAR_NETWORK, vcRpcHandler } from 'soroban/constants'
+import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
 import { StellarPlus } from 'stellar-plus'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
-import { TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
+import { FeeBumpTransaction, Transaction, TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
+import { CustomAccountHandler } from 'soroban'
+import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -144,13 +145,13 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     return new StellarPlus.Contracts.CertificateOfDeposit({
       network: STELLAR_NETWORK,
       contractId: contractId,
-      rpcHandler: vcRpcHandler
+      rpcHandler: vcRpcHandler,
+      wasmHash: WASM_HASH
     })
   }
 
   const userTxInvocation = (sourcePk: string): Hooks.UseContractsTypes.IInvocation => {
-    const source = new StellarPlus.Account.CustomAccountHandler({
-      STELLAR_NETWORK,
+    const source = new CustomAccountHandler({
       customSign: customSign,
       publicKey: sourcePk,
     })
@@ -158,7 +159,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     return {
       header: {
         source: sourcePk,
-        timeout: 30,
+        timeout: 45,
         fee: '1000000',
       },
       signers: [source],
@@ -181,7 +182,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         ...userTxInvocation(sourcePk),
       })
 
-      console.log(3)
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)

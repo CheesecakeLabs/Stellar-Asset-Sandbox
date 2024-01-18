@@ -1,11 +1,9 @@
 import { FieldValues } from 'react-hook-form'
 
-import { FeeBumpTransaction, Transaction } from '@stellar/stellar-sdk'
 import axios from 'axios'
 import { StellarPlus } from 'stellar-plus'
-import { CustomAccountHandlerClient } from 'stellar-plus/lib/stellar-plus/account/account-handler/custom'
 import { SACHandler } from 'stellar-plus/lib/stellar-plus/asset'
-import { TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
+import { FeeBumpHeader, FeeBumpTransaction, Transaction, TransactionInvocation, TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
@@ -13,11 +11,13 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 import { http } from 'interfaces/http'
 
 import { STELLAR_NETWORK, vcRpcHandler } from './constants'
+import { CustomAccountHandler } from 'soroban'
 
 export const TOKEN_DECIMALS = 10000000
+export const BUMP_FEE = '10000000'
+export const INNER_FEE = '1000000'
 const SECONDS_IN_DAY = 86400
 const VALUE_TO_PERCENTAGE = 100
-const FEE = '10000000'
 const TIMEOUT = 45
 
 interface ICODParams {
@@ -37,7 +37,8 @@ interface IHeaderTx {
     fee: string
     timeout: number
   }
-  signers: CustomAccountHandlerClient[]
+  signers: CustomAccountHandler[],
+  feeBump: TransactionInvocation
 }
 
 const customSign = async (
@@ -88,26 +89,26 @@ const getExpirationLedger = async (): Promise<number> => {
   return latestLedger.sequence + 200000
 }
 
-const loadAccount = (publicKey: string | undefined): CustomAccountHandlerClient => {
+const loadAccount = (publicKey: string | undefined): CustomAccountHandler => {
   if (!publicKey) {
     throw new Error('Invalid public key!')
   }
 
-  return new StellarPlus.Account.CustomAccountHandler({
-    STELLAR_NETWORK,
+  return new CustomAccountHandler({
     customSign: customSign,
     publicKey: publicKey,
   })
 }
 
-const getTxInvocation = (account: CustomAccountHandlerClient): IHeaderTx => {
+const getTxInvocation = (account: CustomAccountHandler, fee: string, feeBump?: FeeBumpHeader): TransactionInvocation => {
   return {
     header: {
       source: account.getPublicKey(),
-      fee: FEE,
+      fee: fee,
       timeout: TIMEOUT,
     },
     signers: [account],
+    feeBump: feeBump
   }
 }
 

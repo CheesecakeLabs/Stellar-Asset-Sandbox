@@ -136,7 +136,7 @@ export const ContractsDetail: React.FC = () => {
 
     try {
       const isSuccess = await deposit(
-        BigInt(data.amount),
+        BigInt(data.amount * 10000000),
         profile.vault.wallet.key.publicKey,
         contract.address,
         profile.vault.wallet.key.publicKey
