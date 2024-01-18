@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 )
@@ -87,20 +88,24 @@ func New(level string) *Logger {
 }
 
 func (l *Logger) Debug(message string, args ...interface{}) {
+	sentry.CaptureMessage(message)
 	l.logger.Debug().Msgf(message, args...)
 }
 
 func (l *Logger) Info(message string, args ...interface{}) {
 	l.logger.Info().Msgf(message, args...)
+	sentry.CaptureMessage(message)
 }
 
 func (l *Logger) Warn(message string, args ...interface{}) {
 	l.logger.Warn().Msgf(message, args...)
+	sentry.CaptureMessage(message)
 }
 
 func (l *Logger) Error(err error, message string, args ...interface{}) {
 	event := l.logger.Error()
 	if err != nil {
+		sentry.CaptureException(err)
 		event = event.Err(err)
 	}
 	event.Msgf(message, args...)
