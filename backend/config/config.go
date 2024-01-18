@@ -15,6 +15,7 @@ type (
 		Log     Log
 		AWS     AWS
 		Deploy  Deploy
+		Sentry  Sentry
 	}
 
 	Log struct {
@@ -110,6 +111,10 @@ type (
 
 	Deploy struct {
 		DeployStage string `env:"DEPLOY_STAGE"`
+	}
+
+	Sentry struct {
+		DSN string `env:"SENTRY_DSN"`
 	}
 )
 
