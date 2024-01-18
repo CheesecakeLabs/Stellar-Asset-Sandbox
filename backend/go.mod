@@ -1,6 +1,6 @@
 module github.com/CheesecakeLabs/token-factory-v2/backend
 
-go 1.19
+go 1.21
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
