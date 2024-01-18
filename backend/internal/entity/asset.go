@@ -1,15 +1,18 @@
 package entity
 
 type Asset struct {
-	Id          int     `json:"id" example:"1"`
-	Name        string  `json:"name" example:"USD Coin"`
-	Code        string  `json:"code" example:"USDC"`
-	Distributor Wallet  `json:"distributor"`
-	Issuer      Wallet  `json:"issuer"`
-	Amount      int     `json:"amount" example:"1000000"`
-	AssetType   string  `json:"asset_type"`
-	Image       string  `json:"image,omitempty"`
-	ContractId  *string `json:"contract_id,omitempty"`
+	Id                int     `json:"id" example:"1"`
+	Name              string  `json:"name" example:"USD Coin"`
+	Code              string  `json:"code" example:"USDC"`
+	Distributor       Wallet  `json:"distributor"`
+	Issuer            Wallet  `json:"issuer"`
+	Amount            int     `json:"amount" example:"1000000"`
+	AssetType         string  `json:"asset_type"`
+	Image             string  `json:"image,omitempty"`
+	ContractId        *string `json:"contract_id,omitempty"`
+	AuthorizeRequired bool    `json:"authorize_required" example:"true"`
+	ClawbackEnabled   bool    `json:"clawback_enabled" example:"false"`
+	FreezeEnabled     bool    `json:"freeze_enabled" example:"false"`
 }
 
 const (
@@ -97,4 +100,12 @@ type Toml struct {
 	Content   string
 	CreatedAt string `pg:"default:now()"`
 	UpdatedAt string `pg:"default:now()"`
+}
+
+type AssetFilter struct {
+	AssetName         string
+	AssetType         string
+	AuthorizeRequired *bool
+	ClawbackEnabled   *bool
+	FreezeEnabled     *bool
 }

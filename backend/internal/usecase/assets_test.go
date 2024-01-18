@@ -215,6 +215,8 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		mockAsset,
 	}
 
+	mockFilter := entity.AssetFilter{}
+
 	mockToml := "mock toml data"
 	mockReq := entity.TomlData{
 		Version: "2.0.0",
@@ -245,7 +247,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		{
 			name: "get all - success",
 			mock: func() {
-				ra.EXPECT().GetAssets().Return(mockAssets, nil)
+				ra.EXPECT().GetAssets(mockFilter).Return(mockAssets, nil)
 			},
 			res: mockAssets,
 			err: nil,
@@ -253,7 +255,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		{
 			name: "get all - database error",
 			mock: func() {
-				ra.EXPECT().GetAssets().Return([]entity.Asset{}, assetDbError)
+				ra.EXPECT().GetAssets(mockFilter).Return([]entity.Asset{}, assetDbError)
 			},
 			res: []entity.Asset{},
 			err: assetDbError,
@@ -300,7 +302,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 
 			// Test GetAll
 			if _, ok := tc.req.(bool); ok {
-				res, err := u.GetAll()
+				res, err := u.GetAll(mockFilter)
 				require.EqualValues(t, tc.res, res)
 				if tc.err == nil {
 					require.EqualValues(t, err, tc.err)

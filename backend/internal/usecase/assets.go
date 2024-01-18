@@ -78,8 +78,8 @@ func (uc *AssetUseCase) GetById(id string) (entity.Asset, error) {
 	return asset, nil
 }
 
-func (uc *AssetUseCase) GetAll() ([]entity.Asset, error) {
-	assets, err := uc.aRepo.GetAssets()
+func (uc *AssetUseCase) GetAll(filter entity.AssetFilter) ([]entity.Asset, error) {
+	assets, err := uc.aRepo.GetAssets(filter)
 	if err != nil {
 		return nil, fmt.Errorf("AssetUseCase - GetAll - uc.repo.GetAssets: %w", err)
 	}
@@ -190,8 +190,8 @@ func (uc *AssetUseCase) UpdateContractId(assetId string, contractId string) erro
 	return nil
 }
 
-func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int) ([]entity.Asset, int, error) {
-	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit)
+func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int, filter entity.AssetFilter) ([]entity.Asset, int, error) {
+	assets, totalPages, err := uc.aRepo.GetPaginatedAssets(page, limit, filter)
 	if err != nil {
 		return nil, 0, fmt.Errorf("AssetUseCase - GetPaginated - uc.repo.GetPaginated: %w", err)
 	}

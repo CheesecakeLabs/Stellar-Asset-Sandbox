@@ -113,7 +113,7 @@ const docTemplate = `{
         },
         "/assets": {
             "get": {
-                "description": "Get all assets with optional pagination",
+                "description": "Get all assets with optional pagination and filtering",
                 "consumes": [
                     "application/json"
                 ],
@@ -126,14 +126,26 @@ const docTemplate = `{
                 "summary": "Get all assets",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Filter by asset name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by asset type",
+                        "name": "asset_type",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
-                        "description": "Page number",
+                        "description": "Page number for pagination",
                         "name": "page",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Number of items per page",
+                        "description": "Number of items per page for pagination",
                         "name": "limit",
                         "in": "query"
                     }
@@ -548,6 +560,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/assets/update-contract-id": {
+            "put": {
+                "description": "Update a Contract ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Update a Contract ID",
+                "parameters": [
+                    {
+                        "description": "Contract ID",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractIdRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets/update-toml": {
             "put": {
                 "description": "Update a TOML file",
@@ -734,9 +792,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/contracts": {
-            "get": {
-                "description": "Retrieve a list of all contracts, with optional pagination",
+        "/contract/history": {
+            "put": {
+                "description": "Update contract history",
                 "consumes": [
                     "application/json"
                 ],
@@ -746,7 +804,109 @@ const docTemplate = `{
                 "tags": [
                     "Contract"
                 ],
-                "summary": "Get all contracts",
+                "summary": "Update contract history",
+                "parameters": [
+                    {
+                        "description": "History info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ContractHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add contract history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Add contract history",
+                "parameters": [
+                    {
+                        "description": "History info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AddContractHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ContractHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contracts": {
+            "get": {
+                "description": "Retrieve a list of history of contract",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ContractHistory"
+                ],
+                "summary": "Get contract history",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1671,6 +1831,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/users": {
+            "get": {
+                "description": "Forget Password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Forget Password",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/edit-users-role": {
             "post": {
                 "description": "Edit users role",
@@ -2312,6 +2495,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "USDC"
                 },
+                "contract_id": {
+                    "type": "string"
+                },
                 "distributor": {
                     "$ref": "#/definitions/entity.Wallet"
                 },
@@ -2320,10 +2506,7 @@ const docTemplate = `{
                     "example": 1
                 },
                 "image": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "string"
                 },
                 "issuer": {
                     "$ref": "#/definitions/entity.Wallet"
@@ -2342,6 +2525,9 @@ const docTemplate = `{
                 },
                 "asset": {
                     "$ref": "#/definitions/entity.Asset"
+                },
+                "compound": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -2368,6 +2554,33 @@ const docTemplate = `{
                 },
                 "yield_rate": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.ContractHistory": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "$ref": "#/definitions/entity.Contract"
+                },
+                "deposit_amount": {
+                    "type": "number"
+                },
+                "deposited_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user": {
+                    "$ref": "#/definitions/entity.User"
+                },
+                "withdraw_amount": {
+                    "type": "number"
+                },
+                "withdrawn_at": {
+                    "type": "string"
                 }
             }
         },
@@ -2803,6 +3016,12 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "vault": {
+                    "$ref": "#/definitions/entity.Vault"
+                },
+                "vault_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -2851,8 +3070,14 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Treasury"
                 },
+                "owner_id": {
+                    "type": "integer"
+                },
                 "vault_category": {
                     "$ref": "#/definitions/entity.VaultCategory"
+                },
+                "vault_category_id": {
+                    "type": "integer"
                 },
                 "wallet": {
                     "$ref": "#/definitions/entity.Wallet"
@@ -2894,6 +3119,9 @@ const docTemplate = `{
                     "example": "sponsor"
                 }
             }
+        },
+        "v1.AddContractHistoryRequest": {
+            "type": "object"
         },
         "v1.BurnAssetRequest": {
             "type": "object",
@@ -3028,6 +3256,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "1"
                 },
+                "compound": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "min_deposit": {
                     "type": "integer",
                     "example": 1
@@ -3042,7 +3274,7 @@ const docTemplate = `{
                 },
                 "term": {
                     "type": "integer",
-                    "example": 1
+                    "example": 60
                 },
                 "vault_id": {
                     "type": "string",
@@ -3074,8 +3306,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "assets_id",
-                "name",
-                "vault_category_id"
+                "name"
             ],
             "properties": {
                 "assets_id": {
@@ -3087,6 +3318,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "owner_id": {
+                    "type": "integer"
                 },
                 "vault_category_id": {
                     "type": "integer",
@@ -3292,6 +3526,18 @@ const docTemplate = `{
                 "trustor_pk": {
                     "type": "string",
                     "example": "2"
+                }
+            }
+        },
+        "v1.UpdateContractHistoryRequest": {
+            "type": "object"
+        },
+        "v1.UpdateContractIdRequest": {
+            "type": "object",
+            "properties": {
+                "contract_id": {
+                    "type": "string",
+                    "example": "iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."
                 }
             }
         },
