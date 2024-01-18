@@ -14,6 +14,7 @@ import { useDashboards } from 'hooks/useDashboards'
 import { assetHomeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toBase64 } from 'utils/converter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -40,6 +41,10 @@ export const AssetHome: React.FC = () => {
   const { id } = useParams()
 
   const toast = useToast()
+
+  useEffect(() => {
+    GAService.GAPageView('Asset Home')
+  }, [])
 
   useEffect(() => {
     if (id) {

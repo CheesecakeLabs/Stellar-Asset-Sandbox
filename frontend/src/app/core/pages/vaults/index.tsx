@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -18,6 +19,10 @@ export const Vaults: React.FC = () => {
   const { assets, getAssets } = useAssets()
   const [currentPage, setCurrentPage] = useState(1)
   const LIMIT = 12
+
+  useEffect(() => {
+    GAService.GAPageView('Treasury')
+  }, [])
 
   useEffect(() => {
     getPagedVaults({

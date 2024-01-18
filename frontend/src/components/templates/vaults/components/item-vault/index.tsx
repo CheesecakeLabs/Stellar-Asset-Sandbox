@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { getCurrencyIcon, vaultCategoryTheme } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { LockIcon } from 'components/icons'
@@ -31,7 +32,10 @@ export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
       variant="primary"
       display="flex"
       flexDir="column"
-      onClick={(): void => navigate(`${PathRoute.VAULT_DETAIL}/${vault.id}`)}
+      onClick={(): void => {
+        GAService.GAEvent('vault_details_click')
+        navigate(`${PathRoute.VAULT_DETAIL}/${vault.id}`)
+      }}
       cursor="pointer"
       w="full"
       maxW="full"
@@ -76,11 +80,7 @@ export const ItemVault: React.FC<IItemVault> = ({ vault, assets }) => {
               >
                 <Flex alignItems="center" gap={2}>
                   {findAsset(balance)?.image ? (
-                    <Img
-                      src={findAsset(balance)?.image}
-                      w="16px"
-                      h="16px"
-                    />
+                    <Img src={findAsset(balance)?.image} w="16px" h="16px" />
                   ) : (
                     getCurrencyIcon(balance.asset_code, '1rem')
                   )}

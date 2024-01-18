@@ -11,7 +11,7 @@ import {
   RadioGroup,
   Stack,
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
@@ -23,7 +23,8 @@ interface IAuthorizeAccountTemplate {
   onSubmit(
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    wallet: string | undefined
+    wallet: string | undefined,
+    setWallet: Dispatch<SetStateAction<string | undefined>>
   ): Promise<void>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
@@ -43,12 +44,25 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    clearErrors,
+    setError,
   } = useForm()
 
   const [wallet, setWallet] = useState<string | undefined>()
   const [typeAccount, setTypeAccount] = React.useState<'INTERNAL' | 'EXTERNAL'>(
     'INTERNAL'
   )
+
+  const handleForm = (data: FieldValues): void => {
+    if (
+      (typeAccount === 'INTERNAL' && !wallet) ||
+      (typeAccount === 'EXTERNAL' && !data.wallet)
+    ) {
+      setError('wallet', { message: 'This field is required' })
+      return
+    }
+    onSubmit(data, setValue, wallet, setWallet)
+  }
 
   return (
     <Flex flexDir="column" w="full">
@@ -68,22 +82,24 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
           </Stack>
         </RadioGroup>
         <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue, wallet)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             {typeAccount === 'INTERNAL' ? (
               <FormControl isInvalid={errors?.wallet !== undefined}>
-                <FormLabel>Vault</FormLabel>
+                <FormLabel>Vault or wallet</FormLabel>
                 <SelectVault
                   vaults={vaultsUnauthorized}
                   setWallet={setWallet}
+                  clearErrors={(): void => {
+                    clearErrors('wallet')
+                  }}
+                  noOptionsMessage="No vaults or wallets with pending authorization"
                 />
-                <FormErrorMessage>Required</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors?.wallet?.message?.toString()}
+                </FormErrorMessage>
               </FormControl>
             ) : (
-              <FormControl>
+              <FormControl isInvalid={errors?.wallet !== undefined}>
                 <FormLabel>Wallet</FormLabel>
                 <Input
                   type="text"
@@ -92,7 +108,9 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
                     required: true,
                   })}
                 />
-                <FormErrorMessage>Required</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors?.wallet?.message?.toString()}
+                </FormErrorMessage>
               </FormControl>
             )}
             <Flex justifyContent="flex-end">

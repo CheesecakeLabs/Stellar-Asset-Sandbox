@@ -43,13 +43,13 @@ type (
 	// Asset -.
 	AssetRepoInterface interface {
 		GetAsset(int) (entity.Asset, error)
-		GetAssets() ([]entity.Asset, error)
+		GetAssets(entity.AssetFilter) ([]entity.Asset, error)
 		GetAssetByCode(string) (entity.Asset, error)
 		CreateAsset(entity.Asset) (entity.Asset, error)
 		GetAssetById(string) (entity.Asset, error)
 		StoreAssetImage(string, string) error
 		GetAssetImage(string) ([]byte, error)
-		GetPaginatedAssets(int, int) ([]entity.Asset, int, error)
+		GetPaginatedAssets(int, int, entity.AssetFilter) ([]entity.Asset, int, error)
 		UpdateContractId(string, string) error
 	}
 

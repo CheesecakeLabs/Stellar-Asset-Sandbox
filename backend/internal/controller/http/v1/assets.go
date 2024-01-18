@@ -289,6 +289,16 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		}
 	}
 
+	for _, flag := range request.SetFlags {
+		switch flag {
+		case "AUTH_REQUIRED_FLAG":
+			asset.AuthorizeRequired = true
+		case "AUTH_CLAWBACK_ENABLED":
+			asset.ClawbackEnabled = true
+		case "AUTH_REVOCABLE_FLAG":
+			asset.FreezeEnabled = true
+		}
+	}
 	asset, err = r.as.Create(asset, imageBytes)
 	if err != nil {
 		r.logger.Error(err, "http - v1 - create asset - create asset")
@@ -867,18 +877,53 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 }
 
 // @Summary Get all assets
-// @Description Get all assets with optional pagination
+// @Description Get all assets with optional pagination and filtering
 // @Tags        Assets
 // @Accept      json
 // @Produce     json
-// @Param       page query int false "Page number"
-// @Param       limit query int false "Number of items per page"
+// @Param       name query string false "Filter by asset name"
+// @Param       asset_type query string false "Filter by asset type"
+// @Param       page query int false "Page number for pagination"
+// @Param       limit query int false "Number of items per page for pagination"
 // @Success     200 {object} PaginatedAssetsResponse
 // @Failure     500 {object} response
 // @Router      /assets [get]
 func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	pageQuery := c.Query("page")
 	limitQuery := c.Query("limit")
+
+	// Parse additional filter parameters
+	nameFilter := c.Query("name")
+	assetTypeFilter := c.Query("asset_type")
+
+	authorizeRequired, err := parseBoolQueryParameter(c.Query("authorize_required"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse authorize_required")
+		errorResponse(c, http.StatusBadRequest, "Invalid authorize_required parameter", err)
+		return
+	}
+
+	clawbackEnabled, err := parseBoolQueryParameter(c.Query("clawback_enabled"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse clawback_enabled")
+		errorResponse(c, http.StatusBadRequest, "Invalid clawback_enabled parameter", err)
+		return
+	}
+
+	freezeEnabled, err := parseBoolQueryParameter(c.Query("freeze_enabled"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse freeze_enabled")
+		errorResponse(c, http.StatusBadRequest, "Invalid freeze_enabled parameter", err)
+		return
+	}
+
+	filter := entity.AssetFilter{
+		AssetName:         nameFilter,
+		AssetType:         assetTypeFilter,
+		AuthorizeRequired: authorizeRequired,
+		ClawbackEnabled:   clawbackEnabled,
+		FreezeEnabled:     freezeEnabled,
+	}
 
 	if pageQuery != "" && limitQuery != "" {
 		// Parse query parameters for pagination
@@ -896,7 +941,7 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		}
 
 		// Fetch paginated assets
-		assets, totalPages, err := r.as.GetPaginatedAssets(page, limit)
+		assets, totalPages, err := r.as.GetPaginatedAssets(page, limit, filter)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - get all assets - get paginated")
 			errorResponse(c, http.StatusInternalServerError, "error getting paginated assets", err)
@@ -909,7 +954,7 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 		})
 	} else {
 		// Fetch all assets
-		assets, err := r.as.GetAll()
+		assets, err := r.as.GetAll(filter)
 		if err != nil {
 			r.logger.Error(err, "http - v1 - get all assets - get all")
 			errorResponse(c, http.StatusInternalServerError, "error getting all assets", err)
@@ -968,7 +1013,15 @@ func (r *assetsRoutes) uploadAssetImage(c *gin.Context) {
 	}
 
 	assetId := c.Param("id")
-	if err := r.as.UploadImage(assetId, decodedBytes); err != nil {
+
+	asset, err := r.as.GetById(assetId)
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get asset by id - get by id")
+		errorResponse(c, http.StatusInternalServerError, "error getting asset", err)
+		return
+	}
+
+	if err := r.as.UploadImage(asset, decodedBytes); err != nil {
 		r.logger.Error(err, "http - v1 - upload asset image - upload image")
 		errorResponse(c, http.StatusInternalServerError, "Failed to store the image", err)
 		return
@@ -1098,8 +1151,8 @@ func (r *assetsRoutes) getTomlData(c *gin.Context) {
 // @Tags  	    Assets
 // @Accept      json
 // @Produce     json
-// @Param       request body entity.UpdateContractIdRequest true "Contract ID"
-// @Success     200 {object} entity.UpdateContractIdRequest
+// @Param       request body UpdateContractIdRequest true "Contract ID"
+// @Success     200 {object} UpdateContractIdRequest
 // @Failure     400 {object} response
 // @Failure     500 {object} response
 // @Router      /assets/update-contract-id [put]

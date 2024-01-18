@@ -16,6 +16,7 @@ import { havePermission } from 'utils'
 import { clawbackHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -38,6 +39,10 @@ export const ClawbackAsset: React.FC = () => {
   const { vaults, getVaults } = useVaults()
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Clawback Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,

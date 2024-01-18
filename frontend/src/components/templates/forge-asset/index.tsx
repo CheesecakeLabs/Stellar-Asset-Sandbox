@@ -157,7 +157,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
               })}
             >
               <Flex flexDir={{ base: 'column', md: 'row' }}>
-                <Flex flexDir="column" mr="1rem"  mb="1rem">
+                <Flex flexDir="column" mr="1rem" mb="1rem">
                   <Flex justifyContent="space-between" alignItems="center">
                     <FormLabel>Asset Icon</FormLabel>
                     {selectedFile && (
@@ -194,7 +194,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                       className="asset-name"
                     />
                     <FormErrorMessage>
-                      Name must be more than 2 characters
+                      Asset name must be between 2 and 48 characters long
                     </FormErrorMessage>
                   </FormControl>
 
@@ -217,7 +217,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         className="asset-code"
                       />
                       <FormErrorMessage>
-                        Code must be 3 characters
+                        Code must be between 3 and 12 characters long
                       </FormErrorMessage>
                     </FormControl>
 
@@ -309,7 +309,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   type="submit"
                   variant="primary"
                   mt="1.5rem"
-                  w={{base: 'full', md: 'fit-content'}}
+                  w={{ base: 'full', md: 'fit-content' }}
                   isLoading={loading}
                 >
                   Forge asset

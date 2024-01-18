@@ -2,6 +2,7 @@ import { Flex, VStack, useMediaQuery } from '@chakra-ui/react'
 import React, { useEffect } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
@@ -24,6 +25,10 @@ export const TeamMembers: React.FC = () => {
     userPermissions,
     loadingUserPermissions,
   } = useAuth()
+
+  useEffect(() => {
+    GAService.GAPageView('Administration')
+  }, [])
 
   const handleEditRole = async (
     params: Hooks.UseAuthTypes.IUserRole

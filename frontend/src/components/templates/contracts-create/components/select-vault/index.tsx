@@ -12,6 +12,7 @@ interface ISelectVault {
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   setVault: Dispatch<SetStateAction<Hooks.UseVaultsTypes.IVault | undefined>>
   distributorWallet?: string
+  clearErrors?(): void
 }
 
 const createOption = (
@@ -28,6 +29,7 @@ export const SelectVault: React.FC<ISelectVault> = ({
   vaults,
   setVault,
   distributorWallet,
+  clearErrors,
 }) => {
   const { colorMode } = useColorMode()
   const [options, setOptions] = useState<IOption[] | []>([])
@@ -45,7 +47,10 @@ export const SelectVault: React.FC<ISelectVault> = ({
   return (
     <Select
       options={options}
-      onChange={(newValue): void => setVault(newValue?.value)}
+      onChange={(newValue): void => {
+        if (clearErrors) clearErrors()
+        setVault(newValue?.value)
+      }}
       isOptionDisabled={(option): boolean => option.disabled}
       styles={{
         control: baseStyles => ({

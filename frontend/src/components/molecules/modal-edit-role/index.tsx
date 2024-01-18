@@ -20,6 +20,7 @@ import React, { useState } from 'react'
 import { useForm, FieldValues } from 'react-hook-form'
 
 import { Loading } from 'components/atoms'
+import { GAService } from 'utils/ga'
 
 interface IModalReject {
   isOpen: boolean
@@ -56,6 +57,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
       })
 
       if (isSuccess) {
+        GAService.GAEvent('user_role_changed')
         onClose()
       }
     } catch (error) {

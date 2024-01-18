@@ -5,7 +5,13 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -16,6 +22,7 @@ import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { authorizeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -46,10 +53,15 @@ export const AuthorizeAccount: React.FC = () => {
   const toast = useToast()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    GAService.GAPageView('Authorize Account')
+  }, [])
+
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    wallet: string | undefined
+    wallet: string | undefined,
+    setWallet: Dispatch<SetStateAction<string | undefined>>
   ): Promise<void> => {
     if (!asset || !id) return
 
@@ -63,6 +75,7 @@ export const AuthorizeAccount: React.FC = () => {
 
       if (isSuccess) {
         setValue('wallet', '')
+        setWallet(undefined)
         toast({
           title: 'Authorize success!',
           description: `You authorized the account`,

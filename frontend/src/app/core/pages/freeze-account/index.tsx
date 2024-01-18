@@ -16,6 +16,7 @@ import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { freezeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -43,6 +44,10 @@ export const FreezeAccount: React.FC = () => {
 
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Freeze account')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,

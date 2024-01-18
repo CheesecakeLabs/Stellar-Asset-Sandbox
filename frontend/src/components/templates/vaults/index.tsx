@@ -2,6 +2,8 @@ import { Flex, Text, SimpleGrid, Box, Button } from '@chakra-ui/react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { GAService } from 'utils/ga'
+
 import { ItemVault } from './components/item-vault'
 import { LoaderSkeleton } from './components/loader-skeleton'
 import { PathRoute } from 'components/enums/path-route'
@@ -39,7 +41,10 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
           <Button
             variant="primary"
             leftIcon={<NewIcon />}
-            onClick={(): void => navigate({ pathname: PathRoute.VAULT_CREATE })}
+            onClick={(): void => {
+              GAService.GAEvent('create_vault_click')
+              navigate({ pathname: PathRoute.VAULT_CREATE })
+            }}
           >
             Create Vault
           </Button>

@@ -7,6 +7,7 @@ import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { havePermission } from 'utils'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -32,6 +33,10 @@ export const PublishInformation: React.FC = () => {
   const { id } = useParams()
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Publish Information Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -15,6 +16,10 @@ export const TokenManagement: React.FC = () => {
   const { getPagedAssets } = useAssets()
   const { userPermissions, getUserPermissions } = useAuth()
   const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    GAService.GAPageView('Token Management')
+  }, [])
 
   const LIMIT = 10
 

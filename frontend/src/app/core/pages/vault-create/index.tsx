@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -22,6 +23,11 @@ export const VaultCreate: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Vault Create')
+    GAService.GAEvent('create_vault_form_start')
+  }, [])
 
   const onSubmit = async (
     name: string,
@@ -45,6 +51,7 @@ export const VaultCreate: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('create_vault_success')
         navigate(PathRoute.VAULTS)
         return
       }

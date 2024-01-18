@@ -9,15 +9,15 @@ definitions:
       code:
         example: USDC
         type: string
+      contract_id:
+        type: string
       distributor:
         $ref: '#/definitions/entity.Wallet'
       id:
         example: 1
         type: integer
       image:
-        items:
-          type: integer
-        type: array
+        type: string
       issuer:
         $ref: '#/definitions/entity.Wallet'
       name:
@@ -30,6 +30,8 @@ definitions:
         type: string
       asset:
         $ref: '#/definitions/entity.Asset'
+      compound:
+        type: integer
       created_at:
         type: string
       id:
@@ -48,6 +50,24 @@ definitions:
         $ref: '#/definitions/entity.Vault'
       yield_rate:
         type: integer
+    type: object
+  entity.ContractHistory:
+    properties:
+      contract:
+        $ref: '#/definitions/entity.Contract'
+      deposit_amount:
+        type: number
+      deposited_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      user:
+        $ref: '#/definitions/entity.User'
+      withdraw_amount:
+        type: number
+      withdrawn_at:
+        type: string
     type: object
   entity.Currency:
     properties:
@@ -342,6 +362,10 @@ definitions:
         type: integer
       updated_at:
         type: string
+      vault:
+        $ref: '#/definitions/entity.Vault'
+      vault_id:
+        type: integer
     type: object
   entity.UserRole:
     properties:
@@ -373,8 +397,12 @@ definitions:
       name:
         example: Treasury
         type: string
+      owner_id:
+        type: integer
       vault_category:
         $ref: '#/definitions/entity.VaultCategory'
+      vault_category_id:
+        type: integer
       wallet:
         $ref: '#/definitions/entity.Wallet'
     type: object
@@ -402,6 +430,8 @@ definitions:
       type:
         example: sponsor
         type: string
+    type: object
+  v1.AddContractHistoryRequest:
     type: object
   v1.BurnAssetRequest:
     properties:
@@ -493,6 +523,9 @@ definitions:
       asset_id:
         example: "1"
         type: string
+      compound:
+        example: 1
+        type: integer
       min_deposit:
         example: 1
         type: integer
@@ -503,7 +536,7 @@ definitions:
         example: 1
         type: integer
       term:
-        example: 1
+        example: 60
         type: integer
       vault_id:
         example: "1"
@@ -541,13 +574,14 @@ definitions:
       name:
         example: Treasury
         type: string
+      owner_id:
+        type: integer
       vault_category_id:
         example: 1
         type: integer
     required:
     - assets_id
     - name
-    - vault_category_id
     type: object
   v1.CreateWalletRequest:
     properties:
@@ -691,6 +725,14 @@ definitions:
     - code
     - issuer
     type: object
+  v1.UpdateContractHistoryRequest:
+    type: object
+  v1.UpdateContractIdRequest:
+    properties:
+      contract_id:
+        example: iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///...
+        type: string
+    type: object
   v1.UpdateVaultAssetRequest:
     properties:
       asset_code:
@@ -802,13 +844,21 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get all assets with optional pagination
+      description: Get all assets with optional pagination and filtering
       parameters:
-      - description: Page number
+      - description: Filter by asset name
+        in: query
+        name: name
+        type: string
+      - description: Filter by asset type
+        in: query
+        name: asset_type
+        type: string
+      - description: Page number for pagination
         in: query
         name: page
         type: integer
-      - description: Number of items per page
+      - description: Number of items per page for pagination
         in: query
         name: limit
         type: integer
@@ -1142,6 +1192,36 @@ paths:
       summary: Transfer an asset
       tags:
       - Assets
+  /assets/update-contract-id:
+    put:
+      consumes:
+      - application/json
+      description: Update a Contract ID
+      parameters:
+      - description: Contract ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateContractIdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.UpdateContractIdRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update a Contract ID
+      tags:
+      - Assets
   /assets/update-toml:
     put:
       consumes:
@@ -1206,11 +1286,78 @@ paths:
       summary: Create a new contract
       tags:
       - Contract
+  /contract/history:
+    post:
+      consumes:
+      - application/json
+      description: Add contract history
+      parameters:
+      - description: History info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddContractHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ContractHistory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Add contract history
+      tags:
+      - Contract
+    put:
+      consumes:
+      - application/json
+      description: Update contract history
+      parameters:
+      - description: History info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateContractHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ContractHistory'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.response'
+      summary: Update contract history
+      tags:
+      - Contract
   /contracts:
     get:
       consumes:
       - application/json
-      description: Retrieve a list of all contracts, with optional pagination
+      description: Retrieve a list of history of contract
       parameters:
       - description: Page number for pagination
         in: query
@@ -1237,9 +1384,9 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/v1.response'
-      summary: Get all contracts
+      summary: Get contract history
       tags:
-      - Contract
+      - ContractHistory
   /log_transactions:
     get:
       consumes:
@@ -1817,6 +1964,21 @@ paths:
           schema:
             $ref: '#/definitions/v1.response'
       summary: Logout User
+      tags:
+      - user
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Forget Password
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.UserResponse'
+      summary: Forget Password
       tags:
       - user
   /users/edit-users-role:
