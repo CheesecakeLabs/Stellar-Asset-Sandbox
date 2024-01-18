@@ -41,6 +41,7 @@ func (r AssetRepo) GetAssets(filter entity.AssetFilter) ([]entity.Asset, error) 
         SELECT
             a.id, a.name, a.asset_type, a.code,
             COALESCE(a.image, '') AS image, a.contract_id,
+            a.authorize_required, a.clawback_enabled, a.freeze_enabled, 
             d.id, d.type, d.funded,
             dk.id, dk.public_key, dk.weight,
             i.id, i.type, i.funded,
@@ -99,6 +100,7 @@ func (r AssetRepo) GetAssets(filter entity.AssetFilter) ([]entity.Asset, error) 
 		err := rows.Scan(
 			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
 			&asset.ContractId,
+			&asset.AuthorizeRequired, &asset.ClawbackEnabled, &asset.FreezeEnabled,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -233,6 +235,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFi
         SELECT
             a.id, a.name, a.asset_type, a.code,
             COALESCE(a.image, '') AS image, a.contract_id,
+			a.authorize_required, a.clawback_enabled, a.freeze_enabled,
             d.id, d.type, d.funded,
             dk.id, dk.public_key, dk.weight,
             i.id, i.type, i.funded,
@@ -296,6 +299,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFi
 		err := rows.Scan(
 			&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
 			&asset.ContractId,
+			&asset.AuthorizeRequired, &asset.ClawbackEnabled, &asset.FreezeEnabled,
 			&distributor.Id, &distributor.Type, &distributor.Funded,
 			&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 			&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -401,7 +405,11 @@ func (r AssetRepo) UpdateContractId(assetId string, contractId string) error {
 
 func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 	res := data
-	stmt := `INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image, authorize_required, clawback_enabled, freeze_enabled ) VALUES ($1, $2, $3,$4, $5, $6) RETURNING id;`
+	stmt := `
+        INSERT INTO Asset (code, issuer_id, distributor_id, name, asset_type, image, authorize_required, clawback_enabled, freeze_enabled)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id;
+    `
 	err := r.Db.QueryRow(stmt, data.Code, data.Issuer.Id, data.Distributor.Id, data.Name, data.AssetType, data.Image, data.AuthorizeRequired, data.ClawbackEnabled, data.FreezeEnabled).Scan(&res.Id)
 	if err != nil {
 		return entity.Asset{}, fmt.Errorf("AssetRepo - CreateAsset - db.QueryRow: %w", err)
