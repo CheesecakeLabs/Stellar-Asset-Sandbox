@@ -890,9 +890,33 @@ func (r *assetsRoutes) getAllAssets(c *gin.Context) {
 	nameFilter := c.Query("name")
 	assetTypeFilter := c.Query("asset_type")
 
+	authorizeRequired, err := parseBoolQueryParameter(c.Query("authorize_required"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse authorize_required")
+		errorResponse(c, http.StatusBadRequest, "Invalid authorize_required parameter", err)
+		return
+	}
+
+	clawbackEnabled, err := parseBoolQueryParameter(c.Query("clawback_enabled"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse clawback_enabled")
+		errorResponse(c, http.StatusBadRequest, "Invalid clawback_enabled parameter", err)
+		return
+	}
+
+	freezeEnabled, err := parseBoolQueryParameter(c.Query("freeze_enabled"))
+	if err != nil {
+		r.logger.Error(err, "http - v1 - get all assets - parse freeze_enabled")
+		errorResponse(c, http.StatusBadRequest, "Invalid freeze_enabled parameter", err)
+		return
+	}
+
 	filter := entity.AssetFilter{
-		AssetName: nameFilter,
-		AssetType: assetTypeFilter,
+		AssetName:         nameFilter,
+		AssetType:         assetTypeFilter,
+		AuthorizeRequired: authorizeRequired,
+		ClawbackEnabled:   clawbackEnabled,
+		FreezeEnabled:     freezeEnabled,
 	}
 
 	if pageQuery != "" && limitQuery != "" {

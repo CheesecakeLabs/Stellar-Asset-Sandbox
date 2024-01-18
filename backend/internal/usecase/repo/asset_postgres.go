@@ -3,6 +3,7 @@ package repo
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -38,7 +39,7 @@ func (r AssetRepo) GetAsset(id int) (entity.Asset, error) {
 func (r AssetRepo) GetAssets(filter entity.AssetFilter) ([]entity.Asset, error) {
 	queryBuilder := `
         SELECT
-            a.id, a.name, a.asset_type, a.code, 
+            a.id, a.name, a.asset_type, a.code,
             COALESCE(a.image, '') AS image, a.contract_id,
             d.id, d.type, d.funded,
             dk.id, dk.public_key, dk.weight,
@@ -51,27 +52,35 @@ func (r AssetRepo) GetAssets(filter entity.AssetFilter) ([]entity.Asset, error) 
         JOIN key ik ON i.id = ik.wallet_id
     `
 
-	// Initialize arguments slice for query parameters
 	var args []interface{}
+	var conditions []string
 
-	// Apply filters
-	if filter.AssetName != "" || filter.AssetType != "" {
-		queryBuilder += "WHERE "
-		if filter.AssetName != "" {
-			queryBuilder += "a.name = $1 "
-			args = append(args, filter.AssetName)
-		}
-		if filter.AssetType != "" {
-			if len(args) > 0 {
-				queryBuilder += "AND "
-			}
-			queryBuilder += "a.asset_type = $2 "
-			args = append(args, filter.AssetType)
-		}
+	if filter.AssetName != "" {
+		conditions = append(conditions, "a.name = $"+strconv.Itoa(len(args)+1))
+		args = append(args, filter.AssetName)
+	}
+	if filter.AssetType != "" {
+		conditions = append(conditions, "a.asset_type = $"+strconv.Itoa(len(args)+1))
+		args = append(args, filter.AssetType)
+	}
+	if filter.AuthorizeRequired != nil {
+		conditions = append(conditions, "a.authorize_required = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.AuthorizeRequired)
+	}
+	if filter.ClawbackEnabled != nil {
+		conditions = append(conditions, "a.clawback_enabled = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.ClawbackEnabled)
+	}
+	if filter.FreezeEnabled != nil {
+		conditions = append(conditions, "a.freeze_enabled = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.FreezeEnabled)
 	}
 
-	// Add ordering
-	queryBuilder += "ORDER BY a.name;"
+	if len(conditions) > 0 {
+		queryBuilder += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	queryBuilder += " ORDER BY a.name;"
 
 	// Execute the query
 	rows, err := r.Db.Query(queryBuilder, args...)
@@ -216,14 +225,13 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	return asset, nil
 }
 
-func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFilter) ([]entity.Asset, int, error) {
-	// Calculate the offset
+func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFilter) ([]entity.Asset, int, error) { // Calculate the offset
 	offset := (page - 1) * limit
 
 	// Start building the SQL query
 	queryBuilder := `
         SELECT
-            a.id, a.name, a.asset_type, a.code, 
+            a.id, a.name, a.asset_type, a.code,
             COALESCE(a.image, '') AS image, a.contract_id,
             d.id, d.type, d.funded,
             dk.id, dk.public_key, dk.weight,
@@ -236,28 +244,39 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFi
         JOIN key ik ON i.id = ik.wallet_id
     `
 
-	// Initialize arguments slice for query parameters
 	var args []interface{}
+	var conditions []string
 
-	// Apply filters
-	whereClauses := []string{}
+	// Existing filter conditions
 	if filter.AssetName != "" {
-		whereClauses = append(whereClauses, "a.name = ?")
+		conditions = append(conditions, "a.name = $"+strconv.Itoa(len(args)+1))
 		args = append(args, filter.AssetName)
 	}
 	if filter.AssetType != "" {
-		whereClauses = append(whereClauses, "a.asset_type = ?")
+		conditions = append(conditions, "a.asset_type = $"+strconv.Itoa(len(args)+1))
 		args = append(args, filter.AssetType)
 	}
-	if len(whereClauses) > 0 {
-		queryBuilder += "WHERE " + strings.Join(whereClauses, " AND ")
+
+	// New filter conditions for control flags
+	if filter.AuthorizeRequired != nil {
+		conditions = append(conditions, "a.authorize_required = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.AuthorizeRequired)
+	}
+	if filter.ClawbackEnabled != nil {
+		conditions = append(conditions, "a.clawback_enabled = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.ClawbackEnabled)
+	}
+	if filter.FreezeEnabled != nil {
+		conditions = append(conditions, "a.freeze_enabled = $"+strconv.Itoa(len(args)+1))
+		args = append(args, *filter.FreezeEnabled)
+	}
+
+	if len(conditions) > 0 {
+		queryBuilder += " WHERE " + strings.Join(conditions, " AND ")
 	}
 
 	// Add ordering and pagination
-	queryBuilder += `
-        ORDER BY a.name
-        LIMIT ? OFFSET ?;
-    `
+	queryBuilder += " ORDER BY a.name LIMIT $" + strconv.Itoa(len(args)+1) + " OFFSET $" + strconv.Itoa(len(args)+2)
 	args = append(args, limit, offset)
 
 	// Execute the query
@@ -298,19 +317,23 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFi
 		assets = append(assets, asset)
 	}
 
-	var totalAssets int
-
 	// Check for errors after iterating through the rows
 	if err = rows.Err(); err != nil {
 		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - rows.Err: %w", err)
 	}
 
-	// Query to count the total number of assets after applying the filters
+	countArgs := make([]interface{}, len(args)-2)
+	copy(countArgs, args[:len(args)-2])
+
+	// Building count query
 	countQueryBuilder := "SELECT COUNT(*) FROM asset a "
-	if len(whereClauses) > 0 {
-		countQueryBuilder += "WHERE " + strings.Join(whereClauses, " AND ")
+	if len(conditions) > 0 {
+		countQueryBuilder += " WHERE " + strings.Join(conditions, " AND ")
 	}
-	err = r.Db.QueryRow(countQueryBuilder, args...).Scan(&totalAssets)
+
+	// Execute the count query
+	var totalAssets int
+	err = r.Db.QueryRow(countQueryBuilder, countArgs...).Scan(&totalAssets)
 	if err != nil {
 		return nil, 0, fmt.Errorf("AssetRepo - GetPaginated - Count Query: %w", err)
 	}
