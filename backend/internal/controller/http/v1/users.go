@@ -242,7 +242,7 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 // @Tags user
 // @Accept json
 // @Produce json
-// @Success 200  {object} entity.
+// @Success 200  {object} entity.UserResponse
 // @Router /users [get]
 func (r *usersRoutes) forgetPassword(c *gin.Context) {
 }

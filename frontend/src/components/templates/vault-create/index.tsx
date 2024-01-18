@@ -4,11 +4,14 @@ import {
   Button,
   Container,
   Flex,
+  FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   Text,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
+import { FieldValues, useForm } from 'react-hook-form'
 
 import { SelectAssets } from './select-assets'
 import { SelectCategory } from './select-category'
@@ -40,21 +43,31 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
   createVaultCategory,
 }) => {
   const [errorSubmit] = useState<string | null>(null)
-  const [name, setName] = useState<string>()
   const [categorySelected, setCategorySelected] = useState<
     IOption | undefined | null
   >()
   const [assetsSelecteds, setAssetsSelecteds] = useState<number[]>([])
 
-  const submit = (): void => {
-    if (!name || !categorySelected || !assetsSelecteds) return
-    onSubmit(name, categorySelected.value, assetsSelecteds)
-  }
+  const {
+    handleSubmit,
+    register,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm()
 
-  const handleName = (event: {
-    target: { name: string; value: string }
-  }): void => {
-    setName(event.target.value)
+  const handleForm = (data: FieldValues): void => {
+    let hasError = false
+
+    if (!categorySelected) {
+      setError('category', { message: 'This field is required' })
+      hasError = true
+    }
+
+    if (!hasError && categorySelected) {
+      onSubmit(data.name, categorySelected.value, assetsSelecteds)
+    }
   }
 
   return (
@@ -70,47 +83,61 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
           </Alert>
         )}
         <Container variant="primary" justifyContent="center" p="2rem">
-          <FormLabel>Vault name</FormLabel>
-          <Input
-            type="text"
-            placeholder="Vault name"
-            autoComplete="off"
-            onChange={handleName}
-          />
-
-          {vaultCategories && (
-            <>
-              <FormLabel mt="1.5rem">Vault category</FormLabel>
-              <SelectCategory
-                vaultCategories={vaultCategories}
-                createVaultCategory={createVaultCategory}
-                setCategorySelected={setCategorySelected}
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
+            <FormControl isInvalid={errors?.name !== undefined}>
+              <FormLabel>Vault name</FormLabel>
+              <Input
+                type="text"
+                placeholder="Vault name"
+                autoComplete="off"
+                {...register('name', {
+                  required: true,
+                })}
               />
-            </>
-          )}
+              <FormErrorMessage>Vault name must be between 2 and 48 characters long</FormErrorMessage>
+            </FormControl>
 
-          {assets && (
-            <>
-              <FormLabel mt="1.5rem">Assets</FormLabel>
-              <SelectAssets
-                assets={assets}
-                setAssetsSelecteds={setAssetsSelecteds}
-                assetsSelecteds={assetsSelecteds}
-              />
-            </>
-          )}
+            <FormControl isInvalid={errors?.category !== undefined}>
+              {vaultCategories && (
+                <>
+                  <FormLabel mt="1.5rem">Vault category</FormLabel>
+                  <SelectCategory
+                    vaultCategories={vaultCategories}
+                    createVaultCategory={createVaultCategory}
+                    setCategorySelected={setCategorySelected}
+                    clearErrors={(): void => {
+                      clearErrors('category')
+                    }}
+                  />
+                </>
+              )}
+              <FormErrorMessage>
+                {errors?.category?.message?.toString()}
+              </FormErrorMessage>
+            </FormControl>
 
-          <Flex justifyContent="flex-end" mt="1rem">
-            <Button
-              type="submit"
-              variant="primary"
-              mt="1.5rem"
-              isLoading={loading}
-              onClick={submit}
-            >
-              Create vault
-            </Button>
-          </Flex>
+            {assets && (
+              <>
+                <FormLabel mt="1.5rem">Assets</FormLabel>
+                <SelectAssets
+                  assets={assets}
+                  setAssetsSelecteds={setAssetsSelecteds}
+                  assetsSelecteds={assetsSelecteds}
+                />
+              </>
+            )}
+
+            <Flex justifyContent="flex-end" mt="1rem">
+              <Button
+                type="submit"
+                variant="primary"
+                mt="1.5rem"
+                isLoading={loading}
+              >
+                Create vault
+              </Button>
+            </Flex>
+          </form>
         </Container>
       </Flex>
     </Flex>

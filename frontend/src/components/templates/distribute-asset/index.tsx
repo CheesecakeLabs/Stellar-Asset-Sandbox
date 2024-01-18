@@ -45,31 +45,51 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
     getValues,
   } = useForm()
   const [wallet, setWallet] = useState<string | undefined>()
+
+  const handleForm = (data: FieldValues): void => {
+    clearErrors()
+    let hasError = false
+    if (!data.amount) {
+      setError('amount', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!wallet) {
+      setError('wallet', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!hasError) {
+      onSubmit(data, setValue, wallet)
+    }
+  }
 
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" p="0" maxW="full">
         <AssetHeader asset={asset} />
         <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue, wallet)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             <Flex justifyContent="flex-end" w="full">
               <Tooltip label={TooltipsData.distribute}>
                 <HelpIcon width="20px" />
               </Tooltip>
             </Flex>
-            <FormControl
-              isInvalid={errors?.destination_wallet_id !== undefined}
-            >
+            <FormControl isInvalid={errors?.wallet !== undefined}>
               <FormLabel>Destination</FormLabel>
-              <SelectVault vaults={vaults} setWallet={setWallet} />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <SelectVault
+                vaults={vaults}
+                setWallet={setWallet}
+                clearErrors={(): void => {
+                  clearErrors('wallet')
+                }}
+              />
+              <FormErrorMessage>
+                {errors?.wallet?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
@@ -82,10 +102,13 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
+                  clearErrors('amount')
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <FormErrorMessage>
+                {errors?.amount?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
 
             <Text

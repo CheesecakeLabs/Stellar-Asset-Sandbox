@@ -6,6 +6,7 @@ import {
   Container,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Input,
   InputGroup,
@@ -62,7 +63,14 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
   const [compoundType, setCompoundType] =
     useState<TSelectCompoundType>('Simple interest')
 
-  const { handleSubmit, setValue, getValues } = useForm()
+  const {
+    handleSubmit,
+    setValue,
+    getValues,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm()
 
   const filteredAssets = (): Hooks.UseAssetsTypes.IAssetDto[] | undefined => {
     return (
@@ -74,6 +82,39 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
         )
       ) || []
     )
+  }
+
+  const handleForm = (data: FieldValues): void => {
+    let hasError = false
+
+    if (!vault) {
+      setError('vault', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!asset) {
+      setError('asset', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!data.min_deposit) {
+      setError('min_deposit', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!data.term) {
+      setError('term', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!data.term) {
+      setError('yield_rate', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!data.term) {
+      setError('penalty_rate', { message: 'This field is required' })
+      hasError = true
+    }
+
+    if (!hasError && vault && asset) {
+      onSubmit(data, asset, vault, compoundType, compound)
+    }
   }
 
   return (
@@ -111,31 +152,34 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
             <Skeleton w="full" h="16rem" />
           ) : (
             <Box p="1rem">
-              <form
-                onSubmit={handleSubmit(data => {
-                  if (!asset) {
-                    throw new Error('Invalid asset')
-                  }
-
-                  if (!vault) {
-                    throw new Error('Invalid vault')
-                  }
-
-                  onSubmit(data, asset, vault, compoundType, compound)
-                })}
-              >
+              <form onSubmit={handleSubmit(data => handleForm(data))}>
                 <Flex flexDir={{ base: 'column', md: 'row' }} gap="1.5rem">
-                  <FormControl>
-                    <FormLabel>Vault</FormLabel>
-                    <SelectVault vaults={vaults} setVault={setVault} />
+                  <FormControl isInvalid={errors?.vault !== undefined}>
+                    <FormLabel>Vault*</FormLabel>
+                    <SelectVault
+                      vaults={vaults}
+                      setVault={setVault}
+                      clearErrors={(): void => {
+                        clearErrors('vault')
+                      }}
+                    />
+                    <FormErrorMessage>
+                      {errors?.vault?.message?.toString()}
+                    </FormErrorMessage>
                   </FormControl>
 
-                  <FormControl>
-                    <FormLabel>Asset</FormLabel>
+                  <FormControl isInvalid={errors?.asset !== undefined}>
+                    <FormLabel>Asset*</FormLabel>
                     <SelectAsset
                       assets={filteredAssets()}
                       setAsset={setAsset}
+                      clearErrors={(): void => {
+                        clearErrors('asset')
+                      }}
                     />
+                    <FormErrorMessage>
+                      {errors?.asset?.message?.toString()}
+                    </FormErrorMessage>
                   </FormControl>
                 </Flex>
 
@@ -149,8 +193,8 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     flexDir={{ base: 'column', md: 'row' }}
                     gap="1.5rem"
                   >
-                    <FormControl>
-                      <FormLabel>Minimum Deposit</FormLabel>
+                    <FormControl isInvalid={errors?.min_deposit !== undefined}>
+                      <FormLabel>Minimum Deposit*</FormLabel>
                       <Input
                         as={NumericFormat}
                         decimalScale={7}
@@ -159,13 +203,17 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                         autoComplete="off"
                         value={getValues('min_deposit')}
                         onChange={(event): void => {
+                          clearErrors('min_deposit')
                           setValue('min_deposit', toNumber(event.target.value))
                         }}
                       />
+                      <FormErrorMessage>
+                        {errors?.min_deposit?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
 
-                    <FormControl>
-                      <FormLabel>Term</FormLabel>
+                    <FormControl isInvalid={errors?.term !== undefined}>
+                      <FormLabel>Term*</FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -174,11 +222,15 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                           autoComplete="off"
                           value={getValues('term')}
                           onChange={(event): void => {
+                            clearErrors('term')
                             setValue('term', toNumber(event.target.value))
                           }}
                         />
                         <InputRightAddon children="days" />
                       </InputGroup>
+                      <FormErrorMessage>
+                        {errors?.term?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
                   </Flex>
 
@@ -187,8 +239,8 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     flexDir={{ base: 'column', md: 'row' }}
                     gap="1.5rem"
                   >
-                    <FormControl>
-                      <FormLabel>Yield Rate</FormLabel>
+                    <FormControl isInvalid={errors?.yield_rate !== undefined}>
+                      <FormLabel>Yield Rate*</FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -196,15 +248,19 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                           autoComplete="off"
                           placeholder="Yield Rate"
                           onChange={(event): void => {
+                            clearErrors('yield_rate')
                             setValue('yield_rate', toNumber(event.target.value))
                           }}
                         />
                         <InputRightAddon children="%" />
                       </InputGroup>
+                      <FormErrorMessage>
+                        {errors?.yield_rate?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
 
-                    <FormControl>
-                      <FormLabel>Penalty rate</FormLabel>
+                    <FormControl isInvalid={errors?.penalty_rate !== undefined}>
+                      <FormLabel>Penalty rate*</FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -214,6 +270,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                           autoComplete="off"
                           value={getValues('penalty_rate')}
                           onChange={(event): void => {
+                            clearErrors('penalty_rate')
                             setValue(
                               'penalty_rate',
                               toNumber(event.target.value)
@@ -222,6 +279,9 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                         />
                         <InputRightAddon children="%" />
                       </InputGroup>
+                      <FormErrorMessage>
+                        {errors?.penalty_rate?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
                   </Flex>
                 </Flex>
@@ -236,7 +296,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   _dark={{ bg: 'black.600' }}
                 >
                   <FormControl w="full">
-                    <FormLabel>Compound</FormLabel>
+                    <FormLabel>Compound*</FormLabel>
                     <SelectCompoundType
                       compoundType={compoundType}
                       setCompoundType={setCompoundType}

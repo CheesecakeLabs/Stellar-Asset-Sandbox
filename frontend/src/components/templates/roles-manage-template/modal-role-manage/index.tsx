@@ -45,6 +45,7 @@ export const ModalRoleManage: React.FC<IModalRoleManage> = ({
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     setErrorSubmit(null)
+
     try {
       const isSuccess = await handleRole(data.name, role?.id)
 
@@ -85,14 +86,14 @@ export const ModalRoleManage: React.FC<IModalRoleManage> = ({
                 onSubmit(data)
               })}
             >
-              <FormControl isInvalid={errors?.role_id !== undefined}>
+              <FormControl isInvalid={errors?.name !== undefined}>
                 <FormLabel mt="1.5rem">Role</FormLabel>
                 <Input
                   placeholder="Role name"
                   {...register('name', { required: true })}
                   defaultValue={role?.name}
                 />
-                <FormErrorMessage>Inform the role</FormErrorMessage>
+                <FormErrorMessage>This field is required</FormErrorMessage>
               </FormControl>
               <Button
                 w="full"
