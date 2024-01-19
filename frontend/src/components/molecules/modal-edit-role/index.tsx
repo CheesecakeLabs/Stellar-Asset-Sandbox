@@ -99,7 +99,6 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   <FormControl isInvalid={errors?.role_id !== undefined}>
                     <FormLabel mt="1.5rem">Role</FormLabel>
                     <Select
-                      placeholder="Select role"
                       {...register('role_id', { required: true })}
                       defaultValue={user.role_id}
                     >

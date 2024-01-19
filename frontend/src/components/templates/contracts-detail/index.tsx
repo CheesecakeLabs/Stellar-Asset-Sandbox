@@ -111,7 +111,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                   onSubmit={onSubmitWithdraw}
                   contract={contract}
                   loading={isWithdrawing}
-                  isDone={!contractData.timeLeft || contractData.timeLeft === 0}
+                  isDone={!timerCounter || timerCounter === 0}
                   withdrawValue={
                     contractData.timeLeft && contractData.timeLeft > 0
                       ? Number(contractData.estimatedPrematureWithdraw)

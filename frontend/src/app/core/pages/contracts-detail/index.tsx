@@ -173,6 +173,7 @@ export const ContractsDetail: React.FC = () => {
 
       if (isSuccess) {
         loadContractData()
+        loadTimer()
         await addContractHistory({
           deposit_amount: Number(data.amount),
           contract_id: contract.id,
