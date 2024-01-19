@@ -58,7 +58,6 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
               _dark={{ fill: 'white' }}
             >
               <Text>Team members</Text>
-              <InfoIcon />
             </Flex>
           </Flex>
           {loading ? (
@@ -72,7 +71,6 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                   <Th>ID</Th>
                   <Th>Member</Th>
                   <Th>Role</Th>
-                  <Th w="1rem" p={0}></Th>
                 </Tr>
               </Thead>
               <Tbody>

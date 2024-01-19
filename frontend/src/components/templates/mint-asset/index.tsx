@@ -72,17 +72,19 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
         <Box p="1rem" w="full">
           <form onSubmit={handleSubmit(data => handleForm(data))}>
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex justifyContent="space-between" w="full" px="0.25rem">
+              <Flex w="full" px="0.25rem" alignItems="center">
                 <FormLabel>Amount to mint</FormLabel>
-                <Tooltip label={TooltipsData.mint}>
-                  <HelpIcon width="20px" />
-                </Tooltip>
+                <Box pb={2}>
+                  <Tooltip label={TooltipsData.mint}>
+                    <HelpIcon width="14px" />
+                  </Tooltip>
+                </Box>
               </Flex>
               <Input
                 as={NumericFormat}
                 decimalScale={7}
                 thousandSeparator=","
-                placeholder="Type the amount you want to mint..."
+                placeholder="Amount to mint..."
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {

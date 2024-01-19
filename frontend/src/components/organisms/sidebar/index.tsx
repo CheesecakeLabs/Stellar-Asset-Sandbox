@@ -38,7 +38,7 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Token Management',
+    name: 'Asset Management',
     icon: <PaymentsIcon />,
     path: PathRoute.TOKEN_MANAGEMENT,
   },

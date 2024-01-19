@@ -1,20 +1,12 @@
 import {
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Td,
   Tr,
   useDisclosure,
 } from '@chakra-ui/react'
-import React, { ReactNode } from 'react'
+import React from 'react'
 
-import { havePermission } from 'utils'
 import { formatName } from 'utils/formatter'
 
-import { Permissions } from 'components/enums/permissions'
-import { MenuDotsIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
 
 interface IItemUser {
@@ -32,7 +24,6 @@ export const ItemUser: React.FC<IItemUser> = ({
   handleEditRole,
   roles,
   loadingRoles,
-  permissions,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -51,7 +42,7 @@ export const ItemUser: React.FC<IItemUser> = ({
         <Td>{user.id}</Td>
         <Td>{formatName(user.name)}</Td>
         <Td>{user.role}</Td>
-        <Td w="1rem" p={0}>
+        {/* <Td w="1rem" p={0}>
           {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
             <Menu>
               {({ isOpen }): ReactNode => (
@@ -74,7 +65,7 @@ export const ItemUser: React.FC<IItemUser> = ({
               )}
             </Menu>
           )}
-        </Td>
+        </Td>*/}
       </Tr>
     </>
   )
