@@ -87,8 +87,12 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
           px="0.75rem"
           py="0.25rem"
         >
-          <Text fontSize="xs" py="0.25rem" lineHeight="20px">
+          <Text fontSize="xs" fontWeight="bold">
             {Authentication.getUser()?.name || '-'}
+          </Text>
+
+          <Text fontSize="xs">
+            {profile?.role || ''}
           </Text>
         </Container>
       )}
@@ -101,7 +105,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
               w="max-content"
               mr="1rem"
               px="0.75rem"
-              py="0.25rem"
+              py="0.5rem"
               display="flex"
               flexDir="row"
               alignItems="center"
