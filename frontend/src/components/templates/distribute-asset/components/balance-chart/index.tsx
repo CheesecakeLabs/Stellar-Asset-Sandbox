@@ -3,8 +3,6 @@ import React from 'react'
 
 import { toCrypto } from 'utils/formatter'
 
-import { HelpIcon } from 'components/icons'
-
 interface IBalanceChart {
   supply: number
   mainVault: number

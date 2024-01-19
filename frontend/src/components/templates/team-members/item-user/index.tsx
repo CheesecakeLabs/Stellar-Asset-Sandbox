@@ -25,7 +25,7 @@ export const ItemUser: React.FC<IItemUser> = ({
   roles,
   loadingRoles,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { isOpen, onClose } = useDisclosure()
 
   return (
     <>

@@ -11,7 +11,6 @@ import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
 import { CustomAccountHandler } from 'soroban'
-import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext

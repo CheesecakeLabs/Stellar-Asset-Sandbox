@@ -13,7 +13,6 @@ import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
-import { InfoIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
 import { ItemUser } from './item-user'

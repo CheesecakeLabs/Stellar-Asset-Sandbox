@@ -31,16 +31,6 @@ interface ICODParams {
   allowancePeriod: number
 }
 
-interface IHeaderTx {
-  header: {
-    source: string
-    fee: string
-    timeout: number
-  }
-  signers: CustomAccountHandler[],
-  feeBump: TransactionInvocation
-}
-
 const customSign = async (
   tx: Transaction | FeeBumpTransaction,
   publicKey: string
