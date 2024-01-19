@@ -252,7 +252,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   ): Promise<number | undefined> => {
     try {
       const contract = getContractData(contractId)
-      return contract.getEstimatedPrematureWithdraw({
+      return contract.getTimeLeft({
         address: address,
         ...userTxInvocation(sourcePk),
       })
