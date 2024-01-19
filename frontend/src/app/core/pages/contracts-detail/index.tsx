@@ -37,6 +37,7 @@ export const ContractsDetail: React.FC = () => {
     useState<Hooks.UseContractsTypes.IContractData>()
   const [history, setHistory] = useState<Hooks.UseContractsTypes.IHistory[]>()
   const [currentInVault, setCurrentInVault] = useState<string>()
+  const [timerCounter, setTimerCounter] = useState<number>()
 
   const { id } = useParams()
   const navigate = useNavigate()
@@ -44,6 +45,33 @@ export const ContractsDetail: React.FC = () => {
   useEffect(() => {
     getUserPermissions()
   }, [getUserPermissions])
+
+  const loadTimer = useCallback(async (): Promise<void> => {
+    if (id) {
+      const contract = await getContract(id)
+      setContract(contract)
+      const profile = await getProfile()
+      setProfile(profile)
+
+      if (profile && contract) {
+        const wallet = profile.vault?.wallet.key.publicKey
+
+        let timeLeft = contractData?.timeLeft
+
+        const position =
+          Number((await getPosition(wallet, contract.address, wallet)) || 0) /
+          10000000
+
+        timeLeft =
+          position > 0
+            ? Number((await getTimeLeft(wallet, contract.address, wallet)) || 0)
+            : 0
+
+        setTimerCounter(Date.now() + (timeLeft || 0) * 1000)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const loadContractData = useCallback(async (): Promise<void> => {
     if (id) {
@@ -62,20 +90,28 @@ export const ContractsDetail: React.FC = () => {
         let timeLeft = contractData?.timeLeft
 
         const position =
-          Number((await getPosition(wallet, contract.address)) || 0) / 10000000
+          Number((await getPosition(wallet, contract.address, wallet)) || 0) /
+          10000000
 
         const userYield =
-          Number((await getYield(wallet, contract.address)) || 0) / 10000000
+          Number((await getYield(wallet, contract.address, wallet)) || 0) /
+          10000000
 
         const estimatedPrematureWithdraw =
           Number(
-            (await getEstimatedPrematureWithdraw(wallet, contract.address)) || 0
+            (await getEstimatedPrematureWithdraw(
+              wallet,
+              contract.address,
+              wallet
+            )) || 0
           ) / 10000000
 
         if (!timeLeft) {
           timeLeft =
             position > 0
-              ? Number((await getTimeLeft(wallet, contract.address)) || 0)
+              ? Number(
+                  (await getTimeLeft(wallet, contract.address, wallet)) || 0
+                )
               : 0
         }
 
@@ -106,6 +142,7 @@ export const ContractsDetail: React.FC = () => {
 
   useEffect(() => {
     const interval = updatePeriodically()
+    loadTimer()
     loadContractData()
 
     return () => {
@@ -128,7 +165,7 @@ export const ContractsDetail: React.FC = () => {
 
     try {
       const isSuccess = await deposit(
-        BigInt(data.amount),
+        BigInt(data.amount * 10000000),
         profile.vault.wallet.key.publicKey,
         contract.address,
         profile.vault.wallet.key.publicKey
@@ -173,7 +210,8 @@ export const ContractsDetail: React.FC = () => {
       const isSuccess = await withdraw(
         profile.vault.wallet.key.publicKey,
         true,
-        contract.address
+        contract.address,
+        profile.vault?.wallet.key.publicKey
       )
 
       if (isSuccess) {
@@ -268,6 +306,7 @@ export const ContractsDetail: React.FC = () => {
           history={history}
           userPermissions={userPermissions}
           currentInVault={currentInVault}
+          timerCounter={timerCounter}
         />
       </Sidebar>
     </Flex>

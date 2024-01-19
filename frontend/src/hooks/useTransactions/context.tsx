@@ -16,26 +16,6 @@ interface IProps {
 export const TransactionsProvider: React.FC<IProps> = ({ children }) => {
   const [loading, setLoading] = useState(false)
 
-  const sign = async (
-    params: Hooks.UseTransactionsTypes.ISignRequest
-  ): Promise<Hooks.UseTransactionsTypes.ISignResponse | undefined> => {
-    setLoading(true)
-    try {
-      const response = await http.post(`soroban-transactions/sign`, params)
-      if (response.status === 200) {
-        return response.data.Message
-      }
-      return undefined
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.message)
-      }
-      throw new Error(MessagesError.errorOccurred)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const submit = async (
     params: Hooks.UseTransactionsTypes.ISubmitRequest
   ): Promise<string | undefined> => {
@@ -78,7 +58,6 @@ export const TransactionsProvider: React.FC<IProps> = ({ children }) => {
     <TransactionsContext.Provider
       value={{
         loading,
-        sign,
         submit,
         getSponsorPK
       }}
