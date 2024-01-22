@@ -105,7 +105,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                   })}
                 />
                 <FormErrorMessage>
-                  Name must be between 2 and 25 characters long”
+                  Name must be between 2 and 25 characters long
                 </FormErrorMessage>
               </FormControl>
 
