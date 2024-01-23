@@ -5,11 +5,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
 import { useContracts } from 'hooks/useContracts'
+import { useTransactions } from 'hooks/useTransactions'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsDetailTemplate } from 'components/templates/contracts-detail'
+import { ContractsService } from 'soroban/contracts-service'
 
 export const ContractsDetail: React.FC = () => {
   const {
@@ -28,6 +30,7 @@ export const ContractsDetail: React.FC = () => {
   const { getProfile } = useAuth()
   const { getHistory } = useContracts()
   const { userPermissions, getUserPermissions } = useAuth()
+  const { getSponsorPK } = useTransactions()
   const toast = useToast()
 
   const [loadingPosition, setLoadingPosition] = useState(true)
@@ -55,16 +58,27 @@ export const ContractsDetail: React.FC = () => {
 
       if (profile && contract) {
         const wallet = profile.vault?.wallet.key.publicKey
+        const sponsor = await getSponsorPK()
+
+        if (!sponsor) throw new Error('Invalid sponsor')
 
         let timeLeft = contractData?.timeLeft
 
         const position =
-          Number((await getPosition(wallet, contract.address, wallet)) || 0) /
-          10000000
+          Number(
+            (await getPosition(wallet, contract.address, wallet, sponsor)) || 0
+          ) / 10000000
 
         timeLeft =
           position > 0
-            ? Number((await getTimeLeft(wallet, contract.address, wallet)) || 0)
+            ? Number(
+                (await getTimeLeft(
+                  wallet,
+                  contract.address,
+                  wallet,
+                  sponsor
+                )) || 0
+              )
             : 0
 
         setTimerCounter(Date.now() + (timeLeft || 0) * 1000)
@@ -86,23 +100,31 @@ export const ContractsDetail: React.FC = () => {
 
       if (profile && contract) {
         const wallet = profile.vault?.wallet.key.publicKey
+        const sponsor = await getSponsorPK()
+
+        if (!sponsor) throw new Error('Invalid sponsor')
 
         let timeLeft = contractData?.timeLeft
 
+        await ContractsService.validateContract(sponsor, contract.address)
+        
         const position =
-          Number((await getPosition(wallet, contract.address, wallet)) || 0) /
-          10000000
+          Number(
+            (await getPosition(wallet, contract.address, wallet, sponsor)) || 0
+          ) / 10000000
 
         const userYield =
-          Number((await getYield(wallet, contract.address, wallet)) || 0) /
-          10000000
+          Number(
+            (await getYield(wallet, contract.address, wallet, sponsor)) || 0
+          ) / 10000000
 
         const estimatedPrematureWithdraw =
           Number(
             (await getEstimatedPrematureWithdraw(
               wallet,
               contract.address,
-              wallet
+              wallet,
+              sponsor
             )) || 0
           ) / 10000000
 
@@ -110,7 +132,12 @@ export const ContractsDetail: React.FC = () => {
           timeLeft =
             position > 0
               ? Number(
-                  (await getTimeLeft(wallet, contract.address, wallet)) || 0
+                  (await getTimeLeft(
+                    wallet,
+                    contract.address,
+                    wallet,
+                    sponsor
+                  )) || 0
                 )
               : 0
         }
@@ -142,7 +169,7 @@ export const ContractsDetail: React.FC = () => {
 
   useEffect(() => {
     const interval = updatePeriodically()
-    loadTimer()
+    //loadTimer()
     loadContractData()
 
     return () => {
@@ -164,11 +191,15 @@ export const ContractsDetail: React.FC = () => {
     if (!contract || !profile?.vault) return
 
     try {
+      const sponsor = await getSponsorPK()
+      if (!sponsor) throw new Error('Invalid sponsor')
+
       const isSuccess = await deposit(
         BigInt(data.amount * 10000000),
         profile.vault.wallet.key.publicKey,
         contract.address,
-        profile.vault.wallet.key.publicKey
+        profile.vault.wallet.key.publicKey,
+        sponsor
       )
 
       if (isSuccess) {
@@ -208,11 +239,15 @@ export const ContractsDetail: React.FC = () => {
     if (!contract || !profile) return
 
     try {
+      const sponsor = await getSponsorPK()
+      if (!sponsor) throw new Error('Invalid sponsor')
+
       const isSuccess = await withdraw(
         profile.vault.wallet.key.publicKey,
         true,
         contract.address,
-        profile.vault?.wallet.key.publicKey
+        profile.vault?.wallet.key.publicKey,
+        sponsor
       )
 
       if (isSuccess) {

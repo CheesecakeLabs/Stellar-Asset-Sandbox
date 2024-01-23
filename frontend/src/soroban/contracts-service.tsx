@@ -1,17 +1,23 @@
 import { FieldValues } from 'react-hook-form'
 
 import axios from 'axios'
+import { CustomAccountHandler } from 'soroban'
 import { StellarPlus } from 'stellar-plus'
 import { SACHandler } from 'stellar-plus/lib/stellar-plus/asset'
-import { FeeBumpHeader, FeeBumpTransaction, Transaction, TransactionInvocation, TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
+import {
+  FeeBumpHeader,
+  FeeBumpTransaction,
+  Transaction,
+  TransactionInvocation,
+  TransactionXdr,
+} from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
 
 import { http } from 'interfaces/http'
 
-import { STELLAR_NETWORK, vcRpcHandler } from './constants'
-import { CustomAccountHandler } from 'soroban'
+import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from './constants'
 
 export const TOKEN_DECIMALS = 10000000
 export const BUMP_FEE = '10000000'
@@ -69,7 +75,7 @@ const loadToken = (asset: Hooks.UseAssetsTypes.IAssetDto): SACHandler => {
     code: asset.code,
     issuerPublicKey: asset.issuer.key.publicKey,
     network: STELLAR_NETWORK,
-    rpcHandler: vcRpcHandler
+    rpcHandler: vcRpcHandler,
   })
 }
 
@@ -90,7 +96,11 @@ const loadAccount = (publicKey: string | undefined): CustomAccountHandler => {
   })
 }
 
-const getTxInvocation = (account: CustomAccountHandler, fee: string, feeBump?: FeeBumpHeader): TransactionInvocation => {
+const getTxInvocation = (
+  account: CustomAccountHandler,
+  fee: string,
+  feeBump?: FeeBumpHeader
+): TransactionInvocation => {
   return {
     header: {
       source: account.getPublicKey(),
@@ -98,7 +108,7 @@ const getTxInvocation = (account: CustomAccountHandler, fee: string, feeBump?: F
       timeout: TIMEOUT,
     },
     signers: [account],
-    feeBump: feeBump
+    feeBump: feeBump,
   }
 }
 
@@ -143,10 +153,48 @@ const validateParamsCOD = async (
   return codParams
 }
 
+const validateContract = async (
+  sponsorPK: string,
+  contractId?: string
+): Promise<void> => {
+  const opex = ContractsService.loadAccount(sponsorPK)
+  const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+  const contract = new StellarPlus.Contracts.CertificateOfDeposit({
+    network: STELLAR_NETWORK,
+    contractId: contractId,
+    rpcHandler: vcRpcHandler,
+    wasmHash: WASM_HASH,
+    options: {
+      restoreTxInvocation: restoreTxInvocation,
+    },
+  })
+
+  const server = new StellarPlus.SorobanHandler(STELLAR_NETWORK).server
+  const latestLedger = await server.getLatestLedger()
+
+  const codeLiveUntilLedgerSeq =
+    await contract.getContractCodeLiveUntilLedgerSeq()
+
+  if (codeLiveUntilLedgerSeq < latestLedger.sequence) {
+    await contract.restoreContractCode(restoreTxInvocation)
+  }
+
+  if (contractId) {
+    const instanceLiveUntilLedgerSeq =
+      await contract.getContractInstanceLiveUntilLedgerSeq()
+
+    if (instanceLiveUntilLedgerSeq < latestLedger.sequence) {
+      await contract.restoreContractFootprint(restoreTxInvocation)
+    }
+  }
+}
+
 export const ContractsService = {
   customSign,
   loadToken,
   validateParamsCOD,
   loadAccount,
   getTxInvocation,
+  validateContract,
 }
