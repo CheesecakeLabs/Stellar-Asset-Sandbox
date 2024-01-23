@@ -64,6 +64,25 @@ declare namespace Hooks {
       totalPages: number
     }
 
+    interface IInvocation {
+      header: {
+        source: string,
+        timeout: number,
+        fee: string,
+      },
+      signers: CustomAccountHandlerClient[],
+    }
+
+    interface ISignRequest {
+      envelope: string
+      wallet_pk?: string
+    }
+
+    interface ISignResponse {
+      envelope: string
+      hash: string
+    }
+
     interface IContractsContext {
       loading: boolean
       contracts: IContract[] | undefined
@@ -82,27 +101,40 @@ declare namespace Hooks {
         amount: bigint,
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<boolean>
       getPosition(
         address: string,
-        contractId: string
-      ): Promise<bigint | undefined>
+        contractId: string,
+        sourcePk: string,
+        sponsorPk: string
+      ): Promise<number | undefined>
       getEstimatedPrematureWithdraw(
         address: string,
-        contractId: string
-      ): Promise<bigint | undefined>
-      getYield(address: string, contractId: string): Promise<bigint | undefined>
+        contractId: string,
+        sourcePk: string,
+        sponsorPk: string
+      ): Promise<number | undefined>
+      getYield(
+        address: string,
+        contractId: string,
+        sourcePk: string,
+        sponsorPk: string
+      ): Promise<number | undefined>
       getTimeLeft(
         address: string,
-        contractId: string
-      ): Promise<bigint | undefined>
+        contractId: string,
+        sourcePk: string,
+        sponsorPk: string
+      ): Promise<number | undefined>
       getAccount(update: React.Dispatch<React.SetStateAction<string>>): void
       withdraw(
         address: string,
         premature: boolean,
         contractId: string,
-        signerSecret?: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<boolean>
       getHistory(
         contractId: number
@@ -111,6 +143,7 @@ declare namespace Hooks {
       updateContractHistory(
         params: IHistoryUpdate
       ): Promise<IHistory | undefined>
+      sign(params: ISignRequest): Promise<ISignResponse | undefined>
     }
   }
 }

@@ -63,7 +63,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Token Management
+            Asset Management
           </Text>
           {havePermission(Permissions.CREATE_ASSET, userPermissions) && (
             <Button

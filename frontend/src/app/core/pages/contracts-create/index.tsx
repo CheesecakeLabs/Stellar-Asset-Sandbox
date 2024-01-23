@@ -5,20 +5,16 @@ import { useNavigate } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useContracts } from 'hooks/useContracts'
-import { useHorizon } from 'hooks/useHorizon'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
-import { SorobanService } from 'soroban'
-import * as SorobanClient from 'soroban-client'
-import { sorobanConfig } from 'soroban/constants'
-import { deployerClient } from 'soroban/deployer'
+import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
 import {
-  allowancePeriod,
-  codSalt,
-  codWasmHash,
-} from 'soroban/deployer/constants'
-import { MessagesError } from 'utils/constants/messages-error'
-import { GAService } from 'utils/ga'
+  BUMP_FEE,
+  ContractsService,
+  INNER_FEE,
+  TOKEN_DECIMALS,
+} from 'soroban/contracts-service'
+import { StellarPlus } from 'stellar-plus'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -27,13 +23,11 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
-  const [isGeneratedContractId, setGeneratedContractId] = useState(false)
 
   const { loadingAssets, assets, getAssets, updateContractId } = useAssets()
   const { createContract } = useContracts()
   const { vaults, loadingVaults, getVaults } = useVaults()
-  const { sign, submit, getSponsorPK } = useTransactions()
-  const { getLatestSequenceLedger } = useHorizon()
+  const { getSponsorPK } = useTransactions()
 
   const toast = useToast()
   const navigate = useNavigate()
@@ -51,134 +45,89 @@ export const ContractsCreate: React.FC = () => {
     try {
       setCreatingContract(true)
 
-      const contractId = asset.contract_id
-        ? asset.contract_id
-        : SorobanService.getContractId({
-            assetCode: asset.code,
-            assetIssuerPk: asset.issuer.key.publicKey,
-          })
+      const token = ContractsService.loadToken(asset)
+      let contractId = asset.contract_id
 
-      if (!asset.contract_id) {
+      const sponsorPK = await getSponsorPK()
+      if (!sponsorPK) throw new Error('Invalid sponsor')
+
+      await ContractsService.validateContract(sponsorPK)
+
+      const opex = ContractsService.loadAccount(sponsorPK)
+      const opexTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+      if (!contractId) {
+        await token.wrapAndDeploy(opexTxInvocation)
+        contractId = token.sorobanTokenHandler.getContractId()
+
+        if (!contractId) throw new Error('Error creating contract id')
         await updateContractId(asset.id, contractId)
       }
 
-      const termToSeconds = Number(data.term || 0) * 86400
-      const yieldRate = Number(data.yield_rate || 0) * 100
-      const penaltyRate = Number(data.penalty_rate || 0) * 100
+      const codVault = ContractsService.loadAccount(vault.wallet.key.publicKey)
+      const codTxInvocation = ContractsService.getTxInvocation(
+        codVault,
+        INNER_FEE
+      )
 
-      const sponsorPK = await getSponsorPK()
-      if (!sponsorPK) {
-        throw new Error('Invalid sponsor!')
-      }
-
-      const sourceAccount = await SorobanService.getSourceAccount(sponsorPK)
-
-      const operation = SorobanService.getContractOperation({
-        assetCode: asset.code,
-        assetIssuerPk: asset.issuer.key.publicKey,
+      const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
+        network: STELLAR_NETWORK,
+        wasmHash: WASM_HASH,
+        rpcHandler: vcRpcHandler,
+        options: {
+          restoreTxInvocation: opexTxInvocation,
+        },
       })
 
-      if (!asset.contract_id && !isGeneratedContractId) {
-        const preppedTx = await SorobanService.wrapClassicAsset(
-          operation,
-          sourceAccount
-        )
+      const codParams = await ContractsService.validateParamsCOD(
+        vault,
+        asset,
+        token,
+        data,
+        compoundType,
+        compound
+      )
 
-        const signedTransaction = await sign({ envelope: preppedTx })
-        if (signedTransaction) {
-          const resultEnvelope = await submit({
-            envelope: signedTransaction.envelope,
-          })
+      await codClient.deploy(opexTxInvocation)
+      await codClient.initialize({ ...codParams, ...codTxInvocation })
 
-          if (resultEnvelope) {
-            const transaction = new SorobanClient.Transaction(
-              resultEnvelope,
-              sorobanConfig.network.passphrase
-            )
-            await SorobanService.submitSoroban(transaction)
-          }
-        }
-        setGeneratedContractId(true)
+      const codContractId = codClient.getContractId()
+      if (!codContractId) throw new Error('Invalid Contract ID')
+
+      const contract = {
+        name: 'Certificate of Deposit',
+        asset_id: asset.id.toString(),
+        vault_id: vault.id.toString(),
+        address: codClient.getContractId() || '',
+        yield_rate: Number(codParams.yieldRate),
+        term: Number(codParams.term),
+        min_deposit: Number(codParams.minDeposit) / TOKEN_DECIMALS,
+        penalty_rate: Number(codParams.penaltyRate),
+        compound: Number(codParams.compoundStep),
       }
 
-      const latestSequenceLedger = await getLatestSequenceLedger()
+      const contractCreated = await createContract(contract)
 
-      if (!latestSequenceLedger) {
-        throw new Error('Invalid latest sequence ledger!')
+      if (contractCreated) {
+        toast({
+          title: 'Contract created!',
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+          position: 'top-right',
+        })
+        navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
+        return
       }
-
-      const transactionResult = await deployerClient.deploy({
-        wasm_hash: codWasmHash,
-        salt: codSalt(),
-        admin: vault.wallet.key.publicKey,
-        asset: contractId,
-        term: BigInt(termToSeconds),
-        compound_step: BigInt(
-          compoundType === 'Compound interest' ? compound : 0
-        ),
-        yield_rate: BigInt(yieldRate),
-        min_deposit: BigInt(Number(data.min_deposit || 0) * 10000000),
-        penalty_rate: BigInt(penaltyRate),
-        allowance_period: latestSequenceLedger + allowancePeriod,
-        signerSecret: vault.wallet.key.publicKey,
-      })
-
-      if (transactionResult.status === 'SUCCESS') {
-        const transactionSuccess =
-          transactionResult as SorobanClient.SorobanRpc.GetSuccessfulTransactionResponse
-
-        const xdr = transactionSuccess.returnValue?.toXDR('base64')
-        if (!xdr) {
-          throw new Error('Invalid transaction XDR')
-        }
-
-        const scVal = SorobanClient.xdr.ScVal.fromXDR(xdr, 'base64')
-        const contractAddress =
-          SorobanClient.Address.fromScVal(scVal).toString()
-
-        const contract = {
-          name: 'Contract',
-          asset_id: asset.id.toString(),
-          vault_id: vault.id.toString(),
-          address: contractAddress,
-          yield_rate: yieldRate,
-          term: termToSeconds,
-          min_deposit: Number(data.min_deposit || 0),
-          penalty_rate: penaltyRate,
-          compound: compoundType === 'Compound interest' ? compound : 0,
-        }
-
-        const contractCreated = await createContract(contract)
-
-        if (contractCreated) {
-          toast({
-            title: 'Contract created!',
-            status: 'success',
-            duration: 9000,
-            isClosable: true,
-            position: 'top-right',
-          })
-          GAService.GAEvent('cd_form_success')
-          navigate(`${PathRoute.CONTRACT_DETAIL}/${contractCreated.id}`)
-          return
-        }
-      } else {
-        toastError(MessagesError.errorOccurred)
-      }
-
-      setCreatingContract(false)
     } catch (error) {
-      setCreatingContract(false)
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
       toastError(message)
+    } finally {
+      setCreatingContract(false)
     }
   }
-
-  useEffect(() => {
-    GAService.GAEvent('cd_form_start')
-  }, [])
 
   const toastError = (message: string): void => {
     toast({

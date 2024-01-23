@@ -63,7 +63,7 @@ export const SelectAsset: React.FC<ISelectAsset> = ({
         setAsset(newValue?.value), setSelected && setSelected(newValue)
       }}
       value={selected}
-      placeholder="Select asset"
+      placeholder="Select..."
       formatOptionLabel={formatLabel}
       styles={{
         control: baseStyles => ({

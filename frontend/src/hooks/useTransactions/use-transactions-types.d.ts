@@ -14,23 +14,12 @@ declare namespace Hooks {
       walletId: int
     }
 
-    interface ISignRequest {
-      envelope: string
-      wallet_pk?: string
-    }
-
-    interface ISignResponse {
-      envelope: string
-      hash: string
-    }
-
     interface ISubmitRequest {
       envelope: string
     }
 
     interface ITransactionsContext {
       loading: boolean
-      sign(params: ISignRequest): Promise<ISignResponse | undefined>
       submit(params: ISubmitRequest): Promise<string | undefined>
       getSponsorPK(): Promise<string | undefined>
     }

@@ -86,10 +86,9 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                 </Alert>
               )}
               <Container variant="secondary">
-                <Text fontSize="sm" fontWeight="700">
+                <Text fontSize="sm" fontWeight="700" textAlign="center">
                   {user.name}
                 </Text>
-                <Text fontSize="xs">{user.email}</Text>
               </Container>
               <form
                 onSubmit={handleSubmit(data => {
@@ -100,7 +99,6 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   <FormControl isInvalid={errors?.role_id !== undefined}>
                     <FormLabel mt="1.5rem">Role</FormLabel>
                     <Select
-                      placeholder="Select role"
                       {...register('role_id', { required: true })}
                       defaultValue={user.role_id}
                     >

@@ -23,6 +23,7 @@ interface IWithdraw {
   contractData: Hooks.UseContractsTypes.IContractData
   deposited: number | undefined
   currentInVault: string | undefined
+  timerCounter: number | undefined
 }
 
 export const Withdraw: React.FC<IWithdraw> = ({
@@ -34,6 +35,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
   contractData,
   deposited,
   currentInVault,
+  timerCounter
 }) => {
   const { handleSubmit } = useForm()
   const [isPremature, setIsPremature] = useState(false)
@@ -234,7 +236,7 @@ export const Withdraw: React.FC<IWithdraw> = ({
               mt="3rem"
             >
               <Countdown
-                date={Date.now() + (contractData.timeLeft || 0) * 1000}
+                date={timerCounter}
                 renderer={renderer}
               />
               <Progress

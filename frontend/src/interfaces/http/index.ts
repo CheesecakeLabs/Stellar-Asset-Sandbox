@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import Authentication from 'app/auth/services/auth'
 
-export const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000'
+export const BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8080/v1'
 
 const http = axios.create({
   baseURL: BASE_URL,

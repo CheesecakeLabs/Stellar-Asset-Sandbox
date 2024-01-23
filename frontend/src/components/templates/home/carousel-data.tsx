@@ -18,7 +18,7 @@ export const carouselData = [
         <Text>
           Brought to you by Cheesecake Labs and proudly supported by the Stellar
           Development Foundation, this sandbox is your gateway to
-          enterprise-grade token management. Dive deep into the core
+          enterprise-grade asset management. Dive deep into the core
           functionalities of the Stellar network, specifically tailored for
           asset issuance.
         </Text>
@@ -67,7 +67,7 @@ export const carouselData = [
     ),
   },
   {
-    title: 'Token Management in the Sandbox',
+    title: 'Asset Management in the Sandbox',
     slide: VIDEO_ASSET_MANAGEMENT,
     actionName: undefined,
     actionDestination: undefined,
@@ -75,7 +75,7 @@ export const carouselData = [
       <Box>
         <Text>
           The Stellar Asset Issuance Sandbox provides a comprehensive suite of
-          tools for token management, allowing Asset Managers to tailor tokens
+          tools for asset management, allowing Asset Managers to tailor tokens
           to specific needs and operational structures:
         </Text>
         <br />

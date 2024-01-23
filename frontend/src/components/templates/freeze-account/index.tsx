@@ -108,7 +108,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
         <Box p="1rem">
           {typeAccount === 'INTERNAL' ? (
             <FormControl isInvalid={errors?.wallet !== undefined}>
-              <FormLabel>Vault</FormLabel>
+              <FormLabel>Vault or wallet</FormLabel>
               <SelectVault
                 vaults={vaults}
                 setWallet={setWallet}

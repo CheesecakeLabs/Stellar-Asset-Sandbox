@@ -3,7 +3,16 @@ import { createContext, useCallback, useState } from 'react'
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
-import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
+import { CustomAccountHandler } from 'soroban'
+import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
+import { BUMP_FEE, ContractsService } from 'soroban/contracts-service'
+import { StellarPlus } from 'stellar-plus'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import {
+  FeeBumpTransaction,
+  Transaction,
+  TransactionXdr,
+} from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
@@ -96,6 +105,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const customSign = async (
+    tx: Transaction | FeeBumpTransaction,
+    publicKey: string
+  ): Promise<TransactionXdr> => {
+    const signedTransaction = await sign({
+      envelope: tx.toXDR(),
+      wallet_pk: publicKey,
+    })
+    return signedTransaction?.envelope || ''
+  }
+
   const getContract = useCallback(
     async (
       id: string
@@ -125,24 +145,70 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData]
   )
 
+  const getContractData = (contractId: string, sponsorPK: string): CertificateOfDepositClient => {
+    const opex = ContractsService.loadAccount(sponsorPK)
+    const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+    const contract = new StellarPlus.Contracts.CertificateOfDeposit({
+      network: STELLAR_NETWORK,
+      contractId: contractId,
+      rpcHandler: vcRpcHandler,
+      wasmHash: WASM_HASH,
+      options: {
+        restoreTxInvocation: restoreTxInvocation,
+      },
+    })
+
+    contract.getContractCodeLiveUntilLedgerSeq().then(result => {
+      console.log('getContractCodeLiveUntilLedgerSeq: ' + result)
+    })
+
+    contract.getContractInstanceLiveUntilLedgerSeq().then(result => {
+      console.log('getContractInstanceLiveUntilLedgerSeq: ' + result)
+    })
+
+    return contract
+  }
+
+  const userTxInvocation = (
+    sourcePk: string
+  ): Hooks.UseContractsTypes.IInvocation => {
+    const source = new CustomAccountHandler({
+      customSign: customSign,
+      publicKey: sourcePk,
+    })
+
+    return {
+      header: {
+        source: sourcePk,
+        timeout: 45,
+        fee: '1000000',
+      },
+      signers: [source],
+    }
+  }
+
   const deposit = async (
     amount: bigint,
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      const result = await certificateOfDepositClient.deposit({
-        amount: amount * BigInt(10000000),
+      const contract = getContractData(contractId, sponsorPk)
+
+      await contract.deposit({
         address: address,
-        contractId: contractId,
-        sourcePk: sourcePk,
+        amount: amount,
+        ...userTxInvocation(sourcePk),
       })
+
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
-      return result.status === 'SUCCESS'
+      return true
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -155,14 +221,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const getPosition = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getPosition({
+      const contract = getContractData(contractId, sponsorPk)
+
+      return contract.getPosition({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
-      return result
     } catch (e) {
       return
     }
@@ -170,14 +239,16 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const getYield = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getEstimatedYield({
+      const contract = getContractData(contractId, sponsorPk)
+      return contract.getEstimatedYield({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
-      return result
     } catch (e) {
       return
     }
@@ -185,15 +256,16 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const getEstimatedPrematureWithdraw = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
     try {
-      const result =
-        await certificateOfDepositClient.getEstimatedPrematureWithdraw({
-          address: address,
-          contractId: contractId,
-        })
-      return result
+      const contract = getContractData(contractId, sponsorPk)
+      return contract.getEstimatedPrematureWithdraw({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
     } catch (e) {
       return
     }
@@ -201,14 +273,16 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const getTimeLeft = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
     try {
-      const result = await certificateOfDepositClient.getTimeLeft({
+      const contract = getContractData(contractId, sponsorPk)
+      return contract.getTimeLeft({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
-      return result
     } catch (e) {
       return
     }
@@ -222,27 +296,24 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const withdraw = async (
     address: string,
-    premature: boolean,
+    accept_premature_withdraw: boolean,
     contractId: string,
-    signerSecret?: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      const result = await certificateOfDepositClient.withdraw({
-        address: address,
-        accept_premature_withdraw: premature,
-        contractId: contractId,
-        signerSecret: signerSecret,
-      })
+      const contract = getContractData(contractId, sponsorPk)
 
-      const xdr = result.returnValue?.toXDR('base64')
-      if (!xdr) {
-        throw new Error('Invalid transaction XDR')
-      }
+      await contract.withdraw({
+        address: address,
+        acceptPrematureWithdraw: accept_premature_withdraw,
+        ...userTxInvocation(sourcePk),
+      })
 
       setIsWithdrawing(false)
       setWithdrawConfirmed(true)
-      return result.status === 'SUCCESS'
+      return true
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -316,6 +387,23 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const sign = async (
+    params: Hooks.UseContractsTypes.ISignRequest
+  ): Promise<Hooks.UseContractsTypes.ISignResponse | undefined> => {
+    try {
+      const response = await http.post(`soroban-transactions/sign`, params)
+      if (response.status === 200) {
+        return response.data.Message
+      }
+      return undefined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    }
+  }
+
   return (
     <ContractsContext.Provider
       value={{
@@ -338,7 +426,8 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         getHistory,
         addContractHistory,
         updateContractHistory,
-        getPagedContracts
+        getPagedContracts,
+        sign,
       }}
     >
       {children}

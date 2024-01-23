@@ -25,7 +25,7 @@ export enum PathRoute {
   VAULT_CREATE = '/vault-create',
   VAULT_DETAIL = '/vault-detail',
   CONTRACT_DETAIL = '/contract-detail',
-  CONTRACT_CREATE = '/contract-create',
+  CONTRACT_CREATE = '/new-certificate-of-deposit',
   TOKEN_MANAGEMENT = '/token-management',
   DASHBOARDS = '/dashboards',
   TOML_FILE = '/.well-known/stellar.toml',
