@@ -36,6 +36,8 @@ import {
 import { Empty } from 'components/molecules/empty'
 import { Paginator } from 'components/molecules/paginator'
 
+import { Filter } from './filter'
+
 interface ITokenManagementTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -78,6 +80,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
             </Button>
           )}
         </Flex>
+        <Filter />
         {loading ? (
           <Skeleton w="full" h="8rem" />
         ) : assets && assets.length > 0 ? (
