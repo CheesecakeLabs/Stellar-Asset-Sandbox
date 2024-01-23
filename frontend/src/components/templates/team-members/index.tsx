@@ -13,7 +13,6 @@ import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
-import { InfoIcon } from 'components/icons'
 import { Empty } from 'components/molecules/empty'
 
 import { ItemUser } from './item-user'
@@ -58,7 +57,6 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
               _dark={{ fill: 'white' }}
             >
               <Text>Team members</Text>
-              <InfoIcon />
             </Flex>
           </Flex>
           {loading ? (
@@ -72,7 +70,6 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                   <Th>ID</Th>
                   <Th>Member</Th>
                   <Th>Role</Th>
-                  <Th w="1rem" p={0}></Th>
                 </Tr>
               </Thead>
               <Tbody>

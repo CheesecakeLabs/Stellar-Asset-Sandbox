@@ -5,7 +5,13 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -54,7 +60,8 @@ export const AuthorizeAccount: React.FC = () => {
   const onSubmit = async (
     data: FieldValues,
     setValue: UseFormSetValue<FieldValues>,
-    wallet: string | undefined
+    wallet: string | undefined,
+    setWallet: Dispatch<SetStateAction<string | undefined>>
   ): Promise<void> => {
     if (!asset || !id) return
 
@@ -68,6 +75,7 @@ export const AuthorizeAccount: React.FC = () => {
 
       if (isSuccess) {
         setValue('wallet', '')
+        setWallet(undefined)
         toast({
           title: 'Authorize success!',
           description: `You authorized the account`,

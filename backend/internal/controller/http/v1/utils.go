@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -120,4 +121,16 @@ func createLogDescription(transaction int, assetCode string, setFlags, clearFlag
 func generateID() int {
 	currentTimeInMillis := int(time.Now().UnixNano() / int64(time.Millisecond))
 	return currentTimeInMillis
+}
+
+// Helper function to parse string to *bool
+func parseBoolQueryParameter(value string) (*bool, error) {
+	if value == "" {
+		return nil, nil
+	}
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		return nil, err
+	}
+	return &boolValue, nil
 }

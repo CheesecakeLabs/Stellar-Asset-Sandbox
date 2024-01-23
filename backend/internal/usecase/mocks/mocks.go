@@ -447,24 +447,24 @@ func (mr *MockAssetRepoInterfaceMockRecorder) GetAssetImage(arg0 interface{}) *g
 }
 
 // GetAssets mocks base method.
-func (m *MockAssetRepoInterface) GetAssets() ([]entity.Asset, error) {
+func (m *MockAssetRepoInterface) GetAssets(arg0 entity.AssetFilter) ([]entity.Asset, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAssets")
+	ret := m.ctrl.Call(m, "GetAssets", arg0)
 	ret0, _ := ret[0].([]entity.Asset)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAssets indicates an expected call of GetAssets.
-func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets() *gomock.Call {
+func (mr *MockAssetRepoInterfaceMockRecorder) GetAssets(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetAssets), arg0)
 }
 
 // GetPaginatedAssets mocks base method.
-func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int) ([]entity.Asset, int, error) {
+func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int, arg2 entity.AssetFilter) ([]entity.Asset, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPaginatedAssets", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetPaginatedAssets", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]entity.Asset)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
@@ -472,9 +472,9 @@ func (m *MockAssetRepoInterface) GetPaginatedAssets(arg0, arg1 int) ([]entity.As
 }
 
 // GetPaginatedAssets indicates an expected call of GetPaginatedAssets.
-func (mr *MockAssetRepoInterfaceMockRecorder) GetPaginatedAssets(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockAssetRepoInterfaceMockRecorder) GetPaginatedAssets(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetPaginatedAssets), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPaginatedAssets", reflect.TypeOf((*MockAssetRepoInterface)(nil).GetPaginatedAssets), arg0, arg1, arg2)
 }
 
 // StoreAssetImage mocks base method.

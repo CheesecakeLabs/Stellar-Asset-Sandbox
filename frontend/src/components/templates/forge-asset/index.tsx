@@ -53,6 +53,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     handleSubmit,
     setValue,
     getValues,
+    setError,
   } = useForm()
 
   const handleJoyrideCallback = (data: CallBackProps): void => {
@@ -97,6 +98,14 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
       disableBeacon: true,
     },
   ]
+
+  const submit = (data: FieldValues): void => {
+    if (Number(data.asset_type) === -1) {
+      setError('asset_type', { message: 'This field is required' })
+      return
+    }
+    onSubmit(data, setValue)
+  }
 
   return (
     <>
@@ -153,11 +162,11 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
           >
             <form
               onSubmit={handleSubmit(data => {
-                onSubmit(data, setValue)
+                submit(data)
               })}
             >
               <Flex flexDir={{ base: 'column', md: 'row' }}>
-                <Flex flexDir="column" mr="1rem"  mb="1rem">
+                <Flex flexDir="column" mr="1rem" mb="1rem">
                   <Flex justifyContent="space-between" alignItems="center">
                     <FormLabel>Asset Icon</FormLabel>
                     {selectedFile && (
@@ -194,7 +203,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                       className="asset-name"
                     />
                     <FormErrorMessage>
-                      Name must be more than 2 characters
+                      Asset name must be between 2 and 48 characters long
                     </FormErrorMessage>
                   </FormControl>
 
@@ -217,12 +226,12 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         className="asset-code"
                       />
                       <FormErrorMessage>
-                        Code must be 3 characters
+                        Code must be between 3 and 12 characters long
                       </FormErrorMessage>
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel>Initial supply</FormLabel>
+                      <FormLabel>Initial supply (optional)</FormLabel>
                       <Input
                         as={NumericFormat}
                         decimalScale={7}
@@ -268,19 +277,24 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         className="asset-limit"
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={errors.asset_type !== undefined}>
                       <FormLabel>Asset type</FormLabel>
                       <Select
                         {...register('asset_type', { required: true })}
-                        defaultValue={typesAsset[0].id}
+                        defaultValue={undefined}
+                        defaultChecked={false}
                         className="asset-type"
                       >
+                        <option value={-1}>Select asset type</option>
                         {typesAsset.map((typeAsset, index) => (
                           <option value={typeAsset.id} key={index}>
                             {typeAsset.name}
                           </option>
                         ))}
                       </Select>
+                      <FormErrorMessage>
+                        {errors?.asset_type?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
                   </Flex>
                 </Flex>
@@ -309,7 +323,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   type="submit"
                   variant="primary"
                   mt="1.5rem"
-                  w={{base: 'full', md: 'fit-content'}}
+                  w={{ base: 'full', md: 'fit-content' }}
                   isLoading={loading}
                 >
                   Forge asset

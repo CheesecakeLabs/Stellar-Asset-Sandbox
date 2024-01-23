@@ -20,5 +20,14 @@ export const Alert = {
         color: 'purple.500',
       },
     },
+    error: {
+      container: {
+        bg: 'red.500',
+        color: 'white',
+      },
+      icon: {
+        color: 'white',
+      },
+    },
   },
 }

@@ -42,7 +42,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
 
   const onSubmit = async (data: FieldValues): Promise<void> => {
     if (data.password !== data.confirmPassword) {
-      setError('confirmPassword', { message: 'The passwords are not the same' })
+      setError('confirmPassword', { message: 'The passwords do not match' })
       return
     }
 
@@ -97,13 +97,15 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                 <Input
                   type="text"
                   placeholder="Name"
+                  autoComplete='off'
                   {...register('name', {
                     required: true,
                     minLength: 3,
+                    maxLength: 25,
                   })}
                 />
                 <FormErrorMessage>
-                  Name must be more than 2 characters
+                  Name must be between 2 and 25 characters long
                 </FormErrorMessage>
               </FormControl>
 
@@ -112,9 +114,10 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                 <Input
                   type="email"
                   placeholder="Email address"
+                  autoComplete='off'
                   {...register('email', { required: true })}
                 />
-                <FormErrorMessage>Please check the email</FormErrorMessage>
+                <FormErrorMessage>Email is required</FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={errors?.password !== undefined}>
@@ -125,10 +128,11 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                   {...register('password', {
                     required: true,
                     minLength: 6,
+                    maxLength: 16,
                   })}
                 />
                 <FormErrorMessage>
-                  Password must be at least 6 characters long
+                  Password must be between 6 and 16 characters long
                 </FormErrorMessage>
               </FormControl>
 
@@ -141,7 +145,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                 />
                 <FormErrorMessage>
                   {errors?.confirmPassword?.message?.toString() ||
-                    'Confirm your password'}
+                    'The passwords do not match'}
                 </FormErrorMessage>
               </FormControl>
 
@@ -158,7 +162,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                       </option>
                     ))}
                   </Select>
-                  <FormErrorMessage>Inform the role</FormErrorMessage>
+                  <FormErrorMessage>Role is required</FormErrorMessage>
                 </FormControl>
               )}
 

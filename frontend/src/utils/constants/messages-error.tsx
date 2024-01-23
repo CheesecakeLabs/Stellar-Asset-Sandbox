@@ -1,5 +1,5 @@
 export const MessagesError = {
-  invalidCredentials: 'Invalid credentials',
+  invalidCredentials: 'The email address or password is incorrect.',
   errorOccurred: 'Sorry, an error occurred, please try again.',
-  signUpFailed: 'Failed to register, please try again.',
+  signUpFailed: 'Failed to register.',
 }

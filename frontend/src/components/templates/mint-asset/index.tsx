@@ -53,37 +53,48 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
   } = useForm()
+
+  const handleForm = (data: FieldValues): void => {
+    if (!data.amount) {
+      setError('amount', { message: 'This field is required' })
+      return
+    }
+    onSubmit(data, setValue)
+  }
 
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="0">
         <AssetHeader asset={asset} />
         <Box p="1rem" w="full">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex justifyContent="space-between" w="full" px="0.25rem">
+              <Flex w="full" px="0.25rem" alignItems="center">
                 <FormLabel>Amount to mint</FormLabel>
-                <Tooltip label={TooltipsData.mint}>
-                  <HelpIcon width="20px" />
-                </Tooltip>
+                <Box pb={2}>
+                  <Tooltip label={TooltipsData.mint}>
+                    <HelpIcon width="14px" />
+                  </Tooltip>
+                </Box>
               </Flex>
               <Input
                 as={NumericFormat}
                 decimalScale={7}
                 thousandSeparator=","
-                placeholder="Type the amount you want to mint..."
+                placeholder="Amount to mint..."
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
+                  clearErrors('amount')
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <FormErrorMessage>
+                {errors?.amount?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
             <Text
               color="gray.900"

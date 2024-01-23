@@ -7,10 +7,6 @@
 * [How to issue a token](tutorials/how-to-issue-a-token.md)
 * [Creating a treasury vault](tutorials/creating-a-treasury-vault.md)
 
-***
-
-* [Page](page.md)
-
 ## Core Functionalities
 
 * [Token Management](core-functionalities/token-management/README.md)
