@@ -3,14 +3,19 @@ import { createContext, useCallback, useState } from 'react'
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
+import { CustomAccountHandler } from 'soroban'
 import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
+import { BUMP_FEE, ContractsService } from 'soroban/contracts-service'
 import { StellarPlus } from 'stellar-plus'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
-import { FeeBumpTransaction, Transaction, TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
+import {
+  FeeBumpTransaction,
+  Transaction,
+  TransactionXdr,
+} from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
-import { CustomAccountHandler } from 'soroban'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -140,16 +145,34 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData]
   )
 
-  const getContractData = (contractId: string): CertificateOfDepositClient => {
-    return new StellarPlus.Contracts.CertificateOfDeposit({
+  const getContractData = (contractId: string, sponsorPK: string): CertificateOfDepositClient => {
+    const opex = ContractsService.loadAccount(sponsorPK)
+    const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+    const contract = new StellarPlus.Contracts.CertificateOfDeposit({
       network: STELLAR_NETWORK,
       contractId: contractId,
       rpcHandler: vcRpcHandler,
-      wasmHash: WASM_HASH
+      wasmHash: WASM_HASH,
+      options: {
+        restoreTxInvocation: restoreTxInvocation,
+      },
     })
+
+    contract.getContractCodeLiveUntilLedgerSeq().then(result => {
+      console.log('getContractCodeLiveUntilLedgerSeq: ' + result)
+    })
+
+    contract.getContractInstanceLiveUntilLedgerSeq().then(result => {
+      console.log('getContractInstanceLiveUntilLedgerSeq: ' + result)
+    })
+
+    return contract
   }
 
-  const userTxInvocation = (sourcePk: string): Hooks.UseContractsTypes.IInvocation => {
+  const userTxInvocation = (
+    sourcePk: string
+  ): Hooks.UseContractsTypes.IInvocation => {
     const source = new CustomAccountHandler({
       customSign: customSign,
       publicKey: sourcePk,
@@ -169,11 +192,12 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     amount: bigint,
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
 
       await contract.deposit({
         address: address,
@@ -198,10 +222,11 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const getPosition = async (
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<number | undefined> => {
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
 
       return contract.getPosition({
         address: address,
@@ -215,10 +240,11 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const getYield = async (
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<number | undefined> => {
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
       return contract.getEstimatedYield({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -231,10 +257,11 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const getEstimatedPrematureWithdraw = async (
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<number | undefined> => {
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
       return contract.getEstimatedPrematureWithdraw({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -247,10 +274,11 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
   const getTimeLeft = async (
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<number | undefined> => {
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
       return contract.getTimeLeft({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -270,11 +298,12 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     address: string,
     accept_premature_withdraw: boolean,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      const contract = getContractData(contractId)
+      const contract = getContractData(contractId, sponsorPk)
 
       await contract.withdraw({
         address: address,
@@ -398,7 +427,7 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         addContractHistory,
         updateContractHistory,
         getPagedContracts,
-        sign
+        sign,
       }}
     >
       {children}

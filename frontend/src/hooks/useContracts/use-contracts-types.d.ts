@@ -101,34 +101,40 @@ declare namespace Hooks {
         amount: bigint,
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<boolean>
       getPosition(
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<number | undefined>
       getEstimatedPrematureWithdraw(
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<number | undefined>
       getYield(
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<number | undefined>
       getTimeLeft(
         address: string,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<number | undefined>
       getAccount(update: React.Dispatch<React.SetStateAction<string>>): void
       withdraw(
         address: string,
         premature: boolean,
         contractId: string,
-        sourcePk: string
+        sourcePk: string,
+        sponsorPk: string
       ): Promise<boolean>
       getHistory(
         contractId: number

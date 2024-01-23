@@ -8,7 +8,12 @@ import { useContracts } from 'hooks/useContracts'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
 import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
-import { BUMP_FEE, ContractsService, INNER_FEE, TOKEN_DECIMALS } from 'soroban/contracts-service'
+import {
+  BUMP_FEE,
+  ContractsService,
+  INNER_FEE,
+  TOKEN_DECIMALS,
+} from 'soroban/contracts-service'
 import { StellarPlus } from 'stellar-plus'
 
 import { PathRoute } from '../../../../components/enums/path-route'
@@ -44,6 +49,10 @@ export const ContractsCreate: React.FC = () => {
       let contractId = asset.contract_id
 
       const sponsorPK = await getSponsorPK()
+      if (!sponsorPK) throw new Error('Invalid sponsor')
+
+      await ContractsService.validateContract(sponsorPK)
+
       const opex = ContractsService.loadAccount(sponsorPK)
       const opexTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
 
@@ -56,12 +65,18 @@ export const ContractsCreate: React.FC = () => {
       }
 
       const codVault = ContractsService.loadAccount(vault.wallet.key.publicKey)
-      const codTxInvocation = ContractsService.getTxInvocation(codVault, INNER_FEE)
+      const codTxInvocation = ContractsService.getTxInvocation(
+        codVault,
+        INNER_FEE
+      )
 
       const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
         network: STELLAR_NETWORK,
         wasmHash: WASM_HASH,
-        rpcHandler: vcRpcHandler
+        rpcHandler: vcRpcHandler,
+        options: {
+          restoreTxInvocation: opexTxInvocation,
+        },
       })
 
       const codParams = await ContractsService.validateParamsCOD(
