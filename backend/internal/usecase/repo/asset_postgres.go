@@ -252,7 +252,7 @@ func (r AssetRepo) GetPaginatedAssets(page int, limit int, filter entity.AssetFi
 
 	// Existing filter conditions
 	if filter.AssetName != "" {
-		conditions = append(conditions, "a.name = $"+strconv.Itoa(len(args)+1))
+		conditions = append(conditions, "a.name ILIKE CAST('%' || $"+strconv.Itoa(len(args)+1)+"|| '%' AS TEXT)")
 		args = append(args, filter.AssetName)
 	}
 	if filter.AssetType != "" {
