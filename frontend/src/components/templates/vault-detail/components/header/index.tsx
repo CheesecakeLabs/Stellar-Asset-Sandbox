@@ -59,7 +59,7 @@ const Form: React.FC<IHeader> = ({
 }) => {
   const [categorySelected, setCategorySelected] = useState<
     IOption | null | undefined
-  >(category && { label: category?.name, value: category?.id })
+  >(category && { label: category?.name, value: category?.id, disabled: false })
 
   const [name, setName] = useState<string | undefined>(vault.name)
 

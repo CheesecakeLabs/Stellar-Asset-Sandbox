@@ -19,6 +19,7 @@ import { SelectCategory } from './select-category'
 export interface IOption {
   readonly label: string
   readonly value: number
+  readonly disabled: boolean
 }
 
 interface IVaultCreateTemplate {
