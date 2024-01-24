@@ -152,7 +152,7 @@ export const ListAssets: React.FC<IListAssets> = ({
                 assets={assets?.filter(
                   asset =>
                     !listEdit?.some(
-                      balance => asset.code === balance.asset_code
+                      balance => asset.code === balance.asset_code && asset.issuer.key.publicKey === balance.asset_issuer
                     )
                 )}
                 setAsset={setAsset}
