@@ -24,10 +24,11 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
   createVaultCategory,
   setCategorySelected,
   categorySelected,
-  clearErrors
+  clearErrors,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [options, setOptions] = useState<IOption[]>([])
+  const [value, setValue] = useState<IOption>()
 
   const { colorMode } = useColorMode()
 
@@ -41,6 +42,7 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
       setIsLoading(false)
       setOptions(prev => [...prev, newOption])
       setCategorySelected(newOption)
+      setValue(newOption)
     }, 1000)
   }
 
@@ -59,6 +61,7 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
       isLoading={isLoading}
       onCreateOption={handleVaultCategory}
       options={options}
+      value={value}
       onChange={(newValue): void => {
         if (clearErrors) clearErrors()
         setCategorySelected(newValue)
