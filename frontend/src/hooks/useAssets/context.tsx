@@ -185,11 +185,36 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     async (args: {
       page: number
       limit: number
+      filters?: {
+        name?: string
+        asset_type?: string
+        authorize_required?: boolean
+        clawback_enabled?: boolean
+        freeze_enabled?: boolean
+      }
     }): Promise<Hooks.UseAssetsTypes.IPagedAssets | undefined> => {
       setLoadingAssets(true)
       try {
         const response = await http.get(
-          `assets?page=${args.page}&limit=${args.limit}`
+          `assets?page=${args.page}&limit=${args.limit}${
+            args.filters?.name ? `&name=${args.filters?.name}` : ''
+          }${
+            args.filters?.asset_type
+              ? `&asset_type=${args.filters?.asset_type}`
+              : ''
+          }${
+            args.filters?.authorize_required
+              ? `&authorize_required=${args.filters?.authorize_required}`
+              : ''
+          }${
+            args.filters?.clawback_enabled
+              ? `&clawback_enabled=${args.filters?.clawback_enabled}`
+              : ''
+          }${
+            args.filters?.freeze_enabled
+              ? `&freeze_enabled=${args.filters?.freeze_enabled}`
+              : ''
+          }`
         )
         const data = response.data
 
