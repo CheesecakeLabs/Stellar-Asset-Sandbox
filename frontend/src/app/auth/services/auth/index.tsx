@@ -1,7 +1,10 @@
+import SurveyStore from 'utils/survey'
+
 const LOCAL_STORAGE_KEY = 'auth-token-sandbox-v2'
 
-const logout = (): void => {
+const logout = (clearSurvey?: boolean): void => {
   localStorage.removeItem(LOCAL_STORAGE_KEY)
+  if (clearSurvey) SurveyStore.clearAnswer()
 }
 
 const setToken = (token: string): void => {

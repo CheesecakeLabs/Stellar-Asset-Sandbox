@@ -107,7 +107,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
       const response = await http.post(`users/logout`)
       const isSuccess = response.status === 200
       if (isSuccess) {
-        Authentication.logout()
+        Authentication.logout(true)
       }
       return isSuccess
     } catch (error) {
