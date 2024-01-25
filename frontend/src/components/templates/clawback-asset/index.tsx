@@ -10,7 +10,6 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Text,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
@@ -19,6 +18,7 @@ import { NumericFormat } from 'react-number-format'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
+import { SupplyTag } from 'components/atoms/supply-tag'
 import { SelectVault } from 'components/molecules/select-vault'
 
 interface IClawbackAssetTemplate {
@@ -111,9 +111,7 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 </FormErrorMessage>
               </FormControl>
             ) : (
-              <FormControl
-                isInvalid={errors?.from !== undefined}
-              >
+              <FormControl isInvalid={errors?.from !== undefined}>
                 <FormLabel>Wallet</FormLabel>
                 <Input
                   type="text"
@@ -146,20 +144,13 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 {errors?.amount?.message?.toString()}
               </FormErrorMessage>
             </FormControl>
-            <Text
-              color="gray.900"
-              fontWeight="600"
-              fontSize="xs"
-              mt="0.5rem"
-              ms="0.25rem"
-            >
-              {`Circulation supply: ${
+            <SupplyTag
+              value={`Circulation supply: ${
                 assetData
                   ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
                   : 'loading'
               }`}
-            </Text>
-
+            />
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"
