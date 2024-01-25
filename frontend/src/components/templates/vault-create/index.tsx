@@ -51,7 +51,6 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
   const {
     handleSubmit,
     register,
-    getValues,
     setError,
     clearErrors,
     formState: { errors },
