@@ -158,7 +158,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
               <form onSubmit={handleSubmit(data => handleForm(data))}>
                 <Flex flexDir={{ base: 'column', md: 'row' }} gap="1.5rem">
                   <FormControl isInvalid={errors?.vault !== undefined}>
-                    <FormLabel>Vault*</FormLabel>
+                    <FormLabel>Vault</FormLabel>
                     <SelectVault
                       vaults={vaults}
                       setVault={setVault}
@@ -172,7 +172,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   </FormControl>
 
                   <FormControl isInvalid={errors?.asset !== undefined}>
-                    <FormLabel>Asset*</FormLabel>
+                    <FormLabel>Asset</FormLabel>
                     <SelectAsset
                       assets={filteredAssets()}
                       setAsset={setAsset}
@@ -197,7 +197,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     gap="1.5rem"
                   >
                     <FormControl isInvalid={errors?.min_deposit !== undefined}>
-                      <FormLabel>Minimum Deposit*</FormLabel>
+                      <FormLabel>Minimum Deposit</FormLabel>
                       <Input
                         as={NumericFormat}
                         decimalScale={7}
@@ -216,7 +216,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     </FormControl>
 
                     <FormControl isInvalid={errors?.term !== undefined}>
-                      <FormLabel>Term*</FormLabel>
+                      <FormLabel>Term</FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -244,7 +244,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   >
                     <FormControl isInvalid={errors?.yield_rate !== undefined}>
                       <FormLabel display="flex" alignItems="center" gap={2}>
-                        Yield Rate*{' '}
+                        Yield Rate{' '}
                         <Tooltip label={TooltipsData.yieldRate}>
                           <HelpIcon width="14px" />
                         </Tooltip>
@@ -269,7 +269,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
 
                     <FormControl isInvalid={errors?.penalty_rate !== undefined}>
                       <FormLabel display="flex" alignItems="center" gap={2}>
-                        Early Redemption Penalty Rate*
+                        Early Redemption Penalty Rate
                         <Tooltip label={TooltipsData.penaltyRate}>
                           <HelpIcon width="14px" />
                         </Tooltip>
@@ -309,7 +309,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   _dark={{ bg: 'black.600' }}
                 >
                   <FormControl w="full">
-                    <FormLabel>Interest type*</FormLabel>
+                    <FormLabel>Interest type</FormLabel>
                     <SelectCompoundType
                       compoundType={compoundType}
                       setCompoundType={setCompoundType}
