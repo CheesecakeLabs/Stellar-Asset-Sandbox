@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
+import { InfoTag } from 'components/atoms/info-tag'
 import { SelectVault } from 'components/molecules/select-vault'
 import { VaultsStatusList } from 'components/molecules/vaults-status-list'
 
@@ -136,31 +137,36 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
               </FormErrorMessage>
             </FormControl>
           )}
-          <Flex gap={4} justifyContent="flex-end">
-            <Button
-              type="submit"
-              variant="primary"
-              mt="1.5rem"
-              isLoading={loading && loadingFreeze}
-              w={{ base: 'full', md: 'fit-content' }}
-              onClick={handleSubmit(data => {
-                freeze(data)
-              })}
-            >
-              Freeze
-            </Button>
-            <Button
-              type="submit"
-              variant="secondary"
-              mt="1.5rem"
-              isLoading={loading && loadingUnfreeze}
-              w={{ base: 'full', md: 'fit-content' }}
-              onClick={handleSubmit(data => {
-                unfreeze(data)
-              })}
-            >
-              Unfreeze
-            </Button>
+          <Flex alignItems="flex-end" flexDir="column" mt="1.5rem" gap={3}>
+            <Flex gap={4}>
+              <Button
+                type="submit"
+                variant="primary"
+                isDisabled={!asset.freeze_enabled}
+                isLoading={loading && loadingFreeze}
+                w={{ base: 'full', md: 'fit-content' }}
+                onClick={handleSubmit(data => {
+                  freeze(data)
+                })}
+              >
+                Freeze
+              </Button>
+              <Button
+                type="submit"
+                variant="secondary"
+                isDisabled={!asset.freeze_enabled}
+                isLoading={loading && loadingUnfreeze}
+                w={{ base: 'full', md: 'fit-content' }}
+                onClick={handleSubmit(data => {
+                  unfreeze(data)
+                })}
+              >
+                Unfreeze
+              </Button>
+            </Flex>
+            {!asset.freeze_enabled && (
+              <InfoTag text="Freeze not enabled for this asset" />
+            )}
           </Flex>
         </Box>
       </Container>
