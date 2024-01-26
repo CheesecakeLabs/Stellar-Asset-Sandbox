@@ -7,7 +7,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Text,
   Tooltip,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
@@ -18,6 +17,7 @@ import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
+import { SupplyTag } from 'components/atoms/supply-tag'
 import { HelpIcon } from 'components/icons'
 import { ChartMintBurn } from 'components/molecules/chart-mint-burn'
 import { TChartPeriod } from 'components/molecules/chart-period'
@@ -96,19 +96,20 @@ export const BurnAssetTemplate: React.FC<IBurnAssetTemplate> = ({
                 {errors?.amount?.message?.toString()}
               </FormErrorMessage>
             </FormControl>
-            <Text
-              color="gray.900"
-              fontWeight="600"
-              fontSize="xs"
-              mt="0.5rem"
-              ms="0.25rem"
-            >
-              {`Circulation supply: ${
-                assetData
-                  ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
-                  : 'loading'
-              }`}
-            </Text>
+            <Flex gap={2}>
+              <SupplyTag
+                value={`Circulation supply: ${
+                  assetData
+                    ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
+                    : 'loading'
+                }`}
+              />
+              <SupplyTag
+                value={`Main vault: ${toCrypto(
+                  Number(asset.distributorBalance?.balance || 0)
+                )}`}
+              />
+            </Flex>
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"

@@ -7,7 +7,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Text,
   Tooltip,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
@@ -19,6 +18,7 @@ import { toCrypto, toNumber } from 'utils/formatter'
 
 import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
+import { SupplyTag } from 'components/atoms/supply-tag'
 import { HelpIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
 
@@ -110,23 +110,15 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
                 {errors?.amount?.message?.toString()}
               </FormErrorMessage>
             </FormControl>
-
-            <Text
-              color="gray.900"
-              fontWeight="600"
-              fontSize="xs"
-              mt="0.5rem"
-              ms="0.25rem"
-            >
-              {`Main Vault: ${
+            <SupplyTag
+              value={`Main Vault: ${
                 assetData
                   ? `${toCrypto(Number(asset.distributorBalance?.balance))} ${
                       asset.code
                     }`
                   : 'loading'
               }`}
-            </Text>
-
+            />
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"
