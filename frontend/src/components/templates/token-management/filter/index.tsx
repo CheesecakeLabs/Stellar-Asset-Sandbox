@@ -111,7 +111,7 @@ export const Filter: React.FC<IFilter> = ({
         <InputGroup w="fit-content">
           <Input
             type="search"
-            placeholder="Search"
+            placeholder="Search by name"
             bg="gray.100"
             _dark={{ bg: 'black.800', color: 'white' }}
             w="20rem"
