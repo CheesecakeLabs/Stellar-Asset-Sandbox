@@ -1,0 +1,5 @@
+ALTER TABLE Role
+DROP CONSTRAINT IF EXISTS fk_role_created_by;
+DROP COLUMN IF EXISTS created_by;
+ALTER TABLE Role
+DROP COLUMN IF EXISTS created_at;
