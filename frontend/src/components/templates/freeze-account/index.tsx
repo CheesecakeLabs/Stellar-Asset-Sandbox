@@ -165,7 +165,7 @@ export const FreezeAccountTemplate: React.FC<IFreezeAccountTemplate> = ({
               </Button>
             </Flex>
             {!asset.freeze_enabled && (
-              <InfoTag text="Freeze not enabled for this asset" />
+              <InfoTag text="You cannot freeze accounts for this asset; freeze control is not enabled." />
             )}
           </Flex>
         </Box>

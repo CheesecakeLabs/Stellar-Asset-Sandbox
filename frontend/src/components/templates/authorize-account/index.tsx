@@ -125,7 +125,7 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
                 Authorize
               </Button>
               {!asset.authorize_required && (
-                <InfoTag text="Authorize not enabled for this asset" />
+                <InfoTag text="Authorization is not required, all accounts can hold balance and transact this asset." />
               )}
             </Flex>
           </form>

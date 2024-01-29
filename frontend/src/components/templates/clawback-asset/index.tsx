@@ -163,7 +163,7 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 Clawback
               </Button>
               {!asset.clawback_enabled && (
-                <InfoTag text="Clawback not enabled for this asset" />
+                <InfoTag text="Balance clawback is not possible; clawback control is not enabled." />
               )}
             </Flex>
           </form>
