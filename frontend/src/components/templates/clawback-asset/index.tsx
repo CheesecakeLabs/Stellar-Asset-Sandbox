@@ -18,6 +18,7 @@ import { NumericFormat } from 'react-number-format'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
+import { InfoTag } from 'components/atoms/info-tag'
 import { SupplyTag } from 'components/atoms/supply-tag'
 import { SelectVault } from 'components/molecules/select-vault'
 
@@ -151,16 +152,19 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                   : 'loading'
               }`}
             />
-            <Flex justifyContent="flex-end">
+            <Flex alignItems="flex-end" flexDir="column" mt="1.5rem" gap={3}>
               <Button
                 type="submit"
                 variant="primary"
-                mt="1.5rem"
+                isDisabled={!asset.clawback_enabled}
                 isLoading={loading}
                 w={{ base: 'full', md: 'fit-content' }}
               >
                 Clawback
               </Button>
+              {!asset.clawback_enabled && (
+                <InfoTag text="Balance clawback is not possible; clawback control is not enabled." />
+              )}
             </Flex>
           </form>
         </Box>
