@@ -16,6 +16,7 @@ import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
+import Authentication from 'app/auth/services/auth'
 import { IChange } from 'app/core/pages/role-permissions'
 
 interface IRolePermissionsTemplate {
@@ -68,6 +69,10 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
       is_add: isAdd,
     }
     setChanges([...filtered, newChange])
+  }
+
+  const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
+    return role.admin === 1 || role.created_by != Authentication.getUser()?.id
   }
 
   return (
@@ -137,7 +142,12 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                             permission.id,
                             role.id
                           )}
-                          isDisabled={role.admin === 1}
+                          isDisabled={isDisabled(role)}
+                          title={
+                            isDisabled(role)
+                              ? 'You can only edit roles you created'
+                              : ''
+                          }
                           onChange={(event): void => {
                             onChange(
                               permission.id,

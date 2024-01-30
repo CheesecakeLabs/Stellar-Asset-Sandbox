@@ -37,6 +37,7 @@ declare namespace Hooks {
       id: number
       name: string
       admin: id
+      created_by: number
     }
 
     interface IUserRole {
