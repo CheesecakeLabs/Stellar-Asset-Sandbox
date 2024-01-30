@@ -30,7 +30,7 @@ import (
 func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, storageService storage.StorageService) {
 	// Logger and Sentry
 	l := logger.New(cfg.Log.Level)
-	if cfg.Deploy.DeployStage == "production" {
+	if cfg.Deploy.DeployStage != "local" {
 		sentryPkg.New(cfg, l)
 	}
 
