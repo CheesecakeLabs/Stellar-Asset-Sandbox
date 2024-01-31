@@ -6,6 +6,7 @@ import {
   Spacer,
   Tag,
   Text,
+  useMediaQuery,
 } from '@chakra-ui/react'
 
 import { NavItem } from 'components/atoms'
@@ -30,6 +31,8 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
   onClose,
   ...rest
 }: ISidebarProps) => {
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+
   return (
     <Box
       w={{ base: 'full', md: 60 }}
@@ -90,7 +93,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
             </NavItem>
           </Box>
         ))}
-        <Spacer />
+        {isLargerThanMd && <Spacer />}
         <NavItem
           key={'Profile'}
           icon={<ProfileIcon />}
@@ -107,6 +110,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         >
           Administration
         </NavItem>
+        {!isLargerThanMd && <Spacer />}
         <Flex mt="1rem" alignItems="center">
           <Flex
             fill="black"

@@ -106,7 +106,11 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                       )}
                     </Td>
                     <Td>{contract.asset.code}</Td>
-                    <Td>{contract.vault.name}</Td>
+                    <Td>
+                      {!isLargerThanLg && contract.vault.name.length > 10
+                        ? `${contract.vault.name.substring(0, 8)}...`
+                        : contract.vault.name}
+                    </Td>
                     {isLargerThanSm && (
                       <Td>{`${contract.yield_rate / 100}%`}</Td>
                     )}

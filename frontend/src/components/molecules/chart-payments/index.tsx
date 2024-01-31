@@ -58,7 +58,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       width: [0, 4],
     },
     dataLabels: {
-      enabled: true,
+      enabled: false,
       enabledOnSeries: [1],
     },
     labels: getChartLabels(chartPeriod),

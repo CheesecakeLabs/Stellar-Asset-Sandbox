@@ -25,6 +25,7 @@ import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
 
@@ -152,7 +153,12 @@ export const MintAsset: React.FC = () => {
             <ActionHelper title={'About Mint'} description={mintHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Mint'} />
+            <Flex justifyContent="space-between" w="full" alignItems="center">
+              <ManagementBreadcrumb title={'Mint'} />
+              {id && isSmallerThanMd && (
+                <MenuActionsAssetMobile id={id} selected={'MINT'} />
+              )}
+            </Flex>
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -170,7 +176,7 @@ export const MintAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.MINT}
                 permissions={userPermissions}

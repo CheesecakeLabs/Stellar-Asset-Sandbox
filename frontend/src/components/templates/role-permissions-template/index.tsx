@@ -5,16 +5,20 @@ import {
   Flex,
   Skeleton,
   Table,
+  TableContainer,
   Tbody,
   Td,
   Text,
   Th,
   Thead,
   Tr,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+
+import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { IChange } from 'app/core/pages/role-permissions'
 
@@ -40,6 +44,8 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   onSubmit,
   setChanges,
 }) => {
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+
   const havePermissionByRole = (
     permissionId: number,
     roleId: number
@@ -73,10 +79,18 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-          Administration
-        </Text>
-        <Container variant="primary" px={0} pb={0} maxW="full" overflowX="auto">
+        <Flex
+          justifyContent="space-between"
+          w="full"
+          alignItems="center"
+          mb="1.5rem"
+        >
+          <Text fontSize="2xl" fontWeight="400">
+            Administration
+          </Text>
+          {isSmallerThanMd && <MenuAdminMobile selected={'ROLE_PERMISSIONS'} />}
+        </Flex>
+        <Container variant="primary" px={0} pb={0} maxW="full">
           <Flex
             justifyContent="space-between"
             px="1.25rem"
@@ -108,50 +122,52 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           {loading ? (
             <Skeleton h="8rem" />
           ) : (
-            <Table w="full" variant="list">
-              <Thead w="full">
-                <Tr>
-                  <Th>Role name</Th>
-                  {roles?.map((role, index) => (
-                    <Th textAlign="center" key={index}>
-                      {role.name}
-                    </Th>
-                  ))}
-                </Tr>
-              </Thead>
-              <Tbody>
-                {permissions?.map((permission, index) => (
-                  <Tr key={index}>
-                    <Td>
-                      <Text>{permission.name}</Text>
-                      <Text fontSize="xs" maxW="400px">
-                        {permission.description}
-                      </Text>
-                    </Td>
+            <TableContainer>
+              <Table w="full" variant="list" overflowX="unset" overflowY="unset">
+                <Thead w="full">
+                  <Tr position="sticky">
+                    <Th >Role name</Th>
                     {roles?.map((role, index) => (
-                      <Td key={index}>
-                        <Checkbox
-                          w="full"
-                          justifyContent="center"
-                          defaultChecked={havePermissionByRole(
-                            permission.id,
-                            role.id
-                          )}
-                          isDisabled={role.admin === 1}
-                          onChange={(event): void => {
-                            onChange(
-                              permission.id,
-                              role.id,
-                              event.target.checked
-                            )
-                          }}
-                        />
-                      </Td>
+                      <Th textAlign="center" key={index}>
+                        {role.name}
+                      </Th>
                     ))}
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {permissions?.map((permission, index) => (
+                    <Tr key={index}>
+                      <Td position="sticky">
+                        <Text>{permission.name}</Text>
+                        <Text fontSize="xs" maxW="400px">
+                          {permission.description}
+                        </Text>
+                      </Td>
+                      {roles?.map((role, index) => (
+                        <Td key={index}>
+                          <Checkbox
+                            w="full"
+                            justifyContent="center"
+                            defaultChecked={havePermissionByRole(
+                              permission.id,
+                              role.id
+                            )}
+                            isDisabled={role.admin === 1}
+                            onChange={(event): void => {
+                              onChange(
+                                permission.id,
+                                role.id,
+                                event.target.checked
+                              )
+                            }}
+                          />
+                        </Td>
+                      ))}
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           )}
         </Container>
       </Flex>

@@ -67,9 +67,11 @@ export const TeamMembers: React.FC = () => {
               permissions={userPermissions}
             />
           </Flex>
-          <VStack>
-            <MenuSettings option={SettingsOptions.TEAM_MEMBERS} />
-          </VStack>
+          {isLargerThanMd && (
+            <VStack>
+              <MenuSettings option={SettingsOptions.TEAM_MEMBERS} />
+            </VStack>
+          )}
         </Flex>
       </Sidebar>
     </Flex>
