@@ -5,6 +5,7 @@ import {
   Box,
   useColorMode,
   Skeleton,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
@@ -27,6 +28,7 @@ export const ChartSupply: React.FC<IChartSupply> = ({
   setChartPeriod,
 }) => {
   const { colorMode } = useColorMode()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   const series = [
     {
@@ -66,7 +68,7 @@ export const ChartSupply: React.FC<IChartSupply> = ({
       labels: {
         show: true,
         formatter: function (value: string): string {
-          return chartPeriod === '24h' ? formatHour(value) : formatDateMD(value)
+          return isLargerThanMd ? chartPeriod === '24h' ? formatHour(value) : formatDateMD(value) : ''
         },
       },
     },

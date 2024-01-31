@@ -22,7 +22,6 @@ export const ItemActionAssetMobile: React.FC<IItemActionAssetMobile> = ({
       icon={icon}
       stroke={isSelected ? 'white' : 'gray'}
       fill={isSelected ? 'white' : 'gray'}
-      iconSpacing={5}
       onClick={(): void => {
         navigate(path)
       }}

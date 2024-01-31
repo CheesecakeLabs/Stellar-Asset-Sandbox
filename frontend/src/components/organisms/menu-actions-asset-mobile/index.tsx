@@ -69,56 +69,56 @@ export const MenuActionsAssetMobile: React.FC<IMenuActions> = ({
         <ItemActionAssetMobile
           isSelected={isSelected('HOME')}
           title={'Asset home'}
-          icon={<HomeIcon />}
+          icon={<HomeIcon width="16px" height="16px" />}
           path={`${PathRoute.ASSET_HOME}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('MINT')}
           title={'Mint assets'}
-          icon={<AddIcon />}
+          icon={<AddIcon width="16px" height="16px" />}
           path={`${PathRoute.MINT_ASSET}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('BURN')}
           title={'Burn assets'}
-          icon={<BurnIcon />}
+          icon={<BurnIcon width="16px" height="16px" />}
           path={`${PathRoute.BURN_ASSET}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('DISTRIBUTE')}
           title={'Distribute'}
-          icon={<TransferIcon />}
+          icon={<TransferIcon width="16px" height="16px" />}
           path={`${PathRoute.DISTRIBUTE_ASSET}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('AUTHORIZE')}
           title={'Authorize account'}
-          icon={<AuthorizeIcon />}
+          icon={<AuthorizeIcon width="16px" height="16px" />}
           path={`${PathRoute.AUTHORIZE_ACCOUNT}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('FREEZE')}
           title={'Freeze account'}
-          icon={<BlockIcon />}
+          icon={<BlockIcon width="16px" height="16px" />}
           path={`${PathRoute.FREEZE_ACCOUNT}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('CLAWBACK')}
           title={'Clawback'}
-          icon={<BackIcon />}
+          icon={<BackIcon width="16px" height="16px" />}
           path={`${PathRoute.CLAWBACK_ASSET}/${id}`}
         />
 
         <ItemActionAssetMobile
           isSelected={isSelected('PUBLISH_INFORMATION')}
           title={'Publish information'}
-          icon={<FileIcon />}
+          icon={<FileIcon width="16px" height="16px" />}
           path={`${PathRoute.PUBLISH_INFORMATION}/${id}`}
         />
       </MenuList>
