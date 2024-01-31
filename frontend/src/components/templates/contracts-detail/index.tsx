@@ -54,7 +54,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   currentInVault,
   hasAssetInVault,
   hasWallet,
-  timerCounter
+  timerCounter,
 }) => {
   return (
     <Flex flexDir="column" w="full">
@@ -111,7 +111,9 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                   onSubmit={onSubmitWithdraw}
                   contract={contract}
                   loading={isWithdrawing}
-                  isDone={!timerCounter || timerCounter === 0}
+                  isDone={
+                    contractData.timeLeft ? contractData.timeLeft < 0 : false
+                  }
                   withdrawValue={
                     contractData.timeLeft && contractData.timeLeft > 0
                       ? Number(contractData.estimatedPrematureWithdraw)

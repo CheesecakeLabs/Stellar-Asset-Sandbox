@@ -6,12 +6,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from 'hooks/useAuth'
 import { useContracts } from 'hooks/useContracts'
 import { useTransactions } from 'hooks/useTransactions'
+import { ContractsService } from 'soroban/contracts-service'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsDetailTemplate } from 'components/templates/contracts-detail'
-import { ContractsService } from 'soroban/contracts-service'
 
 export const ContractsDetail: React.FC = () => {
   const {
@@ -107,7 +107,7 @@ export const ContractsDetail: React.FC = () => {
         let timeLeft = contractData?.timeLeft
 
         await ContractsService.validateContract(sponsor, contract.address)
-        
+
         const position =
           Number(
             (await getPosition(wallet, contract.address, wallet, sponsor)) || 0
