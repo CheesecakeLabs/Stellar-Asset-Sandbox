@@ -35,7 +35,7 @@ export const DashboardsTemplate: React.FC<IDashboardsTemplate> = ({
     useState<Hooks.UseAssetsTypes.IAssetDto>()
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW="1580px" alignSelf="center" flexDir="column" w="full">
         <Flex>
           <Text fontSize="2xl" fontWeight="400">
