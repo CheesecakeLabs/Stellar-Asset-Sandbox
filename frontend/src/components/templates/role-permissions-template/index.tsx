@@ -133,13 +133,16 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                   <Thead w="full">
                     <Tr position="sticky">
                       <Th>Role name</Th>
-                    </Tr>◊
+                    </Tr>
+                    ◊
                   </Thead>
                   <Tbody>
                     {permissions?.map((permission, index) => (
                       <Tr key={index}>
                         <Td position="sticky">
-                          <Text fontSize={{base: 'xs', md: 'sm'}}>{permission.name}</Text>
+                          <Text fontSize={{ base: 'xs', md: 'sm' }}>
+                            {permission.name}
+                          </Text>
                           <Text fontSize="xs" maxW="400px">
                             {permission.description}
                           </Text>
@@ -177,12 +180,12 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                                 permission.id,
                                 role.id
                               )}
-                             isDisabled={isDisabled(role)}
-                                                       title={
-                                                         isDisabled(role)
-                                                           ? 'You can only edit roles you created'
-                                                           : ''
-                                                       }
+                              isDisabled={isDisabled(role)}
+                              title={
+                                isDisabled(role)
+                                  ? 'You can only edit roles you created'
+                                  : ''
+                              }
                               onChange={(event): void => {
                                 onChange(
                                   permission.id,
