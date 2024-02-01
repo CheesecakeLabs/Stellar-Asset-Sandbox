@@ -307,7 +307,14 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   const createRole = async (name: string): Promise<boolean> => {
     setCreatingRole(true)
     try {
-      const response = await http.post(`role`, { name: name })
+      const user = Authentication.getUser()
+
+      if (!user?.id) throw new Error('Unauthorized error')
+
+      const response = await http.post(`role`, {
+        name: name,
+        created_by: Number(user.id),
+      })
       if (response.status !== 200) {
         throw new Error()
       }

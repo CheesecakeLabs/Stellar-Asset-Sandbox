@@ -20,6 +20,7 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
+import Authentication from 'app/auth/services/auth'
 import { IChange } from 'app/core/pages/role-permissions'
 
 interface IRolePermissionsTemplate {
@@ -76,6 +77,10 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
     setChanges([...filtered, newChange])
   }
 
+  const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
+    return role.admin === 1 || role.created_by != Authentication.getUser()?.id
+  }
+
   return (
     <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
@@ -129,12 +134,15 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                     <Tr position="sticky">
                       <Th>Role name</Th>
                     </Tr>
+                    ◊
                   </Thead>
                   <Tbody>
                     {permissions?.map((permission, index) => (
                       <Tr key={index}>
                         <Td position="sticky">
-                          <Text fontSize={{base: 'xs', md: 'sm'}}>{permission.name}</Text>
+                          <Text fontSize={{ base: 'xs', md: 'sm' }}>
+                            {permission.name}
+                          </Text>
                           <Text fontSize="xs" maxW="400px">
                             {permission.description}
                           </Text>
@@ -172,7 +180,12 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                                 permission.id,
                                 role.id
                               )}
-                              isDisabled={role.admin === 1}
+                              isDisabled={isDisabled(role)}
+                              title={
+                                isDisabled(role)
+                                  ? 'You can only edit roles you created'
+                                  : ''
+                              }
                               onChange={(event): void => {
                                 onChange(
                                   permission.id,
