@@ -159,14 +159,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       },
     })
 
-    contract.getContractCodeLiveUntilLedgerSeq().then(result => {
-      console.log('getContractCodeLiveUntilLedgerSeq: ' + result)
-    })
-
-    contract.getContractInstanceLiveUntilLedgerSeq().then(result => {
-      console.log('getContractInstanceLiveUntilLedgerSeq: ' + result)
-    })
-
     return contract
   }
 

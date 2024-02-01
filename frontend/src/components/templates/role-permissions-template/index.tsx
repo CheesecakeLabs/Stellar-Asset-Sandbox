@@ -122,52 +122,73 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           {loading ? (
             <Skeleton h="8rem" />
           ) : (
-            <TableContainer>
-              <Table w="full" variant="list" overflowX="unset" overflowY="unset">
-                <Thead w="full">
-                  <Tr position="sticky">
-                    <Th >Role name</Th>
-                    {roles?.map((role, index) => (
-                      <Th textAlign="center" key={index}>
-                        {role.name}
-                      </Th>
-                    ))}
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {permissions?.map((permission, index) => (
-                    <Tr key={index}>
-                      <Td position="sticky">
-                        <Text>{permission.name}</Text>
-                        <Text fontSize="xs" maxW="400px">
-                          {permission.description}
-                        </Text>
-                      </Td>
-                      {roles?.map((role, index) => (
-                        <Td key={index}>
-                          <Checkbox
-                            w="full"
-                            justifyContent="center"
-                            defaultChecked={havePermissionByRole(
-                              permission.id,
-                              role.id
-                            )}
-                            isDisabled={role.admin === 1}
-                            onChange={(event): void => {
-                              onChange(
-                                permission.id,
-                                role.id,
-                                event.target.checked
-                              )
-                            }}
-                          />
+            <Flex>
+              <TableContainer minW="max-content">
+                <Table w="full" variant="list">
+                  <Thead w="full">
+                    <Tr position="sticky">
+                      <Th>Role name</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {permissions?.map((permission, index) => (
+                      <Tr key={index}>
+                        <Td position="sticky">
+                          <Text fontSize={{base: 'xs', md: 'sm'}}>{permission.name}</Text>
+                          <Text fontSize="xs" maxW="400px">
+                            {permission.description}
+                          </Text>
                         </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+              <TableContainer w="full">
+                <Table
+                  w="full"
+                  variant="list"
+                  overflowX="unset"
+                  overflowY="unset"
+                >
+                  <Thead w="full">
+                    <Tr position="sticky">
+                      {roles?.map((role, index) => (
+                        <Th textAlign="center" key={index}>
+                          {role.name}
+                        </Th>
                       ))}
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+                  </Thead>
+                  <Tbody>
+                    {permissions?.map((permission, index) => (
+                      <Tr key={index}>
+                        {roles?.map((role, index) => (
+                          <Td key={index}>
+                            <Checkbox
+                              w="full"
+                              justifyContent="center"
+                              defaultChecked={havePermissionByRole(
+                                permission.id,
+                                role.id
+                              )}
+                              isDisabled={role.admin === 1}
+                              onChange={(event): void => {
+                                onChange(
+                                  permission.id,
+                                  role.id,
+                                  event.target.checked
+                                )
+                              }}
+                            />
+                          </Td>
+                        ))}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </Flex>
           )}
         </Container>
       </Flex>

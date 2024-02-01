@@ -51,7 +51,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
   const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">

@@ -66,10 +66,9 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
   const navigate = useNavigate()
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
-  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
@@ -103,7 +102,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   <Th w="2rem" p={0} />
                   <Th>Code</Th>
                   <Th>Name</Th>
-                  {isLargerThanSm && <Th isNumeric>Supply</Th>}
+                  {isLargerThanMd && <Th isNumeric>Supply</Th>}
                   {isLargerThanLg && <Th>Asset type</Th>}
                   {isLargerThanMd && <Th>Controls</Th>}
                   <Th w="2rem" p={0} />
@@ -128,7 +127,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                     </Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
-                    {isLargerThanSm && (
+                    {isLargerThanMd && (
                       <Td isNumeric>
                         {asset.assetData
                           ? toCrypto(Number(asset.assetData?.amount))

@@ -39,7 +39,7 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
   permissions,
 }) => {
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const { onOpen } = useDisclosure()
 
   return (
     <Flex flexDir="column" w="full">

@@ -1,20 +1,8 @@
-import {
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Td,
-  Tr,
-  useDisclosure,
-} from '@chakra-ui/react'
-import React, { ReactNode } from 'react'
+import { Td, Tr, useDisclosure } from '@chakra-ui/react'
+import React from 'react'
 
-import { havePermission } from 'utils'
 import { formatName } from 'utils/formatter'
 
-import { Permissions } from 'components/enums/permissions'
-import { MenuDotsIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
 
 import { ItemMenu } from '../item-menu'

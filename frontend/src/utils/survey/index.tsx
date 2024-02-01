@@ -1,4 +1,4 @@
-const LOCAL_STORAGE_KEY = 'survey-answer'
+const LOCAL_STORAGE_KEY = 'survey-answer10'
 
 const addAnswer = (answer: string): void => {
   localStorage.setItem(LOCAL_STORAGE_KEY, answer)
