@@ -251,16 +251,20 @@ export const AssetsList: React.FC<IAssetsList> = ({
                 >
                   Accounts authorization
                 </Text>
-                <AccountsChart
-                  authorized={assetSelected.assetData?.accounts.authorized || 0}
-                  unauthorized={
-                    (assetSelected.assetData?.accounts
-                      .authorized_to_maintain_liabilities || 0) +
-                    (assetSelected.assetData?.accounts.unauthorized || 0)
-                  }
-                  authorizedLabel={'Authorized'}
-                  unauthorizedLabel={'Pending authorization'}
-                />
+                <Flex justifyContent="center">
+                  <AccountsChart
+                    authorized={
+                      assetSelected.assetData?.accounts.authorized || 0
+                    }
+                    unauthorized={
+                      (assetSelected.assetData?.accounts
+                        .authorized_to_maintain_liabilities || 0) +
+                      (assetSelected.assetData?.accounts.unauthorized || 0)
+                    }
+                    authorizedLabel={'Authorized'}
+                    unauthorizedLabel={'Pending authorization'}
+                  />
+                </Flex>
                 <Divider mt="1rem" />
                 <BalanceChart
                   supply={Number(assetSelected.assetData?.amount || 0)}

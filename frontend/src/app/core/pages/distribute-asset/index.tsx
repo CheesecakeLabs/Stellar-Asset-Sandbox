@@ -25,6 +25,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
@@ -185,7 +186,13 @@ export const DistributeAsset: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Distribute'} />
+            <Flex justifyContent="space-between" w="full" alignItems="center">
+              <ManagementBreadcrumb title={'Distribute'} />
+              {id && isSmallerThanMd && (
+                <MenuActionsAssetMobile id={id} selected={'DISTRIBUTE'} />
+              )}
+            </Flex>
+
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -199,7 +206,7 @@ export const DistributeAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.DISTRIBUTE}
                 permissions={userPermissions}

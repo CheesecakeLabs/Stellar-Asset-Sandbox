@@ -35,7 +35,7 @@ export const AccountsChart: React.FC<IAccountsChart> = ({
         breakpoint: 480,
         options: {
           chart: {
-            width: 200,
+            width: '200',
           },
           legend: {
             position: 'bottom',
