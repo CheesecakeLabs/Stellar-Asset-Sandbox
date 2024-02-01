@@ -134,7 +134,6 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
                     <Tr position="sticky">
                       <Th>Role name</Th>
                     </Tr>
-                    ◊
                   </Thead>
                   <Tbody>
                     {permissions?.map((permission, index) => (
