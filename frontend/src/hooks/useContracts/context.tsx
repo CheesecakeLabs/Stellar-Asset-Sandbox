@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createContext, useCallback, useState } from 'react'
 
 import freighter from '@stellar/freighter-api'
@@ -10,10 +9,7 @@ import { BUMP_FEE, ContractsService } from 'soroban/contracts-service'
 import { StellarPlus } from 'stellar-plus'
 import { ContractEngineErrorCodes } from 'stellar-plus/lib/stellar-plus/core/contract-engine/errors'
 import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
-import {
-  SimulationErrorInfo,
-  restoreData,
-} from 'stellar-plus/lib/stellar-plus/error/helpers/soroban-rpc'
+import { restoreData } from 'stellar-plus/lib/stellar-plus/error/helpers/soroban-rpc'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 import {
   FeeBumpTransaction,
