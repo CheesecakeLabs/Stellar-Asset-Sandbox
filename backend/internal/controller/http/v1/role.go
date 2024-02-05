@@ -8,6 +8,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,10 +16,11 @@ type role struct {
 	roleUseCase         usecase.RoleUseCase
 	messengerController HTTPControllerMessenger
 	l                   *logger.Logger
+	pf 	   profanity.ProfanityFilter
 }
 
-func newRoleRoutes(handler *gin.RouterGroup, roleUseCase usecase.RoleUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
-	r := &role{roleUseCase, messengerController, l}
+func newRoleRoutes(handler *gin.RouterGroup, roleUseCase usecase.RoleUseCase, messengerController HTTPControllerMessenger, l *logger.Logger, pf profanity.ProfanityFilter) {
+	r := &role{roleUseCase, messengerController, l, pf}
 
 	h := handler.Group("/role")
 	{
@@ -66,6 +68,12 @@ func (r *role) createRole(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.l.Error(err, "http - v1 - create role - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	if r.pf.ContainsProfanity(request.Name) {
+		r.l.Error(nil, "http - v1 - create role - name profanity")
+		errorResponse(c, http.StatusBadRequest, "name not allowed", nil)
 		return
 	}
 

@@ -1,31 +1,15 @@
 package profanity
 
 import (
-	"strings"
+	goaway "github.com/TwiN/go-away"
 )
 
-var ProfanityList = []string{
-	"badword1",
-	"badword2",
+type ProfanityFilter struct{}
+
+func (pf *ProfanityFilter) ContainsProfanity(input string) bool {
+	return goaway.IsProfane(input)
 }
 
-func ContainsProfanity(input string) bool {
-	lowerInput := strings.ToLower(input)
-	for _, word := range ProfanityList {
-		if strings.Contains(lowerInput, word) {
-			return true
-		}
-	}
-	return false
-}
-
-func ReplaceProfanity(input string) string {
-	lowerInput := strings.ToLower(input)
-	for _, word := range ProfanityList {
-		if strings.Contains(lowerInput, word) {
-			replacement := strings.Repeat("*", len(word))
-			input = strings.Replace(input, word, replacement, -1)
-		}
-	}
-	return input
+func (pf *ProfanityFilter) ReplaceProfanity(input string) string {
+	return goaway.Censor(input)
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	sentryPkg "github.com/CheesecakeLabs/token-factory-v2/backend/pkg/sentry"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
@@ -33,6 +34,8 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	if cfg.Deploy.DeployStage == "production" {
 		sentryPkg.New(cfg, l)
 	}
+
+	pf := profanity.ProfanityFilter{}
 
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
@@ -81,7 +84,7 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	if cfg.Deploy.DeployStage == "production" {
 		handler.Use(sentrygin.New(sentrygin.Options{}))
 	}
-	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l)
+	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l, pf)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),
