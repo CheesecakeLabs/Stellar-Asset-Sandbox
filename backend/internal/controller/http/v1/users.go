@@ -81,7 +81,7 @@ func (r *usersRoutes) createUser(c *gin.Context) {
 
 	if r.pf.ContainsProfanity(user.Name) {
 		r.l.Error(nil, "http - v1 - create user - name profanity")
-		errorResponse(c, http.StatusBadRequest, "name not allowed", nil)
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 

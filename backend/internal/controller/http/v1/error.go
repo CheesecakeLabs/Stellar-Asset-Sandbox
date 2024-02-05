@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,3 +22,10 @@ func errorResponse(c *gin.Context, code int, msg string, err error) {
 	}
 	c.AbortWithStatusJSON(code, resp)
 }
+
+func profanityError(entry string) string {
+	return fmt.Sprintf("The entry '%s' cannot be accepted due to inappropriate language.", entry)
+} 
+
+
+

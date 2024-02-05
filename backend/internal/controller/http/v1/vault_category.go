@@ -56,7 +56,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 
 	if r.pf.ContainsProfanity(request.Name) {
 		r.l.Error(nil, "http - v1 - create vault category - name profanity")
-		errorResponse(c, http.StatusBadRequest, "name not allowed", nil)
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 

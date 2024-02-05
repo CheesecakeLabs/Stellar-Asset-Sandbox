@@ -73,7 +73,7 @@ func (r *role) createRole(c *gin.Context) {
 
 	if r.pf.ContainsProfanity(request.Name) {
 		r.l.Error(nil, "http - v1 - create role - name profanity")
-		errorResponse(c, http.StatusBadRequest, "name not allowed", nil)
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 
@@ -113,6 +113,12 @@ func (r *role) updateRole(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.l.Error(err, "http - v1 - update role - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	if r.pf.ContainsProfanity(request.Name) {
+		r.l.Error(nil, "http - v1 - update role - name profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 

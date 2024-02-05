@@ -178,13 +178,13 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 
 	if r.pf.ContainsProfanity(request.Code) {
 		r.logger.Error(nil, "http - v1 - create asset - code profanity")
-		errorResponse(c, http.StatusBadRequest, "asset code not allowed", nil)
+		errorResponse(c, http.StatusBadRequest, profanityError("Code"), nil)
 		return
 	}
 
 	if r.pf.ContainsProfanity(request.Name) {
 		r.logger.Error(nil, "http - v1 - create asset - name profanity")
-		errorResponse(c, http.StatusBadRequest, "asset name not allowed", nil)
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 
