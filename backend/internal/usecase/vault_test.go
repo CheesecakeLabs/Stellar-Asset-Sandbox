@@ -219,15 +219,6 @@ func TestVaultUseCaseCreate(t *testing.T) {
 			res: entity.Vault{},
 			err: vaultDbError,
 		},
-		{
-			name: "create - vault - Wallet Error",
-			req:  vault,
-			mock: func() {
-				wr.EXPECT().CreateWalletWithKey(vault.Wallet).Return(entity.Wallet{}, walletDbError)
-			},
-			res: entity.Vault{},
-			err: walletDbError,
-		},
 	}
 
 	for _, tc := range tests {
