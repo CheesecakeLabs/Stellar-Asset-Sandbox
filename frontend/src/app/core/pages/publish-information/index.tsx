@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -14,12 +20,16 @@ import { PathRoute } from 'components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { PublishInformationTemplate } from 'components/templates/publish-information'
 
 export const PublishInformation: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [tomlData, setTomlData] = useState<Hooks.UseAssetsTypes.ITomlFile>()
+
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const {
     generateToml,
@@ -125,7 +135,15 @@ export const PublishInformation: React.FC = () => {
           gap="1.5rem"
         >
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Publish information'} />
+            <Flex justifyContent="space-between" w="full" alignItems="center">
+              <ManagementBreadcrumb title={'Publish information'} />
+              {id && isSmallerThanMd && (
+                <MenuActionsAssetMobile
+                  id={id}
+                  selected={'PUBLISH_INFORMATION'}
+                />
+              )}
+            </Flex>
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -138,7 +156,7 @@ export const PublishInformation: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.PUBLISH_INFORMATION}
                 permissions={userPermissions}

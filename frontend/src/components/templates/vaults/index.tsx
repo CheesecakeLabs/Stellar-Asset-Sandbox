@@ -32,7 +32,7 @@ export const VaultsTemplate: React.FC<IVaultsTemplate> = ({
   const navigate = useNavigate()
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW="1280px" alignSelf="center" flexDir="column" w="full">
         <Flex mb="1rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">

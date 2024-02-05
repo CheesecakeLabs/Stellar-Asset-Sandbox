@@ -14,7 +14,7 @@ export interface ISubmissionPayload {
 
 export const Survey: React.FC = () => {
   const [showSurvey, setShowSurvey] = useState(!SurveyStore.isAnswered())
-  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   function isJsonString(str: string): boolean {
     try {
@@ -49,10 +49,10 @@ export const Survey: React.FC = () => {
           fontWeight="semibold"
           data-tally-open="wzYj21"
           data-tally-width="380"
-          iconSpacing={isLargerThanSm ? '0.5rem' : '0'}
+          iconSpacing={isLargerThanMd ? '0.5rem' : '0'}
           leftIcon={<Clipboard size="16px" color="white" />}
         >
-          {isLargerThanSm ? 'Asset Sandbox Survey' : ''}
+          {isLargerThanMd ? 'Asset Sandbox Survey' : ''}
         </Button>
       )}
     </Box>

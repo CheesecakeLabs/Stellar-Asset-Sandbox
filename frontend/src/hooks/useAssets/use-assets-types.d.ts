@@ -11,6 +11,9 @@ declare namespace Hooks {
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
       contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
     }
 
     interface IAssetDto {
@@ -25,6 +28,9 @@ declare namespace Hooks {
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
       contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
     }
 
     interface IPagedAssets {

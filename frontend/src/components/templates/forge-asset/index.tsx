@@ -127,7 +127,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
           },
         }}
       />
-      <Flex flexDir="column" w="full">
+      <Flex flexDir="column" w="full" pb="3.5rem">
         <Flex
           maxW={MAX_PAGE_WIDTH}
           alignSelf="center"

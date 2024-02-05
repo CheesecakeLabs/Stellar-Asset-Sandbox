@@ -1,13 +1,15 @@
 package entity
 
 type Role struct {
-	Id    int    `json:"id" example:"1"`
-	Name  string `json:"name" example:"Admin"`
-	Admin int    `json:"admin" example:"1"`
+	Id        int    `json:"id" example:"1"`
+	Name      string `json:"name" example:"Admin"`
+	Admin     int    `json:"admin" example:"1"`
+	CreatedBy int    `json:"created_by" example:"1"`
 }
 
 type RoleRequest struct {
-	Name string `json:"name" example:"Admin"`
+	Name      string `json:"name" example:"Admin"`
+	CreatedBy int    `json:"created_by" example:"1"`
 }
 
 type RoleDelete struct {

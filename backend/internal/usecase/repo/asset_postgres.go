@@ -181,7 +181,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
 	query := `
         SELECT
             a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
-            COALESCE(a.image, '') AS image, a.contract_id, 
+            COALESCE(a.image, '') AS image, a.contract_id,
 			a.authorize_required, a.clawback_enabled, a.freeze_enabled,
             d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
             dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,

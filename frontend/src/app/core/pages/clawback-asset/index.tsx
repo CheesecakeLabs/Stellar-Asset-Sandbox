@@ -24,6 +24,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ClawbackAssetTemplate } from 'components/templates/clawback-asset'
 
@@ -134,7 +135,12 @@ export const ClawbackAsset: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Clawback'} />
+            <Flex justifyContent="space-between" w="full" alignItems="center">
+              <ManagementBreadcrumb title={'Clawback'} />
+              {id && isSmallerThanMd && (
+                <MenuActionsAssetMobile id={id} selected={'CLAWBACK'} />
+              )}
+            </Flex>
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -148,7 +154,7 @@ export const ClawbackAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.CLAWBACK}
                 permissions={userPermissions}

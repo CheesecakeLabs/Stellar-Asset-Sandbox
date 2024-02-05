@@ -30,6 +30,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
 
@@ -174,7 +175,13 @@ export const AuthorizeAccount: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Authorize'} />
+            <Flex justifyContent="space-between" w="full" alignItems="center">
+              <ManagementBreadcrumb title={'Authorize'} />
+              {id && isSmallerThanMd && (
+                <MenuActionsAssetMobile id={id} selected={'AUTHORIZE'} />
+              )}
+            </Flex>
+
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -188,7 +195,7 @@ export const AuthorizeAccount: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.AUTHORIZE}
                 permissions={userPermissions}

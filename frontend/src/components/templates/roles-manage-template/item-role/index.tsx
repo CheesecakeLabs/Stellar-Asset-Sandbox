@@ -3,6 +3,8 @@ import React from 'react'
 
 import { DeleteIcon } from 'components/icons'
 
+import Authentication from 'app/auth/services/auth'
+
 import { ModalRoleDelete } from '../modal-role-delete'
 import { ModalRoleManage } from '../modal-role-manage'
 
@@ -35,6 +37,10 @@ export const ItemRole: React.FC<IItemRole> = ({
     onClose: onCloseDelete,
   } = useDisclosure()
 
+  const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
+    return role.admin === 1 || role.created_by != Authentication.getUser()?.id
+  }
+
   return (
     <>
       <ModalRoleManage
@@ -61,7 +67,10 @@ export const ItemRole: React.FC<IItemRole> = ({
             <Button
               variant="secondary"
               onClick={onOpenUpdate}
-              isDisabled={role.admin === 1}
+              title={
+                isDisabled(role) ? 'You can only edit roles you created' : ''
+              }
+              isDisabled={isDisabled(role)}
             >
               Rename
             </Button>
@@ -69,7 +78,10 @@ export const ItemRole: React.FC<IItemRole> = ({
               variant="primary"
               onClick={onOpenDelete}
               bg="red.500"
-              isDisabled={role.admin === 1}
+              title={
+                isDisabled(role) ? 'You can only edit roles you created' : ''
+              }
+              isDisabled={isDisabled(role)}
             >
               <DeleteIcon />
             </Button>

@@ -3,7 +3,7 @@ import { StellarPlus } from "stellar-plus";
 export const STELLAR_NETWORK = StellarPlus.Constants.testnet
 
 export const WASM_HASH =
-  '6cc0156febf6f2b83fa46f5b5ec58f516a05e7921dbe4d33398e735e3af203d8'
+  '3e74bccc06fba85a5e0f25cb0488754ef4224d1cd44ed1c409e032abc46fe4fd'
 
 export const vcRpcHandler = new StellarPlus.RPC.ValidationCloudRpcHandler(
   STELLAR_NETWORK,

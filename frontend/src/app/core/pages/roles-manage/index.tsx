@@ -3,13 +3,13 @@ import React, { useEffect } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
 import { MenuSettings } from 'components/organisms/menu-settings'
 import { Sidebar } from 'components/organisms/sidebar'
 import { RolesManageTemplate } from 'components/templates/roles-manage-template'
-import { GAService } from 'utils/ga'
 
 export const RolesManage: React.FC = () => {
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
@@ -122,9 +122,11 @@ export const RolesManage: React.FC = () => {
               handleRole={handleRole}
             />
           </Flex>
-          <VStack>
-            <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
-          </VStack>
+          {isLargerThanMd && (
+            <VStack>
+              <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
+            </VStack>
+          )}
         </Flex>
       </Sidebar>
     </Flex>
