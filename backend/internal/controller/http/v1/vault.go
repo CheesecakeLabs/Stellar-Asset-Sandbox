@@ -8,6 +8,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,12 +20,13 @@ type vaultRoutes struct {
 	w  usecase.WalletUseCase
 	as usecase.AssetUseCase
 	l  logger.Interface
+	pf profanity.ProfanityFilter
 }
 
 func newVaultRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, v usecase.VaultUseCase, vc usecase.VaultCategoryUseCase,
-	w usecase.WalletUseCase, as usecase.AssetUseCase, l logger.Interface,
+	w usecase.WalletUseCase, as usecase.AssetUseCase, l logger.Interface, pf profanity.ProfanityFilter,
 ) {
-	r := &vaultRoutes{m, a, v, vc, w, as, l}
+	r := &vaultRoutes{m, a, v, vc, w, as, l, pf}
 	h := handler.Group("/vault").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("/:id", r.getVaultById)
@@ -78,6 +80,12 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.l.Error(err, "http - v1 - create vault - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
+		return
+	}
+
+	if r.pf.ContainsProfanity(request.Name) {
+		r.l.Error(nil, "http - v1 - create vault - name profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 

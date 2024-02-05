@@ -9,6 +9,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,18 +25,19 @@ type assetsRoutes struct {
 	a      usecase.AuthUseCase
 	l      usecase.LogTransactionUseCase
 	logger *logger.Logger
+	pf 	   profanity.ProfanityFilter
 }
 
-func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger) {
-	r := &assetsRoutes{w, as, m, a, l, logger}
+func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
+	r := &assetsRoutes{w, as, m, a, l, logger, pf}
 	h := handler.Group("/").Use()
 	{
 		h.GET("/.well-known/stellar.toml", r.retrieveToml)
 	}
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger) {
-	r := &assetsRoutes{w, as, m, a, l, logger}
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
+	r := &assetsRoutes{w, as, m, a, l, logger, pf}
 
 	h := handler.Group("/assets")
 	h.Use(Auth(r.a.ValidateToken()))
@@ -171,6 +173,18 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	if err != nil {
 		r.logger.Error(err, "http - v1 - create asset - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
+		return
+	}
+
+	if r.pf.ContainsProfanity(request.Code) {
+		r.logger.Error(nil, "http - v1 - create asset - code profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Code"), nil)
+		return
+	}
+
+	if r.pf.ContainsProfanity(request.Name) {
+		r.logger.Error(nil, "http - v1 - create asset - name profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 
@@ -527,7 +541,6 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - burn asset - send message %d", Id))
 		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
 		return
-
 	}
 
 	amount, err := strconv.ParseFloat(request.Amount, 64)

@@ -9,6 +9,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -70,6 +71,7 @@ func NewRouter(
 	logUc usecase.LogTransactionUseCase,
 	cfg config.HTTP,
 	logger *logger.Logger,
+	profanityF profanity.ProfanityFilter,
 ) {
 	// Messenger
 	messengerController := newHTTPControllerMessenger(pKp, pHor, pEnv, pSub, pSig)
@@ -85,16 +87,16 @@ func NewRouter(
 	handler.Use(CORSMiddleware(cfg, logger))
 	groupV1 := handler.Group("/v1")
 	{
-		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, logger, vaultUc)
+		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, logger, vaultUc, profanityF)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase, logger)
-		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)
-		newRoleRoutes(groupV1, roleUseCase, messengerController, logger)
+		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger, profanityF)
+		newRoleRoutes(groupV1, roleUseCase, messengerController, logger, profanityF)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, messengerController, logger)
-		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc, logger)
-		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase, logger)
+		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc, logger, profanityF)
+		newVaultRoutes(groupV1, messengerController, authUseCase, vaultUc, vaultCategoryUc, walletUseCase, assetUseCase, logger, profanityF)
 		newContractRoutes(groupV1, messengerController, authUseCase, contractUc, vaultUc, assetUseCase, userUseCase, logger)
 		newLogTransactionsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, logUc, authUseCase, logger)
 		newSorobanRoutes(groupV1, walletUseCase, messengerController, authUseCase)
-		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger)
+		newAssetTomlRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger, profanityF)
 	}
 }

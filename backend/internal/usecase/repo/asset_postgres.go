@@ -130,6 +130,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
         SELECT
             a.id AS asset_id, a.name AS asset_name, a.asset_type, a.code AS code, 
             COALESCE(a.image, '') AS image, a.contract_id,
+			a.authorize_required, a.clawback_enabled, a.freeze_enabled,
             d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
             dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
             i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
@@ -151,7 +152,7 @@ func (r AssetRepo) GetAssetByCode(code string) (entity.Asset, error) {
 
 	err := row.Scan(
 		&asset.Id, &asset.Name, &asset.AssetType, &asset.Code, &image,
-		&asset.ContractId,
+		&asset.ContractId, &asset.AuthorizeRequired, &asset.ClawbackEnabled, &asset.FreezeEnabled,
 		&distributor.Id, &distributor.Type, &distributor.Funded,
 		&distributor.Key.Id, &distributor.Key.PublicKey, &distributor.Key.Weight,
 		&issuer.Id, &issuer.Type, &issuer.Funded,
@@ -185,7 +186,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
             d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
             dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
             i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
-            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight
+            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight, 
         FROM asset a
         JOIN wallet d ON a.distributor_id = d.id
         JOIN key dk ON d.id = dk.wallet_id

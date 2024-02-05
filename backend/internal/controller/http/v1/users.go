@@ -8,6 +8,7 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,12 +17,12 @@ type usersRoutes struct {
 	a  usecase.AuthUseCase
 	rP usecase.RolePermissionUseCase
 	v  usecase.VaultUseCase
-	// l logger.Interface
 	l logger.Interface
+	pf profanity.ProfanityFilter
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase) {
-	r := &usersRoutes{t, a, rP, v, l}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase, pf profanity.ProfanityFilter) {
+	r := &usersRoutes{t, a, rP, v, l, pf}
 
 	h := handler.Group("/users")
 	{
@@ -75,6 +76,12 @@ func (r *usersRoutes) createUser(c *gin.Context) {
 	if err := c.ShouldBindJSON(&user); err != nil {
 		r.l.Error(err, "http - v1 - create - ShouldBindJSON")
 		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	if r.pf.ContainsProfanity(user.Name) {
+		r.l.Error(nil, "http - v1 - create user - name profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
 		return
 	}
 

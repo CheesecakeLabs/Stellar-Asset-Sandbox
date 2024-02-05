@@ -25,6 +25,7 @@ require (
 	github.com/Eun/go-convert v1.2.12 // indirect
 	github.com/Eun/go-doppelgangerreader v0.0.0-20220728163552-459d94705224 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/TwiN/go-away v1.6.12 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect

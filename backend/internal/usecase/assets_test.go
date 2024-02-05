@@ -26,7 +26,7 @@ type testAsset struct {
 	err  error
 }
 
-func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, *mocks.MockWalletRepoInterface, *mocks.MockTomlInterface) {
+func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, *mocks.MockWalletRepoInterface, *mocks.MockTomlInterface, *mocks.MockTomlRepoInterface) {
 	t.Helper()
 
 	mockCtl := gomock.NewController(t)
@@ -39,11 +39,11 @@ func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, 
 	st := mocks.NewMockAssetServiceInterface(mockCtl)
 	u := usecase.NewAssetUseCase(ra, rw, tg, tr, config.Horizon{}, st)
 
-	return u, ra, rw, tg
+	return u, ra, rw, tg, tr
 }
 
 func TestAssetUseCaseCreate(t *testing.T) {
-	u, ra, rw, tg := asset(t)
+	u, ra, rw, tg, tr := asset(t)
 
 	req := entity.Asset{
 		Code: "ABC",
@@ -267,6 +267,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 				mockCfg := config.Horizon{} // Mock configuration
 				mockTRepo := tg
 				mockTRepo.EXPECT().GenerateToml(mockReq, mockCfg).Return(mockToml, nil)
+				tr.EXPECT().CreateToml(mockToml).Return(mockToml, nil)
 			},
 			res: mockToml,
 			err: nil,
