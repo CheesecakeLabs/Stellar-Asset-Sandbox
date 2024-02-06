@@ -78,7 +78,6 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   }
 
   const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
-    return false
     return role.admin === 1 || role.created_by != Authentication.getUser()?.id
   }
 
