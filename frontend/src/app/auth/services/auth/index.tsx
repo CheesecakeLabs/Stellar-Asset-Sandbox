@@ -1,6 +1,6 @@
 import SurveyStore from 'utils/survey'
 
-const LOCAL_STORAGE_KEY = 'auth-token-sandbox-v2'
+const LOCAL_STORAGE_KEY = 'auth-token-sand-v2'
 
 const logout = (clearSurvey?: boolean): void => {
   localStorage.removeItem(LOCAL_STORAGE_KEY)
