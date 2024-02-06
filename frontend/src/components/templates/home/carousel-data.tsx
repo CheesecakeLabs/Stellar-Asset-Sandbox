@@ -9,7 +9,7 @@ import VIDEO_TREASURY from 'app/core/resources/home-videos/treasury.mp4'
 export const carouselData = [
   {
     title: 'Welcome to the Stellar Asset Issuance Sandbox (Custodial Edition)!',
-    slide: "https://www.youtube.com/embed/F4eFUwpcEYA?si=WQJpVCXhfhR3qVa5",
+    slide: 'https://www.youtube.com/embed/F4eFUwpcEYA?si=WQJpVCXhfhR3qVa5',
     actionName: undefined,
     actionDestination: undefined,
     isYoutube: true,
@@ -28,7 +28,7 @@ export const carouselData = [
           and management on the Stellar testnet. With our user-friendly
           application, experience the Stellar network like never before.
           Designed as an educational tool, our platform is open and accessible
-          to everyone.'
+          to everyone.
         </Text>
       </Box>
     ),
@@ -54,8 +54,8 @@ export const carouselData = [
         </Text>
         <br />
         <Text>
-          <b>Default Roles</b>: The platform comes with predefined roles such as
-          Asset Manager and Treasurer, each with its set of permissions.
+          <b>Default Roles</b>:The platform comes with predefined roles such as
+          Asset Manager and Analyst, each with its set of permissions.
         </Text>
         <br />
         <Text>
@@ -188,32 +188,26 @@ export const carouselData = [
     ),
   },
   {
-    title: 'Soroban: The Next Evolution (Coming Soon)',
+    title: 'Soroban: The Next Evolution',
     slide: VIDEO_SOROBAN,
     actionName: undefined,
     actionDestination: undefined,
     children: (
       <Box>
         <Text>
-          Prepare to unlock a new dimension of possibilities with the Stellar
-          network. We're excited to announce that the Stellar Asset Issuance
-          Sandbox will soon integrate features powered by Soroban, Stellar's
-          upcoming smart contracts platform.
+          Get ready to unlock a new dimension of possibilities with the Stellar
+          network! We're thrilled to announce that the Stellar Asset Issuance
+          Sandbox has now integrated features powered by Soroban, Stellar's
+          smart contracts platform.
         </Text>
         <br />
         <Text>
-          Soroban promises to revolutionize the Stellar ecosystem by introducing
+          Soroban is set to revolutionize the Stellar ecosystem by introducing
           enhanced programmability, paving the way for more intricate and
-          diverse use cases to be constructed. With this integration, users will
-          be able to explore and experiment with the advanced functionalities
-          that smart contracts bring to the table, further expanding the
-          horizons of what's achievable on the Stellar network.
-        </Text>
-        <br />
-        <Text>
-          Stay tuned for this transformative update, as we continue our
-          commitment to providing the best educational and experimental platform
-          for Stellar enthusiasts and professionals alike.
+          diverse use cases to be constructed. With this integration, users can
+          now explore and experiment with the advanced functionalities that
+          smart contracts bring to the table, further expanding the horizons of
+          what's achievable on the Stellar network.
         </Text>
       </Box>
     ),

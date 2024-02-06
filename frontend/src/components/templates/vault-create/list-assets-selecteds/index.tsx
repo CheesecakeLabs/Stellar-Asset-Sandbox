@@ -1,21 +1,19 @@
-import { Text, Flex, Switch, Img } from '@chakra-ui/react'
+import { Text, Flex, Img, Button } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
 import { getCurrencyIcon } from 'utils/constants/constants'
 
-interface ISelectAssets {
+interface IListAssetsSelecteds {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
-  assetsSelecteds: number[]
-  setAssetsSelecteds: Dispatch<SetStateAction<number[]>>
+  setAssets: Dispatch<SetStateAction<Hooks.UseAssetsTypes.IAssetDto[]>>
 }
 
-export const SelectAssets: React.FC<ISelectAssets> = ({
+export const ListAssetsSelecteds: React.FC<IListAssetsSelecteds> = ({
   assets,
-  setAssetsSelecteds,
-  assetsSelecteds,
+  setAssets,
 }) => {
   return (
-    <Flex flexDir="column">
+    <Flex flexDir="column" mt="0.5rem">
       {assets?.map((asset, index) => (
         <Flex
           key={index}
@@ -43,15 +41,19 @@ export const SelectAssets: React.FC<ISelectAssets> = ({
               {asset.name}
             </Text>
           </Flex>
-          <Switch
-            onChange={(event): void => {
-              if (event.target.checked) {
-                setAssetsSelecteds([asset.id, ...assetsSelecteds])
-                return
-              }
-              setAssetsSelecteds(assetsSelecteds.filter(id => id !== asset.id))
+          <Button
+            variant="delete"
+            h="fit-content"
+            p="0.15rem"
+            fontSize="xs"
+            onClick={(): void => {
+              setAssets(prev =>
+                prev.filter(selected => selected.id !== asset.id)
+              )
             }}
-          />
+          >
+            Remove
+          </Button>
         </Flex>
       ))}
     </Flex>

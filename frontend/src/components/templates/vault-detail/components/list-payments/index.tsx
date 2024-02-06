@@ -227,10 +227,10 @@ export const ListPayments: React.FC<IListPayments> = ({
                   <Text fontWeight="bold">{operationType(effect)}</Text>
                   {walletOperation(effect, 'FROM') !== '-' && (
                     <Flex gap="0.35rem" alignItems="center">
-                      <Text fontWeight="bold">FROM</Text>
-                      <Text>{walletOperation(effect, 'FROM')}</Text>
-                      <Text fontWeight="bold">TO</Text>
-                      <Text>{walletOperation(effect, 'TO')}</Text>
+                      <Text>
+                        <b>FROM</b> {walletOperation(effect, 'FROM')} <b>TO</b>{' '}
+                        {walletOperation(effect, 'TO')}
+                      </Text>
                     </Flex>
                   )}
                   {effect.asset_code && (
