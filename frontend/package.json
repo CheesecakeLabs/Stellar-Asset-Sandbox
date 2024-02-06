@@ -72,6 +72,7 @@
     "@testing-library/user-event": "~14.4.3",
     "@trivago/prettier-plugin-sort-imports": "~4.1.1",
     "@types/enzyme": "^3.10.12",
+    "@types/feather-icons": "^4.29.4",
     "@types/jest": "~29.4.1",
     "@types/lodash": "^4.14.191",
     "@types/node": "~18.15.3",
