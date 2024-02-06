@@ -186,7 +186,7 @@ func (r AssetRepo) GetAssetById(id string) (entity.Asset, error) {
             d.id AS distributor_id, d.type AS distributor_type, d.funded AS distributor_funded,
             dk.id AS distributor_key_id, dk.public_key AS distributor_key_public_key, dk.weight AS distributor_key_weight,
             i.id AS issuer_id, i.type AS issuer_type, i.funded AS issuer_funded,
-            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight, 
+            ik.id AS issuer_key_id, ik.public_key AS issuer_key_public_key, ik.weight AS issuer_key_weight 
         FROM asset a
         JOIN wallet d ON a.distributor_id = d.id
         JOIN key dk ON d.id = dk.wallet_id
