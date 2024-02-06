@@ -75,8 +75,8 @@ export const ListPayments: React.FC<IListPayments> = ({
       const operation =
         effectItem.operation as Hooks.UseHorizonTypes.IOperationPayment
       return type === 'FROM'
-        ? walletToName(operation.from)
-        : walletToName(operation.to)
+        ? walletToName(operation?.from)
+        : walletToName(operation?.to)
     }
     return '-'
   }
