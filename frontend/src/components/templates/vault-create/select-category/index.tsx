@@ -40,14 +40,17 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
   const handleVaultCategory = (inputValue: string): void => {
     setIsLoading(true)
     setTimeout(async () => {
-      const vaultCategory = await createVaultCategory({ name: inputValue })
-      if (!vaultCategory) return
+      try {
+        const vaultCategory = await createVaultCategory({ name: inputValue })
+        if (!vaultCategory) return
 
-      const newOption = createOption(vaultCategory?.name, vaultCategory?.id)
-      setIsLoading(false)
-      setOptions(prev => [...prev, newOption])
-      setCategorySelected(newOption)
-      setValue(newOption)
+        const newOption = createOption(vaultCategory?.name, vaultCategory?.id)
+        setOptions(prev => [...prev, newOption])
+        setCategorySelected(newOption)
+        setValue(newOption)
+      } finally {
+        setIsLoading(false)
+      }
     }, 1000)
   }
 
