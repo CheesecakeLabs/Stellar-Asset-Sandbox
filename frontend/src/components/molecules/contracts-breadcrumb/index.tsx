@@ -39,7 +39,7 @@ export const ContractsBreadcrumb: React.FC<IContractsBreadcrumb> = ({
             fill="gray.650"
             _dark={{ fill: 'white' }}
           >
-            <ContractIcon /> Certificate of deposit
+            <ContractIcon /> Yield-bearing asset
           </BreadcrumbLink>
         </BreadcrumbItem>
 

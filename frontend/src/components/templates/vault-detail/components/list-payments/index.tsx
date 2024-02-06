@@ -146,7 +146,7 @@ export const ListPayments: React.FC<IListPayments> = ({
         _dark={{ fill: 'white', stroke: 'white', borderColor: 'black.800' }}
       >
         <Text fontSize="sm" fontWeight="600">
-          Payments
+          Vault's history
         </Text>
       </Flex>
       <Box px="1rem" overflowX="auto">
