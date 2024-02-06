@@ -18,7 +18,12 @@ import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import Joyride, { CallBackProps, STATUS } from 'react-joyride'
 import { NumericFormat } from 'react-number-format'
 
-import { assetFlags, typesAsset } from 'utils/constants/data-constants'
+import {
+  AUTH_CLAWBACK_ENABLED,
+  AUTH_REVOCABLE_FLAG,
+  assetFlags,
+  typesAsset,
+} from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
@@ -31,7 +36,8 @@ import { UploadImage } from '../../molecules/upload-image'
 interface IForgeAssetTemplate {
   onSubmit(
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    flags: string[]
   ): Promise<void>
   setSelectedFile: Dispatch<SetStateAction<File | null>>
   loading: boolean
@@ -46,6 +52,8 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 }) => {
   const [errorSubmit] = useState<string | null>(null)
   const [runTour, setRunTour] = useState(false)
+  const [flags, setFlags] = useState<string[]>([])
+
   const { colorMode } = useColorMode()
   const {
     register,
@@ -104,7 +112,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
       setError('asset_type', { message: 'This field is required' })
       return
     }
-    onSubmit(data, setValue)
+    onSubmit(data, setValue, flags)
   }
 
   return (
@@ -306,11 +314,16 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   {assetFlags.map((assetFlag, index) => (
                     <RadioCard
                       key={index}
-                      register={register}
+                      setFlags={setFlags}
+                      flags={flags}
                       title={assetFlag.title}
                       description={assetFlag.description}
                       value={assetFlag.flag}
-                      isDisabled={assetFlag.isDisabled}
+                      isDisabled={
+                        assetFlag.isDisabled ||
+                        (assetFlag.flag === AUTH_REVOCABLE_FLAG &&
+                          flags.includes(AUTH_CLAWBACK_ENABLED))
+                      }
                       link={assetFlag.link}
                       isComing={assetFlag.isComing}
                     />
