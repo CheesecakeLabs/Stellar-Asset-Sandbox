@@ -15,13 +15,6 @@ export const Home: React.FC = () => {
     useAuth()
 
   useEffect(() => {
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line
-      console.log('is dev')
-    } else{
-      // eslint-disable-next-line
-      console.log('is production')
-    }
     GAService.GAPageView('Home')
   }, [])
 
