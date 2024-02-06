@@ -43,7 +43,7 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
-    name: 'Certificate of Deposit',
+    name: 'Yield-bearing asset',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
   },

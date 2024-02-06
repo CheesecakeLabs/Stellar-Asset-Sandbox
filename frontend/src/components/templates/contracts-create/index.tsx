@@ -128,7 +128,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
       justifyContent="center"
     >
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        <ContractsBreadcrumb title="New Certificate of Deposit" />
+        <ContractsBreadcrumb title="New Yield-bearing asset" />
         {errorSubmit && (
           <Alert mb="0.75rem" status="error">
             <AlertIcon />
@@ -148,7 +148,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
             _dark={{ fill: 'white', stroke: 'white', borderColor: 'black.800' }}
           >
             <Text fontSize="sm" fontWeight="600">
-              New Certificate of Deposit
+              New Yield-bearing asset
             </Text>
           </Flex>
           {loading ? (
@@ -343,7 +343,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     mt="1.5rem"
                     isLoading={creatingContract}
                   >
-                    Create Certificate of Deposit
+                    Create Yield-bearing asset
                   </Button>
                 </Flex>
               </form>

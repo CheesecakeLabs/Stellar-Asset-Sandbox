@@ -55,7 +55,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Certificate of Deposits
+            Yield-bearing asset
           </Text>
           {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) && (
             <Button
@@ -65,7 +65,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                 navigate({ pathname: PathRoute.CONTRACT_CREATE })
               }
             >
-              {isLargerThanSm ? 'New Certificate of Deposit' : 'New'}
+              {isLargerThanSm ? 'New Yield-bearing asset' : 'New'}
             </Button>
           )}
         </Flex>

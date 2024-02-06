@@ -160,7 +160,7 @@ export const AuthorizeAccount: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -175,13 +175,10 @@ export const AuthorizeAccount: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Authorize'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'AUTHORIZE'} />
-              )}
-            </Flex>
-
+            <ManagementBreadcrumb title={'Authorize'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'AUTHORIZE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (

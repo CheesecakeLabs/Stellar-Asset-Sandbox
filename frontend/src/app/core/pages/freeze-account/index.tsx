@@ -150,7 +150,7 @@ export const FreezeAccount: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -162,12 +162,10 @@ export const FreezeAccount: React.FC = () => {
             <ActionHelper title={'About Freeze'} description={freezeHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Freeze'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'FREEZE'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Freeze'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'FREEZE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (

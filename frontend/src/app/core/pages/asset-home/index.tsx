@@ -102,7 +102,7 @@ export const AssetHome: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -117,12 +117,10 @@ export const AssetHome: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Asset home'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'HOME'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Asset home'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'HOME'} />
+            )}
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (

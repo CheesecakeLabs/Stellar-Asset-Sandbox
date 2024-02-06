@@ -4,22 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3170048c-93bf-4f45-9082-dcbf1deeed4f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/pages/contracts-create/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/pages/contracts-create/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/core/pages/contracts-detail/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/pages/contracts-detail/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/useContracts/context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useContracts/context.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/useContracts/use-contracts-types.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useContracts/use-contracts-types.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/soroban/certificate-of-deposit/constants.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/soroban/certificate-of-deposit/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/soroban/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/soroban/constants.ts" afterDir="false" />
-    </list>
+    <list default="true" id="3170048c-93bf-4f45-9082-dcbf1deeed4f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="T1AS-149_block_standard_roles" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="GithubProjectSettings">

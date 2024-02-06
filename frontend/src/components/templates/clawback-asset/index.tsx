@@ -11,7 +11,7 @@ import {
   RadioGroup,
   Stack,
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
@@ -28,18 +28,24 @@ interface IClawbackAssetTemplate {
     setValue: UseFormSetValue<FieldValues>,
     wallet: string | undefined
   ): Promise<void>
+  setWallet: Dispatch<SetStateAction<string | undefined>>
   loading: boolean
   asset: Hooks.UseAssetsTypes.IAssetDto
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   assetData: Hooks.UseHorizonTypes.IAsset | undefined
+  wallet: string | undefined
+  walletBalance: string | undefined
 }
 
 export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
   onSubmit,
+  setWallet,
+  wallet,
   loading,
   asset,
   vaults,
   assetData,
+  walletBalance,
 }) => {
   const {
     register,
@@ -51,7 +57,6 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
     setError,
   } = useForm()
 
-  const [wallet, setWallet] = useState<string | undefined>()
   const [typeAccount, setTypeAccount] = React.useState<'INTERNAL' | 'EXTERNAL'>(
     'INTERNAL'
   )
@@ -107,6 +112,18 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                   }}
                   noOptionsMessage="No vaults or wallets with funds"
                 />
+
+                {walletBalance && (
+                  <SupplyTag
+                    value={`${
+                      typeAccount === 'INTERNAL' ? 'Vault' : 'Wallet'
+                    } balance: ${
+                      assetData
+                        ? `${toCrypto(Number(walletBalance))} ${asset.code}`
+                        : 'loading'
+                    }`}
+                  />
+                )}
                 <FormErrorMessage>
                   {errors?.wallet?.message?.toString()}
                 </FormErrorMessage>
@@ -137,7 +154,16 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
-                  clearErrors('amount')
+                  if (
+                    Number(toNumber(event.currentTarget.value)) >
+                    Number(walletBalance)
+                  ) {
+                    setError('amount', {
+                      message: `Amount exceeded`,
+                    })
+                  } else {
+                    clearErrors('amount')
+                  }
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
@@ -156,7 +182,9 @@ export const ClawbackAssetTemplate: React.FC<IClawbackAssetTemplate> = ({
               <Button
                 type="submit"
                 variant="primary"
-                isDisabled={!asset.clawback_enabled}
+                isDisabled={
+                  !asset.clawback_enabled || errors.amount != undefined
+                }
                 isLoading={loading}
                 w={{ base: 'full', md: 'fit-content' }}
               >

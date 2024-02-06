@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { clawbackHelper } from 'utils/constants/helpers'
@@ -32,12 +33,18 @@ export const ClawbackAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [vaults, setVaults] = useState<
+    Hooks.UseVaultsTypes.IVault[] | undefined
+  >([])
+  const [wallet, setWallet] = useState<string | undefined>()
+  const [walletBalance, setWalletBalance] = useState<string | undefined>()
 
   const { clawback, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { id } = useParams()
-  const { vaults, getVaults } = useVaults()
+  const { getVaults } = useVaults()
+  const { getAccountData } = useHorizon()
   const toast = useToast()
   const navigate = useNavigate()
 
@@ -98,8 +105,22 @@ export const ClawbackAsset: React.FC = () => {
   }
 
   useEffect(() => {
-    getVaults()
-  }, [getVaults])
+    if (asset) {
+      getVaults(true).then(
+        (result: Hooks.UseVaultsTypes.IVault[] | undefined) => {
+          setVaults(
+            result?.filter(vaultsData =>
+              vaultsData.accountData?.balances.find(
+                balance =>
+                  balance.asset_code === asset?.code &&
+                  balance.asset_issuer === asset?.issuer.key.publicKey
+              )
+            ) || []
+          )
+        }
+      )
+    }
+  }, [getVaults, asset])
 
   useEffect(() => {
     if (id) {
@@ -119,8 +140,22 @@ export const ClawbackAsset: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (wallet) {
+      getAccountData(wallet).then(accountData => {
+        const balance = accountData?.balances.find(
+          balance =>
+            balance.asset_code === asset?.code &&
+            balance.asset_issuer === asset?.issuer.key.publicKey
+        )?.balance
+
+        setWalletBalance(balance)
+      })
+    }
+  }, [wallet, asset?.code, asset?.issuer.key.publicKey, getAccountData])
+
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -135,21 +170,22 @@ export const ClawbackAsset: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Clawback'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'CLAWBACK'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Clawback'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'CLAWBACK'} />
+            )}
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
               <ClawbackAssetTemplate
                 onSubmit={onSubmit}
+                setWallet={setWallet}
                 loading={loadingOperation}
                 asset={asset}
                 vaults={vaults}
                 assetData={asset.assetData}
+                wallet={wallet}
+                walletBalance={walletBalance}
               />
             )}
           </Flex>

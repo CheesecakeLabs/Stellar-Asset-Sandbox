@@ -20,7 +20,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
   const navigate = useNavigate()
 
   return (
-    <Flex h="3.5rem" alignItems="center">
+    <Flex alignItems="center" mb="0.5rem">
       <Breadcrumb
         spacing="0.75rem"
         separator={<ChevronRight />}

@@ -25,7 +25,8 @@ export const ForgeAsset: React.FC = () => {
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    flags: string[]
   ): Promise<void> => {
     try {
       const asset = {
@@ -33,7 +34,7 @@ export const ForgeAsset: React.FC = () => {
         code: data.code,
         amount: data.initial_supply,
         asset_type: data.asset_type,
-        set_flags: data.control_mechanisms || [],
+        set_flags: flags,
         image: selectedFile ? await toBase64(selectedFile) : null,
       }
       const assetForged = await forge(asset)
