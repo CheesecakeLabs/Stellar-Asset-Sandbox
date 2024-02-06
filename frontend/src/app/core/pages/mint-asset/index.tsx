@@ -141,7 +141,7 @@ export const MintAsset: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -153,12 +153,10 @@ export const MintAsset: React.FC = () => {
             <ActionHelper title={'About Mint'} description={mintHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Mint'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'MINT'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Mint'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'MINT'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (

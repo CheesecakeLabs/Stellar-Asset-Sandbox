@@ -126,7 +126,7 @@ export const PublishInformation: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -135,15 +135,13 @@ export const PublishInformation: React.FC = () => {
           gap="1.5rem"
         >
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Publish information'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile
-                  id={id}
-                  selected={'PUBLISH_INFORMATION'}
-                />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Publish information'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile
+                id={id}
+                selected={'PUBLISH_INFORMATION'}
+              />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (

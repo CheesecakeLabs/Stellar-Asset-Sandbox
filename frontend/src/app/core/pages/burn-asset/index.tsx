@@ -141,7 +141,7 @@ export const BurnAsset: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -153,12 +153,10 @@ export const BurnAsset: React.FC = () => {
             <ActionHelper title={'About Burn'} description={burnHelper} />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Burn'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'BURN'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Burn'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'BURN'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (

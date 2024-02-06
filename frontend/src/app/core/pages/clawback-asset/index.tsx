@@ -155,7 +155,7 @@ export const ClawbackAsset: React.FC = () => {
   }, [wallet, asset?.code, asset?.issuer.key.publicKey, getAccountData])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -170,12 +170,10 @@ export const ClawbackAsset: React.FC = () => {
             />
           )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <Flex justifyContent="space-between" w="full" alignItems="center">
-              <ManagementBreadcrumb title={'Clawback'} />
-              {id && isSmallerThanMd && (
-                <MenuActionsAssetMobile id={id} selected={'CLAWBACK'} />
-              )}
-            </Flex>
+            <ManagementBreadcrumb title={'Clawback'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'CLAWBACK'} />
+            )}
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
