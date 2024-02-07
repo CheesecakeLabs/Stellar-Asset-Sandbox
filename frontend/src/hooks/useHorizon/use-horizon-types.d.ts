@@ -84,6 +84,76 @@ declare namespace Hooks {
       }
     }
 
+    interface IEffects {
+      _embedded: {
+        records: IEffectItem[]
+      }
+      _links: {
+        next: {
+          href: string
+          results: number
+        }
+        prev: {
+          href: string
+          results: number
+        }
+        self: {
+          href: string
+        }
+      }
+    }
+
+    interface IOperationTrustline {
+      id: string
+      paging_token: string
+      transaction_successful: boolean
+      source_account: string
+      type: string
+      type_i: number
+      created_at: string
+      transaction_hash: string
+      asset_type: string
+      asset_code: string
+      asset_issuer: string
+      limit: string
+      trustee: string
+      trustor: string
+    }
+
+    interface IOperationTrustline {
+      id: string
+      paging_token: string
+      transaction_successful: boolean
+      source_account: string
+      type: string
+      type_i: number
+      created_at: string
+      transaction_hash: string
+      asset_type: string
+      asset_code: string
+      asset_issuer: string
+      limit: string
+      trustee: string
+      trustor: string
+    }
+
+    interface IOperationPayment {
+      id: string
+      paging_token: string
+      transaction_successful: boolean
+      source_account: string
+      type: string
+      type_i: number
+      created_at: string
+      transaction_hash: string
+      asset_type: string
+      asset_code: string
+      asset_issuer: string
+      from: string
+      to: string
+      amount: string
+    }
+
     interface IPaymentItem {
       id: string
       paging_token: string
@@ -99,6 +169,18 @@ declare namespace Hooks {
       from: string
       to: string
       amount: string
+    }
+
+    interface IEffectItem {
+      id: string
+      account: string
+      type: string
+      created_at: string
+      asset_type: string
+      asset_code: string
+      asset_issuer: string
+      amount: string
+      operation: IOperationPayment | IOperationTrustline | undefined
     }
 
     interface IBalance {
@@ -138,6 +220,10 @@ declare namespace Hooks {
         wallet?: string,
         link?: string
       ): Promise<IPayments | undefined>
+      getAccountEffects(
+        wallet?: string,
+        link?: string
+      ): Promise<IEffects | undefined>
       getAssetAccounts(
         assetCode: string,
         assetIssuer: string

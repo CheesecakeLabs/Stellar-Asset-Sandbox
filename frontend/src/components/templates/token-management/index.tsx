@@ -14,7 +14,7 @@ import {
   useMediaQuery,
   Img,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { havePermission } from 'utils'
@@ -36,6 +36,10 @@ import {
 import { Empty } from 'components/molecules/empty'
 import { Paginator } from 'components/molecules/paginator'
 
+import { IOptionFilter } from 'app/core/pages/token-management'
+
+import { Filter } from './filter'
+
 interface ITokenManagementTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
@@ -43,6 +47,9 @@ interface ITokenManagementTemplate {
   currentPage: number
   totalPages: number
   changePage(page: number): void
+  setTextSearch: Dispatch<SetStateAction<string | undefined>>
+  setFilterByAssetFlag: Dispatch<SetStateAction<IOptionFilter[]>>
+  setFilterByAssetType: Dispatch<SetStateAction<IOptionFilter | undefined>>
 }
 
 export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
@@ -52,18 +59,20 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
   currentPage,
   totalPages,
   changePage,
+  setTextSearch,
+  setFilterByAssetFlag,
+  setFilterByAssetType,
 }) => {
   const navigate = useNavigate()
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
-  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Token Management
+            Asset Management
           </Text>
           {havePermission(Permissions.CREATE_ASSET, userPermissions) && (
             <Button
@@ -78,6 +87,11 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
             </Button>
           )}
         </Flex>
+        <Filter
+          setTextSearch={setTextSearch}
+          setFilterByAssetFlag={setFilterByAssetFlag}
+          setFilterByAssetType={setFilterByAssetType}
+        />
         {loading ? (
           <Skeleton w="full" h="8rem" />
         ) : assets && assets.length > 0 ? (
@@ -88,10 +102,10 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                   <Th w="2rem" p={0} />
                   <Th>Code</Th>
                   <Th>Name</Th>
-                  {isLargerThanSm && <Th isNumeric>Supply</Th>}
+                  {isLargerThanMd && <Th isNumeric>Supply</Th>}
                   {isLargerThanLg && <Th>Asset type</Th>}
                   {isLargerThanMd && <Th>Controls</Th>}
-                  {isLargerThanMd && <Th w="2rem" p={0} />}
+                  <Th w="2rem" p={0} />
                 </Tr>
               </Thead>
               <Tbody>
@@ -113,7 +127,7 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                     </Td>
                     <Td>{asset.code}</Td>
                     <Td>{asset.name}</Td>
-                    {isLargerThanSm && (
+                    {isLargerThanMd && (
                       <Td isNumeric>
                         {asset.assetData
                           ? toCrypto(Number(asset.assetData?.amount))
@@ -151,11 +165,9 @@ export const TokenManagementTemplate: React.FC<ITokenManagementTemplate> = ({
                         </Flex>
                       </Td>
                     )}
-                    {isLargerThanMd && (
-                      <Td w="2rem" p={0}>
-                        <ArrowRightIcon width="12px" />
-                      </Td>
-                    )}
+                    <Td w="2rem" p={0}>
+                      <ArrowRightIcon width="12px" />
+                    </Td>
                   </Tr>
                 ))}
               </Tbody>

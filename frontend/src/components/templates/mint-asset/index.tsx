@@ -7,7 +7,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Text,
   Tooltip,
 } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
@@ -18,6 +17,7 @@ import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toCrypto, toNumber } from 'utils/formatter'
 
 import { AssetHeader } from 'components/atoms'
+import { SupplyTag } from 'components/atoms/supply-tag'
 import { HelpIcon } from 'components/icons'
 import { ChartMintBurn } from 'components/molecules/chart-mint-burn'
 import { TChartPeriod } from 'components/molecules/chart-period'
@@ -72,17 +72,19 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
         <Box p="1rem" w="full">
           <form onSubmit={handleSubmit(data => handleForm(data))}>
             <FormControl isInvalid={errors?.amount !== undefined}>
-              <Flex justifyContent="space-between" w="full" px="0.25rem">
+              <Flex w="full" px="0.25rem" alignItems="center">
                 <FormLabel>Amount to mint</FormLabel>
-                <Tooltip label={TooltipsData.mint}>
-                  <HelpIcon width="20px" />
-                </Tooltip>
+                <Box pb={2}>
+                  <Tooltip label={TooltipsData.mint}>
+                    <HelpIcon width="14px" />
+                  </Tooltip>
+                </Box>
               </Flex>
               <Input
                 as={NumericFormat}
                 decimalScale={7}
                 thousandSeparator=","
-                placeholder="Type the amount you want to mint..."
+                placeholder="Amount to mint..."
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
@@ -94,19 +96,20 @@ export const MintAssetTemplate: React.FC<IMintAssetTemplate> = ({
                 {errors?.amount?.message?.toString()}
               </FormErrorMessage>
             </FormControl>
-            <Text
-              color="gray.900"
-              fontWeight="600"
-              fontSize="xs"
-              mt="0.5rem"
-              ms="0.25rem"
-            >
-              {`Circulation supply: ${
-                assetData
-                  ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
-                  : 'loading'
-              }`}
-            </Text>
+            <Flex gap={2}>
+              <SupplyTag
+                value={`Circulation supply: ${
+                  assetData
+                    ? `${toCrypto(Number(assetData.amount))} ${asset.code}`
+                    : 'loading'
+                }`}
+              />
+              <SupplyTag
+                value={`Main vault: ${toCrypto(
+                  Number(asset.distributorBalance?.balance || 0)
+                )}`}
+              />
+            </Flex>
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"

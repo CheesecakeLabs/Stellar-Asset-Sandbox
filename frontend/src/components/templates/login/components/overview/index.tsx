@@ -140,7 +140,7 @@ export const Overview: React.FC<IOverview> = ({
             </Flex>
             <Flex flexDir="column" ms="1rem">
               <Text fontSize="xl" mb="0.75rem">
-                Create Certificate of Deposit
+                Create Yield-bearing asset
               </Text>
               <Text>
                 In the Sandbox you can define permissions for each type of role

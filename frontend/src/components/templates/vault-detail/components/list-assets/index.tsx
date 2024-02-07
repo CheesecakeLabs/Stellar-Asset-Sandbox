@@ -8,8 +8,8 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
-import { AddIcon, EditIcon } from 'components/icons'
-import { IOption, SelectAsset } from 'components/molecules/select-asset'
+import { EditIcon } from 'components/icons'
+import { SelectAssets } from 'components/molecules/select-assets'
 
 import { ItemAsset } from '../item-asset'
 
@@ -36,28 +36,11 @@ export const ListAssets: React.FC<IListAssets> = ({
   const [listEdit, setListEdit] = useState<
     Hooks.UseHorizonTypes.IBalance[] | undefined
   >(vault.accountData?.balances)
-  const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
-  const [selected, setSelected] = useState<IOption | null>()
 
   const removeAsset = (
     balanceSelected: Hooks.UseHorizonTypes.IBalance
   ): void => {
     setListEdit(listEdit?.filter(balance => balance !== balanceSelected))
-  }
-
-  const addAsset = (): void => {
-    if (listEdit && asset) {
-      setSelected(null)
-      setListEdit([
-        ...listEdit,
-        {
-          balance: '0',
-          is_authorized: true,
-          asset_code: asset?.code,
-          asset_issuer: asset?.issuer.key.publicKey,
-        },
-      ])
-    }
   }
 
   const onSave = (): void => {
@@ -66,6 +49,20 @@ export const ListAssets: React.FC<IListAssets> = ({
         setIsEditing(false)
       }
     })
+  }
+
+  const onChangeAssets = (assetAdded: Hooks.UseAssetsTypes.IAssetDto): void => {
+    if (listEdit) {
+      setListEdit([
+        ...listEdit,
+        {
+          balance: '0',
+          is_authorized: true,
+          asset_code: assetAdded?.code,
+          asset_issuer: assetAdded?.issuer.key.publicKey,
+        },
+      ])
+    }
   }
 
   return (
@@ -148,31 +145,18 @@ export const ListAssets: React.FC<IListAssets> = ({
         {isEditing && (
           <Flex p="1rem" w="full" maxW="full" alignItems="center" gap={3}>
             <Box w="full">
-              <SelectAsset
+              <SelectAssets
                 assets={assets?.filter(
                   asset =>
                     !listEdit?.some(
-                      balance => asset.code === balance.asset_code
+                      balance =>
+                        asset.code === balance.asset_code &&
+                        asset.issuer.key.publicKey === balance.asset_issuer
                     )
                 )}
-                setAsset={setAsset}
-                selected={selected}
-                setSelected={setSelected}
+                onChange={onChangeAssets}
               />
             </Box>
-            <Button
-              variant="primary"
-              onClick={addAsset}
-              fill="white"
-              isDisabled={!selected}
-              leftIcon={
-                <Flex w="1rem" justifyContent="center">
-                  <AddIcon />
-                </Flex>
-              }
-            >
-              Add
-            </Button>
           </Flex>
         )}
       </Box>

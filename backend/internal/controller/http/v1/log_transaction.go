@@ -32,7 +32,6 @@ func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase,
 		h.GET("/assets/sum/:time_range/:time_frame", r.sumAmountsForAllAssets)
 		h.GET("/last-transactions/:transaction_type_id", r.getLastLogTransactions)
 		h.POST("/supply/:asset_id", r.supplyByAssetID)
-
 	}
 }
 

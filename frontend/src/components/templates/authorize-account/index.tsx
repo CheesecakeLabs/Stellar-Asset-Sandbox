@@ -15,6 +15,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react'
 import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 
 import { AssetHeader } from 'components/atoms'
+import { InfoTag } from 'components/atoms/info-tag'
 import { VaultsStatusList } from 'components/molecules/vaults-status-list'
 
 import { SelectVault } from '../../molecules/select-vault'
@@ -113,16 +114,19 @@ export const AuthorizeAccountTemplate: React.FC<IAuthorizeAccountTemplate> = ({
                 </FormErrorMessage>
               </FormControl>
             )}
-            <Flex justifyContent="flex-end">
+            <Flex alignItems="flex-end" flexDir="column" mt="1.5rem" gap={3}>
               <Button
                 type="submit"
                 variant="primary"
-                mt="1.5rem"
+                isDisabled={!asset.authorize_required}
                 isLoading={loading}
                 w={{ base: 'full', md: 'fit-content' }}
               >
                 Authorize
               </Button>
+              {!asset.authorize_required && (
+                <InfoTag text="Authorization is not required, all accounts can hold balance and transact this asset." />
+              )}
             </Flex>
           </form>
         </Box>

@@ -11,6 +11,9 @@ declare namespace Hooks {
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
       contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
     }
 
     interface IAssetDto {
@@ -25,6 +28,9 @@ declare namespace Hooks {
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
       image: string
       contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
     }
 
     interface IPagedAssets {
@@ -128,6 +134,14 @@ declare namespace Hooks {
       CURRENCIES: ICurrencies[]
     }
 
+    interface IFilter {
+      name?: string
+      asset_type?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
+    }
+
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
@@ -153,6 +167,7 @@ declare namespace Hooks {
       getPagedAssets: (args: {
         page: number
         limit: number
+        filters?: IFilter
       }) => Promise<IPagedAssets | undefined>
     }
   }

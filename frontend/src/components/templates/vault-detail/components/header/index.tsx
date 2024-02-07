@@ -25,6 +25,7 @@ import {
   Tag,
   Text,
   useDisclosure,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 
@@ -59,7 +60,7 @@ const Form: React.FC<IHeader> = ({
 }) => {
   const [categorySelected, setCategorySelected] = useState<
     IOption | null | undefined
-  >(category && { label: category?.name, value: category?.id })
+  >(category && { label: category?.name, value: category?.id, disabled: false })
 
   const [name, setName] = useState<string | undefined>(vault.name)
 
@@ -121,6 +122,7 @@ export const Header: React.FC<IHeader> = ({
     onClose: onCloseModal,
   } = useDisclosure()
   const firstFieldRef = React.useRef(null)
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
     <>
@@ -145,9 +147,9 @@ export const Header: React.FC<IHeader> = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Flex w="full" justifyContent="space-between">
-        <Flex alignItems="center" mb="1.5rem">
-          <Text fontSize="2xl" fontWeight="400">
+      <Flex w="full" justifyContent="space-between" alignItems="center" mb="1.5rem">
+        <Flex alignItems="center">
+          <Text fontSize={isLargerThanSm ? '2xl' : 'lg'} fontWeight="400">
             {vault.name}
           </Text>
           <Tag

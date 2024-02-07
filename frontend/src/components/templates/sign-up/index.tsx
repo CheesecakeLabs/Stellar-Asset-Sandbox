@@ -52,7 +52,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
         email: data.email,
         password: data.password,
         name: data.name,
-        role_id: Number(8),
+        role_id: Number(data.role_id),
       })
     } catch (error) {
       let message
@@ -105,7 +105,7 @@ export const SignUpTemplate: React.FC<ISignUpTemplate> = ({
                   })}
                 />
                 <FormErrorMessage>
-                  Name must be between 2 and 25 characters long”
+                  Name must be between 2 and 25 characters long
                 </FormErrorMessage>
               </FormControl>
 

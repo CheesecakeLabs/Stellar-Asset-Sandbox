@@ -34,6 +34,7 @@ interface IContractsDetailTemplate {
   currentInVault: string | undefined
   hasAssetInVault: boolean
   hasWallet: boolean
+  timerCounter: number | undefined
 }
 
 export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
@@ -53,6 +54,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   currentInVault,
   hasAssetInVault,
   hasWallet,
+  timerCounter,
 }) => {
   return (
     <Flex flexDir="column" w="full">
@@ -83,7 +85,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                 gap="2rem"
               >
                 <ContractInfo contract={contract} />
-                
+
                 {contractData?.position &&
                 havePermission(
                   Permissions.INVEST_CERTIFICATE,
@@ -109,7 +111,9 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                   onSubmit={onSubmitWithdraw}
                   contract={contract}
                   loading={isWithdrawing}
-                  isDone={!contractData.timeLeft || contractData.timeLeft === 0}
+                  isDone={
+                    contractData.timeLeft ? contractData.timeLeft < 0 : false
+                  }
                   withdrawValue={
                     contractData.timeLeft && contractData.timeLeft > 0
                       ? Number(contractData.estimatedPrematureWithdraw)
@@ -118,6 +122,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
                   contractData={contractData}
                   deposited={deposited}
                   currentInVault={currentInVault}
+                  timerCounter={timerCounter}
                 />
               ) : (
                 <Deposit

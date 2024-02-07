@@ -1,25 +1,28 @@
 import { Flex, Switch, Text, Tag } from '@chakra-ui/react'
-import { FieldValues } from 'react-hook-form'
-import { UseFormRegister } from 'react-hook-form/dist/types/form'
+import { Dispatch, SetStateAction } from 'react'
+
+import { AUTH_CLAWBACK_ENABLED, AUTH_REVOCABLE_FLAG } from 'utils/constants/data-constants'
 
 interface IRadioCard {
-  register: UseFormRegister<FieldValues>
+  setFlags: Dispatch<SetStateAction<string[]>>
   title: string
   description: string
   value: string
   isDisabled: boolean
   link: string | undefined
   isComing: boolean | undefined
+  flags: string[]
 }
 
 export const RadioCard: React.FC<IRadioCard> = ({
   title,
   description,
-  register,
+  setFlags,
   value,
   isDisabled,
   link,
   isComing,
+  flags
 }) => {
   return (
     <Flex
@@ -68,7 +71,23 @@ export const RadioCard: React.FC<IRadioCard> = ({
         </Text>
       </Flex>
       <Switch
-        {...register('control_mechanisms[]')}
+        onChange={(event): void => {
+          if (event.target.checked) {
+            if (event.target.value === AUTH_CLAWBACK_ENABLED) {
+              setFlags(flags => {
+                if(flags.includes(AUTH_REVOCABLE_FLAG)){
+                  return [...flags, event.target.value]
+                }
+                return [...flags, event.target.value, AUTH_REVOCABLE_FLAG]
+              })
+            } else {
+              setFlags(flags => [...flags, event.target.value])
+            }
+          } else {
+            setFlags(flags => flags.filter(flag => flag !== event.target.value))
+          }
+        }}
+        isChecked={flags.includes(value)}
         name={'control_mechanisms[]'}
         value={value}
         isDisabled={isDisabled}

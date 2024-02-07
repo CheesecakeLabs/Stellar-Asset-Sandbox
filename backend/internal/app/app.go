@@ -7,9 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	timeout "github.com/vearne/gin-timeout"
-
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	v1 "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/v1"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -19,13 +16,26 @@ import (
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
+	sentryPkg "github.com/CheesecakeLabs/token-factory-v2/backend/pkg/sentry"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
+
+	timeout "github.com/vearne/gin-timeout"
 )
 
 // Run creates objects via constructors.
 func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, storageService storage.StorageService) {
+	// Logger and Sentry
 	l := logger.New(cfg.Log.Level)
+	if cfg.Deploy.DeployStage != "local" {
+		sentryPkg.New(cfg, l)
+	}
+
+	pf := profanity.ProfanityFilter{}
 
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
@@ -71,8 +81,10 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
-
-	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l)
+	if cfg.Deploy.DeployStage == "production" {
+		handler.Use(sentrygin.New(sentrygin.Options{}))
+	}
+	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l, pf)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),
@@ -86,13 +98,16 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	select {
 	case s := <-interrupt:
 		l.Warn(s.String())
+		sentry.CaptureMessage(s.String())
 	case err := <-httpServer.Notify():
+		sentry.CaptureException(err)
 		l.Error(err, "app - Run - httpServer.Notify")
 	}
 
 	// Shutdown
 	err := httpServer.Shutdown()
 	if err != nil {
+		sentry.CaptureException(err)
 		l.Fatal("app - Run - httpServer.Shutdown: %v", err)
 	}
 }

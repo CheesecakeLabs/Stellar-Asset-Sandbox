@@ -3,7 +3,19 @@ import { createContext, useCallback, useState } from 'react'
 import freighter from '@stellar/freighter-api'
 import axios from 'axios'
 import { useHorizon } from 'hooks/useHorizon'
-import { certificateOfDepositClient } from 'soroban/certificate-of-deposit'
+import { CustomAccountHandler } from 'soroban'
+import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from 'soroban/constants'
+import { BUMP_FEE, ContractsService } from 'soroban/contracts-service'
+import { StellarPlus } from 'stellar-plus'
+import { ContractEngineErrorCodes } from 'stellar-plus/lib/stellar-plus/core/contract-engine/errors'
+import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
+import { restoreData } from 'stellar-plus/lib/stellar-plus/error/helpers/soroban-rpc'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import {
+  FeeBumpTransaction,
+  Transaction,
+  TransactionXdr,
+} from 'stellar-plus/lib/stellar-plus/types'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
@@ -96,6 +108,17 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const customSign = async (
+    tx: Transaction | FeeBumpTransaction,
+    publicKey: string
+  ): Promise<TransactionXdr> => {
+    const signedTransaction = await sign({
+      envelope: tx.toXDR(),
+      wallet_pk: publicKey,
+    })
+    return signedTransaction?.envelope || ''
+  }
+
   const getContract = useCallback(
     async (
       id: string
@@ -125,24 +148,65 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     [getAccountData]
   )
 
+  const getContractData = (
+    contractId: string,
+    sponsorPK: string
+  ): CertificateOfDepositClient => {
+    const opex = ContractsService.loadAccount(sponsorPK)
+    const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+    const contract = new StellarPlus.Contracts.CertificateOfDeposit({
+      network: STELLAR_NETWORK,
+      contractId: contractId,
+      rpcHandler: vcRpcHandler,
+      wasmHash: WASM_HASH,
+      options: {
+        restoreTxInvocation: restoreTxInvocation,
+      },
+    })
+
+    return contract
+  }
+
+  const userTxInvocation = (
+    sourcePk: string
+  ): Hooks.UseContractsTypes.IInvocation => {
+    const source = new CustomAccountHandler({
+      customSign: customSign,
+      publicKey: sourcePk,
+    })
+
+    return {
+      header: {
+        source: sourcePk,
+        timeout: 45,
+        fee: '1000000',
+      },
+      signers: [source],
+    }
+  }
+
   const deposit = async (
     amount: bigint,
     address: string,
     contractId: string,
-    sourcePk: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsDepositing(true)
     try {
-      const result = await certificateOfDepositClient.deposit({
-        amount: amount * BigInt(10000000),
+      const contract = getContractData(contractId, sponsorPk)
+
+      await contract.deposit({
         address: address,
-        contractId: contractId,
-        sourcePk: sourcePk,
+        amount: amount,
+        ...userTxInvocation(sourcePk),
       })
+
       setIsDepositing(false)
       setDepositConfirmed(true)
       setTimeout(() => setDepositConfirmed(false), 5000)
-      return result.status === 'SUCCESS'
+      return true
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -153,64 +217,127 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const restoreData = async (
+    sponsorPk: string,
+    stellarPlusError: StellarPlusError,
+    contract: CertificateOfDepositClient
+  ): Promise<void> => {
+    const opex = ContractsService.loadAccount(sponsorPk)
+    const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+    const restoreData = stellarPlusError.meta
+      ?.sorobanSimulationData as restoreData
+
+    await contract.restoreFootprint({
+      ...restoreTxInvocation,
+      restorePreamble: restoreData.restorePreamble,
+    })
+  }
+
   const getPosition = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
+    const contract = getContractData(contractId, sponsorPk)
     try {
-      const result = await certificateOfDepositClient.getPosition({
+      const result = await contract.getPosition({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
       return result
     } catch (e) {
-      return
+      const stellarPlusError = e as StellarPlusError
+      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
+        restoreData(sponsorPk, stellarPlusError, contract)
+      }
+
+      const result = await contract.getPosition({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
+      return result
     }
   }
 
   const getYield = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
+    const contract = getContractData(contractId, sponsorPk)
     try {
-      const result = await certificateOfDepositClient.getEstimatedYield({
+      const result = await contract.getEstimatedYield({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
       return result
     } catch (e) {
-      return
+      const stellarPlusError = e as StellarPlusError
+      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
+        restoreData(sponsorPk, stellarPlusError, contract)
+      }
+
+      const result = await contract.getEstimatedYield({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
+      return result
     }
   }
 
   const getEstimatedPrematureWithdraw = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
+    const contract = getContractData(contractId, sponsorPk)
     try {
-      const result =
-        await certificateOfDepositClient.getEstimatedPrematureWithdraw({
-          address: address,
-          contractId: contractId,
-        })
+      const result = await contract.getEstimatedPrematureWithdraw({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
       return result
     } catch (e) {
-      return
+      const stellarPlusError = e as StellarPlusError
+      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
+        restoreData(sponsorPk, stellarPlusError, contract)
+      }
+
+      const result = await contract.getEstimatedPrematureWithdraw({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
+      return result
     }
   }
 
   const getTimeLeft = async (
     address: string,
-    contractId: string
-  ): Promise<bigint | undefined> => {
+    contractId: string,
+    sourcePk: string,
+    sponsorPk: string
+  ): Promise<number | undefined> => {
+    const contract = getContractData(contractId, sponsorPk)
     try {
-      const result = await certificateOfDepositClient.getTimeLeft({
+      const result = await contract.getTimeLeft({
         address: address,
-        contractId: contractId,
+        ...userTxInvocation(sourcePk),
       })
       return result
     } catch (e) {
-      return
+      const stellarPlusError = e as StellarPlusError
+      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
+        restoreData(sponsorPk, stellarPlusError, contract)
+      }
+
+      const result = await contract.getTimeLeft({
+        address: address,
+        ...userTxInvocation(sourcePk),
+      })
+      return result
     }
   }
 
@@ -222,27 +349,24 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
 
   const withdraw = async (
     address: string,
-    premature: boolean,
+    accept_premature_withdraw: boolean,
     contractId: string,
-    signerSecret?: string
+    sourcePk: string,
+    sponsorPk: string
   ): Promise<boolean> => {
     setIsWithdrawing(true)
     try {
-      const result = await certificateOfDepositClient.withdraw({
-        address: address,
-        accept_premature_withdraw: premature,
-        contractId: contractId,
-        signerSecret: signerSecret,
-      })
+      const contract = getContractData(contractId, sponsorPk)
 
-      const xdr = result.returnValue?.toXDR('base64')
-      if (!xdr) {
-        throw new Error('Invalid transaction XDR')
-      }
+      await contract.withdraw({
+        address: address,
+        acceptPrematureWithdraw: accept_premature_withdraw,
+        ...userTxInvocation(sourcePk),
+      })
 
       setIsWithdrawing(false)
       setWithdrawConfirmed(true)
-      return result.status === 'SUCCESS'
+      return true
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(error.message)
@@ -316,6 +440,23 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const sign = async (
+    params: Hooks.UseContractsTypes.ISignRequest
+  ): Promise<Hooks.UseContractsTypes.ISignResponse | undefined> => {
+    try {
+      const response = await http.post(`soroban-transactions/sign`, params)
+      if (response.status === 200) {
+        return response.data.Message
+      }
+      return undefined
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    }
+  }
+
   return (
     <ContractsContext.Provider
       value={{
@@ -338,7 +479,8 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
         getHistory,
         addContractHistory,
         updateContractHistory,
-        getPagedContracts
+        getPagedContracts,
+        sign,
       }}
     >
       {children}

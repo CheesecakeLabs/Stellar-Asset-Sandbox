@@ -22,6 +22,7 @@ import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { AssetHomeTemplate } from 'components/templates/asset-home'
 
@@ -101,7 +102,7 @@ export const AssetHome: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -117,6 +118,9 @@ export const AssetHome: React.FC = () => {
           )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Asset home'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'HOME'} />
+            )}
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -135,7 +139,7 @@ export const AssetHome: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.HOME}
                 permissions={userPermissions}

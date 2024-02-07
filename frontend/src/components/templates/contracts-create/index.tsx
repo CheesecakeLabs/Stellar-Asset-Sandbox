@@ -13,6 +13,7 @@ import {
   InputRightAddon,
   Skeleton,
   Text,
+  Tooltip,
   VStack,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
@@ -21,6 +22,7 @@ import { NumericFormat } from 'react-number-format'
 
 import { newContractHelper } from 'utils/constants/helpers'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
 
 import { SelectCompound, CompoundTime } from './components/select-compound'
@@ -29,6 +31,7 @@ import {
   TSelectCompoundType,
 } from './components/select-compound-type'
 import { SelectVault } from './components/select-vault'
+import { HelpIcon } from 'components/icons'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ContractsBreadcrumb } from 'components/molecules/contracts-breadcrumb'
 import { SelectAsset } from 'components/molecules/select-asset'
@@ -125,7 +128,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
       justifyContent="center"
     >
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
-        <ContractsBreadcrumb title="New Contract" />
+        <ContractsBreadcrumb title="New Yield-bearing asset" />
         {errorSubmit && (
           <Alert mb="0.75rem" status="error">
             <AlertIcon />
@@ -145,7 +148,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
             _dark={{ fill: 'white', stroke: 'white', borderColor: 'black.800' }}
           >
             <Text fontSize="sm" fontWeight="600">
-              New Certificate of Deposit
+              New Yield-bearing asset
             </Text>
           </Flex>
           {loading ? (
@@ -155,7 +158,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
               <form onSubmit={handleSubmit(data => handleForm(data))}>
                 <Flex flexDir={{ base: 'column', md: 'row' }} gap="1.5rem">
                   <FormControl isInvalid={errors?.vault !== undefined}>
-                    <FormLabel>Vault*</FormLabel>
+                    <FormLabel>Vault</FormLabel>
                     <SelectVault
                       vaults={vaults}
                       setVault={setVault}
@@ -169,7 +172,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   </FormControl>
 
                   <FormControl isInvalid={errors?.asset !== undefined}>
-                    <FormLabel>Asset*</FormLabel>
+                    <FormLabel>Asset</FormLabel>
                     <SelectAsset
                       assets={filteredAssets()}
                       setAsset={setAsset}
@@ -194,7 +197,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     gap="1.5rem"
                   >
                     <FormControl isInvalid={errors?.min_deposit !== undefined}>
-                      <FormLabel>Minimum Deposit*</FormLabel>
+                      <FormLabel>Minimum Deposit</FormLabel>
                       <Input
                         as={NumericFormat}
                         decimalScale={7}
@@ -213,7 +216,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     </FormControl>
 
                     <FormControl isInvalid={errors?.term !== undefined}>
-                      <FormLabel>Term*</FormLabel>
+                      <FormLabel>Term</FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -240,7 +243,12 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     gap="1.5rem"
                   >
                     <FormControl isInvalid={errors?.yield_rate !== undefined}>
-                      <FormLabel>Yield Rate*</FormLabel>
+                      <FormLabel display="flex" alignItems="center" gap={2}>
+                        Yield Rate{' '}
+                        <Tooltip label={TooltipsData.yieldRate}>
+                          <HelpIcon width="14px" />
+                        </Tooltip>
+                      </FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -260,7 +268,12 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     </FormControl>
 
                     <FormControl isInvalid={errors?.penalty_rate !== undefined}>
-                      <FormLabel>Penalty rate*</FormLabel>
+                      <FormLabel display="flex" alignItems="center" gap={2}>
+                        Early Redemption Penalty Rate
+                        <Tooltip label={TooltipsData.penaltyRate}>
+                          <HelpIcon width="14px" />
+                        </Tooltip>
+                      </FormLabel>
                       <InputGroup>
                         <Input
                           as={NumericFormat}
@@ -296,7 +309,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                   _dark={{ bg: 'black.600' }}
                 >
                   <FormControl w="full">
-                    <FormLabel>Compound*</FormLabel>
+                    <FormLabel>Interest type</FormLabel>
                     <SelectCompoundType
                       compoundType={compoundType}
                       setCompoundType={setCompoundType}
@@ -330,7 +343,7 @@ export const ContractsCreateTemplate: React.FC<IContractsCreateTemplate> = ({
                     mt="1.5rem"
                     isLoading={creatingContract}
                   >
-                    Create Certificate of Deposit
+                    Create Yield-bearing asset
                   </Button>
                 </Flex>
               </form>

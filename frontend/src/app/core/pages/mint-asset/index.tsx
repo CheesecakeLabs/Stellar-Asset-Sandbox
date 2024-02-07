@@ -25,6 +25,7 @@ import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
 
@@ -140,7 +141,7 @@ export const MintAsset: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -153,6 +154,9 @@ export const MintAsset: React.FC = () => {
           )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'MINT'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -170,7 +174,7 @@ export const MintAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.MINT}
                 permissions={userPermissions}

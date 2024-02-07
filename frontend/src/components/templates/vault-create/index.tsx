@@ -13,12 +13,15 @@ import {
 import React, { useState } from 'react'
 import { FieldValues, useForm } from 'react-hook-form'
 
-import { SelectAssets } from './select-assets'
+import { SelectAssets } from 'components/molecules/select-assets'
+
+import { ListAssetsSelecteds } from './list-assets-selecteds'
 import { SelectCategory } from './select-category'
 
 export interface IOption {
   readonly label: string
   readonly value: number
+  readonly disabled: boolean
 }
 
 interface IVaultCreateTemplate {
@@ -46,12 +49,13 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
   const [categorySelected, setCategorySelected] = useState<
     IOption | undefined | null
   >()
-  const [assetsSelecteds, setAssetsSelecteds] = useState<number[]>([])
+  const [listAssets, setListAssets] = useState<
+    Hooks.UseAssetsTypes.IAssetDto[]
+  >([])
 
   const {
     handleSubmit,
     register,
-    getValues,
     setError,
     clearErrors,
     formState: { errors },
@@ -66,8 +70,18 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
     }
 
     if (!hasError && categorySelected) {
-      onSubmit(data.name, categorySelected.value, assetsSelecteds)
+      onSubmit(
+        data.name,
+        categorySelected.value,
+        listAssets.map(asset => {
+          return asset.id
+        })
+      )
     }
+  }
+
+  const onChangeAssets = (assetAdded: Hooks.UseAssetsTypes.IAssetDto): void => {
+    setListAssets(prev => [...prev, assetAdded])
   }
 
   return (
@@ -94,7 +108,9 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
                   required: true,
                 })}
               />
-              <FormErrorMessage>Vault name must be between 2 and 48 characters long</FormErrorMessage>
+              <FormErrorMessage>
+                Vault name must be between 2 and 48 characters long
+              </FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={errors?.category !== undefined}>
@@ -120,9 +136,20 @@ export const VaultCreateTemplate: React.FC<IVaultCreateTemplate> = ({
               <>
                 <FormLabel mt="1.5rem">Assets</FormLabel>
                 <SelectAssets
-                  assets={assets}
-                  setAssetsSelecteds={setAssetsSelecteds}
-                  assetsSelecteds={assetsSelecteds}
+                  assets={assets?.filter(
+                    asset =>
+                      !listAssets?.some(
+                        balance =>
+                          asset.code === balance.code &&
+                          asset.issuer.key.publicKey ===
+                            balance.issuer.key.publicKey
+                      )
+                  )}
+                  onChange={onChangeAssets}
+                />
+                <ListAssetsSelecteds
+                  assets={listAssets}
+                  setAssets={setListAssets}
                 />
               </>
             )}

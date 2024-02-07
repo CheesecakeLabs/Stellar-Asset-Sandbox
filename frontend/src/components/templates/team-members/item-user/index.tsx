@@ -1,21 +1,11 @@
-import {
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Td,
-  Tr,
-  useDisclosure,
-} from '@chakra-ui/react'
-import React, { ReactNode } from 'react'
+import { Td, Tr, useDisclosure } from '@chakra-ui/react'
+import React from 'react'
 
-import { havePermission } from 'utils'
 import { formatName } from 'utils/formatter'
 
-import { Permissions } from 'components/enums/permissions'
-import { MenuDotsIcon } from 'components/icons'
 import { ModalEditRole } from 'components/molecules'
+
+import { ItemMenu } from '../item-menu'
 
 interface IItemUser {
   user: Hooks.UseAuthTypes.IUserDto
@@ -51,30 +41,11 @@ export const ItemUser: React.FC<IItemUser> = ({
         <Td>{user.id}</Td>
         <Td>{formatName(user.name)}</Td>
         <Td>{user.role}</Td>
-        <Td w="1rem" p={0}>
-          {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
-            <Menu>
-              {({ isOpen }): ReactNode => (
-                <>
-                  <MenuButton
-                    isActive={isOpen}
-                    as={IconButton}
-                    bg="none"
-                    h="2rem"
-                    w="0.5rem"
-                    p="0"
-                    fill="black"
-                    _dark={{ fill: 'white' }}
-                    icon={<MenuDotsIcon />}
-                  />
-                  <MenuList>
-                    <MenuItem onClick={onOpen}>Change role</MenuItem>
-                  </MenuList>
-                </>
-              )}
-            </Menu>
-          )}
-        </Td>
+        {
+          <Td w="1rem" p={0}>
+            <ItemMenu onOpen={onOpen} permissions={permissions} />
+          </Td>
+        }
       </Tr>
     </>
   )

@@ -3,8 +3,6 @@ import React from 'react'
 
 import { toCrypto } from 'utils/formatter'
 
-import { HelpIcon } from 'components/icons'
-
 interface IBalanceChart {
   supply: number
   mainVault: number
@@ -32,11 +30,6 @@ export const BalanceChart: React.FC<IBalanceChart> = ({
         <Text fontSize="xs" fontWeight="600">
           Balance in the Main Vault
         </Text>
-        {!modeClean && (
-          <Flex>
-            <HelpIcon />
-          </Flex>
-        )}
       </Flex>
 
       <Flex flexDir="column" gap={2} mb="1rem">

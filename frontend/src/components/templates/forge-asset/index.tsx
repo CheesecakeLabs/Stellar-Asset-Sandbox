@@ -18,7 +18,12 @@ import { FieldValues, UseFormSetValue, useForm } from 'react-hook-form'
 import Joyride, { CallBackProps, STATUS } from 'react-joyride'
 import { NumericFormat } from 'react-number-format'
 
-import { assetFlags, typesAsset } from 'utils/constants/data-constants'
+import {
+  AUTH_CLAWBACK_ENABLED,
+  AUTH_REVOCABLE_FLAG,
+  assetFlags,
+  typesAsset,
+} from 'utils/constants/data-constants'
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { toNumber } from 'utils/formatter'
@@ -31,7 +36,8 @@ import { UploadImage } from '../../molecules/upload-image'
 interface IForgeAssetTemplate {
   onSubmit(
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    flags: string[]
   ): Promise<void>
   setSelectedFile: Dispatch<SetStateAction<File | null>>
   loading: boolean
@@ -46,6 +52,8 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
 }) => {
   const [errorSubmit] = useState<string | null>(null)
   const [runTour, setRunTour] = useState(false)
+  const [flags, setFlags] = useState<string[]>([])
+
   const { colorMode } = useColorMode()
   const {
     register,
@@ -53,6 +61,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     handleSubmit,
     setValue,
     getValues,
+    setError,
   } = useForm()
 
   const handleJoyrideCallback = (data: CallBackProps): void => {
@@ -98,6 +107,14 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
     },
   ]
 
+  const submit = (data: FieldValues): void => {
+    if (Number(data.asset_type) === -1) {
+      setError('asset_type', { message: 'This field is required' })
+      return
+    }
+    onSubmit(data, setValue, flags)
+  }
+
   return (
     <>
       <Joyride
@@ -118,7 +135,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
           },
         }}
       />
-      <Flex flexDir="column" w="full">
+      <Flex flexDir="column" w="full" pb="3.5rem">
         <Flex
           maxW={MAX_PAGE_WIDTH}
           alignSelf="center"
@@ -153,7 +170,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
           >
             <form
               onSubmit={handleSubmit(data => {
-                onSubmit(data, setValue)
+                submit(data)
               })}
             >
               <Flex flexDir={{ base: 'column', md: 'row' }}>
@@ -222,7 +239,7 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                     </FormControl>
 
                     <FormControl>
-                      <FormLabel>Initial supply</FormLabel>
+                      <FormLabel>Initial supply (optional)</FormLabel>
                       <Input
                         as={NumericFormat}
                         decimalScale={7}
@@ -268,19 +285,24 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                         className="asset-limit"
                       />
                     </FormControl>
-                    <FormControl>
+                    <FormControl isInvalid={errors.asset_type !== undefined}>
                       <FormLabel>Asset type</FormLabel>
                       <Select
                         {...register('asset_type', { required: true })}
-                        defaultValue={typesAsset[0].id}
+                        defaultValue={undefined}
+                        defaultChecked={false}
                         className="asset-type"
                       >
+                        <option value={-1}>Select asset type</option>
                         {typesAsset.map((typeAsset, index) => (
                           <option value={typeAsset.id} key={index}>
                             {typeAsset.name}
                           </option>
                         ))}
                       </Select>
+                      <FormErrorMessage>
+                        {errors?.asset_type?.message?.toString()}
+                      </FormErrorMessage>
                     </FormControl>
                   </Flex>
                 </Flex>
@@ -292,11 +314,16 @@ export const ForgeAssetTemplate: React.FC<IForgeAssetTemplate> = ({
                   {assetFlags.map((assetFlag, index) => (
                     <RadioCard
                       key={index}
-                      register={register}
+                      setFlags={setFlags}
+                      flags={flags}
                       title={assetFlag.title}
                       description={assetFlag.description}
                       value={assetFlag.flag}
-                      isDisabled={assetFlag.isDisabled}
+                      isDisabled={
+                        assetFlag.isDisabled ||
+                        (assetFlag.flag === AUTH_REVOCABLE_FLAG &&
+                          flags.includes(AUTH_CLAWBACK_ENABLED))
+                      }
                       link={assetFlag.link}
                       isComing={assetFlag.isComing}
                     />

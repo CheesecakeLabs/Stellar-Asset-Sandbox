@@ -24,6 +24,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
@@ -149,7 +150,7 @@ export const FreezeAccount: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -162,6 +163,9 @@ export const FreezeAccount: React.FC = () => {
           )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Freeze'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'FREEZE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -175,7 +179,7 @@ export const FreezeAccount: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.FREEZE}
                 permissions={userPermissions}

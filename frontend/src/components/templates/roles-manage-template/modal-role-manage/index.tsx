@@ -87,7 +87,7 @@ export const ModalRoleManage: React.FC<IModalRoleManage> = ({
               })}
             >
               <FormControl isInvalid={errors?.name !== undefined}>
-                <FormLabel mt="1.5rem">Role</FormLabel>
+                <FormLabel mt="1.5rem">Role name</FormLabel>
                 <Input
                   placeholder="Role name"
                   {...register('name', { required: true })}

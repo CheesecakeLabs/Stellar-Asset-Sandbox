@@ -30,6 +30,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { AuthorizeAccountTemplate } from 'components/templates/authorize-account'
 
@@ -159,7 +160,7 @@ export const AuthorizeAccount: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
         <Flex
           flexDir={{ base: 'column-reverse', md: 'row' }}
@@ -175,6 +176,9 @@ export const AuthorizeAccount: React.FC = () => {
           )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Authorize'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'AUTHORIZE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -188,7 +192,7 @@ export const AuthorizeAccount: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.AUTHORIZE}
                 permissions={userPermissions}

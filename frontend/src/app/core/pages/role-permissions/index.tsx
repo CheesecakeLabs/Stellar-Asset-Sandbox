@@ -3,13 +3,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
 import { MenuSettings } from 'components/organisms/menu-settings'
 import { Sidebar } from 'components/organisms/sidebar'
 import { RolePermissionsTemplate } from 'components/templates/role-permissions-template'
-import { GAService } from 'utils/ga'
 
 export interface IChange {
   role_id: number
@@ -28,11 +28,13 @@ export const RolePermissions: React.FC = () => {
     getPermissions,
     getRolesPermissions,
     updateRolesPermissions,
+    getProfile,
     roles,
     userPermissions,
     permissions,
     rolesPermissions,
     updatingRolesPermissions,
+    profile
   } = useAuth()
 
   const toast = useToast()
@@ -43,8 +45,9 @@ export const RolePermissions: React.FC = () => {
     await getUserPermissions()
     await getPermissions()
     await getRolesPermissions()
+    await getProfile()
     setLoading(false)
-  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions])
+  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions, getProfile])
 
   useEffect(() => {
     loadData()
@@ -108,13 +111,16 @@ export const RolePermissions: React.FC = () => {
               rolesPermissions={rolesPermissions}
               updatingRolesPermissions={updatingRolesPermissions}
               changes={changes}
+              profile={profile}
               onSubmit={onSubmit}
               setChanges={setChanges}
             />
           </Flex>
-          <VStack>
-            <MenuSettings option={SettingsOptions.ROLE_PERMISSIONS} />
-          </VStack>
+          {isLargerThanMd && (
+            <VStack>
+              <MenuSettings option={SettingsOptions.ROLE_PERMISSIONS} />
+            </VStack>
+          )}
         </Flex>
       </Sidebar>
     </Flex>
