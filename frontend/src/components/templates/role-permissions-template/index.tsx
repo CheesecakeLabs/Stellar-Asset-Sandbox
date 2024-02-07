@@ -20,7 +20,6 @@ import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
-import Authentication from 'app/auth/services/auth'
 import { IChange } from 'app/core/pages/role-permissions'
 
 interface IRolePermissionsTemplate {
@@ -31,6 +30,7 @@ interface IRolePermissionsTemplate {
   rolesPermissions: Hooks.UseAuthTypes.IRolePermission[] | undefined
   updatingRolesPermissions: boolean
   changes: IChange[]
+  profile: Hooks.UseAuthTypes.IUserDto | undefined
   setChanges: Dispatch<SetStateAction<IChange[]>>
   onSubmit(params: Hooks.UseAuthTypes.IRolePermission[]): Promise<void>
 }
@@ -42,6 +42,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   rolesPermissions,
   updatingRolesPermissions,
   changes,
+  profile,
   onSubmit,
   setChanges,
 }) => {
@@ -78,7 +79,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   }
 
   const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
-    return role.admin === 1 || role.created_by != Authentication.getUser()?.id
+    return role.admin === 1 || role.created_by != profile?.id
   }
 
   return (

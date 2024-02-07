@@ -28,11 +28,13 @@ export const RolePermissions: React.FC = () => {
     getPermissions,
     getRolesPermissions,
     updateRolesPermissions,
+    getProfile,
     roles,
     userPermissions,
     permissions,
     rolesPermissions,
     updatingRolesPermissions,
+    profile
   } = useAuth()
 
   const toast = useToast()
@@ -43,8 +45,9 @@ export const RolePermissions: React.FC = () => {
     await getUserPermissions()
     await getPermissions()
     await getRolesPermissions()
+    await getProfile()
     setLoading(false)
-  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions])
+  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions, getProfile])
 
   useEffect(() => {
     loadData()
@@ -108,6 +111,7 @@ export const RolePermissions: React.FC = () => {
               rolesPermissions={rolesPermissions}
               updatingRolesPermissions={updatingRolesPermissions}
               changes={changes}
+              profile={profile}
               onSubmit={onSubmit}
               setChanges={setChanges}
             />
