@@ -315,7 +315,6 @@ export const VaultDetail: React.FC = () => {
   const getPaymentsDataByLink = (action: 'prev' | 'next'): void => {
     if (action === 'prev') {
       const effectsPrev = historyNavPayments[historyNavPayments.length - 1]
-      console.log(effectsPrev)
       setEffects(effectsPrev)
       setHistoryNavPayments(previous => previous.slice(0, -1))
       return
