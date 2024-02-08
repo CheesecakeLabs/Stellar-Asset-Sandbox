@@ -264,7 +264,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
-		FeeBump:    distPk,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - create asset - send message %d", Id))
