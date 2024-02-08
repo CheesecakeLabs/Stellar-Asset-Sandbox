@@ -82,7 +82,7 @@ declare namespace Hooks {
       updateRolesPermissions: (
         params: Hooks.UseAuthTypes.IRolePermission[]
       ) => Promise<boolean>
-      createRole: (name: string) => Promise<boolean>
+      createRole: (userId: number, name: string) => Promise<boolean>
       updateRole: (id: number, name: string) => Promise<boolean>
       deleteRole: (id: number, idNewUsersRole: number) => Promise<boolean>
       isAuthenticated: boolean
