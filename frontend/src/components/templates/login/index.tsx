@@ -63,7 +63,7 @@ export const LoginTemplate: React.FC<ILoginTemplate> = ({
       </Flex>
       <Flex flexDir="column" w="376px" alignSelf="center" mt="6rem">
         {error && (
-          <Alert mb="0.75rem" status="error" variant="purple">
+          <Alert mb="0.75rem" status="error" variant="error">
             <AlertIcon />
             {error}
           </Alert>

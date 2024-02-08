@@ -5,7 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/bitly/go-notify"
@@ -15,10 +17,12 @@ type HTTPControllerMessenger struct {
 	pKp  entity.ProducerInterface
 	pHor entity.ProducerInterface
 	pEnv entity.ProducerInterface
+	pSub entity.ProducerInterface
+	pSig entity.ProducerInterface
 }
 
-func newHTTPControllerMessenger(pKp, pHor, pEnv entity.ProducerInterface) HTTPControllerMessenger {
-	return HTTPControllerMessenger{pKp, pHor, pEnv}
+func newHTTPControllerMessenger(pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface) HTTPControllerMessenger {
+	return HTTPControllerMessenger{pKp, pHor, pEnv, pSub, pSig}
 }
 
 func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}) (*entity.NotifyData, error) {
@@ -26,7 +30,6 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 	if err != nil {
 		return &entity.NotifyData{}, fmt.Errorf("sendMessage - generateHash: %v", err)
 	}
-
 	channel := make(chan interface{})
 	notify.Start(msgKey, channel)
 
@@ -36,7 +39,10 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 	}
 
 	res := <-channel
-	notify.Stop(msgKey, channel)
+	err = notify.Stop(msgKey, channel)
+	if err != nil {
+		return &entity.NotifyData{}, fmt.Errorf("sendMessage - notify.Stop: %v", err)
+	}
 	if notifyData, ok := res.(*entity.NotifyData); ok {
 		switch msg := notifyData.Message.(type) {
 		case entity.EnvelopeResponse:
@@ -76,6 +82,10 @@ func (m *HTTPControllerMessenger) produce(chanName string, msgKey string, value 
 		err = m.pHor.Produce(msgKey, value)
 	case entity.EnvelopeChannel:
 		err = m.pEnv.Produce(msgKey, value)
+	case entity.SubmitTransactionChannel:
+		err = m.pSub.Produce(msgKey, value)
+	case entity.SignChannel:
+		err = m.pSig.Produce(msgKey, value)
 	default:
 		err = fmt.Errorf("invalid channel name")
 	}
@@ -105,4 +115,22 @@ func createLogDescription(transaction int, assetCode string, setFlags, clearFlag
 	default:
 		return "Unrecognized transaction type"
 	}
+}
+
+// Generate ID
+func generateID() int {
+	currentTimeInMillis := int(time.Now().UnixNano() / int64(time.Millisecond))
+	return currentTimeInMillis
+}
+
+// Helper function to parse string to *bool
+func parseBoolQueryParameter(value string) (*bool, error) {
+	if value == "" {
+		return nil, nil
+	}
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		return nil, err
+	}
+	return &boolValue, nil
 }

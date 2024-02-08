@@ -7,19 +7,21 @@ import (
 	"time"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type logTransactionsRoutes struct {
-	w  usecase.WalletUseCase
-	as usecase.AssetUseCase
-	m  HTTPControllerMessenger
-	l  usecase.LogTransactionUseCase
-	a  usecase.AuthUseCase
+	w      usecase.WalletUseCase
+	as     usecase.AssetUseCase
+	m      HTTPControllerMessenger
+	l      usecase.LogTransactionUseCase
+	a      usecase.AuthUseCase
+	logger *logger.Logger
 }
 
-func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, l usecase.LogTransactionUseCase, a usecase.AuthUseCase) {
-	r := &logTransactionsRoutes{w, as, m, l, a}
+func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, l usecase.LogTransactionUseCase, a usecase.AuthUseCase, logger *logger.Logger) {
+	r := &logTransactionsRoutes{w, as, m, l, a, logger}
 	h := handler.Group("/log_transactions").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("/:time_range", r.getLogTransactions)
@@ -30,7 +32,6 @@ func newLogTransactionsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase,
 		h.GET("/assets/sum/:time_range/:time_frame", r.sumAmountsForAllAssets)
 		h.GET("/last-transactions/:transaction_type_id", r.getLastLogTransactions)
 		h.POST("/supply/:asset_id", r.supplyByAssetID)
-
 	}
 }
 
@@ -54,6 +55,7 @@ func (r *logTransactionsRoutes) getLogTransactions(c *gin.Context) {
 
 	logTransactions, err := r.l.GetLogTransactions(timeRange)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactions")
 		errorResponse(c, http.StatusInternalServerError, "error getting log transactions: %s", err)
 		return
 	}
@@ -76,12 +78,14 @@ func (r *logTransactionsRoutes) getLogTransactionsByAssetID(c *gin.Context) {
 
 	assetID, err := strconv.Atoi(assetIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByAssetID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByAssetID(assetID, timeRange)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByAssetID")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
@@ -104,12 +108,14 @@ func (r *logTransactionsRoutes) getLogTransactionsByUserID(c *gin.Context) {
 
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByUserID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid user ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByUserID(userID, timeRange)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByUserID")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
@@ -132,12 +138,14 @@ func (r *logTransactionsRoutes) getLogTransactionsByTransactionTypeID(c *gin.Con
 
 	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByTransactionTypeID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLogTransactionsByTransactionTypeID(transactionTypeID, timeRange)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLogTransactionsByTransactionTypeID")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
@@ -172,23 +180,27 @@ func (r *logTransactionsRoutes) sumAmountsByAssetID(c *gin.Context) {
 	// Convert transactionTypeStr to integer
 	transactionType, err := strconv.Atoi(transactionTypeStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsByAssetID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid transaction type: %s", err.Error()), err)
 		return
 	}
 	duration, err := time.ParseDuration(timeFrame)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsByAssetID")
 		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format", err)
 		return
 	}
 
 	assetID, err := strconv.Atoi(assetIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsByAssetID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	sum, err := r.l.SumLogTransactionsByAssetID(assetID, timeRange, duration, transactionType)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsByAssetID")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
@@ -214,11 +226,13 @@ func (r *logTransactionsRoutes) sumAmountsForAllAssets(c *gin.Context) {
 
 	duration, err := time.ParseDuration(timeFrame)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsForAllAssets")
 		errorResponse(c, http.StatusBadRequest, "Invalid time_frame format", err)
 		return
 	}
 	sum, err := r.l.SumLogTransactions(timeRange, duration)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - sumAmountsForAllAssets")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}
@@ -240,12 +254,14 @@ func (r *logTransactionsRoutes) getLastLogTransactions(c *gin.Context) {
 
 	transactionTypeID, err := strconv.Atoi(transactionTypeIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLastLogTransactions")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	logTransactions, err := r.l.GetLastLogTransactions(transactionTypeID)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - GetLastLogTransactions")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting last log transactions: %s", err.Error()), err)
 		return
 	}
@@ -271,18 +287,21 @@ func (r *logTransactionsRoutes) supplyByAssetID(c *gin.Context) {
 
 	var request FiltersRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - supplyByAssetID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
 
 	assetID, err := strconv.Atoi(assetIDStr)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - supplyByAssetID")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid asset ID: %s", err.Error()), err)
 		return
 	}
 
 	sum, err := r.l.LogTransactionsSupplyByAssetID(assetID, request.TimeRange, request.PeriodInitial, request.Interval)
 	if err != nil {
+		r.logger.Error(err, "http - v1 - list log transactions - supplyByAssetID")
 		errorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error getting log transactions: %s", err.Error()), err)
 		return
 	}

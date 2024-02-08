@@ -1,5 +1,4 @@
 import {
-  Box,
   Container,
   Flex,
   Table,
@@ -35,7 +34,13 @@ export const VaultsStatusList: React.FC<IVaultsStatusList> = ({
         Vaults
       </Text>
       <Flex w="full" maxW="full" flexDir="column" alignItems="center">
-        <Box w="480px" mb="1.5rem">
+        <Flex
+          w="480px"
+          mb="1.5rem"
+          alignSelf="center"
+          justifyContent="center"
+          alignItems="center"
+        >
           <AccountsChart
             authorized={asset.assetData?.accounts.authorized || 0}
             unauthorized={
@@ -45,15 +50,15 @@ export const VaultsStatusList: React.FC<IVaultsStatusList> = ({
             authorizedLabel={authorizedLabel}
             unauthorizedLabel={unauthorizedLabel}
           />
-        </Box>
+        </Flex>
         <Table variant="list">
           <Thead>
             <Th>Account</Th>
             <Th>Status</Th>
           </Thead>
           <Tbody>
-            {vaultsStatus?.map(vaultStatus => (
-              <Tr>
+            {vaultsStatus?.map((vaultStatus, index) => (
+              <Tr key={index}>
                 <Td>{vaultStatus.name}</Td>
                 <Td>
                   <Flex alignItems="center" gap={3}>

@@ -18,6 +18,8 @@ declare namespace Hooks {
       name: string
       token: string
       role_id: number
+      vault_id: number
+      vault: Hooks.UseVaultsTypes.IVault
     }
 
     interface IUserDto {
@@ -27,12 +29,15 @@ declare namespace Hooks {
       role: string
       updated_at: string
       role_id: number
+      vault_id: number
+      vault: Hooks.UseVaultsTypes.IVault
     }
 
     interface IRole {
       id: number
       name: string
       admin: id
+      created_by: number
     }
 
     interface IUserRole {
@@ -60,13 +65,19 @@ declare namespace Hooks {
       signIn: (params: ISignIn) => Promise<IUser | null>
       signUp: (params: ISignUp) => Promise<IUser | null>
       signOut: () => Promise<boolean>
-      getRoles: () => Promise<void>
+      getRoles: () => Promise<Hooks.UseAuthTypes.IRole[] | undefined>
       getAllUsers: () => Promise<void>
-      getProfile: () => Promise<void>
+      getProfile: () => Promise<IUserDto | undefined>
       editUsersRole: (params: IUserRole) => Promise<boolean>
-      getUserPermissions: () => Promise<void>
-      getRolesPermissions: () => Promise<void>
-      getPermissions: () => Promise<void>
+      getUserPermissions: () => Promise<
+        Hooks.UseAuthTypes.IUserPermission[] | undefined
+      >
+      getRolesPermissions: () => Promise<
+        Hooks.UseAuthTypes.IRolePermission[] | undefined
+      >
+      getPermissions: () => Promise<
+        Hooks.UseAuthTypes.IPermission[] | undefined
+      >
       editProfile: (params: IUserRole) => Promise<boolean>
       updateRolesPermissions: (
         params: Hooks.UseAuthTypes.IRolePermission[]

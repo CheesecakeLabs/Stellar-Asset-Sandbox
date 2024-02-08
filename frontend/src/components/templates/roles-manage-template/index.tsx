@@ -8,11 +8,15 @@ import {
   Text,
   Th,
   Thead,
+  Tr,
   useDisclosure,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
+
+import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { ItemRole } from './item-role'
 import { ModalRoleManage } from './modal-role-manage'
@@ -37,6 +41,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
   handleDeleteRole,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   return (
     <>
@@ -54,9 +59,17 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
           flexDir="column"
           w="full"
         >
-          <Text fontSize="2xl" fontWeight="400" mb="1.5rem">
-            Administration
-          </Text>
+          <Flex
+            justifyContent="space-between"
+            w="full"
+            alignItems="center"
+            mb="1.5rem"
+          >
+            <Text fontSize="2xl" fontWeight="400">
+              Administration
+            </Text>
+            {isSmallerThanMd && <MenuAdminMobile selected={'ROLES'} />}
+          </Flex>
           <Container variant="primary" px={0} pb={0} maxW="full">
             <Flex
               justifyContent="space-between"
@@ -84,14 +97,17 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             ) : (
               <Table w="full" variant="list">
                 <Thead w="full">
-                  <Th>Role name</Th>
-                  <Th justifyContent="flex-end" display="flex">
-                    Actions
-                  </Th>
+                  <Tr>
+                    <Th>Role name</Th>
+                    <Th justifyContent="flex-end" display="flex">
+                      Actions
+                    </Th>
+                  </Tr>
                 </Thead>
                 <Tbody>
-                  {roles?.map(role => (
+                  {roles?.map((role, index) => (
                     <ItemRole
+                      key={index}
                       role={role}
                       loading={creatingRole || updatingRole || deletingRole}
                       roles={roles}

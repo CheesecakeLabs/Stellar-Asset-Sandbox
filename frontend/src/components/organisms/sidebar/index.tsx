@@ -38,15 +38,14 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.HOME,
   },
   {
-    name: 'Token Management',
+    name: 'Asset Management',
     icon: <PaymentsIcon />,
     path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
-    name: 'Smart Contracts',
+    name: 'Yield-bearing asset',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
-    comingSoon: true,
   },
   {
     name: 'Treasury',
@@ -69,8 +68,7 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box w="full" 
-      zIndex={101}>
+    <Box w="full" zIndex={101}>
       <Header onOpen={onOpen} />
       <Flex pt="5rem">
         <SidebarContent

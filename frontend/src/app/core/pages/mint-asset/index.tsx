@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -10,6 +16,7 @@ import { havePermission } from 'utils'
 import { mintHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -18,6 +25,7 @@ import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { MintAssetTemplate } from 'components/templates/mint-asset'
 
@@ -28,6 +36,8 @@ export const MintAsset: React.FC = () => {
   const [burnOperations, setBurnOperations] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { mint, getAssetById, loadingOperation, loadingAsset } = useAssets()
   const { loadingChart, getPaymentsByAssetId } = useDashboards()
@@ -36,6 +46,10 @@ export const MintAsset: React.FC = () => {
   const { id } = useParams()
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Mint Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,
@@ -127,11 +141,22 @@ export const MintAsset: React.FC = () => {
   }
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper title={'About Mint'} description={mintHelper} />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Mint'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'MINT'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -149,13 +174,15 @@ export const MintAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.MINT}
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper title={'About Mint'} description={mintHelper} />
+            {isLargerThanMd && (
+              <ActionHelper title={'About Mint'} description={mintHelper} />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

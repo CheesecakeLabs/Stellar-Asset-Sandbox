@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
@@ -44,6 +45,7 @@ export const RolesManage: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_created')
         getRoles()
         return true
       }
@@ -74,6 +76,7 @@ export const RolesManage: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_deleted')
         getRoles()
         return true
       }
@@ -119,9 +122,11 @@ export const RolesManage: React.FC = () => {
               handleRole={handleRole}
             />
           </Flex>
-          <VStack>
-            <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
-          </VStack>
+          {isLargerThanMd && (
+            <VStack>
+              <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
+            </VStack>
+          )}
         </Flex>
       </Sidebar>
     </Flex>

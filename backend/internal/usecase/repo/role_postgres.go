@@ -17,9 +17,8 @@ func NewRoleRepo(pg *postgres.Postgres) RoleRepo {
 }
 
 func (r RoleRepo) GetRoles() ([]entity.Role, error) {
-	stmt := `SELECT id, name, admin FROM Role ORDER BY name ASC`
+	stmt := `SELECT id, name, admin, created_by FROM Role ORDER BY name ASC`
 	rows, err := r.Db.Query(stmt)
-
 	if err != nil {
 		return nil, fmt.Errorf("WalletRepo - GetRoles - db.Query: %w", err)
 	}
@@ -30,10 +29,18 @@ func (r RoleRepo) GetRoles() ([]entity.Role, error) {
 
 	for rows.Next() {
 		var role entity.Role
+		var createdBy sql.NullInt64
 
-		err = rows.Scan(&role.Id, &role.Name, &role.Admin)
+		err = rows.Scan(&role.Id, &role.Name, &role.Admin, &createdBy)
 		if err != nil {
 			return nil, fmt.Errorf("RoleRepo - GetRoles - rows.Scan: %w", err)
+		}
+
+		// If createdBy is valid, set it to Role.CreatedBy
+		if createdBy.Valid {
+			role.CreatedBy = int(createdBy.Int64)
+		} else {
+			role.CreatedBy = 0
 		}
 
 		entities = append(entities, role)
@@ -65,8 +72,8 @@ func (r RoleRepo) DeleteRole(data entity.RoleDelete) (entity.RoleDelete, error) 
 }
 
 func (r RoleRepo) CreateRole(data entity.RoleRequest) (entity.RoleRequest, error) {
-	stmt := `INSERT INTO role (name) VALUES ($1);`
-	_, err := r.Db.Exec(stmt, data.Name)
+	stmt := `INSERT INTO role (name, created_by ) VALUES ($1, $2);`
+	_, err := r.Db.Exec(stmt, data.Name, data.CreatedBy)
 	if err != nil {
 		return entity.RoleRequest{}, fmt.Errorf("RoleRepo - CreateRole - db.QueryRow: %w", err)
 	}

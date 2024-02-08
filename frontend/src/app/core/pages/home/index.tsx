@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -14,7 +15,11 @@ export const Home: React.FC = () => {
     useAuth()
 
   useEffect(() => {
-    getAssets()
+    GAService.GAPageView('Home')
+  }, [])
+
+  useEffect(() => {
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {

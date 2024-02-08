@@ -9,6 +9,7 @@ import { useHorizon } from 'hooks/useHorizon'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -21,8 +22,10 @@ export const VaultDetail: React.FC = () => {
     useState<Hooks.UseVaultsTypes.IVault[]>()
   const [vaultCategories, setVaultCategories] =
     useState<Hooks.UseVaultsTypes.IVaultCategory[]>()
-  const [payments, setPayments] = useState<Hooks.UseHorizonTypes.IPayments>()
-  const [historyNavPayments, setHistoryNavPayments] = useState<string[]>([])
+  const [effects, setEffects] = useState<Hooks.UseHorizonTypes.IEffects>()
+  const [historyNavPayments, setHistoryNavPayments] = useState<
+    Hooks.UseHorizonTypes.IEffects[]
+  >([])
 
   const toast = useToast()
   const navigate = useNavigate()
@@ -52,7 +55,11 @@ export const VaultDetail: React.FC = () => {
     updateVaultAssets,
     deleteVault,
   } = useVaults()
-  const { loadingHorizon, getPaymentsData, getAssetAccounts } = useHorizon()
+  const { loadingHorizon, getAccountEffects, getAssetAccounts } = useHorizon()
+
+  useEffect(() => {
+    GAService.GAPageView('Vault detail')
+  }, [])
 
   const [selectedAsset, setSelectedAsset] =
     useState<Hooks.UseAssetsTypes.IAssetDto>()
@@ -92,8 +99,8 @@ export const VaultDetail: React.FC = () => {
         })
 
         if (vault) {
-          getPaymentsData(vault.wallet.key.publicKey).then(payments => {
-            setPayments(payments)
+          getAccountEffects(vault.wallet.key.publicKey).then(effects => {
+            setEffects(effects)
           })
         }
 
@@ -133,8 +140,8 @@ export const VaultDetail: React.FC = () => {
         })
 
         if (vault) {
-          getPaymentsData(vault.wallet.key.publicKey).then(payments => {
-            setPayments(payments)
+          getAccountEffects(vault.wallet.key.publicKey).then(effects => {
+            setEffects(effects)
           })
         }
 
@@ -186,9 +193,9 @@ export const VaultDetail: React.FC = () => {
 
   const onUpdateVaultAssets = async (
     listEdit: Hooks.UseHorizonTypes.IBalance[]
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     try {
-      if (!vault) return
+      if (!vault) return false
 
       const assetsRemoveds =
         vault.accountData?.balances
@@ -245,16 +252,17 @@ export const VaultDetail: React.FC = () => {
             setVault(vault)
           })
         }
-
-        return
+        return isSuccess
       }
 
       toastError(MessagesError.errorOccurred)
+      return false
     } catch (error) {
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
       toastError(message)
+      return false
     }
   }
 
@@ -271,7 +279,7 @@ export const VaultDetail: React.FC = () => {
 
   useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
-    getAssets()
+    getAssets(true)
   }, [getAssets, getVaults])
 
   useEffect(() => {
@@ -293,33 +301,30 @@ export const VaultDetail: React.FC = () => {
 
   useEffect(() => {
     if (vault) {
-      getPaymentsData(vault.wallet.key.publicKey).then(payments => {
-        setPayments(payments)
+      getAccountEffects(vault.wallet.key.publicKey).then(effects => {
+        setEffects(effects)
+        setHistoryNavPayments([])
       })
     }
-  }, [getPaymentsData, vault])
+  }, [getAccountEffects, vault])
 
   useEffect(() => {
     getUserPermissions()
   }, [getUserPermissions])
 
   const getPaymentsDataByLink = (action: 'prev' | 'next'): void => {
-    const link =
-      action === 'next'
-        ? payments?._links.next.href
-        : historyNavPayments[historyNavPayments.length - 1]
+    if (action === 'prev') {
+      const effectsPrev = historyNavPayments[historyNavPayments.length - 1]
+      setEffects(effectsPrev)
+      setHistoryNavPayments(previous => previous.slice(0, -1))
+      return
+    }
+
+    const link = effects?._links.next.href
     if (link) {
-      getPaymentsData(undefined, link).then(paymentsData => {
-        if (action === 'prev') {
-          setHistoryNavPayments(previous => previous.slice(0, -1))
-        }
-        if (action === 'next') {
-          setHistoryNavPayments(previous => [
-            ...previous,
-            payments?._links.self.href || '',
-          ])
-        }
-        setPayments(paymentsData)
+      setHistoryNavPayments(history => [...history, effects])
+      getAccountEffects(undefined, link).then(effects => {
+        setEffects(effects)
       })
     }
   }
@@ -335,7 +340,7 @@ export const VaultDetail: React.FC = () => {
       asset.code,
       asset.issuer.key.publicKey
     )
-    const vaults = await getVaults()
+    const vaults = await getVaults(true)
     const filteredVaults =
       vaults
         ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
@@ -376,7 +381,7 @@ export const VaultDetail: React.FC = () => {
           loadingVaults={loadingVault || loadingVaults}
           assets={assets}
           vaults={vaults}
-          payments={payments}
+          effects={effects}
           selectedAsset={selectedAsset}
           loadingHorizon={loadingHorizon}
           vaultCategories={vaultCategories}

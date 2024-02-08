@@ -13,16 +13,11 @@ import (
 const (
 	// Attempts connection
 	host       = "backend:8080"
-	healthPath = "http://" + host + "/healthz"
+	healthPath = "/healthz"
 	attempts   = 20
 
 	// HTTP REST
 	basePath = "http://" + host + "/v1"
-
-	// Kafka
-	kafkaHost     = "kafka:9092"
-	consumerTopic = "consumer_topic"
-	producerTopic = "producer_topic"
 )
 
 func TestMain(t *testing.M) {
@@ -41,12 +36,12 @@ func healthCheck(attempts int) error {
 	var err error
 
 	for attempts > 0 {
-		err = Do(Get(healthPath), Expect().Status().Equal(http.StatusOK))
+		err = Do(Get(basePath+healthPath), Expect().Status().Equal(http.StatusOK))
 		if err == nil {
 			return nil
 		}
 
-		log.Printf("Integration tests: url %s is not available, attempts left: %d", healthPath, attempts)
+		log.Printf("Integration tests: url %s is not available, attempts left: %d", basePath+healthPath, attempts)
 
 		time.Sleep(time.Second)
 

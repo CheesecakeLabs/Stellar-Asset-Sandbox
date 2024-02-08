@@ -35,10 +35,46 @@ func (uc *ContractUseCase) GetAll() ([]entity.Contract, error) {
 }
 
 func (uc *ContractUseCase) GetById(id string) (entity.Contract, error) {
-	asset, err := uc.cRepo.GetContractById(id)
+	contract, err := uc.cRepo.GetContractById(id)
 	if err != nil {
-		return entity.Contract{}, fmt.Errorf("ContractUseCase - Get - uc.repo.GetContractById: %w", err)
+		return entity.Contract{}, fmt.Errorf("ContractUseCase - GetById - uc.repo.GetContractById: %w", err)
 	}
 
-	return asset, nil
+	return contract, nil
+}
+
+func (uc *ContractUseCase) GetPaginatedContracts(page int, limit int) ([]entity.Contract, int, error) {
+	contracts, totalPages, err := uc.cRepo.GetPaginatedContracts(page, limit)
+	if err != nil {
+		return nil, 0, fmt.Errorf("ContractUseCase - GetPaginatedContracts - uc.repo.GetPaginatedContracts: %w", err)
+	}
+
+	return contracts, totalPages, nil
+}
+
+func (uc *ContractUseCase) GetHistory(userId int, contractId int) ([]entity.ContractHistory, error) {
+	contractsHistory, err := uc.cRepo.GetHistory(userId, contractId)
+	if err != nil {
+		return nil, fmt.Errorf("ContractUseCase - GetHistory - uc.repo.GetHistory: %w", err)
+	}
+
+	return contractsHistory, nil
+}
+
+func (uc *ContractUseCase) AddContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error) {
+	contractsHistory, err := uc.cRepo.AddContractHistory(contractHistory)
+	if err != nil {
+		return entity.ContractHistory{}, fmt.Errorf("ContractUseCase - AddContractHistory - uc.repo.AddContractHistory: %w", err)
+	}
+
+	return contractsHistory, nil
+}
+
+func (uc *ContractUseCase) UpdateContractHistory(contractHistory entity.ContractHistory) (entity.ContractHistory, error) {
+	contractHistory, err := uc.cRepo.UpdateContractHistory(contractHistory)
+	if err != nil {
+		return entity.ContractHistory{}, fmt.Errorf("ContractUseCase - UpdateContractHistory - uc.repo.UpdateContractHistory: %w", err)
+	}
+
+	return contractHistory, nil
 }

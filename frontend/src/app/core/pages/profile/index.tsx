@@ -3,6 +3,9 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from 'hooks/useAuth'
+import { useVaults } from 'hooks/useVaults'
+import { formatVaultName } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -10,6 +13,7 @@ import { ProfileTemplate } from 'components/templates/profile'
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate()
+  const { userPermissions, getUserPermissions } = useAuth()
   const {
     signOut,
     editProfile,
@@ -21,10 +25,38 @@ export const Profile: React.FC = () => {
     loadingRoles,
   } = useAuth()
 
+  const { creatingVault, createVault } = useVaults()
+
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
+  useEffect(() => {
+    GAService.GAPageView('Profile')
+  }, [])
+
   const handleSignOut = async (): Promise<void> => {
     const isSuccess = await signOut()
     if (isSuccess) {
       navigate('/login')
+    }
+  }
+
+  const handleCreateVault = async (): Promise<void> => {
+    if (profile?.vault_id) {
+      navigate(`${PathRoute.VAULT_DETAIL}/${profile.vault_id}`)
+      return
+    }
+    GAService.GAEvent('create_wallet_click')
+    const vault = {
+      name: formatVaultName(profile?.name || ''),
+      assets_id: [],
+      owner_id: Number(profile?.id),
+    }
+
+    const vaultCreated = await createVault(vault)
+    if (vaultCreated) {
+      navigate(`${PathRoute.VAULT_DETAIL}/${vaultCreated.id}`)
     }
   }
 
@@ -49,12 +81,15 @@ export const Profile: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.PROFILE}>
         <ProfileTemplate
-          handleSignOut={handleSignOut}
           loading={loading}
           profile={profile}
-          handleEditRole={handleEditRole}
           roles={roles}
           loadingRoles={loadingRoles}
+          creatingVault={creatingVault}
+          userPermissions={userPermissions}
+          handleSignOut={handleSignOut}
+          handleEditRole={handleEditRole}
+          handleCreateVault={handleCreateVault}
         />
       </Sidebar>
     </Flex>

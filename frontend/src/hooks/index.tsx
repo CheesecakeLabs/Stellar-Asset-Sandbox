@@ -5,6 +5,7 @@ import { AuthProvider } from './useAuth/context'
 import { ContractsProvider } from './useContracts/context'
 import { DashboardsProvider } from './useDashboards/context'
 import { HorizonProvider } from './useHorizon/context'
+import { TransactionsProvider } from './useTransactions/context'
 import { VaultsProvider } from './useVaults/context'
 
 interface IProps {
@@ -13,16 +14,18 @@ interface IProps {
 
 export const AppProvider: React.FC<IProps> = ({ children }) => {
   return (
-    <AuthProvider>
-      <HorizonProvider>
-        <AssetsProvider>
-          <DashboardsProvider>
-            <VaultsProvider>
-              <ContractsProvider>{children}</ContractsProvider>
-            </VaultsProvider>
-          </DashboardsProvider>
-        </AssetsProvider>
-      </HorizonProvider>
-    </AuthProvider>
+    <HorizonProvider>
+      <AuthProvider>
+        <TransactionsProvider>
+          <AssetsProvider>
+            <DashboardsProvider>
+              <VaultsProvider>
+                <ContractsProvider>{children}</ContractsProvider>
+              </VaultsProvider>
+            </DashboardsProvider>
+          </AssetsProvider>
+        </TransactionsProvider>
+      </AuthProvider>
+    </HorizonProvider>
   )
 }

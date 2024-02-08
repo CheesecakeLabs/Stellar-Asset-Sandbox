@@ -20,7 +20,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
   const navigate = useNavigate()
 
   return (
-    <Flex h="3.5rem" alignItems="center">
+    <Flex alignItems="center" mb="0.5rem">
       <Breadcrumb
         spacing="0.75rem"
         separator={<ChevronRight />}
@@ -30,7 +30,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
         <BreadcrumbItem>
           <BreadcrumbLink
             onClick={(): void => {
-              navigate(PathRoute.HOME)
+              navigate(PathRoute.TOKEN_MANAGEMENT)
             }}
             flexDir="row"
             display="flex"
@@ -39,7 +39,7 @@ export const ManagementBreadcrumb: React.FC<IManagementBreadcrumb> = ({
             fill="gray.650"
             _dark={{ fill: 'white' }}
           >
-            <HomeIcon /> Token Management
+            <HomeIcon /> Asset Management
           </BreadcrumbLink>
         </BreadcrumbItem>
 

@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,6 +17,7 @@ import { havePermission } from 'utils'
 import { distributeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
 import { toFixedCrypto } from 'utils/formatter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -18,12 +25,16 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { DistributeAssetTemplate } from 'components/templates/distribute-asset'
 
 export const DistributeAsset: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+
   const { distribute, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
@@ -34,6 +45,10 @@ export const DistributeAsset: React.FC = () => {
 
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Distribute Asset')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,
@@ -102,7 +117,7 @@ export const DistributeAsset: React.FC = () => {
         asset.code,
         asset.issuer.key.publicKey
       )
-      const vaults = await getVaults()
+      const vaults = await getVaults(true)
       const filteredVaults =
         vaults
           ?.filter((vault: Hooks.UseVaultsTypes.IVault) =>
@@ -156,11 +171,25 @@ export const DistributeAsset: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper
+              title={'About Distribute'}
+              description={distributeHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Distribute'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'DISTRIBUTE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -174,16 +203,18 @@ export const DistributeAsset: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.DISTRIBUTE}
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Distribute'}
-              description={distributeHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Distribute'}
+                description={distributeHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

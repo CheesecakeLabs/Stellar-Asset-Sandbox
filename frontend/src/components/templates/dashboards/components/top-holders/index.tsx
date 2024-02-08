@@ -39,8 +39,8 @@ export const TopHolders: React.FC<ITopHolders> = ({ holders, assetCode }) => {
           <Th isNumeric>Amount</Th>
         </Thead>
         <Tbody>
-          {holders?.map(holder => (
-            <Tr py="2rem">
+          {holders?.map((holder, index) => (
+            <Tr py="2rem" key={index}>
               <Td>{holder.name}</Td>
               <Td fontSize="sm" isNumeric>
                 {toCrypto(holder.amount)} {assetCode}

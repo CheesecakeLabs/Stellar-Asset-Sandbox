@@ -9,4 +9,7 @@ export enum Permissions {
   AUTHORIZE_ASSET = 'authorize',
   MOVE_BALANCES_VAULTS = 'move-balances-vaults',
   MOVE_BALANCES_EXTERNAL_ACCOUNTS = 'move-balances-external-accounts',
+  CREATE_CERTIFICATES = 'create-certificates',
+  CREATE_WALLET = 'create-wallet',
+  INVEST_CERTIFICATE = 'invest-certificate',
 }

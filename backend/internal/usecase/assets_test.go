@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/mocks"
@@ -25,7 +26,7 @@ type testAsset struct {
 	err  error
 }
 
-func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, *mocks.MockWalletRepoInterface) {
+func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, *mocks.MockWalletRepoInterface, *mocks.MockTomlInterface, *mocks.MockTomlRepoInterface) {
 	t.Helper()
 
 	mockCtl := gomock.NewController(t)
@@ -33,13 +34,16 @@ func asset(t *testing.T) (*usecase.AssetUseCase, *mocks.MockAssetRepoInterface, 
 
 	rw := mocks.NewMockWalletRepoInterface(mockCtl)
 	ra := mocks.NewMockAssetRepoInterface(mockCtl)
-	u := usecase.NewAssetUseCase(ra, rw)
+	tg := mocks.NewMockTomlInterface(mockCtl)
+	tr := mocks.NewMockTomlRepoInterface(mockCtl)
+	st := mocks.NewMockAssetServiceInterface(mockCtl)
+	u := usecase.NewAssetUseCase(ra, rw, tg, tr, config.Horizon{}, st)
 
-	return u, ra, rw
+	return u, ra, rw, tg, tr
 }
 
 func TestAssetUseCaseCreate(t *testing.T) {
-	u, ra, rw := asset(t)
+	u, ra, rw, tg, tr := asset(t)
 
 	req := entity.Asset{
 		Code: "ABC",
@@ -153,7 +157,7 @@ func TestAssetUseCaseCreate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mock()
 
-			res, err := u.Create(tc.req.(entity.Asset))
+			res, err := u.Create(tc.req.(entity.Asset), []byte{})
 
 			require.EqualValues(t, tc.res, res)
 			if tc.err == nil {
@@ -197,6 +201,126 @@ func TestAssetUseCaseCreate(t *testing.T) {
 				require.EqualValues(t, err, tc.err)
 			} else {
 				require.ErrorContains(t, err, tc.err.Error())
+			}
+		})
+	}
+
+	assetID := 123
+	mockAsset := entity.Asset{
+		Id:   assetID,
+		Code: "ABC",
+	}
+
+	mockAssets := []entity.Asset{
+		mockAsset,
+	}
+
+	mockFilter := entity.AssetFilter{}
+
+	mockToml := "mock toml data"
+	mockReq := entity.TomlData{
+		Version: "2.0.0",
+	}
+
+	tests = []testAsset{
+		// Test for GetById
+		{
+			name: "get by id - success",
+			req:  assetID,
+			mock: func() {
+				ra.EXPECT().GetAssetById(assetID).Return(mockAsset, nil)
+			},
+			res: mockAsset,
+			err: nil,
+		},
+		// Add other test cases for GetById...
+		{
+			name: "get by id - database error",
+			req:  assetID,
+			mock: func() {
+				ra.EXPECT().GetAssetById(assetID).Return(entity.Asset{}, assetDbError)
+			},
+			res: entity.Asset{},
+			err: assetDbError,
+		},
+		// Test for GetAll
+		{
+			name: "get all - success",
+			mock: func() {
+				ra.EXPECT().GetAssets(mockFilter).Return(mockAssets, nil)
+			},
+			res: mockAssets,
+			err: nil,
+		},
+		{
+			name: "get all - database error",
+			mock: func() {
+				ra.EXPECT().GetAssets(mockFilter).Return([]entity.Asset{}, assetDbError)
+			},
+			res: []entity.Asset{},
+			err: assetDbError,
+		},
+		{
+			name: "create toml - success",
+			req:  mockReq,
+			mock: func() {
+				mockCfg := config.Horizon{} // Mock configuration
+				mockTRepo := tg
+				mockTRepo.EXPECT().GenerateToml(mockReq, mockCfg).Return(mockToml, nil)
+				tr.EXPECT().CreateToml(mockToml).Return(mockToml, nil)
+			},
+			res: mockToml,
+			err: nil,
+		},
+		{
+			name: "create toml - error",
+			req:  mockReq,
+			mock: func() {
+				mockCfg := config.Horizon{} // Mock configuration
+				mockTRepo := tg
+				mockTRepo.EXPECT().GenerateToml(mockReq, mockCfg).Return("", errors.New("error"))
+			},
+			res: "",
+			err: errors.New("error"),
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mock()
+
+			// Test GetById
+			if assetID, ok := tc.req.(string); ok {
+				res, err := u.GetById(assetID)
+				require.EqualValues(t, tc.res, res)
+				if tc.err == nil {
+					require.EqualValues(t, err, tc.err)
+				} else {
+					require.ErrorContains(t, err, tc.err.Error())
+				}
+			}
+
+			// Test GetAll
+			if _, ok := tc.req.(bool); ok {
+				res, err := u.GetAll(mockFilter)
+				require.EqualValues(t, tc.res, res)
+				if tc.err == nil {
+					require.EqualValues(t, err, tc.err)
+				} else {
+					require.ErrorContains(t, err, tc.err.Error())
+				}
+			}
+
+			// Test CreateToml
+			if req, ok := tc.req.(entity.TomlData); ok {
+				res, err := u.CreateToml(req)
+				require.EqualValues(t, tc.res, res)
+				if tc.err == nil {
+					require.EqualValues(t, err, tc.err)
+				} else {
+					require.ErrorContains(t, err, tc.err.Error())
+				}
 			}
 		})
 	}

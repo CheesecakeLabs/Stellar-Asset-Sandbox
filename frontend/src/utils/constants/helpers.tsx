@@ -20,4 +20,4 @@ export const newContractHelper =
   'Stellar smart contracts are a set of operations that have specific conditions and outcomes. Creating a new contract on the Stellar Network allows for a predefined set of rules and actions to take place based on certain triggers, enabling automation and programmable financial logic.'
 
 export const assetHomeHelper =
-  'Each asset represents a unique tokenized asset on the Stellar Network. It provides a digital representation of value, whether it be fiat, cryptocurrency, or other tangible or intangible assets. Within the Stellar ecosystem, Assets can be traded, transferred, and used in various financial operations, providing liquidity and interoperability between different asset classes.'
+  'Each asset represents a unique tokenized asset on the Stellar Network. It provides a digital representation of value, whether it be fiat, cryptocurrency, or other tangible or intangible assets. Within the Stellar ecosystem, assets can be traded, transferred, and used in various financial operations, providing liquidity and interoperability between different asset classes.'

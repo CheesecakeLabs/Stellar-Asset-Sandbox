@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAssets } from 'hooks/useAssets'
 import { useVaults } from 'hooks/useVaults'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -23,6 +24,11 @@ export const VaultCreate: React.FC = () => {
   const toast = useToast()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    GAService.GAPageView('Vault Create')
+    GAService.GAEvent('create_vault_form_start')
+  }, [])
+
   const onSubmit = async (
     name: string,
     vaultCategoryId: number,
@@ -34,9 +40,9 @@ export const VaultCreate: React.FC = () => {
         vault_category_id: vaultCategoryId,
         assets_id: assetsId,
       }
-      const assetForged = await createVault(vault)
+      const vaultCreated = await createVault(vault)
 
-      if (assetForged) {
+      if (vaultCreated) {
         toast({
           title: 'Success!',
           description: `You created ${name}`,
@@ -45,6 +51,7 @@ export const VaultCreate: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('create_vault_success')
         navigate(PathRoute.VAULTS)
         return
       }
@@ -61,7 +68,7 @@ export const VaultCreate: React.FC = () => {
     getVaultCategories().then(vaultCategories =>
       setVaultCategories(vaultCategories)
     )
-    getAssets()
+    getAssets(true)
   }, [getAssets, getVaultCategories])
 
   const toastError = (message: string): void => {

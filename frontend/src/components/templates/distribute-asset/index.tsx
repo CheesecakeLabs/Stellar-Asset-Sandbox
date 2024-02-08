@@ -7,7 +7,6 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Text,
   Tooltip,
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
@@ -19,6 +18,7 @@ import { toCrypto, toNumber } from 'utils/formatter'
 
 import { BalanceChart } from './components/balance-chart'
 import { AssetHeader } from 'components/atoms'
+import { SupplyTag } from 'components/atoms/supply-tag'
 import { HelpIcon } from 'components/icons'
 import { SelectVault } from 'components/molecules/select-vault'
 
@@ -45,31 +45,51 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
     formState: { errors },
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
     getValues,
   } = useForm()
   const [wallet, setWallet] = useState<string | undefined>()
+
+  const handleForm = (data: FieldValues): void => {
+    clearErrors()
+    let hasError = false
+    if (!data.amount) {
+      setError('amount', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!wallet) {
+      setError('wallet', { message: 'This field is required' })
+      hasError = true
+    }
+    if (!hasError) {
+      onSubmit(data, setValue, wallet)
+    }
+  }
 
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" p="0" maxW="full">
         <AssetHeader asset={asset} />
         <Box p="1rem">
-          <form
-            onSubmit={handleSubmit(data => {
-              onSubmit(data, setValue, wallet)
-            })}
-          >
+          <form onSubmit={handleSubmit(data => handleForm(data))}>
             <Flex justifyContent="flex-end" w="full">
               <Tooltip label={TooltipsData.distribute}>
                 <HelpIcon width="20px" />
               </Tooltip>
             </Flex>
-            <FormControl
-              isInvalid={errors?.destination_wallet_id !== undefined}
-            >
-              <FormLabel>Destination Vault</FormLabel>
-              <SelectVault vaults={vaults} setWallet={setWallet} />
-              <FormErrorMessage>Required</FormErrorMessage>
+            <FormControl isInvalid={errors?.wallet !== undefined}>
+              <FormLabel>Destination</FormLabel>
+              <SelectVault
+                vaults={vaults}
+                setWallet={setWallet}
+                clearErrors={(): void => {
+                  clearErrors('wallet')
+                }}
+              />
+              <FormErrorMessage>
+                {errors?.wallet?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
 
             <FormControl isInvalid={errors?.amount !== undefined} mt="1.5rem">
@@ -82,34 +102,30 @@ export const DistributeAssetTemplate: React.FC<IDistributeAssetTemplate> = ({
                 autoComplete="off"
                 value={getValues('amount')}
                 onChange={(event): void => {
+                  clearErrors('amount')
                   setValue('amount', toNumber(event.target.value))
                 }}
               />
-              <FormErrorMessage>Required</FormErrorMessage>
+              <FormErrorMessage>
+                {errors?.amount?.message?.toString()}
+              </FormErrorMessage>
             </FormControl>
-
-            <Text
-              color="gray.900"
-              fontWeight="600"
-              fontSize="xs"
-              mt="0.5rem"
-              ms="0.25rem"
-            >
-              {`Main Vault: ${
+            <SupplyTag
+              value={`Main Vault: ${
                 assetData
                   ? `${toCrypto(Number(asset.distributorBalance?.balance))} ${
                       asset.code
                     }`
                   : 'loading'
               }`}
-            </Text>
-
+            />
             <Flex justifyContent="flex-end">
               <Button
                 type="submit"
                 variant="primary"
                 mt="1.5rem"
                 isLoading={loading}
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 Distribute asset
               </Button>

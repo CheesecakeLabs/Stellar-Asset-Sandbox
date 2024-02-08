@@ -1,24 +1,11 @@
-import { Contract } from 'soroban-client'
+import { StellarPlus } from "stellar-plus";
 
-/**
- * The Soroban contract ID for the certificates_of_deposit contract.
- */
-export const CONTRACT_ID =
-  'CA7XKST64VUZVEDSYUKJHIIY2BXWCHZ4QW2FITG6LPPK3QCXK4DGAB6S'
+export const STELLAR_NETWORK = StellarPlus.Constants.testnet
 
-/**
- * The Soroban contract ID for the certificates_of_deposit contract, in hex.
- * If {@link CONTRACT_ID} is a new-style `C…` string, you will need this hex
- * version when making calls to RPC for now.
- */
-export const CONTRACT_ID_HEX = new Contract(CONTRACT_ID).contractId('hex')
+export const WASM_HASH =
+  'd4fedb949678a4f34963a6cb56b2081a5e9eb537007cb0ea0ff12fc3c7f09de5'
 
-/**
- * The Soroban network passphrase used to initialize this library.
- */
-export const NETWORK_PASSPHRASE = 'Test SDF Future Network ; October 2022'
-
-/**
- * The Soroban RPC endpoint used to initialize this library.
- */
-export const RPC_URL = 'https://rpc-futurenet.stellar.org:443'
+export const vcRpcHandler = new StellarPlus.RPC.ValidationCloudRpcHandler(
+  STELLAR_NETWORK,
+  'R5T1w4Gss5hHDnBpGHip30yzsvcATdLBgQYGvXQIxq8'
+)

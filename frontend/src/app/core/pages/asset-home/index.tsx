@@ -1,4 +1,10 @@
-import { Flex, Skeleton, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  VStack,
+  useMediaQuery,
+  useToast,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -6,6 +12,9 @@ import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { useDashboards } from 'hooks/useDashboards'
 import { assetHomeHelper } from 'utils/constants/helpers'
+import { MessagesError } from 'utils/constants/messages-error'
+import { toBase64 } from 'utils/converter'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -13,6 +22,7 @@ import { ActionHelper } from 'components/molecules/action-helper'
 import { TChartPeriod } from 'components/molecules/chart-period'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { AssetHomeTemplate } from 'components/templates/asset-home'
 
@@ -21,12 +31,21 @@ export const AssetHome: React.FC = () => {
   const [paymentsAsset, setPaymentsAsset] =
     useState<Hooks.UseDashboardsTypes.IAsset>()
   const [chartPeriod, setChartPeriod] = useState<TChartPeriod>('24h')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
-  const { loadingAsset, getAssetById } = useAssets()
+  const { loadingAsset, getAssetById, updateImage } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
   const { id } = useParams()
+
+  const toast = useToast()
+
+  useEffect(() => {
+    GAService.GAPageView('Asset Home')
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -46,12 +65,62 @@ export const AssetHome: React.FC = () => {
     getUserPermissions()
   }, [getUserPermissions])
 
+  const handleUploadImage = async (): Promise<boolean> => {
+    if (!asset || !selectedFile) return false
+
+    try {
+      const image = await toBase64(selectedFile)
+      const isSuccess = await updateImage(asset?.id, image)
+
+      if (isSuccess) {
+        if (id) {
+          getAssetById(id).then(asset => setAsset(asset))
+        }
+        return true
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+
+    return false
+  }
+
+  const toastError = (message: string): void => {
+    toast({
+      title: 'Update logo error!',
+      description: message,
+      status: 'error',
+      duration: 9000,
+      isClosable: true,
+      position: 'top-right',
+    })
+  }
+
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper
+              title={'About Assets'}
+              description={assetHomeHelper}
+            />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
-            <ManagementBreadcrumb title={'Mint'} />
+            <ManagementBreadcrumb title={'Asset home'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'HOME'} />
+            )}
             {loadingAsset || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -61,21 +130,27 @@ export const AssetHome: React.FC = () => {
                 loadingChart={loadingChart}
                 paymentsAsset={paymentsAsset}
                 chartPeriod={chartPeriod}
+                permissions={userPermissions}
+                selectedFile={selectedFile}
+                setSelectedFile={setSelectedFile}
                 setChartPeriod={setChartPeriod}
+                handleUploadImage={handleUploadImage}
               />
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.HOME}
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper
-              title={'About Assets'}
-              description={assetHomeHelper}
-            />
+            {isLargerThanMd && (
+              <ActionHelper
+                title={'About Assets'}
+                description={assetHomeHelper}
+              />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

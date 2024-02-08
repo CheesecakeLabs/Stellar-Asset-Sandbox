@@ -95,9 +95,6 @@ const ChartSupply: FunctionComponent = () => {
         <Text fontSize="xs" fontWeight="600">
           Total Supply and Main vault
         </Text>
-        <Flex>
-          <HelpIcon />
-        </Flex>
       </Flex>
       <Flex>
         <Line options={options} data={data} />

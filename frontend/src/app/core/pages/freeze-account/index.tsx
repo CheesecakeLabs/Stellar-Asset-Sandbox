@@ -1,4 +1,10 @@
-import { Flex, Skeleton, useToast, VStack } from '@chakra-ui/react'
+import {
+  Flex,
+  Skeleton,
+  useMediaQuery,
+  useToast,
+  VStack,
+} from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -10,6 +16,7 @@ import { useVaults } from 'hooks/useVaults'
 import { havePermission } from 'utils'
 import { freezeHelper } from 'utils/constants/helpers'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { AssetActions } from 'components/enums/asset-actions'
 import { PathRoute } from 'components/enums/path-route'
@@ -17,6 +24,7 @@ import { Permissions } from 'components/enums/permissions'
 import { ActionHelper } from 'components/molecules/action-helper'
 import { ManagementBreadcrumb } from 'components/molecules/management-breadcrumb'
 import { MenuActionsAsset } from 'components/organisms/menu-actions-asset'
+import { MenuActionsAssetMobile } from 'components/organisms/menu-actions-asset-mobile'
 import { Sidebar } from 'components/organisms/sidebar'
 import { FreezeAccountTemplate } from 'components/templates/freeze-account'
 
@@ -24,6 +32,8 @@ export const FreezeAccount: React.FC = () => {
   const [asset, setAsset] = useState<Hooks.UseAssetsTypes.IAssetDto>()
   const [vaultsStatusList, setVaultsStatusList] =
     useState<Hooks.UseVaultsTypes.IVaultAccountName[]>()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   const { updateAuthFlags, getAssetById, loadingOperation, loadingAsset } =
     useAssets()
@@ -35,6 +45,10 @@ export const FreezeAccount: React.FC = () => {
 
   const toast = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    GAService.GAPageView('Freeze account')
+  }, [])
 
   const onSubmit = async (
     data: FieldValues,
@@ -136,11 +150,22 @@ export const FreezeAccount: React.FC = () => {
   }, [])
 
   return (
-    <Flex>
+    <Flex pb="3.5rem">
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <Flex flexDir="row" w="full" justifyContent="center" gap="1.5rem">
+        <Flex
+          flexDir={{ base: 'column-reverse', md: 'row' }}
+          w="full"
+          justifyContent="center"
+          gap="1.5rem"
+        >
+          {isSmallerThanMd && (
+            <ActionHelper title={'About Freeze'} description={freezeHelper} />
+          )}
           <Flex maxW="966px" flexDir="column" w="full">
             <ManagementBreadcrumb title={'Freeze'} />
+            {id && isSmallerThanMd && (
+              <MenuActionsAssetMobile id={id} selected={'FREEZE'} />
+            )}
             {(loadingAsset && !asset) || !asset ? (
               <Skeleton h="15rem" />
             ) : (
@@ -154,13 +179,15 @@ export const FreezeAccount: React.FC = () => {
             )}
           </Flex>
           <VStack>
-            {(userPermissions || !loadingUserPermissions) && (
+            {(userPermissions || !loadingUserPermissions) && isLargerThanMd && (
               <MenuActionsAsset
                 action={AssetActions.FREEZE}
                 permissions={userPermissions}
               />
             )}
-            <ActionHelper title={'About Freeze'} description={freezeHelper} />
+            {isLargerThanMd && (
+              <ActionHelper title={'About Freeze'} description={freezeHelper} />
+            )}
           </VStack>
         </Flex>
       </Sidebar>

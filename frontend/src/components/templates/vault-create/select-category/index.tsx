@@ -11,11 +11,17 @@ interface ISelectCategory {
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   setCategorySelected: Dispatch<SetStateAction<IOption | null | undefined>>
   categorySelected?: IOption | null | undefined
+  clearErrors?(): void
 }
 
-const createOption = (label: string, value: number): IOption => ({
+const createOption = (
+  label: string,
+  value: number,
+  disabled?: boolean
+): IOption => ({
   label,
   value: value,
+  disabled: disabled ?? false,
 })
 
 export const SelectCategory: React.FC<ISelectCategory> = ({
@@ -23,30 +29,37 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
   createVaultCategory,
   setCategorySelected,
   categorySelected,
+  clearErrors,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [options, setOptions] = useState<IOption[]>([])
+  const [value, setValue] = useState<IOption>()
 
   const { colorMode } = useColorMode()
 
   const handleVaultCategory = (inputValue: string): void => {
     setIsLoading(true)
     setTimeout(async () => {
-      const vaultCategory = await createVaultCategory({ name: inputValue })
-      if (!vaultCategory) return
+      try {
+        const vaultCategory = await createVaultCategory({ name: inputValue })
+        if (!vaultCategory) return
 
-      const newOption = createOption(vaultCategory?.name, vaultCategory?.id)
-      setIsLoading(false)
-      setOptions(prev => [...prev, newOption])
-      setCategorySelected(newOption)
+        const newOption = createOption(vaultCategory?.name, vaultCategory?.id)
+        setOptions(prev => [...prev, newOption])
+        setCategorySelected(newOption)
+        setValue(newOption)
+      } finally {
+        setIsLoading(false)
+      }
     }, 1000)
   }
 
   useEffect(() => {
-    const ops = vaultCategories?.map(
+    let ops = vaultCategories?.map(
       (vaultCategory: Hooks.UseVaultsTypes.IVaultCategory) =>
         createOption(vaultCategory.name, vaultCategory.id)
     )
+    ops = [...(ops || []), createOption('Type to create...', 0, true)]
     setOptions(ops || [])
   }, [vaultCategories])
 
@@ -57,10 +70,19 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
       isLoading={isLoading}
       onCreateOption={handleVaultCategory}
       options={options}
-      onChange={(newValue): void => setCategorySelected(newValue)}
+      value={value}
+      isOptionDisabled={(option): boolean => option.disabled}
+      onChange={(newValue): void => {
+        if (clearErrors) clearErrors()
+        setCategorySelected(newValue)
+      }}
       defaultValue={
         categorySelected
-          ? { value: categorySelected.value, label: categorySelected.label }
+          ? {
+              value: categorySelected.value,
+              label: categorySelected.label,
+              disabled: false,
+            }
           : undefined
       }
       styles={{
@@ -75,9 +97,10 @@ export const SelectCategory: React.FC<ISelectCategory> = ({
           ...base,
           backgroundColor: colorMode === 'dark' ? '#303448' : undefined,
         }),
-        option: (styles, { isFocused, isSelected }) => ({
+        option: (styles, { isFocused, isSelected, isDisabled }) => ({
           ...styles,
           color: colorMode === 'dark' ? 'white' : 'black',
+          opacity: isDisabled ? '0.5' : undefined,
           background: isFocused
             ? colorMode === 'dark'
               ? '#292d3e'

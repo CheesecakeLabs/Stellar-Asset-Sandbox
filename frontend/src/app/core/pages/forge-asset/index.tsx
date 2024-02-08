@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FieldValues, UseFormSetValue } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
@@ -7,6 +7,8 @@ import { useAssets } from 'hooks/useAssets'
 import { useAuth } from 'hooks/useAuth'
 import { havePermission } from 'utils'
 import { MessagesError } from 'utils/constants/messages-error'
+import { toBase64 } from 'utils/converter'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Permissions } from 'components/enums/permissions'
@@ -14,6 +16,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { ForgeAssetTemplate } from 'components/templates/forge-asset'
 
 export const ForgeAsset: React.FC = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const { forge, loadingOperation } = useAssets()
   const { userPermissions, loadingUserPermissions, getUserPermissions } =
     useAuth()
@@ -22,7 +25,8 @@ export const ForgeAsset: React.FC = () => {
 
   const onSubmit = async (
     data: FieldValues,
-    setValue: UseFormSetValue<FieldValues>
+    setValue: UseFormSetValue<FieldValues>,
+    flags: string[]
   ): Promise<void> => {
     try {
       const asset = {
@@ -30,7 +34,8 @@ export const ForgeAsset: React.FC = () => {
         code: data.code,
         amount: data.initial_supply,
         asset_type: data.asset_type,
-        set_flags: data.control_mechanisms || [],
+        set_flags: flags,
+        image: selectedFile ? await toBase64(selectedFile) : null,
       }
       const assetForged = await forge(asset)
 
@@ -44,6 +49,7 @@ export const ForgeAsset: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('forge_asset_success')
         navigate(`${PathRoute.ASSET_HOME}/${assetForged.id}`)
         return
       }
@@ -68,6 +74,10 @@ export const ForgeAsset: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    GAService.GAEvent('forge_asset_form_start')
+  }, [])
+
   const toastError = (message: string): void => {
     toast({
       title: 'Forge error!',
@@ -82,7 +92,12 @@ export const ForgeAsset: React.FC = () => {
   return (
     <Flex>
       <Sidebar highlightMenu={PathRoute.TOKEN_MANAGEMENT}>
-        <ForgeAssetTemplate onSubmit={onSubmit} loading={loadingOperation} />
+        <ForgeAssetTemplate
+          onSubmit={onSubmit}
+          loading={loadingOperation}
+          setSelectedFile={setSelectedFile}
+          selectedFile={selectedFile}
+        />
       </Sidebar>
     </Flex>
   )

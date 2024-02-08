@@ -107,6 +107,91 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getOperation = useCallback(
+    async (
+      id: string
+    ): Promise<
+      | Hooks.UseHorizonTypes.IOperationTrustline
+      | Hooks.UseHorizonTypes.IOperationPayment
+      | undefined
+    > => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(`${BASE_URL}/operations/${id}`)
+        const data = response.data
+        if (data) {
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    []
+  )
+
+  const getAccountEffects = useCallback(
+    async (
+      wallet?: string,
+      link?: string
+    ): Promise<Hooks.UseHorizonTypes.IEffects | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          link
+            ? link
+            : `${BASE_URL}/accounts/${wallet}/effects?order=desc
+          `
+        )
+        const data = response.data as Hooks.UseHorizonTypes.IEffects
+        if (data) {
+          data._embedded.records =
+            data?._embedded?.records.filter(
+              (effect: Hooks.UseHorizonTypes.IEffectItem) =>
+                effect.type === 'account_credited' ||
+                effect.type === 'account_debited' ||
+                effect.type === 'trustline_removed' ||
+                effect.type === 'trustline_created' ||
+                effect.type === 'account_created'
+            ) || []
+
+          data._embedded.records.map(async record => {
+            const id = record.id.split('-')
+            record.operation = await getOperation(id[0])
+          })
+
+          const resultNext = await axios.get(data._links.next.href)
+
+          data._links.next.results =
+            resultNext.data?._embedded?.records.filter(
+              (effect: Hooks.UseHorizonTypes.IEffectItem) =>
+                effect.type === 'account_credited' ||
+                effect.type === 'account_debited' ||
+                effect.type === 'trustline_removed' ||
+                effect.type === 'trustline_created' ||
+                effect.type === 'account_created'
+            ).length || 0
+
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    [getOperation]
+  )
+
   const getAssetAccounts = useCallback(
     async (
       assetCode: string,
@@ -131,6 +216,21 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getLatestSequenceLedger = useCallback(async (): Promise<
+    number | undefined
+  > => {
+    try {
+      const response = await axios.get(`${BASE_URL}/ledgers?order=desc`)
+      const data = response.data
+      return data._embedded?.records[0]?.sequence
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    }
+  }, [])
+
   return (
     <HorizonContext.Provider
       value={{
@@ -140,7 +240,9 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         getAssetData,
         getAccountData,
         getPaymentsData,
+        getAccountEffects,
         getAssetAccounts,
+        getLatestSequenceLedger,
       }}
     >
       {children}

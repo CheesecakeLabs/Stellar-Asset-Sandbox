@@ -12,6 +12,11 @@ const sizes = {
       p: '6px 10px',
       fontSize: 'sm',
     },
+    addon: {
+      height: '38px',
+      p: '6px 10px',
+      fontSize: 'sm',
+    },
   }),
 }
 

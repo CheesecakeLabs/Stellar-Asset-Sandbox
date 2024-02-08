@@ -33,6 +33,44 @@
                 }
             }
         },
+        "/.well-known/stellar.toml": {
+            "get": {
+                "description": "Retrieve a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Retrieve a TOML file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset issuer",
+                        "name": "asset_issuer",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/asset": {
             "get": {
                 "description": "Get asset by id",
@@ -64,7 +102,7 @@
         },
         "/assets": {
             "get": {
-                "description": "Get all assets",
+                "description": "Get all assets with optional pagination and filtering",
                 "consumes": [
                     "application/json"
                 ],
@@ -75,14 +113,37 @@
                     "Assets"
                 ],
                 "summary": "Get all assets",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by asset name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by asset type",
+                        "name": "asset_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page for pagination",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/entity.Asset"
-                            }
+                            "$ref": "#/definitions/v1.PaginatedAssetsResponse"
                         }
                     },
                     "500": {
@@ -300,6 +361,52 @@
                 }
             }
         },
+        "/assets/generate-toml": {
+            "post": {
+                "description": "Create a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Create a TOML file",
+                "parameters": [
+                    {
+                        "description": "TOML info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets/mint": {
             "post": {
                 "description": "Mint an asset on Stellar",
@@ -352,6 +459,44 @@
                 }
             }
         },
+        "/assets/toml": {
+            "get": {
+                "description": "Get TOML data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Get TOML data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Asset issuer",
+                        "name": "asset_issuer",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/assets/transfer": {
             "post": {
                 "description": "Transfer an asset between wallets on Stellar",
@@ -391,6 +536,98 @@
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/update-contract-id": {
+            "put": {
+                "description": "Update a Contract ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Update a Contract ID",
+                "parameters": [
+                    {
+                        "description": "Contract ID",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractIdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractIdRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/assets/update-toml": {
+            "put": {
+                "description": "Update a TOML file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Assets"
+                ],
+                "summary": "Update a TOML file",
+                "parameters": [
+                    {
+                        "description": "TOML info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TomlData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -537,6 +774,160 @@
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contract/history": {
+            "put": {
+                "description": "Update contract history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Update contract history",
+                "parameters": [
+                    {
+                        "description": "History info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateContractHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ContractHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add contract history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contract"
+                ],
+                "summary": "Add contract history",
+                "parameters": [
+                    {
+                        "description": "History info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AddContractHistoryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ContractHistory"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/contracts": {
+            "get": {
+                "description": "Retrieve a list of history of contract",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ContractHistory"
+                ],
+                "summary": "Get contract history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page for pagination",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Contract"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -1247,6 +1638,98 @@
                 }
             }
         },
+        "/soroban-transactions/sign": {
+            "post": {
+                "description": "Signed a XDR transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Soroban"
+                ],
+                "summary": "Signed Transaction",
+                "parameters": [
+                    {
+                        "description": "Signed a XDR transaction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SignedTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/soroban-transactions/submit": {
+            "post": {
+                "description": "Submit a XDR transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Soroban"
+                ],
+                "summary": "Submit Transaction",
+                "parameters": [
+                    {
+                        "description": "Submit a XDR transaction",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SubmitTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Create user",
@@ -1332,6 +1815,29 @@
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Forget Password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Forget Password",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserResponse"
                         }
                     }
                 }
@@ -1431,7 +1937,7 @@
                 "summary": "Create a new vault",
                 "parameters": [
                     {
-                        "description": "Vault info",
+                        "description": "CreateVaultRequest",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -1723,7 +2229,7 @@
         },
         "/vault/list": {
             "get": {
-                "description": "Get all vault",
+                "description": "Retrieve a list of all vaults, with optional pagination",
                 "consumes": [
                     "application/json"
                 ],
@@ -1733,7 +2239,21 @@
                 "tags": [
                     "Vault"
                 ],
-                "summary": "Get all vault",
+                "summary": "Get all vaults",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page for pagination",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1744,8 +2264,14 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/v1.response"
                         }
@@ -1912,6 +2438,35 @@
                     }
                 }
             }
+        },
+        "/wallets/sponsor_pk/": {
+            "get": {
+                "description": "Get Sponsor Public Key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallets"
+                ],
+                "summary": "Get Sponsor Public Key",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1929,6 +2484,9 @@
                     "type": "string",
                     "example": "USDC"
                 },
+                "contract_id": {
+                    "type": "string"
+                },
                 "distributor": {
                     "$ref": "#/definitions/entity.Wallet"
                 },
@@ -1937,10 +2495,7 @@
                     "example": 1
                 },
                 "image": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "string"
                 },
                 "issuer": {
                     "$ref": "#/definitions/entity.Wallet"
@@ -1959,6 +2514,9 @@
                 },
                 "asset": {
                     "$ref": "#/definitions/entity.Asset"
+                },
+                "compound": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string"
@@ -1985,6 +2543,154 @@
                 },
                 "yield_rate": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.ContractHistory": {
+            "type": "object",
+            "properties": {
+                "contract": {
+                    "$ref": "#/definitions/entity.Contract"
+                },
+                "deposit_amount": {
+                    "type": "number"
+                },
+                "deposited_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user": {
+                    "$ref": "#/definitions/entity.User"
+                },
+                "withdraw_amount": {
+                    "type": "number"
+                },
+                "withdrawn_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Currency": {
+            "type": "object",
+            "properties": {
+                "anchor_asset": {
+                    "type": "string"
+                },
+                "anchor_asset_type": {
+                    "type": "string"
+                },
+                "approval_criteria": {
+                    "type": "string"
+                },
+                "approval_server": {
+                    "type": "string"
+                },
+                "attestation_of_reserve": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "collateral_address_messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "collateral_address_signatures": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "collateral_addresses": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "conditions": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "display_decimals": {
+                    "type": "integer"
+                },
+                "fixed_number": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "is_asset_anchored": {
+                    "type": "boolean"
+                },
+                "is_unlimited": {
+                    "type": "boolean"
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "max_number": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "redemption_instructions": {
+                    "type": "string"
+                },
+                "regulated": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "entity.Documentation": {
+            "type": "object",
+            "properties": {
+                "ORG_DBA": {
+                    "type": "string"
+                },
+                "ORG_DESCRIPTION": {
+                    "type": "string"
+                },
+                "ORG_GITHUB": {
+                    "type": "string"
+                },
+                "ORG_KEYBASE": {
+                    "type": "string"
+                },
+                "ORG_LOGO": {
+                    "type": "string"
+                },
+                "ORG_NAME": {
+                    "type": "string"
+                },
+                "ORG_OFFICIAL_EMAIL": {
+                    "type": "string"
+                },
+                "ORG_PHONE_NUMBER": {
+                    "type": "string"
+                },
+                "ORG_PHONE_NUMBER_ATTESTATION": {
+                    "type": "string"
+                },
+                "ORG_PHYSICAL_ADDRESS": {
+                    "type": "string"
+                },
+                "ORG_PHYSICAL_ADDRESS_ATTESTATION": {
+                    "type": "string"
+                },
+                "ORG_TWITTER": {
+                    "type": "string"
+                },
+                "ORG_URL": {
+                    "type": "string"
                 }
             }
         },
@@ -2071,6 +2777,32 @@
                 "name": {
                     "type": "string",
                     "example": "name"
+                }
+            }
+        },
+        "entity.Principal": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
+                },
+                "id_photo_hash": {
+                    "type": "string"
+                },
+                "keybase": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "twitter": {
+                    "type": "string"
+                },
+                "verification_photo_hash": {
+                    "type": "string"
                 }
             }
         },
@@ -2161,6 +2893,56 @@
                 }
             }
         },
+        "entity.TomlData": {
+            "type": "object",
+            "properties": {
+                "ACCOUNTS": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "CURRENCIES": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Currency"
+                    }
+                },
+                "DOCUMENTATION": {
+                    "$ref": "#/definitions/entity.Documentation"
+                },
+                "FEDERATION_SERVER": {
+                    "type": "string"
+                },
+                "HORIZON_URL": {
+                    "type": "string"
+                },
+                "NETWORK_PASSPHRASE": {
+                    "type": "string"
+                },
+                "PRINCIPALS": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Principal"
+                    }
+                },
+                "SIGNING_KEY": {
+                    "type": "string"
+                },
+                "TRANSFER_SERVER": {
+                    "type": "string"
+                },
+                "VALIDATORS": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Validator"
+                    }
+                },
+                "VERSION": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.User": {
             "type": "object",
             "properties": {
@@ -2223,6 +3005,12 @@
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "vault": {
+                    "$ref": "#/definitions/entity.Vault"
+                },
+                "vault_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -2233,6 +3021,26 @@
                     "type": "string"
                 },
                 "id_user": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Validator": {
+            "type": "object",
+            "properties": {
+                "ALIAS": {
+                    "type": "string"
+                },
+                "DISPLAY_NAME": {
+                    "type": "string"
+                },
+                "HISTORY": {
+                    "type": "string"
+                },
+                "HOST": {
+                    "type": "string"
+                },
+                "PUBLIC_KEY": {
                     "type": "string"
                 }
             }
@@ -2251,8 +3059,14 @@
                     "type": "string",
                     "example": "Treasury"
                 },
+                "owner_id": {
+                    "type": "integer"
+                },
                 "vault_category": {
                     "$ref": "#/definitions/entity.VaultCategory"
+                },
+                "vault_category_id": {
+                    "type": "integer"
                 },
                 "wallet": {
                     "$ref": "#/definitions/entity.Wallet"
@@ -2294,6 +3108,9 @@
                     "example": "sponsor"
                 }
             }
+        },
+        "v1.AddContractHistoryRequest": {
+            "type": "object"
         },
         "v1.BurnAssetRequest": {
             "type": "object",
@@ -2428,6 +3245,10 @@
                     "type": "string",
                     "example": "1"
                 },
+                "compound": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "min_deposit": {
                     "type": "integer",
                     "example": 1
@@ -2442,7 +3263,7 @@
                 },
                 "term": {
                     "type": "integer",
-                    "example": 1
+                    "example": 60
                 },
                 "vault_id": {
                     "type": "string",
@@ -2474,8 +3295,7 @@
             "type": "object",
             "required": [
                 "assets_id",
-                "name",
-                "vault_category_id"
+                "name"
             ],
             "properties": {
                 "assets_id": {
@@ -2487,6 +3307,9 @@
                 "name": {
                     "type": "string",
                     "example": "Treasury"
+                },
+                "owner_id": {
+                    "type": "integer"
                 },
                 "vault_category_id": {
                     "type": "integer",
@@ -2552,6 +3375,20 @@
                 }
             }
         },
+        "v1.PaginatedAssetsResponse": {
+            "type": "object",
+            "properties": {
+                "assets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Asset"
+                    }
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        },
         "v1.RolePermissionRequest": {
             "type": "object",
             "properties": {
@@ -2566,6 +3403,34 @@
                 "role_id": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "v1.SignedTransactionRequest": {
+            "type": "object",
+            "required": [
+                "envelope"
+            ],
+            "properties": {
+                "envelope": {
+                    "type": "string",
+                    "example": "KJDSKD..."
+                },
+                "wallet_pk": {
+                    "type": "string",
+                    "example": "GDSKJG..."
+                }
+            }
+        },
+        "v1.SubmitTransactionRequest": {
+            "type": "object",
+            "required": [
+                "envelope"
+            ],
+            "properties": {
+                "envelope": {
+                    "type": "string",
+                    "example": "KJDSKD..."
                 }
             }
         },
@@ -2650,6 +3515,18 @@
                 "trustor_pk": {
                     "type": "string",
                     "example": "2"
+                }
+            }
+        },
+        "v1.UpdateContractHistoryRequest": {
+            "type": "object"
+        },
+        "v1.UpdateContractIdRequest": {
+            "type": "object",
+            "properties": {
+                "contract_id": {
+                    "type": "string",
+                    "example": "iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."
                 }
             }
         },

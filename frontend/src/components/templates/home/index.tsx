@@ -5,6 +5,7 @@ import {
   Flex,
   IconButton,
   Text,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 import ReactPlayer from 'react-player'
@@ -28,6 +29,7 @@ interface IHomeTemplate {
 
 export const HomeTemplate: React.FC<IHomeTemplate> = () => {
   const [slider, setSlider] = React.useState<Slider | null>(null)
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   const settings = {
     dots: false,
@@ -88,14 +90,22 @@ export const HomeTemplate: React.FC<IHomeTemplate> = () => {
                       w="fit-content"
                       mb="2rem"
                     >
-                      <Box w="full" h="full" top="-4px" pos="relative">
+                      <Box
+                        w={data.isYoutube && isLargerThanMd ? '740px' : 'full'}
+                        h={data.isYoutube && isLargerThanMd ? '420px' : 'full'}
+                        top="-4px"
+                        pos="relative"
+                      >
                         <ReactPlayer
-                          playing
-                          loop
-                          muted
+                          playing={data.isYoutube ? false : true}
+                          loop={data.isYoutube ? false : true}
+                          muted={data.isYoutube ? false : true}
                           url={data.slide}
                           width="100%"
                           height="100%"
+                          config={{
+                            youtube: { embedOptions: { width: '100%' } },
+                          }}
                         />
                       </Box>
                     </Box>

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useAssets } from 'hooks/useAssets'
 import { useDashboards } from 'hooks/useDashboards'
 import { useVaults } from 'hooks/useVaults'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { TChartPeriod } from 'components/molecules/chart-period'
@@ -30,6 +31,10 @@ export const Dashboards: React.FC = () => {
   const { loadingAssets, getAssets, assets } = useAssets()
 
   useEffect(() => {
+    GAService.GAPageView('Dashboards')
+  }, [])
+
+  useEffect(() => {
     getVaults().then(vaults => setVaults(vaults))
   }, [getVaults])
 
@@ -46,7 +51,7 @@ export const Dashboards: React.FC = () => {
   }, [chartPeriod, getPayments])
 
   useEffect(() => {
-    getAssets()
+    getAssets(true)
   }, [getAssets])
 
   useEffect(() => {

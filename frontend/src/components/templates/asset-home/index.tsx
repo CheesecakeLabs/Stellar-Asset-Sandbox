@@ -1,14 +1,14 @@
 import { Container, Flex, Tag, Text } from '@chakra-ui/react'
 import React, { Dispatch, SetStateAction } from 'react'
 
-import {
-  STELLAR_EXPERT_ASSET,
-  getCurrencyIcon,
-} from 'utils/constants/constants'
+import { havePermission } from 'utils'
+import { STELLAR_EXPERT_ASSET } from 'utils/constants/constants'
 import { typesAsset } from 'utils/constants/data-constants'
 import { TooltipsData } from 'utils/constants/tooltips-data'
 import { formatAccount, toCrypto } from 'utils/formatter'
 
+import { AssetImage } from './components/asset-image'
+import { Permissions } from 'components/enums/permissions'
 import { LinkIcon, WalletIcon } from 'components/icons'
 import { TChartPeriod } from 'components/molecules/chart-period'
 
@@ -21,7 +21,11 @@ interface IAssetHomeTemplate {
   asset: Hooks.UseAssetsTypes.IAssetDto
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
   chartPeriod: TChartPeriod
+  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  selectedFile: File | null
+  setSelectedFile: Dispatch<SetStateAction<File | null>>
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>
+  handleUploadImage(): Promise<boolean>
 }
 
 export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
@@ -29,23 +33,27 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
   loadingChart,
   paymentsAsset,
   chartPeriod,
+  permissions,
+  selectedFile,
   setChartPeriod,
+  setSelectedFile,
+  handleUploadImage,
 }) => {
   return (
     <Flex flexDir="column" w="full">
       <Container variant="primary" justifyContent="center" maxW="full" p="1rem">
         <Flex flexDir="column">
           <Flex mb="1rem">
-            <Flex
-              gap="1rem"
-              alignItems="center"
-              me="1rem"
-              fill="black"
-              stroke="black"
-              _dark={{ fill: 'white', stroke: 'white' }}
-            >
-              {getCurrencyIcon(asset.code, '2.5rem')}
-            </Flex>
+            <AssetImage
+              asset={asset}
+              selectedFile={selectedFile}
+              setSelectedFile={setSelectedFile}
+              handleUploadImage={handleUploadImage}
+              havePermission={havePermission(
+                Permissions.MINT_ASSET,
+                permissions
+              )}
+            />
             <Flex
               borderBottom="1px solid"
               borderColor={'gray.600'}
@@ -120,16 +128,16 @@ export const AssetHomeTemplate: React.FC<IAssetHomeTemplate> = ({
         </Flex>
       </Container>
 
-      <Flex flexDir="row" w="full" gap={3} mt="1rem">
+      <Flex flexDir={{ base: 'column', md: 'row' }} w="full" gap={3} mt="1rem">
         <InfoCard
           title={`Total Supply`}
-          icon={<WalletIcon />}
+          icon={<WalletIcon fill="gray"/>}
           value={toCrypto(Number(asset.assetData?.amount || 0))}
           helper={TooltipsData.totalSupply}
         />
         <InfoCard
           title={`Main Vault`}
-          icon={<WalletIcon />}
+          icon={<WalletIcon fill="gray" />}
           value={toCrypto(Number(asset.distributorBalance?.balance || 0))}
           helper={TooltipsData.mainVault}
         />

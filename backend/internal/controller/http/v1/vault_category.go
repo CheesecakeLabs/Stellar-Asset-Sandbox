@@ -6,6 +6,8 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,10 +15,12 @@ type vaultCategoryRoutes struct {
 	m  HTTPControllerMessenger
 	a  usecase.AuthUseCase
 	vc usecase.VaultCategoryUseCase
+	l  *logger.Logger
+	pf 	   profanity.ProfanityFilter
 }
 
-func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, vc usecase.VaultCategoryUseCase) {
-	r := &vaultCategoryRoutes{m, a, vc}
+func newVaultCategoryRoutes(handler *gin.RouterGroup, m HTTPControllerMessenger, a usecase.AuthUseCase, vc usecase.VaultCategoryUseCase, l *logger.Logger, pf profanity.ProfanityFilter) {
+	r := &vaultCategoryRoutes{m, a, vc, l, pf}
 	h := handler.Group("/vault-category").Use(Auth(r.a.ValidateToken()))
 	{
 		h.GET("", r.getAllVaultCategories)
@@ -45,9 +49,17 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 	var err error
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - create vault category - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
+
+	if r.pf.ContainsProfanity(request.Name) {
+		r.l.Error(nil, "http - v1 - create vault category - name profanity")
+		errorResponse(c, http.StatusBadRequest, profanityError("Name"), nil)
+		return
+	}
+
 
 	vaultCategory := entity.VaultCategory{
 		Name:  request.Name,
@@ -56,6 +68,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 
 	vaultCategory, err = r.vc.Create(vaultCategory)
 	if err != nil {
+		r.l.Error(err, "http - v1 - create vault category - create")
 		errorResponse(c, http.StatusNotFound, "database problems", err)
 		return
 	}
@@ -74,6 +87,7 @@ func (r *vaultCategoryRoutes) createVaultCategory(c *gin.Context) {
 func (r *vaultCategoryRoutes) getAllVaultCategories(c *gin.Context) {
 	vaultCategories, err := r.vc.GetAll()
 	if err != nil {
+		r.l.Error(err, "http - v1 - get all vault categories - get all")
 		errorResponse(c, http.StatusInternalServerError, "error getting vault categories", err)
 		return
 	}

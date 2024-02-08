@@ -9,6 +9,11 @@ declare namespace Hooks {
       distributor: Hooks.UseWalletsTypes.IWallet
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
+      image: string
+      contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
     }
 
     interface IAssetDto {
@@ -21,6 +26,16 @@ declare namespace Hooks {
       distributorBalance: Hooks.UseHorizonTypes.IBalance | undefined
       supply: number
       assetData: Hooks.UseHorizonTypes.IAsset | undefined
+      image: string
+      contract_id?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
+    }
+
+    interface IPagedAssets {
+      assets: IAssetDto[]
+      totalPages: number
     }
 
     interface IAssetRequest {
@@ -31,6 +46,7 @@ declare namespace Hooks {
       name: string
       set_flags?: string[]
       sponsor_id?: int
+      image?: unknown
     }
 
     interface IMintRequest {
@@ -85,6 +101,47 @@ declare namespace Hooks {
       set_flags: string[]
     }
 
+    interface ITomlCurrency {
+      code?: string
+      issuer?: string
+      desc: string
+      image: string
+      is_asset_anchored: boolean
+      anchor_asset_type: string
+      anchor_asset: string
+      attestation_of_reserve: string
+      max_number: number | null
+      is_unlimited: boolean
+    }
+
+    interface ITomlData {
+      currencies: ITomlCurrency[]
+    }
+
+    interface ICurrencies {
+      code: string
+      issuer: string
+      desc: string
+      anchor_asset: string
+      anchor_asset_type: string
+      is_asset_anchored: boolean
+      attestation_of_reserve: string
+      max_number: number
+      is_unlimited: boolean
+    }
+
+    interface ITomlFile {
+      CURRENCIES: ICurrencies[]
+    }
+
+    interface IFilter {
+      name?: string
+      asset_type?: string
+      authorize_required?: boolean
+      clawback_enabled?: boolean
+      freeze_enabled?: boolean
+    }
+
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
@@ -97,8 +154,21 @@ declare namespace Hooks {
       updateAuthFlags: (params: IFreezeRequest) => Promise<boolean>
       clawback: (params: IClawbackRequest) => Promise<boolean>
       forge: (params: IAssetRequest) => Promise<IAsset | undefined>
-      getAssets: () => Promise<void>
+      getAssets: (connectHorizon?: boolean) => Promise<IAssetDto[] | undefined>
       getAssetById: (id: string) => Promise<IAssetDto | undefined>
+      generateToml: (params: ITomlData) => Promise<boolean>
+      retrieveToml: () => Promise<Blob | undefined>
+      getTomlData: () => Promise<ITomlFile | undefined>
+      updateImage: (id: number, image: unknown) => Promise<boolean>
+      updateContractId: (
+        assetId: number,
+        contractId: string
+      ) => Promise<boolean>
+      getPagedAssets: (args: {
+        page: number
+        limit: number
+        filters?: IFilter
+      }) => Promise<IPagedAssets | undefined>
     }
   }
 }

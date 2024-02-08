@@ -12,6 +12,7 @@ import { ReactComponent as BrazilIcon } from './fonts/brazil_flag.svg'
 import { ReactComponent as BurnIcon } from './fonts/burn.svg'
 import { ReactComponent as ChevronDownIcon } from './fonts/chevron_down.svg'
 import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
+import { ReactComponent as CircleCheckIcon } from './fonts/circle-check.svg'
 import { ReactComponent as CoinIcon } from './fonts/coin.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
@@ -20,6 +21,7 @@ import { ReactComponent as EditIcon } from './fonts/edit.svg'
 import { ReactComponent as EmptyIcon } from './fonts/empty.svg'
 import { ReactComponent as EurocIcon } from './fonts/euroc.svg'
 import { ReactComponent as ExplorerIcon } from './fonts/explorer.svg'
+import { ReactComponent as FileIcon } from './fonts/file.svg'
 import { ReactComponent as FilterIcon } from './fonts/filter.svg'
 import { ReactComponent as HelpIcon } from './fonts/help.svg'
 import { ReactComponent as HomeIcon } from './fonts/home.svg'
@@ -112,4 +114,6 @@ export {
   RoleIcon,
   ArrowBackIcon,
   ArrowForwardIcon,
+  CircleCheckIcon,
+  FileIcon,
 }

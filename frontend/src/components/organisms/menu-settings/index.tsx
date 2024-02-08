@@ -1,13 +1,10 @@
-import { Button, Container, Text, Flex } from '@chakra-ui/react';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, Container, Text, Flex } from '@chakra-ui/react'
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
-
-
-import { PathRoute } from 'components/enums/path-route';
-import { SettingsOptions } from 'components/enums/settings-options';
-import { MembersIcon, PermissionsIcon, RoleIcon } from 'components/icons';
-
+import { PathRoute } from 'components/enums/path-route'
+import { SettingsOptions } from 'components/enums/settings-options'
+import { MembersIcon, PermissionsIcon, RoleIcon } from 'components/icons'
 
 interface IMenuSettings {
   option: SettingsOptions

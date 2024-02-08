@@ -5,6 +5,7 @@ import {
   Skeleton,
   Text,
   useColorMode,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import { Dispatch, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
@@ -32,6 +33,7 @@ export const ChartMintBurn: React.FC<IChartMintBurn> = ({
   assetCode,
 }) => {
   const { colorMode } = useColorMode()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   const series = [
     {
@@ -85,7 +87,9 @@ export const ChartMintBurn: React.FC<IChartMintBurn> = ({
       labels: {
         show: true,
         formatter: function (value: string): string {
-          return `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+          return isLargerThanMd
+            ? `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+            : ''
         },
       },
     },

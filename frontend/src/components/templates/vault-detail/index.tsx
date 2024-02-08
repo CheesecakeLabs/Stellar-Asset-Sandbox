@@ -20,7 +20,7 @@ interface IVaultDetailTemplate {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vaultsByAsset: Hooks.UseVaultsTypes.IVault[] | undefined
-  payments: Hooks.UseHorizonTypes.IPayments | undefined
+  effects: Hooks.UseHorizonTypes.IEffects | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
   loadingHorizon: boolean
   updatingVault: boolean
@@ -39,7 +39,9 @@ interface IVaultDetailTemplate {
     vaultCategory: Hooks.UseVaultsTypes.IVaultCategoryRequest
   ): Promise<Hooks.UseVaultsTypes.IVaultCategory | undefined>
   onUpdateVault(params: Hooks.UseVaultsTypes.IVaultUpdateParams): Promise<void>
-  onUpdateVaultAssets(listEdit: Hooks.UseHorizonTypes.IBalance[]): Promise<void>
+  onUpdateVaultAssets(
+    listEdit: Hooks.UseHorizonTypes.IBalance[]
+  ): Promise<boolean>
   onDeleteVault(): Promise<void>
   getPaymentsDataByLink(link: 'prev' | 'next'): void
   changeAsset(asset: Hooks.UseAssetsTypes.IAssetDto | undefined): Promise<void>
@@ -52,7 +54,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   loadingOperation,
   assets,
   vaults,
-  payments,
+  effects,
   selectedAsset,
   loadingHorizon,
   vaultCategories,
@@ -78,7 +80,7 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
   )
 
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         {loadingAssets ||
         (!vaults && loadingVaults) ||
@@ -128,11 +130,11 @@ export const VaultDetailTemplate: React.FC<IVaultDetailTemplate> = ({
                 ))}
             </Flex>
             <Flex mt="1rem" w="full">
-              {!payments && loadingHorizon ? (
+              {!effects && loadingHorizon ? (
                 <Skeleton height="4rem" w="full" />
               ) : (
                 <ListPayments
-                  payments={payments}
+                  effects={effects}
                   vaults={vaults}
                   vault={vault}
                   assets={assets}

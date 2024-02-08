@@ -19,14 +19,17 @@ func newMockProducer() *mockProducer {
 
 func (p *mockProducer) Produce(key string, value interface{}) error {
 	go func() {
-		notify.Post(key, mockResponse)
+		err := notify.Post(key, mockResponse)
+		if err != nil {
+			panic(err)
+		}
 	}()
 	return nil
 }
 
 func TestSendMessage(t *testing.T) {
 	mockProducer := newMockProducer()
-	messenger := newHTTPControllerMessenger(mockProducer, mockProducer, mockProducer)
+	messenger := newHTTPControllerMessenger(mockProducer, mockProducer, mockProducer, mockProducer, mockProducer)
 
 	reqData := &entity.CreateKeypairRequest{Amount: 1}
 	actualData, err := messenger.SendMessage(entity.EnvelopeChannel, reqData)

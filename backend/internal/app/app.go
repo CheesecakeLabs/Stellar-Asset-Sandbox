@@ -2,25 +2,41 @@
 package app
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/gin-gonic/gin"
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/config"
 	v1 "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/v1"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/repo"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase/service"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/httpserver"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/postgres"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
+	sentryPkg "github.com/CheesecakeLabs/token-factory-v2/backend/pkg/sentry"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/storage"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/toml"
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
+	"github.com/gin-gonic/gin"
+
+	timeout "github.com/vearne/gin-timeout"
 )
 
 // Run creates objects via constructors.
-func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.ProducerInterface) {
+func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig entity.ProducerInterface, tRepo *toml.DefaultTomlGenerator, storageService storage.StorageService) {
+	// Logger and Sentry
+	l := logger.New(cfg.Log.Level)
+	if cfg.Deploy.DeployStage != "local" {
+		sentryPkg.New(cfg, l)
+	}
+
+	pf := profanity.ProfanityFilter{}
+
 	// Use cases
 	authUc := usecase.NewAuthUseCase(
 		repo.New(pg), cfg.JWT.SecretKey,
@@ -31,10 +47,16 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 	walletUc := usecase.NewWalletUseCase(
 		repo.NewWalletRepo(pg),
 	)
+
 	assetUc := usecase.NewAssetUseCase(
 		repo.NewAssetRepo(pg),
 		repo.NewWalletRepo(pg),
+		tRepo,
+		repo.NewTomlRepo(pg),
+		cfg.Horizon,
+		service.NewAssetService(storageService),
 	)
+
 	roleUc := usecase.NewRoleUseCase(
 		repo.NewRoleRepo(pg),
 	)
@@ -58,7 +80,11 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	// HTTP Server
 	handler := gin.Default()
-	v1.NewRouter(handler, pKp, pHor, pEnv, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP)
+	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
+	if cfg.Deploy.DeployStage == "production" {
+		handler.Use(sentrygin.New(sentrygin.Options{}))
+	}
+	v1.NewRouter(handler, pKp, pHor, pEnv, pSub, pSig, *authUc, *userUc, *walletUc, *assetUc, *roleUc, *rolePermissionUc, *vaultCategoryUc, *vaultUc, *contractUc, *logUc, cfg.HTTP, l, pf)
 	httpServer := httpserver.New(handler,
 		httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(60*time.Second),
@@ -71,14 +97,17 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv entity.Produ
 
 	select {
 	case s := <-interrupt:
-		fmt.Printf("app - Run - signal: " + s.String())
+		l.Warn(s.String())
+		sentry.CaptureMessage(s.String())
 	case err := <-httpServer.Notify():
-		fmt.Errorf("app - Run - httpServer.Notify: %w", err)
+		sentry.CaptureException(err)
+		l.Error(err, "app - Run - httpServer.Notify")
 	}
 
 	// Shutdown
 	err := httpServer.Shutdown()
 	if err != nil {
-		fmt.Errorf("app - Run - httpServer.Shutdown: %w", err)
+		sentry.CaptureException(err)
+		l.Fatal("app - Run - httpServer.Shutdown: %v", err)
 	}
 }

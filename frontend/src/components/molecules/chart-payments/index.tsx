@@ -5,6 +5,7 @@ import {
   Skeleton,
   Text,
   useColorMode,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import { Dispatch, FunctionComponent, SetStateAction } from 'react'
 import Chart from 'react-apexcharts'
@@ -30,6 +31,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
   cleanMode = false,
 }) => {
   const { colorMode } = useColorMode()
+  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
 
   const options = {
     chart: {
@@ -58,7 +60,7 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       width: [0, 4],
     },
     dataLabels: {
-      enabled: true,
+      enabled: isLargerThanMd,
       enabledOnSeries: [1],
     },
     labels: getChartLabels(chartPeriod),
@@ -67,7 +69,9 @@ const ChartPayments: FunctionComponent<IChartPayments> = ({
       labels: {
         show: true,
         formatter: function (value: string): string {
-          return `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+          return isLargerThanMd
+            ? `${chartPeriod === '24h' ? `${value}h` : `${value}`}`
+            : ''
         },
       },
     },

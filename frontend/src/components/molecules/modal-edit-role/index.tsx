@@ -20,6 +20,7 @@ import React, { useState } from 'react'
 import { useForm, FieldValues } from 'react-hook-form'
 
 import { Loading } from 'components/atoms'
+import { GAService } from 'utils/ga'
 
 interface IModalReject {
   isOpen: boolean
@@ -56,6 +57,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
       })
 
       if (isSuccess) {
+        GAService.GAEvent('user_role_changed')
         onClose()
       }
     } catch (error) {
@@ -70,7 +72,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Edit role</ModalHeader>
+        <ModalHeader>Change role</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           {loadingRoles ? (
@@ -84,8 +86,9 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                 </Alert>
               )}
               <Container variant="secondary">
-                <Text fontSize="sm" fontWeight="700">{user.name}</Text>
-                <Text fontSize="xs">{user.email}</Text>
+                <Text fontSize="sm" fontWeight="700" textAlign="center">
+                  {user.name}
+                </Text>
               </Container>
               <form
                 onSubmit={handleSubmit(data => {
@@ -96,12 +99,13 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   <FormControl isInvalid={errors?.role_id !== undefined}>
                     <FormLabel mt="1.5rem">Role</FormLabel>
                     <Select
-                      placeholder="Select role"
                       {...register('role_id', { required: true })}
                       defaultValue={user.role_id}
                     >
-                      {roles.map(role => (
-                        <option value={role.id}>{role.name}</option>
+                      {roles.map((role, index) => (
+                        <option value={role.id} key={index}>
+                          {role.name}
+                        </option>
                       ))}
                     </Select>
                     <FormErrorMessage>Inform the role</FormErrorMessage>
@@ -116,7 +120,7 @@ export const ModalEditRole: React.FC<IModalReject> = ({
                   mt="2rem"
                   isLoading={loading}
                 >
-                  Edit role
+                  Save role
                 </Button>
               </form>
             </Box>

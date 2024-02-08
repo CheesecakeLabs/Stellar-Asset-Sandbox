@@ -121,7 +121,7 @@ export const AssetsList: React.FC<IAssetsList> = ({
 
         const groupedValues = [0, 0, 0, 0, 0, 0, 0]
         const divisorValue =
-          (filteredAccounts ? filteredAccounts[0].amount : 0) / 5
+          (filteredAccounts ? filteredAccounts[0]?.amount || 0 : 0) / 5
 
         accounts
           ?.filter(
@@ -251,16 +251,20 @@ export const AssetsList: React.FC<IAssetsList> = ({
                 >
                   Accounts authorization
                 </Text>
-                <AccountsChart
-                  authorized={assetSelected.assetData?.accounts.authorized || 0}
-                  unauthorized={
-                    (assetSelected.assetData?.accounts
-                      .authorized_to_maintain_liabilities || 0) +
-                    (assetSelected.assetData?.accounts.unauthorized || 0)
-                  }
-                  authorizedLabel={'Authorized'}
-                  unauthorizedLabel={'Pending authorization'}
-                />
+                <Flex justifyContent="center">
+                  <AccountsChart
+                    authorized={
+                      assetSelected.assetData?.accounts.authorized || 0
+                    }
+                    unauthorized={
+                      (assetSelected.assetData?.accounts
+                        .authorized_to_maintain_liabilities || 0) +
+                      (assetSelected.assetData?.accounts.unauthorized || 0)
+                    }
+                    authorizedLabel={'Authorized'}
+                    unauthorizedLabel={'Pending authorization'}
+                  />
+                </Flex>
                 <Divider mt="1rem" />
                 <BalanceChart
                   supply={Number(assetSelected.assetData?.amount || 0)}

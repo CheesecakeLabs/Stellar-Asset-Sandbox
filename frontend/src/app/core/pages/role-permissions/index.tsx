@@ -1,8 +1,9 @@
 import { Flex, VStack, useMediaQuery, useToast } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from 'hooks/useAuth'
 import { MessagesError } from 'utils/constants/messages-error'
+import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
@@ -19,6 +20,7 @@ export interface IChange {
 export const RolePermissions: React.FC = () => {
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [changes, setChanges] = useState<IChange[]>([])
+  const [loading, setLoading] = useState(true)
 
   const {
     getRoles,
@@ -26,29 +28,30 @@ export const RolePermissions: React.FC = () => {
     getPermissions,
     getRolesPermissions,
     updateRolesPermissions,
-    loading,
+    getProfile,
     roles,
-    loadingRoles,
     userPermissions,
     permissions,
     rolesPermissions,
     updatingRolesPermissions,
+    profile
   } = useAuth()
 
   const toast = useToast()
 
-  useEffect(() => {
-    getRoles()
-    getUserPermissions()
-  }, [getRoles, getUserPermissions])
+  const loadData = useCallback(async (): Promise<void> => {
+    setLoading(true)
+    await getRoles()
+    await getUserPermissions()
+    await getPermissions()
+    await getRolesPermissions()
+    await getProfile()
+    setLoading(false)
+  }, [getPermissions, getRoles, getRolesPermissions, getUserPermissions, getProfile])
 
   useEffect(() => {
-    getPermissions()
-  }, [getPermissions])
-
-  useEffect(() => {
-    getRolesPermissions()
-  }, [getRolesPermissions])
+    loadData()
+  }, [loadData])
 
   const onSubmit = async (
     params: Hooks.UseAuthTypes.IRolePermission[]
@@ -65,6 +68,7 @@ export const RolePermissions: React.FC = () => {
           isClosable: true,
           position: 'top-right',
         })
+        GAService.GAEvent('role_permissions_changed')
         setChanges([])
         getRolesPermissions()
         return
@@ -102,19 +106,21 @@ export const RolePermissions: React.FC = () => {
             <RolePermissionsTemplate
               loading={loading}
               roles={roles}
-              loadingRoles={loadingRoles}
               userPermissions={userPermissions}
               permissions={permissions}
               rolesPermissions={rolesPermissions}
               updatingRolesPermissions={updatingRolesPermissions}
               changes={changes}
+              profile={profile}
               onSubmit={onSubmit}
               setChanges={setChanges}
             />
           </Flex>
-          <VStack>
-            <MenuSettings option={SettingsOptions.ROLE_PERMISSIONS} />
-          </VStack>
+          {isLargerThanMd && (
+            <VStack>
+              <MenuSettings option={SettingsOptions.ROLE_PERMISSIONS} />
+            </VStack>
+          )}
         </Flex>
       </Sidebar>
     </Flex>

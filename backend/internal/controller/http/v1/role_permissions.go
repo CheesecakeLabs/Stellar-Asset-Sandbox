@@ -6,16 +6,18 @@ import (
 
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
+	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 type rolePermissions struct {
 	rolePermissionUseCase usecase.RolePermissionUseCase
 	messengerController   HTTPControllerMessenger
+	l                     *logger.Logger
 }
 
-func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase, messengerController HTTPControllerMessenger) {
-	r := &rolePermissions{rolePermissionUseCase, messengerController}
+func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
+	r := &rolePermissions{rolePermissionUseCase, messengerController, l}
 
 	h := handler.Group("/role-permissions")
 	{
@@ -44,6 +46,7 @@ func (r *rolePermissions) userPermissions(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	rolePermissions, err := r.rolePermissionUseCase.GetUserPermissions(token)
 	if err != nil {
+		r.l.Error(err, "http - v1 - list user permissions - GetUserPermissions")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 	c.JSON(http.StatusOK, rolePermissions)
@@ -60,6 +63,7 @@ func (r *rolePermissions) userPermissions(c *gin.Context) {
 func (r *rolePermissions) rolesPermissions(c *gin.Context) {
 	rolePermissions, err := r.rolePermissionUseCase.GetRolesPermissions()
 	if err != nil {
+		r.l.Error(err, "http - v1 - list roles permissions - getRolesPermissions")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 	c.JSON(http.StatusOK, rolePermissions)
@@ -76,6 +80,7 @@ func (r *rolePermissions) rolesPermissions(c *gin.Context) {
 func (r *rolePermissions) permissions(c *gin.Context) {
 	permissions, err := r.rolePermissionUseCase.GetPermissions()
 	if err != nil {
+		r.l.Error(err, "http - v1 - list permissions - GetPermissions")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
 	c.JSON(http.StatusOK, permissions)
@@ -94,6 +99,7 @@ func (r *rolePermissions) permissions(c *gin.Context) {
 func (r *rolePermissions) updateRolesPermissions(c *gin.Context) {
 	var request []RolePermissionRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
+		r.l.Error(err, "http - v1 - update roles permissions - bind")
 		errorResponse(c, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()), err)
 		return
 	}
@@ -106,6 +112,7 @@ func (r *rolePermissions) updateRolesPermissions(c *gin.Context) {
 		}
 		_, err := r.rolePermissionUseCase.UpdateRolePermission(newRolePermission)
 		if err != nil {
+			r.l.Error(err, "http - v1 - update roles permissions - UpdateRolePermission")
 			errorResponse(c, http.StatusNotFound, "error to update role permission", err)
 			return
 		}
