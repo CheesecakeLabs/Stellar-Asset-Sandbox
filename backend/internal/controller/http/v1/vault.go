@@ -178,6 +178,7 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 			MainSource: sponsor.Key.PublicKey,
 			PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
 			Operations: ops,
+			FeeBump:    sponsor.Key.PublicKey,
 		})
 
 		if err != nil {
@@ -427,6 +428,7 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, vault.Wallet.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
