@@ -56,6 +56,8 @@ export const ContractsDetail: React.FC = () => {
       const profile = await getProfile()
       setProfile(profile)
 
+      if (!profile?.vault) return
+
       if (profile && contract) {
         const wallet = profile.vault?.wallet.key.publicKey
         const sponsor = await getSponsorPK()
@@ -93,6 +95,11 @@ export const ContractsDetail: React.FC = () => {
       setContract(contract)
       const profile = await getProfile()
       setProfile(profile)
+
+      if (!profile?.vault) {
+        setLoadingPosition(false)
+        return
+      }
 
       if (contract) {
         getHistory(contract.id).then(history => setHistory(history))

@@ -171,7 +171,10 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
             resultNext.data?._embedded?.records.filter(
               (effect: Hooks.UseHorizonTypes.IEffectItem) =>
                 effect.type === 'account_credited' ||
-                effect.type === 'account_debited'
+                effect.type === 'account_debited' ||
+                effect.type === 'trustline_removed' ||
+                effect.type === 'trustline_created' ||
+                effect.type === 'account_created'
             ).length || 0
 
           return data
