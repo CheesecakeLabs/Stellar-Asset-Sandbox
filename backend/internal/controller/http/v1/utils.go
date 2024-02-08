@@ -13,6 +13,11 @@ import (
 	"github.com/bitly/go-notify"
 )
 
+const (
+	_startingBalance = "0"
+	_sponsorId       = 1
+)
+
 type HTTPControllerMessenger struct {
 	pKp  entity.ProducerInterface
 	pHor entity.ProducerInterface
@@ -44,8 +49,10 @@ func (m *HTTPControllerMessenger) SendMessage(chanName string, value interface{}
 		return &entity.NotifyData{}, fmt.Errorf("sendMessage - notify.Stop: %v", err)
 	}
 	if notifyData, ok := res.(*entity.NotifyData); ok {
+		println("{}", notifyData)
 		switch msg := notifyData.Message.(type) {
 		case entity.EnvelopeResponse:
+			println(msg.StatusCode)
 			if msg.Error != nil {
 				errorDetails := msg.Error.(map[string]interface{})
 				errorDetailsJSON, err := json.Marshal(errorDetails)
