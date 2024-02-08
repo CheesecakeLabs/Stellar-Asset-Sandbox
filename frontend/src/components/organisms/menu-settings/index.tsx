@@ -74,6 +74,24 @@ export const MenuSettings: React.FC<IMenuSettings> = ({ option }) => {
         >
           Roles
         </Button>
+        <Button
+          variant={
+            option === SettingsOptions.COST_CENTER
+              ? 'menuButtonSelected'
+              : 'menuButton'
+          }
+          borderBottomRadius="0.25rem"
+          leftIcon={
+            <Flex w="1rem" justifyContent="center">
+              <RoleIcon />
+            </Flex>
+          }
+          onClick={(): void => {
+            navigate(`${PathRoute.COST_CENTER}`)
+          }}
+        >
+          Operating Expenses
+        </Button>
       </Container>
     </Flex>
   )
