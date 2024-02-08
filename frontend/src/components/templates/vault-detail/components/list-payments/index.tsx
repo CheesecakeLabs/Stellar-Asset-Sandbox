@@ -88,7 +88,7 @@ export const ListPayments: React.FC<IListPayments> = ({
       return 'Clawback'
     }
     if (effectItem.type === 'account_debited') {
-      return 'Payment send'
+      return 'Payment sent'
     }
     if (effectItem.type === 'account_credited') {
       return 'Payment received'
