@@ -19,6 +19,7 @@ export const RolesManage: React.FC = () => {
     createRole,
     updateRole,
     deleteRole,
+    getProfile,
     creatingRole,
     updatingRole,
     roles,
@@ -34,7 +35,12 @@ export const RolesManage: React.FC = () => {
 
   const handleRole = async (name: string, id?: number): Promise<boolean> => {
     try {
-      const isSuccess = id ? await updateRole(id, name) : await createRole(name)
+      const profile = await getProfile()
+      if (!profile?.id) throw new Error('Unauthorized user')
+
+      const isSuccess = id
+        ? await updateRole(id, name)
+        : await createRole(profile.id, name)
 
       if (isSuccess) {
         toast({

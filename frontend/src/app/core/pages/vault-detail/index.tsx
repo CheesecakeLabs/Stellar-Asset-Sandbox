@@ -276,7 +276,7 @@ export const VaultDetail: React.FC = () => {
   }
 
   useEffect(() => {
-    getVaults().then(vaults => setVaults(vaults))
+    getVaults(true).then(vaults => setVaults(vaults))
     getAssets(true)
   }, [getAssets, getVaults])
 
