@@ -207,6 +207,50 @@ declare namespace Hooks {
       percentage: number
     }
 
+    interface ITransactionItem {
+      id: string
+      successful: true
+      hash: string
+      ledger: number
+      created_at: string
+      source_account: string
+      fee_account: string
+      fee_charged: string
+      max_fee: string
+      operation_count: number
+      valid_after: string
+      valid_before: string
+      fee_bump_transaction: {
+        hash: string
+        signatures: string[]
+      }
+      inner_transaction: {
+        hash: string
+        signatures: string[]
+        max_fee: string
+      }
+      effects?: IEffects
+    }
+
+    interface ITransactions {
+      _embedded: {
+        records: ITransactionItem[]
+      }
+      _links: {
+        next: {
+          href: string
+          results: number
+        }
+        prev: {
+          href: string
+          results: number
+        }
+        self: {
+          href: string
+        }
+      }
+    }
+
     interface IHorizonContext {
       loadingHorizon: boolean
       assetData: IAsset | undefined
@@ -229,6 +273,11 @@ declare namespace Hooks {
         assetIssuer: string
       ): Promise<IAssetAccounts[] | undefined>
       getLatestSequenceLedger(): Promise<number | undefined>
+      getTransactions(
+        wallet?: string,
+        link?: string
+      ): Promise<ITransactions | undefined>
+      getAccount(wallet: string): Promise<IAccount | undefined>
     }
   }
 }

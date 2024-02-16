@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
-import { MembersIcon, PermissionsIcon, RoleIcon } from 'components/icons'
+import { CoinsIcon, MembersIcon, PermissionsIcon, RoleIcon } from 'components/icons'
 
 interface IMenuSettings {
   option: SettingsOptions
@@ -83,7 +83,7 @@ export const MenuSettings: React.FC<IMenuSettings> = ({ option }) => {
           borderBottomRadius="0.25rem"
           leftIcon={
             <Flex w="1rem" justifyContent="center">
-              <RoleIcon />
+              <CoinsIcon />
             </Flex>
           }
           onClick={(): void => {

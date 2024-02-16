@@ -3,7 +3,15 @@ export const toCurrency = (value: number): string => {
   return formatter.format(value)
 }
 
-export const toCrypto = (value?: number, prefix?: string): string => {
+export const toCrypto = (
+  value: number | undefined,
+  prefix?: string,
+  convertStroops?: boolean
+): string => {
+  if (value && convertStroops) {
+    value = value / 10000000
+  }
+
   const moneyFormatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 7,
