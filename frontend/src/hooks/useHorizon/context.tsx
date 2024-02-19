@@ -135,6 +135,32 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getOperationTransaction = useCallback(
+    async (
+      id: string
+    ): Promise<Hooks.UseHorizonTypes.IOperationTransaction[] | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/transactions/${id}/operations`
+        )
+        const data = response.data
+        if (data) {
+          return data._embedded.records
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    []
+  )
+
   const getAccountEffects = useCallback(
     async (
       wallet?: string,
@@ -231,6 +257,71 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     }
   }, [])
 
+  const getTransactions = useCallback(
+    async (
+      wallet?: string,
+      link?: string
+    ): Promise<Hooks.UseHorizonTypes.ITransactions | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          link
+            ? link
+            : `${BASE_URL}/accounts/${wallet}/transactions?order=desc
+          `
+        )
+        const data = response.data as Hooks.UseHorizonTypes.ITransactions
+        if (data) {
+          await Promise.all(
+            data._embedded.records.map(async record => {
+              record.operations = await getOperationTransaction(record.id)
+            })
+          )
+
+          const resultNext = await axios.get(data._links.next.href)
+
+          data._links.next.results =
+            resultNext.data?._embedded?.records.length || 0
+
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    [getOperationTransaction]
+  )
+
+  const getAccount = useCallback(
+    async (
+      wallet: string
+    ): Promise<Hooks.UseHorizonTypes.IAccount | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/${wallet}`)
+        const data = response.data as Hooks.UseHorizonTypes.IAccount
+        if (data) {
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    []
+  )
+
   return (
     <HorizonContext.Provider
       value={{
@@ -243,6 +334,8 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         getAccountEffects,
         getAssetAccounts,
         getLatestSequenceLedger,
+        getTransactions,
+        getAccount,
       }}
     >
       {children}

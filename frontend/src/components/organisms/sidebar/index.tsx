@@ -43,7 +43,7 @@ const linkItems: ILinkItemProps[] = [
     path: PathRoute.TOKEN_MANAGEMENT,
   },
   {
-    name: 'Yield-bearing asset',
+    name: 'Yield-bearing Asset',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
   },

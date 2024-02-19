@@ -56,6 +56,7 @@ import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
 import { ReactComponent as UsdcIcon } from './fonts/usdc.svg'
 import { ReactComponent as VaultIcon } from './fonts/vault.svg'
 import { ReactComponent as WalletIcon } from './fonts/wallet.svg'
+import { ReactComponent as CoinsIcon } from './fonts/coins.svg'
 
 export {
   MenuIcon,
@@ -116,4 +117,5 @@ export {
   ArrowForwardIcon,
   CircleCheckIcon,
   FileIcon,
+  CoinsIcon
 }
