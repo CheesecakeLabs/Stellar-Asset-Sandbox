@@ -103,21 +103,26 @@ declare namespace Hooks {
       }
     }
 
-    interface IOperationTrustline {
+    interface IOperationTransaction {
       id: string
-      paging_token: string
       transaction_successful: boolean
       source_account: string
       type: string
       type_i: number
       created_at: string
       transaction_hash: string
-      asset_type: string
-      asset_code: string
-      asset_issuer: string
-      limit: string
-      trustee: string
-      trustor: string
+      asset_type?: string
+      asset_code?: string
+      asset_issuer?: string
+      limit?: string
+      trustee?: string
+      trustor?: string
+      from?: string,
+      to?: string,
+      amount?: string
+      account?: string
+      set_flags_s?: string[]
+      clear_flags_s?: string[]
     }
 
     interface IOperationTrustline {
@@ -229,7 +234,7 @@ declare namespace Hooks {
         signatures: string[]
         max_fee: string
       }
-      effects?: IEffects
+      operations?: IOperationTransaction[]
     }
 
     interface ITransactions {

@@ -9,160 +9,117 @@ import {
   Th,
   Thead,
   Tr,
+  useMediaQuery,
 } from '@chakra-ui/react'
 import React from 'react'
 
-import { formatDateFull, toCrypto } from 'utils/formatter'
+import { formatDateFullClean, toCrypto } from 'utils/formatter'
 
 import { NavLeftIcon, NavRightIcon, SendedIcon } from 'components/icons'
 
+import { IHorizonData } from 'app/core/pages/cost-center'
+
 interface ITransactionsCard {
   transactions: Hooks.UseHorizonTypes.ITransactions | undefined
-  vaults: Hooks.UseVaultsTypes.IVault[] | undefined
-  assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   isPrevDisabled: boolean
   getTransactionsByLink(link: 'prev' | 'next'): void
-}
-
-interface IHorizonData {
-  name: string
-  type: string
+  getTransactionData(
+    transaction: Hooks.UseHorizonTypes.ITransactionItem
+  ): IHorizonData
 }
 
 export const TransactionsCard: React.FC<ITransactionsCard> = ({
   transactions,
-  vaults,
-  assets,
   isPrevDisabled,
   getTransactionsByLink,
+  getTransactionData,
 }) => {
-  const formatAccount = (account: string): string => {
-    return `${account.substring(0, 4)}...${account.substring(
-      account.length - 4,
-      account.length
-    )}`
-  }
-
-  const walletToName = (publicKey: string): string => {
-    if (
-      assets &&
-      assets.find(asset => asset.distributor.key.publicKey === publicKey)
-    ) {
-      return 'Asset issuer'
-    }
-
-    return (
-      vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||
-      formatAccount(publicKey)
-    )
-  }
-
-  const getTransactionData = (
-    transaction: Hooks.UseHorizonTypes.ITransactionItem
-  ): IHorizonData => {
-    const accountCreated = transaction.effects?._embedded.records.find(
-      effect => effect.type === 'account_created'
-    )
-    if (accountCreated) {
-      return {
-        name: walletToName(accountCreated.account),
-        type: 'Account created',
-      }
-    }
-
-    const credited = transaction.effects?._embedded.records.find(
-      effect => effect.type === 'account_credited'
-    )
-    const debited = transaction.effects?._embedded.records.find(
-      effect => effect.type === 'account_debited'
-    )
-
-    if (
-      credited &&
-      assets?.find(
-        asset => asset.distributor.key.publicKey === credited.account
-      ) &&
-      debited &&
-      debited.asset_issuer === debited.account
-    ) {
-      return {
-        name: credited.asset_code,
-        type: 'Minted',
-      }
-    }
-
-    if (
-      debited &&
-      assets?.find(
-        asset => asset.distributor.key.publicKey === debited.account
-      ) &&
-      credited &&
-      credited.asset_issuer === credited.account
-    ) {
-      return {
-        name: debited.asset_code,
-        type: 'Burned',
-      }
-    }
-
-    const accountDebited = transaction.effects?._embedded.records.find(
-      effect => effect.type === 'account_debited'
-    )
-    if (accountDebited) {
-      const accountCredited = transaction.effects?._embedded.records.find(
-        effect => effect.type === 'account_credited'
-      )
-      return {
-        name: `${walletToName(accountDebited.account)} to ${walletToName(
-          accountCredited?.account || '-'
-        )}`,
-        type: 'Payment',
-      }
-    }
-    return {
-      name: '-',
-      type: '-',
-    }
-  }
+  const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   return (
     <Container variant="primary" mb="1rem" p={4} w="full" maxW="full">
       <Text fontSize="md">Transaction's history</Text>
-      <Table w="full" variant="list" mt="1rem">
-        <Thead w="full">
-          <Tr>
-            <Th w="2rem" p={0} />
-            <Th>Transaction</Th>
-            <Th>Date</Th>
-            <Th>Accounts</Th>
-            <Th>Covered fee</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {transactions?._embedded.records.map(transaction => {
+      {isLargerThanSm ? (
+        <Table w="full" variant="list" mt="1rem">
+          <Thead w="full">
+            <Tr>
+              <Th w="2rem" p={0} />
+              <Th>Transaction</Th>
+              <Th>Date</Th>
+              <Th>Asset</Th>
+              <Th>Accounts</Th>
+              <Th>Covered fee</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {transactions?._embedded.records.map(transaction => {
+              const transactionData = getTransactionData(transaction)
+              return (
+                <Tr>
+                  <Td px="1rem" py={0}>
+                    <SendedIcon width="20px" height="20px" />
+                  </Td>
+                  <Td>{transactionData.type}</Td>
+                  <Td>
+                    <Text fontSize="sm">
+                      {formatDateFullClean(transaction.created_at)}
+                    </Text>
+                  </Td>
+                  <Td>{transactionData.asset}</Td>
+                  <Td>{transactionData.name}</Td>
+                  <Td>{`${toCrypto(
+                    Number(transaction.fee_charged),
+                    undefined,
+                    true
+                  )} XLM`}</Td>
+                </Tr>
+              )
+            })}
+          </Tbody>
+        </Table>
+      ) : (
+        <Flex flexDir="column">
+          {transactions?._embedded.records?.map((transaction, index) => {
             const transactionData = getTransactionData(transaction)
             return (
-              <Tr>
-                <Td px="1rem" py={0}>
-                  <SendedIcon width="20px" height="20px" />
-                </Td>
-                <Td>{transactionData.type}</Td>
-                <Td>
-                  <Text fontSize="sm">
-                    {formatDateFull(transaction.created_at)}
-                  </Text>
-                </Td>
-                <Td>{transactionData.name}</Td>
-                <Td>{`${toCrypto(
-                  Number(transaction.fee_charged),
-                  undefined,
-                  true
-                )} XLM`}</Td>
-              </Tr>
+              <Flex
+                key={index}
+                flexDir="column"
+                borderBottom="1px solid"
+                borderColor={'gray.600'}
+                _dark={{ borderColor: 'black.800' }}
+                pb={2}
+                pt={2}
+                gap={1}
+              >
+                <Flex alignItems="center" gap={2}>
+                  <Text>{formatDateFullClean(transaction.created_at)}</Text>
+                </Flex>
+                <Flex gap="0.35rem">
+                  <Text fontWeight="bold">Transaction</Text>
+                  <Text>{`${transactionData.type}`}</Text>
+                </Flex>
+                <Flex gap="0.35rem" alignItems="center">
+                  <Text fontWeight="bold">Asset</Text>
+                  <Text>{transactionData.asset}</Text>
+                </Flex>
+                <Flex gap="0.35rem">
+                  <Text fontWeight="bold">Accounts</Text>
+                  <Text>{`${transactionData.name}`}</Text>
+                </Flex>
+                <Flex gap="0.35rem">
+                  <Text fontWeight="bold">Fee charged</Text>
+                  <Text>{`${toCrypto(
+                    Number(transaction.fee_charged),
+                    undefined,
+                    true
+                  )} XLM`}</Text>
+                </Flex>
+              </Flex>
             )
           })}
-        </Tbody>
-      </Table>
+        </Flex>
+      )}
       <Flex justifyContent="flex-end">
         <Button
           variant={'menuButton'}

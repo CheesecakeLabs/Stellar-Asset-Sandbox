@@ -6,11 +6,13 @@ import { toCrypto } from 'utils/formatter'
 interface IOpexCard {
   accountData: Hooks.UseHorizonTypes.IAccount | undefined
   latestFeeCharged: number | undefined
+  mostRepeatedType: string | undefined
 }
 
 export const OpexCard: React.FC<IOpexCard> = ({
   accountData,
   latestFeeCharged,
+  mostRepeatedType,
 }) => {
   const BASE_RESERVE = 0.5
 
@@ -77,6 +79,7 @@ export const OpexCard: React.FC<IOpexCard> = ({
             w="full"
             justifyContent="space-between"
             mt="1rem"
+            flexDir={{base: 'column', md: 'row'}}
           >
             <Flex flexDir="column" alignItems="center">
               <Text fontSize="sm" mt="1rem">
@@ -101,11 +104,11 @@ export const OpexCard: React.FC<IOpexCard> = ({
             </Flex>
             <Flex flexDir="column" alignItems="center">
               <Text fontSize="sm" mt="1rem">
-                Total covered fees
+                Main type of transaction
               </Text>
               <Text fontSize="xs">(based on the last 10 transactions)</Text>
               <Text fontSize="sm" mt="0.25rem" fontWeight="700">
-                {`${toCrypto(latestFeeCharged || 0, undefined, true)} XLM`}
+                {mostRepeatedType || '-'}
               </Text>
             </Flex>
           </Flex>

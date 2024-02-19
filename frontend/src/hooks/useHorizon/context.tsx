@@ -135,6 +135,32 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     []
   )
 
+  const getOperationTransaction = useCallback(
+    async (
+      id: string
+    ): Promise<Hooks.UseHorizonTypes.IOperationTransaction[] | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/transactions/${id}/operations`
+        )
+        const data = response.data
+        if (data) {
+          return data._embedded.records
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    []
+  )
+
   const getAccountEffects = useCallback(
     async (
       wallet?: string,
@@ -190,32 +216,6 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
       }
     },
     [getOperation]
-  )
-
-  const getTransactiontEffects = useCallback(
-    async (
-      transactionId: string
-    ): Promise<Hooks.UseHorizonTypes.IEffects | undefined> => {
-      setLoadingHorizon(true)
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/transactions/${transactionId}/effects?order=desc`
-        )
-        const data = response.data as Hooks.UseHorizonTypes.IEffects
-        if (data) {
-          return data
-        }
-        return undefined
-      } catch (error) {
-        if (axios.isAxiosError(error) && error?.response?.status === 400) {
-          throw new Error(error.message)
-        }
-        throw new Error(MessagesError.errorOccurred)
-      } finally {
-        setLoadingHorizon(false)
-      }
-    },
-    []
   )
 
   const getAssetAccounts = useCallback(
@@ -274,7 +274,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         if (data) {
           await Promise.all(
             data._embedded.records.map(async record => {
-              record.effects = await getTransactiontEffects(record.id)
+              record.operations = await getOperationTransaction(record.id)
             })
           )
 
@@ -295,7 +295,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         setLoadingHorizon(false)
       }
     },
-    [getTransactiontEffects]
+    [getOperationTransaction]
   )
 
   const getAccount = useCallback(
