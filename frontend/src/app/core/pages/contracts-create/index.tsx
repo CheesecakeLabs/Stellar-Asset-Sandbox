@@ -67,7 +67,15 @@ export const ContractsCreate: React.FC = () => {
       const codVault = ContractsService.loadAccount(vault.wallet.key.publicKey)
       const codTxInvocation = ContractsService.getTxInvocation(
         codVault,
-        INNER_FEE
+        INNER_FEE,
+        /*{
+          signers: [opex],
+          header: {
+            fee: BUMP_FEE,
+            source: opex.getPublicKey(),
+            timeout: 60,
+          },
+        }*/
       )
 
       const codClient = new StellarPlus.Contracts.CertificateOfDeposit({

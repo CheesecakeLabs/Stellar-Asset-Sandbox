@@ -20,6 +20,7 @@ import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { ItemRole } from './item-role'
 import { ModalRoleManage } from './modal-role-manage'
+import { InfoTag } from 'components/atoms/info-tag'
 
 interface IRolesManageTemplate {
   roles: Hooks.UseAuthTypes.IRole[] | undefined
@@ -82,11 +83,12 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             >
               <Flex
                 gap={1}
-                alignItems="center"
                 fill="gray"
+                flexDir="column"
                 _dark={{ fill: 'white' }}
               >
                 <Text>Roles</Text>
+                <InfoTag text="You are only able to modify roles that you have created." />
               </Flex>
               <Button variant="primary" onClick={onOpen}>
                 Create role
