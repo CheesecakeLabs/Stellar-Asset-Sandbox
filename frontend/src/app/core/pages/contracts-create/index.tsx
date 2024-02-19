@@ -95,7 +95,7 @@ export const ContractsCreate: React.FC = () => {
       if (!codContractId) throw new Error('Invalid Contract ID')
 
       const contract = {
-        name: 'Yield-bearing asset',
+        name: 'Yield-bearing Asset',
         asset_id: asset.id.toString(),
         vault_id: vault.id.toString(),
         address: codClient.getContractId() || '',
