@@ -7,6 +7,7 @@ import { ClawbackAsset } from '../pages/clawback-asset'
 import { Contracts } from '../pages/contracts'
 import { ContractsCreate } from '../pages/contracts-create'
 import { ContractsDetail } from '../pages/contracts-detail'
+import { CostCenter } from '../pages/cost-center'
 import { Dashboards } from '../pages/dashboards'
 import { DistributeAsset } from '../pages/distribute-asset'
 import { ForgeAsset } from '../pages/forge-asset'
@@ -131,6 +132,11 @@ export const coreRoutes: AppRoute[] = [
   {
     path: PathRoute.TOML_FILE,
     component: TomlFile,
+    isPrivate: true,
+  },
+  {
+    path: PathRoute.COST_CENTER,
+    component: CostCenter,
     isPrivate: true,
   },
 ]

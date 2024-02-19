@@ -103,21 +103,26 @@ declare namespace Hooks {
       }
     }
 
-    interface IOperationTrustline {
+    interface IOperationTransaction {
       id: string
-      paging_token: string
       transaction_successful: boolean
       source_account: string
       type: string
       type_i: number
       created_at: string
       transaction_hash: string
-      asset_type: string
-      asset_code: string
-      asset_issuer: string
-      limit: string
-      trustee: string
-      trustor: string
+      asset_type?: string
+      asset_code?: string
+      asset_issuer?: string
+      limit?: string
+      trustee?: string
+      trustor?: string
+      from?: string,
+      to?: string,
+      amount?: string
+      account?: string
+      set_flags_s?: string[]
+      clear_flags_s?: string[]
     }
 
     interface IOperationTrustline {
@@ -207,6 +212,50 @@ declare namespace Hooks {
       percentage: number
     }
 
+    interface ITransactionItem {
+      id: string
+      successful: true
+      hash: string
+      ledger: number
+      created_at: string
+      source_account: string
+      fee_account: string
+      fee_charged: string
+      max_fee: string
+      operation_count: number
+      valid_after: string
+      valid_before: string
+      fee_bump_transaction: {
+        hash: string
+        signatures: string[]
+      }
+      inner_transaction: {
+        hash: string
+        signatures: string[]
+        max_fee: string
+      }
+      operations?: IOperationTransaction[]
+    }
+
+    interface ITransactions {
+      _embedded: {
+        records: ITransactionItem[]
+      }
+      _links: {
+        next: {
+          href: string
+          results: number
+        }
+        prev: {
+          href: string
+          results: number
+        }
+        self: {
+          href: string
+        }
+      }
+    }
+
     interface IHorizonContext {
       loadingHorizon: boolean
       assetData: IAsset | undefined
@@ -229,6 +278,11 @@ declare namespace Hooks {
         assetIssuer: string
       ): Promise<IAssetAccounts[] | undefined>
       getLatestSequenceLedger(): Promise<number | undefined>
+      getTransactions(
+        wallet?: string,
+        link?: string
+      ): Promise<ITransactions | undefined>
+      getAccount(wallet: string): Promise<IAccount | undefined>
     }
   }
 }

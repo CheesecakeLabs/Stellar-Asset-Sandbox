@@ -62,7 +62,7 @@ export class CustomAccountHandlerClient
     try {
       return (await this.customSign(tx, this.publicKey)) as TransactionXdr
     } catch (e) {
-      throw new Error('error sign')
+      throw new Error('Error signing transaction')
     }
   }
 }

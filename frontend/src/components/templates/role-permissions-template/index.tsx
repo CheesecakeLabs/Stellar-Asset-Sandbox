@@ -18,6 +18,7 @@ import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
+import { InfoTag } from 'components/atoms/info-tag'
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { IChange } from 'app/core/pages/role-permissions'
@@ -108,11 +109,12 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           >
             <Flex
               gap={1}
-              alignItems="center"
               fill="gray"
+              flexDir="column"
               _dark={{ fill: 'white' }}
             >
               <Text>Permissions</Text>
+              <InfoTag text="You are only able to modify roles that you have created." />
             </Flex>
             <Button
               variant="primary"

@@ -140,7 +140,7 @@ export const Overview: React.FC<IOverview> = ({
             </Flex>
             <Flex flexDir="column" ms="1rem">
               <Text fontSize="xl" mb="0.75rem">
-                Create Yield-bearing asset
+                Create Yield-bearing Asset
               </Text>
               <Text>
                 In the Sandbox you can define permissions for each type of role

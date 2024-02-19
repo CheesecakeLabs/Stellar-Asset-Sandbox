@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 type vaultRoutes struct {
 	m  HTTPControllerMessenger
 	a  usecase.AuthUseCase
@@ -133,12 +132,12 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		},
 	})
 
-
 	ops := []entity.Operation{
 		{
-			Type:    entity.CreateAccountOp,
-			Target:  walletPk,
-			Amount:  _startingBalance,
+			Type:   entity.CreateAccountOp,
+			Target: walletPk,
+			//Amount:  _startingBalance,
+			Amount:  "10",
 			Sponsor: sponsor.Key.PublicKey,
 			Origin:  sponsor.Key.PublicKey,
 		},
@@ -163,7 +162,6 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		})
 	}
 
-	
 	Id := generateID()
 	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,

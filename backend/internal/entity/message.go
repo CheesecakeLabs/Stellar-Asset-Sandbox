@@ -43,6 +43,7 @@ type (
 		Hash       string      `json:"hash"`
 		StatusCode int         `json:"statusCode"`
 		Error      interface{} `json:"error"`
+		FeeCharged int64       `json:"feeCharged"`
 	}
 
 	Operation struct {
@@ -77,10 +78,12 @@ type (
 	}
 
 	SignTransactionRequest struct {
-		Id         int      `json:"id"`
-		Envelope   string   `json:"envelope"`
-		PublicKeys []string `json:"publicKeys"`
-		Hash       string   `json:"hash"`
+		Id                     int      `json:"id"`
+		Envelope               string   `json:"envelope"`
+		PublicKeys             []string `json:"publicKeys"`
+		Hash                   string   `json:"hash"`
+		FeeBump                bool     `json:"feeBump"`
+		FeeBumpProcessingState string   `json:"feeBumpProcessingState"`
 	}
 
 	SorobanTransactionResponse struct {

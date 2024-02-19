@@ -32,6 +32,13 @@ export const Checkbox = {
         bg: 'primary.normal',
         borderColor: 'primary.normal',
       },
+      _disabled: {
+        _checked: {
+          bg: 'primary.normal',
+          borderColor: 'primary.normal',
+          opacity: 0.25,
+        },
+      },
     },
   },
   variants: { highlight },
