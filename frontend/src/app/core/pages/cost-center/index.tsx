@@ -215,6 +215,28 @@ export const CostCenter: React.FC = () => {
         }
       }
 
+      const changeTrust = transaction.operations?.find(
+        operation => operation.type === 'change_trust'
+      )
+      if (changeTrust) {
+        return {
+          name: walletToName(changeTrust.trustor || ''),
+          type: 'Change trustline',
+          asset: changeTrust.asset_code || '-',
+        }
+      }
+
+      const contractRestore = transaction.operations?.find(
+        operation => operation.type === 'restore_footprint'
+      )
+      if (contractRestore) {
+        return {
+          name: walletToName(contractRestore.source_account || ''),
+          type: 'Contract restore',
+          asset: '-',
+        }
+      }
+
       return {
         name: '-',
         type: '-',
