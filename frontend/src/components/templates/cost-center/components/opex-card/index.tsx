@@ -45,7 +45,7 @@ export const OpexCard: React.FC<IOpexCard> = ({
         <Container variant="primary" mb="1rem" p={4} w="full" maxW="full">
           <Text fontSize="md">Sandbox Expenses account</Text>
           <Text fontSize="sm" mt="1rem">
-            Operating xpenses account
+            Operating expenses account
           </Text>
           <Text fontSize="xs" mt="0.25rem" opacity={0.75}>
             {accountData.account_id || '-'}
