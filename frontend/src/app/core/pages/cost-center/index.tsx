@@ -1,4 +1,4 @@
-import { Flex, VStack, useMediaQuery } from '@chakra-ui/react'
+import { Flex, VStack, useMediaQuery, Text } from '@chakra-ui/react'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { useAssets } from 'hooks/useAssets'
@@ -6,10 +6,15 @@ import { useAuth } from 'hooks/useAuth'
 import { useHorizon } from 'hooks/useHorizon'
 import { useTransactions } from 'hooks/useTransactions'
 import { useVaults } from 'hooks/useVaults'
+import {
+  operatingExpensesHelperP1,
+  operatingExpensesHelperP2,
+} from 'utils/constants/helpers'
 import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
 import { SettingsOptions } from 'components/enums/settings-options'
+import { ActionHelper } from 'components/molecules/action-helper'
 import { MenuSettings } from 'components/organisms/menu-settings'
 import { Sidebar } from 'components/organisms/sidebar'
 import { CostCenterTemplate } from 'components/templates/cost-center'
@@ -105,19 +110,22 @@ export const CostCenter: React.FC = () => {
     )}`
   }
 
-  const walletToName = useCallback((publicKey: string): string => {
-    if (
-      assets &&
-      assets.find(asset => asset.distributor.key.publicKey === publicKey)
-    ) {
-      return 'Asset issuer'
-    }
+  const walletToName = useCallback(
+    (publicKey: string): string => {
+      if (
+        assets &&
+        assets.find(asset => asset.distributor.key.publicKey === publicKey)
+      ) {
+        return 'Asset issuer'
+      }
 
-    return (
-      vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||
-      formatAccount(publicKey)
-    )
-  }, [assets, vaults])
+      return (
+        vaults?.find(vault => vault.wallet.key.publicKey === publicKey)?.name ||
+        formatAccount(publicKey)
+      )
+    },
+    [assets, vaults]
+  )
 
   const getTransactionData = useCallback(
     (transaction: Hooks.UseHorizonTypes.ITransactionItem): IHorizonData => {
@@ -294,6 +302,14 @@ export const CostCenter: React.FC = () => {
           {isLargerThanMd && (
             <VStack>
               <MenuSettings option={SettingsOptions.COST_CENTER} />
+              <ActionHelper title={'About Operating Expenses'}>
+                <Text color="gray.900" lineHeight="22px" fontSize="sm">
+                  {operatingExpensesHelperP1}
+                </Text>
+                <Text color="gray.900" lineHeight="22px" fontSize="sm" mt="1rem">
+                  {operatingExpensesHelperP2}
+                </Text>
+              </ActionHelper>
             </VStack>
           )}
         </Flex>
