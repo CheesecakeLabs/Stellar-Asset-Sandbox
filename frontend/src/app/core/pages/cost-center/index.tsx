@@ -283,6 +283,7 @@ export const CostCenter: React.FC = () => {
           w="full"
           justifyContent="center"
           gap="1.5rem"
+          pb="3.5rem"
         >
           <Flex maxW="966px" flexDir="column" w="full">
             <CostCenterTemplate
@@ -306,11 +307,26 @@ export const CostCenter: React.FC = () => {
                 <Text color="gray.900" lineHeight="22px" fontSize="sm">
                   {operatingExpensesHelperP1}
                 </Text>
-                <Text color="gray.900" lineHeight="22px" fontSize="sm" mt="1rem">
+                <Text
+                  color="gray.900"
+                  lineHeight="22px"
+                  fontSize="sm"
+                  mt="1rem"
+                >
                   {operatingExpensesHelperP2}
                 </Text>
               </ActionHelper>
             </VStack>
+          )}
+          {!isLargerThanMd && (
+            <ActionHelper title={'About Operating Expenses'}>
+              <Text color="gray.900" lineHeight="22px" fontSize="sm">
+                {operatingExpensesHelperP1}
+              </Text>
+              <Text color="gray.900" lineHeight="22px" fontSize="sm" mt="1rem">
+                {operatingExpensesHelperP2}
+              </Text>
+            </ActionHelper>
           )}
         </Flex>
       </Sidebar>

@@ -37,7 +37,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
   return (
-    <Flex flexDir="column" w="full" pb="3.5rem">
+    <Flex flexDir="column" w="full">
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex
           justifyContent="space-between"
