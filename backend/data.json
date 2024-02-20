@@ -1,0 +1,31 @@
+{
+    "assets": [
+      {
+        "name": "USDC Coin",
+        "code": "USDC",
+        "amount": "100",
+        "asset_type": "SECURITY_TOKEN",
+        "set_flags": [
+            "AUTH_REQUIRED_FLAG"
+        ]
+      },
+      {
+        "name": "Euro Token",
+        "code": "EUR",
+        "amount": "300",
+        "asset_type": "SECURITY_TOKEN",
+        "set_flags": [
+           
+        ]
+      },
+      {
+        "name": "Bitcoin",
+        "code": "BTC",
+        "amount": "200",
+        "asset_type": "SECURITY_TOKEN",
+        "set_flags": [
+        ]
+      }
+  ]
+}
+  
