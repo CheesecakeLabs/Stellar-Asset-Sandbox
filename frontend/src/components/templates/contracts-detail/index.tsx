@@ -57,7 +57,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   timerCounter,
 }) => {
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex
         maxW={MAX_PAGE_WIDTH_FULL}
         alignSelf="center"
