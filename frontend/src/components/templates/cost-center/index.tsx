@@ -1,4 +1,4 @@
-import { Flex, Text, useMediaQuery } from '@chakra-ui/react'
+import { Flex, Skeleton, Text, useMediaQuery } from '@chakra-ui/react'
 import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
@@ -19,6 +19,7 @@ interface ICostCenterTemplate {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   isPrevDisabled: boolean
   mostRepeatedType: string | undefined
+  loadingHorizon: boolean
   getTransactionsByLink(link: 'prev' | 'next'): void
   getTransactionData(
     transaction: Hooks.UseHorizonTypes.ITransactionItem
@@ -31,8 +32,9 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   latestFeeCharged,
   isPrevDisabled,
   mostRepeatedType,
+  loadingHorizon,
   getTransactionsByLink,
-  getTransactionData
+  getTransactionData,
 }) => {
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
@@ -56,12 +58,16 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
             latestFeeCharged={latestFeeCharged}
             mostRepeatedType={mostRepeatedType}
           />
-          <TransactionsCard
-            transactions={transactions}
-            isPrevDisabled={isPrevDisabled}
-            getTransactionsByLink={getTransactionsByLink}
-            getTransactionData={getTransactionData}
-          />
+          {loadingHorizon ? (
+            <Skeleton height="10rem" w="full" />
+          ) : (
+            <TransactionsCard
+              transactions={transactions}
+              isPrevDisabled={isPrevDisabled}
+              getTransactionsByLink={getTransactionsByLink}
+              getTransactionData={getTransactionData}
+            />
+          )}
         </Flex>
       </Flex>
     </Flex>

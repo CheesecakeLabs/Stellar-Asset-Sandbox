@@ -43,7 +43,7 @@ export const CostCenter: React.FC = () => {
 
   const { userPermissions, getUserPermissions } = useAuth()
   const { getSponsorPK } = useTransactions()
-  const { getTransactions, getAccount } = useHorizon()
+  const { getTransactions, getAccount, loadingHorizon } = useHorizon()
   const { getVaults } = useVaults()
   const { getAssets } = useAssets()
 
@@ -296,6 +296,7 @@ export const CostCenter: React.FC = () => {
               assets={assets}
               isPrevDisabled={historyTransactions.length === 0}
               mostRepeatedType={mostRepeatedType}
+              loadingHorizon={loadingHorizon}
               getTransactionsByLink={getTransactionsByLink}
               getTransactionData={getTransactionData}
             />

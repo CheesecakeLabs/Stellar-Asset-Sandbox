@@ -11,11 +11,25 @@ import {
   Tr,
   useMediaQuery,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { ReactElement } from 'react'
+import { Flag } from 'react-feather'
 
 import { formatDateFullClean, toCrypto } from 'utils/formatter'
 
-import { NavLeftIcon, NavRightIcon, SendedIcon } from 'components/icons'
+import {
+  AddIcon,
+  AuthorizeIcon,
+  BackIcon,
+  BlockIcon,
+  BurnIcon,
+  ContractInvokeIcon,
+  ContractRestoreIcon,
+  NavLeftIcon,
+  NavRightIcon,
+  SendedIcon,
+  TransferIcon,
+  TrustlineIcon,
+} from 'components/icons'
 
 import { IHorizonData } from 'app/core/pages/cost-center'
 
@@ -35,6 +49,43 @@ export const TransactionsCard: React.FC<ITransactionsCard> = ({
   getTransactionData,
 }) => {
   const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
+
+  const operationIcon = (type: string): ReactElement => {
+    if (type === 'Account created') {
+      return <Flag width="16px" height="16px" />
+    }
+    if (type === 'Payment') {
+      return <SendedIcon width="16px" height="16px" />
+    }
+    if (type === 'Minted') {
+      return <AddIcon width="16px" height="16px" />
+    }
+    if (type === 'Authorized') {
+      return <AuthorizeIcon width="16px" height="16px" />
+    }
+    if (type === 'Clawbacked') {
+      return <BackIcon width="16px" height="16px" />
+    }
+    if (type === 'Freezed') {
+      return <BlockIcon width="16px" height="16px" />
+    }
+    if (type === 'Burned') {
+      return <BurnIcon width="16px" height="16px" />
+    }
+    if (type === 'Distribute') {
+      return <TransferIcon width="16px" height="16px" />
+    }
+    if (type === 'Change trustline') {
+      return <TrustlineIcon width="16px" height="16px" />
+    }
+    if (type === 'Contract invoke') {
+      return <ContractInvokeIcon width="16px" height="16px" />
+    }
+    if (type === 'Contract restore') {
+      return <ContractRestoreIcon width="16px" height="16px" />
+    }
+    return <Flag width="16px" height="16px" />
+  }
 
   return (
     <Container variant="primary" mb="1rem" p={4} w="full" maxW="full">
@@ -57,7 +108,7 @@ export const TransactionsCard: React.FC<ITransactionsCard> = ({
               return (
                 <Tr>
                   <Td px="1rem" py={0}>
-                    <SendedIcon width="20px" height="20px" />
+                    {operationIcon(transactionData.type)}
                   </Td>
                   <Td>{transactionData.type}</Td>
                   <Td>

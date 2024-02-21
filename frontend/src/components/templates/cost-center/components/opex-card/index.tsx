@@ -1,6 +1,8 @@
 import { Container, Flex, Progress, Text } from '@chakra-ui/react'
+import { LinkIcon } from 'components/icons'
 import React from 'react'
 
+import { SPONSORED_RESERVES_LINK } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
 interface IOpexCard {
@@ -79,11 +81,22 @@ export const OpexCard: React.FC<IOpexCard> = ({
             w="full"
             justifyContent="space-between"
             mt="1rem"
-            flexDir={{base: 'column', md: 'row'}}
+            flexDir={{ base: 'column', md: 'row' }}
           >
             <Flex flexDir="column" alignItems="center">
-              <Text fontSize="sm" mt="1rem">
-                Total sponsored reserves
+              <Text
+                fontSize="sm"
+                mt="1rem"
+                cursor="pointer"
+                onClick={(): Window | null =>
+                  window.open(`${SPONSORED_RESERVES_LINK}`, '_blank')
+                }
+                flexDir="row"
+                display="flex"
+                alignItems="center"
+                gap={1}
+              >
+                Total sponsored reserves <LinkIcon/>
               </Text>
               <Text fontSize="sm" mt="0.25rem" fontWeight="700">
                 {accountData.num_sponsoring}
