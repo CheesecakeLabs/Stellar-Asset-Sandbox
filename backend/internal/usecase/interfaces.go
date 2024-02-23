@@ -20,6 +20,7 @@ type (
 		GetAllUsers() ([]entity.UserResponse, error)
 		EditUsersRole(id_user string, id_role string) error
 		GetProfile(token string) (entity.UserResponse, error)
+		GetSuperAdminUsers() ([]entity.UserResponse, error)
 	}
 
 	// User -.
@@ -60,6 +61,7 @@ type (
 		UpdateRole(entity.Role) (entity.Role, error)
 		DeleteRole(entity.RoleDelete) (entity.RoleDelete, error)
 		GetRoleById(id int) (entity.Role, error)
+		GetSuperAdminRole() (entity.Role, error)
 	}
 
 	// Role Permission-.

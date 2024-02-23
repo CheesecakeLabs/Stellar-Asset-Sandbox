@@ -95,6 +95,21 @@ func (mr *MockUserRepoMockRecorder) GetProfile(token interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockUserRepo)(nil).GetProfile), token)
 }
 
+// GetSuperAdminUsers mocks base method.
+func (m *MockUserRepo) GetSuperAdminUsers() ([]entity.UserResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSuperAdminUsers")
+	ret0, _ := ret[0].([]entity.UserResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSuperAdminUsers indicates an expected call of GetSuperAdminUsers.
+func (mr *MockUserRepoMockRecorder) GetSuperAdminUsers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSuperAdminUsers", reflect.TypeOf((*MockUserRepo)(nil).GetSuperAdminUsers))
+}
+
 // GetUser mocks base method.
 func (m *MockUserRepo) GetUser(email string) (entity.User, error) {
 	m.ctrl.T.Helper()
@@ -586,6 +601,21 @@ func (m *MockRoleRepoInterface) GetRoles() ([]entity.Role, error) {
 func (mr *MockRoleRepoInterfaceMockRecorder) GetRoles() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoles", reflect.TypeOf((*MockRoleRepoInterface)(nil).GetRoles))
+}
+
+// GetSuperAdminRole mocks base method.
+func (m *MockRoleRepoInterface) GetSuperAdminRole() (entity.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSuperAdminRole")
+	ret0, _ := ret[0].(entity.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSuperAdminRole indicates an expected call of GetSuperAdminRole.
+func (mr *MockRoleRepoInterfaceMockRecorder) GetSuperAdminRole() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSuperAdminRole", reflect.TypeOf((*MockRoleRepoInterface)(nil).GetSuperAdminRole))
 }
 
 // UpdateRole mocks base method.

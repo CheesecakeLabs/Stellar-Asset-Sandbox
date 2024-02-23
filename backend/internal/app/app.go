@@ -78,6 +78,13 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 		repo.NewLogTransactionRepo(pg),
 	)
 
+	// Setup data
+	err := SetupData(cfg, userUc, roleUc)
+	if err != nil {
+		sentry.CaptureException(err)
+		l.Error(err, "app - Run - SetupData")
+	}
+
 	// HTTP Server
 	handler := gin.Default()
 	handler.Use(timeout.Timeout(timeout.WithTimeout(50 * time.Second)))
@@ -105,9 +112,38 @@ func Run(cfg *config.Config, pg *postgres.Postgres, pKp, pHor, pEnv, pSub, pSig 
 	}
 
 	// Shutdown
-	err := httpServer.Shutdown()
+	err = httpServer.Shutdown()
 	if err != nil {
 		sentry.CaptureException(err)
 		l.Fatal("app - Run - httpServer.Shutdown: %v", err)
 	}
+}
+
+
+func SetupData(cfg *config.Config, userUc *usecase.UserUseCase, roleUc *usecase.RoleUseCase) (error) {
+	superAdminRole, err := roleUc.GetSuperAdminRole()
+	if err != nil {
+		return err
+	}
+
+	// Check if the super admin user already exists
+	existingSuperAdmin, err := userUc.GetSuperAdminUsers()
+	if err != nil {
+		return err
+	}
+
+	// If a super admin user already exists, no need to create a new one
+	if len(existingSuperAdmin) != 0 {
+		return nil
+	}
+
+	// If no super admin user exists, create one
+	superadmin := entity.User{
+		Name:     "Super Administrator",
+		RoleId:   superAdminRole.Id,
+		Password: cfg.DefaultData.SuperAdminPassword,
+		Email:    cfg.DefaultData.SuperAdminEmail,
+	}
+
+	return userUc.CreateUser(superadmin)
 }

@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	rolePermission "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/role_permission"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -16,13 +17,14 @@ type usersRoutes struct {
 	t  usecase.UserUseCase
 	a  usecase.AuthUseCase
 	rP usecase.RolePermissionUseCase
+	rl usecase.RoleUseCase
 	v  usecase.VaultUseCase
 	l logger.Interface
 	pf profanity.ProfanityFilter
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase, pf profanity.ProfanityFilter) {
-	r := &usersRoutes{t, a, rP, v, l, pf}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, rl usecase.RoleUseCase, l logger.Interface, v usecase.VaultUseCase, pf profanity.ProfanityFilter) {
+	r := &usersRoutes{t, a, rP, rl, v, l, pf}
 
 	h := handler.Group("/users")
 	{
@@ -201,6 +203,26 @@ func (r *usersRoutes) editUsersRole(c *gin.Context) {
 	if err := c.ShouldBindJSON(&userRole); err != nil {
 		r.l.Error(err, "http - v1 - editUserRole - ShouldBindJSON")
 		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	roleId, err := strconv.Atoi(userRole.ID_role)
+	if err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - strconv.Atoi")
+		errorResponse(c, http.StatusBadRequest, "invalid role id value", err)
+		return
+	}
+
+	role, err := r.rl.GetRoleById(roleId)
+	if err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - GetRoleById")
+		errorResponse(c, http.StatusBadRequest, "role not found", err)
+		return
+	}
+
+	if role.Admin == 1 {
+		r.l.Error(err, "http - v1 - editUserRole - role.Admin")
+		errorResponse(c, http.StatusBadRequest, "not authorized", nil)
 		return
 	}
 

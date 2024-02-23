@@ -89,9 +89,10 @@ func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
 
 func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
 	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
-			 FROM UserAccount u 
-			 LEFT JOIN Role r ON u.role_id = r.id 
-			 ORDER BY u.name ASC`
+		FROM UserAccount u 
+		LEFT JOIN Role r ON u.role_id = r.id 
+		WHERE r.admin = 0
+		ORDER BY u.name ASC`
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
@@ -139,4 +140,34 @@ func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
 	}
 
 	return user, nil
+}
+
+func (r UserRepo) GetSuperAdminUsers() ([]entity.UserResponse, error) {
+    stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
+	FROM UserAccount u 
+	LEFT JOIN Role r ON u.role_id = r.id 
+	WHERE r.admin = 1
+	ORDER BY u.name ASC`
+
+    rows, err := r.Db.Query(stmt)
+    if err != nil {
+        return nil, fmt.Errorf("UserRepo - GetSuperAdminUsers - db.Query: %w", err)
+    }
+
+    defer rows.Close()
+
+    entities := make([]entity.UserResponse, 0, _defaultEntityCap)
+
+    for rows.Next() {
+        var user entity.UserResponse
+
+        err = rows.Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email)
+        if err != nil {
+            return nil, fmt.Errorf("UserRepo - GetSuperAdminUsers - rows.Scan: %w", err)
+        }
+
+        entities = append(entities, user)
+    }
+
+    return entities, nil
 }
