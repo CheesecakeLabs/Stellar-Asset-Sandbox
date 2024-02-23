@@ -171,3 +171,13 @@ func (r UserRepo) GetSuperAdminUsers() ([]entity.UserResponse, error) {
 
     return entities, nil
 }
+
+func (r UserRepo) UpdateName(id string, name string) error {
+	// insert into if not exists if exist replace
+	stmt := `UPDATE UserAccount SET name=$2 WHERE id = $1`
+	_, err := r.Db.Exec(stmt, id, name)
+	if err != nil {
+		return fmt.Errorf("UserRepo - UpdateName - db.Exec: %w", err)
+	}
+	return nil
+}

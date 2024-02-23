@@ -21,6 +21,7 @@ type (
 		EditUsersRole(id_user string, id_role string) error
 		GetProfile(token string) (entity.UserResponse, error)
 		GetSuperAdminUsers() ([]entity.UserResponse, error)
+		UpdateName(id string, name string) error 
 	}
 
 	// User -.

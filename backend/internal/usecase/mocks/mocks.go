@@ -140,6 +140,20 @@ func (mr *MockUserRepoMockRecorder) GetUserByToken(token interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByToken", reflect.TypeOf((*MockUserRepo)(nil).GetUserByToken), token)
 }
 
+// UpdateName mocks base method.
+func (m *MockUserRepo) UpdateName(id, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateName", id, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateName indicates an expected call of UpdateName.
+func (mr *MockUserRepoMockRecorder) UpdateName(id, name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateName", reflect.TypeOf((*MockUserRepo)(nil).UpdateName), id, name)
+}
+
 // UpdateToken mocks base method.
 func (m *MockUserRepo) UpdateToken(id, token string) error {
 	m.ctrl.T.Helper()

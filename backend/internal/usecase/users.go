@@ -120,3 +120,10 @@ func (uc *UserUseCase) GetSuperAdminUsers() ([]entity.UserResponse, error) {
 	return users, nil
 }
 
+func (uc *UserUseCase) UpdateName(userID string, name string) error {
+	err := uc.repo.UpdateName(userID, name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
