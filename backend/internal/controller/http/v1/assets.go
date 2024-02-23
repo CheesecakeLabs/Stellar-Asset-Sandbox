@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	rolePermission "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/role_permission"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
@@ -31,7 +32,7 @@ func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as us
 	}
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, rP usecase.RolePermissionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
 	r := &assetsRoutes{w, as, m, a, l, logger, pf}
 
 	h := handler.Group("/assets")
@@ -51,6 +52,12 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.GET("/toml-data", r.getTomlData)
 		h.PUT("/:id/update-contract-id", r.updateContractId)
 		h.GET("/:id/image.png", r.getAssetImage)
+		
+
+		allowedRoute := h.Group("/").Use(Auth(a.ValidateToken())).Use(rolePermission.Validate(rP))
+		{
+			allowedRoute.PUT("/:id/update-name-code", r.updateNameAndCode)
+		}
 	}
 }
 
@@ -121,6 +128,11 @@ type PaginatedAssetsResponse struct {
 
 type UpdateContractIdRequest struct {
 	ContractId string `json:"contract_id" example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
+}
+
+type UpdateNameRequest struct {
+	Name      string   `json:"name" binding:"required" example:"USD Coin"`
+	Code      string   `json:"code" binding:"required" example:"USDC"`
 }
 
 // @Summary     Create a new asset
@@ -1195,4 +1207,32 @@ func (r *assetsRoutes) updateContractId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"contract_id": request.ContractId})
+}
+
+
+// @Summary Update asset name and code
+// @Description Update asset name and code
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body UpdateNameRequest true "Contract ID"
+// @Success     200 {object} UpdateContractIdRequest
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/{id}/update-name-code [put]
+func (r *assetsRoutes) updateNameAndCode(c *gin.Context) {
+	var request UpdateNameRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	assetId := c.Param("id")
+	err := r.as.UpdateNameAndCode(assetId, request.Name, request.Code)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating asset name and code", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "asset information updated"})
 }

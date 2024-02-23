@@ -52,6 +52,7 @@ type (
 		GetAssetImage(string) ([]byte, error)
 		GetPaginatedAssets(int, int, entity.AssetFilter) ([]entity.Asset, int, error)
 		UpdateContractId(string, string) error
+		UpdateNameAndCode(string, string, string) error
 	}
 
 	// Role -.

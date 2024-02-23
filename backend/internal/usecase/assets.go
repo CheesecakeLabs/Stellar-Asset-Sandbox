@@ -198,3 +198,11 @@ func (uc *AssetUseCase) GetPaginatedAssets(page int, limit int, filter entity.As
 
 	return assets, totalPages, nil
 }
+
+func (uc *AssetUseCase) UpdateNameAndCode(assetId string, name string, code string) error {
+	err := uc.aRepo.UpdateNameAndCode(assetId, name, code)
+	if err != nil {
+		return fmt.Errorf("AssetUseCase - UpdateNameAndCode - uc.aRepo.UpdateNameAndCode: %w", err)
+	}
+	return nil
+}

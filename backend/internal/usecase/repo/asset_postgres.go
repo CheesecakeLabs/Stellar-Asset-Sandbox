@@ -419,3 +419,19 @@ func (r AssetRepo) CreateAsset(data entity.Asset) (entity.Asset, error) {
 
 	return res, nil
 }
+
+
+func (r AssetRepo) UpdateNameAndCode(assetId string, name string, code string) error {
+	stmt := `
+    	UPDATE asset
+    	SET name = $2, code = $3
+    	WHERE id = $1
+	`
+
+	_, err := r.Db.Exec(stmt, assetId, name, code)
+	if err != nil {
+		return fmt.Errorf("AssetRepo - UpdateNameAndCode - Db.Exec: %w", err)
+	}
+
+	return nil
+}
