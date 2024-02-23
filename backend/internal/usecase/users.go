@@ -110,3 +110,13 @@ func (uc *UserUseCase) GetProfile(token string) (entity.UserResponse, error) {
 
 	return profile, nil
 }
+
+func (uc *UserUseCase) GetSuperAdminUsers() ([]entity.UserResponse, error) {
+	users, err := uc.repo.GetSuperAdminUsers()
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}
+

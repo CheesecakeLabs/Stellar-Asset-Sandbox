@@ -17,7 +17,7 @@ func NewRoleRepo(pg *postgres.Postgres) RoleRepo {
 }
 
 func (r RoleRepo) GetRoles() ([]entity.Role, error) {
-	stmt := `SELECT id, name, admin, created_by FROM Role ORDER BY name ASC`
+	stmt := `SELECT id, name, admin, created_by FROM Role WHERE admin = 0 ORDER BY name ASC`
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
 		return nil, fmt.Errorf("WalletRepo - GetRoles - db.Query: %w", err)
@@ -107,6 +107,24 @@ func (r RoleRepo) GetRoleById(id int) (entity.Role, error) {
 			return entity.Role{}, fmt.Errorf("RoleRepo - GetRoleById - role not found")
 		}
 		return entity.Role{}, fmt.Errorf("RoleRepo - GetRoleById - row.Scan: %w", err)
+	}
+
+	return role, nil
+}
+
+func (r RoleRepo) GetSuperAdminRole() (entity.Role, error) {
+	query := `SELECT id, name FROM role WHERE admin = $1`
+
+	row := r.Db.QueryRow(query, 1)
+
+	var role entity.Role
+
+	err := row.Scan(&role.Id, &role.Name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return entity.Role{}, fmt.Errorf("RoleRepo - GetSuperAdminRole - role not found")
+		}
+		return entity.Role{}, fmt.Errorf("RoleRepo - GetSuperAdminRole - row.Scan: %w", err)
 	}
 
 	return role, nil

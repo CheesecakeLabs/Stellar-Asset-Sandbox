@@ -55,3 +55,12 @@ func (useCase *RoleUseCase) GetRoleById(id int) (entity.Role, error) {
 	}
 	return role, nil
 }
+
+func (useCase *RoleUseCase) GetSuperAdminRole() (entity.Role, error) {
+	role, err := useCase.repo.GetSuperAdminRole()
+	if err != nil {
+		return entity.Role{}, fmt.Errorf("RoleUseCase - GetSuperAdminRole - uc.repo.GetSuperAdminRole: %w", err)
+	}
+	return role, nil
+}
+

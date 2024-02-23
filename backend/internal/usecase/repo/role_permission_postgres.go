@@ -17,12 +17,17 @@ func NewRolePermissionRepo(pg *postgres.Postgres) RolePermissionRepo {
 
 func (rpr RolePermissionRepo) Validate(action string, roleId int) (bool, error) {
 	stmt := `
-		SELECT EXISTS(
+	SELECT CASE 
+		WHEN role.admin = 1 THEN true
+		ELSE EXISTS(
 			SELECT per.id FROM rolepermissionjunction rpj 
 			LEFT JOIN permission per ON (rpj.permission_id = per.id) 
 			LEFT JOIN operation ope ON (per.id = ope.permission_id) 
 			WHERE action = $1 AND role_id = $2
 		)
+	END
+	FROM role
+	WHERE role.id = $2
 	`
 
 	var hasPermission bool
