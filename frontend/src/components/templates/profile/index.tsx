@@ -26,7 +26,7 @@ interface IProfileTemplate {
   profile: Hooks.UseAuthTypes.IUserDto | undefined
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const ProfileTemplate: React.FC<IProfileTemplate> = ({

@@ -27,7 +27,7 @@ interface ISettingsTemplate {
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({

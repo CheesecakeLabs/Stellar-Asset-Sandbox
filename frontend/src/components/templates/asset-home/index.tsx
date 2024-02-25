@@ -21,7 +21,7 @@ interface IAssetHomeTemplate {
   asset: Hooks.UseAssetsTypes.IAssetDto
   paymentsAsset: Hooks.UseDashboardsTypes.IAsset | undefined
   chartPeriod: TChartPeriod
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
   selectedFile: File | null
   setSelectedFile: Dispatch<SetStateAction<File | null>>
   setChartPeriod: Dispatch<SetStateAction<TChartPeriod>>

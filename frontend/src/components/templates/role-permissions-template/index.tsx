@@ -26,7 +26,7 @@ import { IChange } from 'app/core/pages/role-permissions'
 interface IRolePermissionsTemplate {
   loading: boolean
   roles: Hooks.UseAuthTypes.IRole[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   permissions: Hooks.UseAuthTypes.IPermission[] | undefined
   rolesPermissions: Hooks.UseAuthTypes.IRolePermission[] | undefined
   updatingRolesPermissions: boolean

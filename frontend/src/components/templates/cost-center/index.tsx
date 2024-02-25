@@ -11,7 +11,7 @@ import { IHorizonData } from 'app/core/pages/cost-center'
 
 interface ICostCenterTemplate {
   transactions: Hooks.UseHorizonTypes.ITransactions | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   accountData: Hooks.UseHorizonTypes.IAccount | undefined
   sponsorAccount: string | undefined
   latestFeeCharged: number | undefined

@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Hooks.UseAuthTypes.IUserDto | undefined
   >()
   const [userPermissions, setUserPermissions] = useState<
-    Hooks.UseAuthTypes.IUserPermission[] | undefined
+    Hooks.UseAuthTypes.IUserPermission | undefined
   >()
   const [rolesPermissions, setRolesPermissions] = useState<
     Hooks.UseAuthTypes.IRolePermission[] | undefined
@@ -203,7 +203,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   }, [getAccountData])
 
   const getUserPermissions = useCallback(async (): Promise<
-    Hooks.UseAuthTypes.IUserPermission[] | undefined
+    Hooks.UseAuthTypes.IUserPermission | undefined
   > => {
     setLoadingUserPermissions(true)
     try {

@@ -31,7 +31,7 @@ import { Paginator } from 'components/molecules/paginator'
 interface IContractsTemplate {
   loading: boolean
   contracts: Hooks.UseContractsTypes.IContract[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   currentPage: number
   totalPages: number
   changePage(page: number): void

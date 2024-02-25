@@ -13,7 +13,7 @@ interface IItemUser {
   handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const ItemUser: React.FC<IItemUser> = ({

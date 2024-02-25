@@ -28,7 +28,7 @@ interface IVaultDetailTemplate {
   vaultCategories: Hooks.UseVaultsTypes.IVaultCategory[] | undefined
   deletingVault: boolean
   isPrevDisabled: boolean
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   loadingUserPermissions: boolean
   onSubmit(
     amount: string,

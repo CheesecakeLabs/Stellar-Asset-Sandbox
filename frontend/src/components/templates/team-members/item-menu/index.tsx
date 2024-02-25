@@ -14,7 +14,7 @@ import { MenuDotsIcon } from 'components/icons'
 
 interface IItemMenu {
   onOpen(): void
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const ItemMenu: React.FC<IItemMenu> = ({ onOpen, permissions }) => {
