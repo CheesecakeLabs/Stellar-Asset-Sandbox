@@ -26,7 +26,8 @@ export interface IHorizonData {
 }
 
 export const CostCenter: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
+
   const [sponsorAccount, setSponsorAccount] = useState<string | undefined>()
   const [transactions, setTransactions] =
     useState<Hooks.UseHorizonTypes.ITransactions>()
@@ -279,7 +280,7 @@ export const CostCenter: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -301,7 +302,7 @@ export const CostCenter: React.FC = () => {
               getTransactionData={getTransactionData}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.COST_CENTER} />
               <ActionHelper title={'About Operating Expenses'}>
@@ -319,7 +320,7 @@ export const CostCenter: React.FC = () => {
               </ActionHelper>
             </VStack>
           )}
-          {!isLargerThanMd && (
+          {!isLargerThanLg && (
             <ActionHelper title={'About Operating Expenses'}>
               <Text color="gray.900" lineHeight="22px" fontSize="sm">
                 {operatingExpensesHelperP1}

@@ -16,11 +16,11 @@ import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
+import { InfoTag } from 'components/atoms/info-tag'
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { ItemRole } from './item-role'
 import { ModalRoleManage } from './modal-role-manage'
-import { InfoTag } from 'components/atoms/info-tag'
 
 interface IRolesManageTemplate {
   roles: Hooks.UseAuthTypes.IRole[] | undefined
@@ -42,7 +42,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
   handleDeleteRole,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   return (
     <>
@@ -69,7 +69,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             <Text fontSize="2xl" fontWeight="400">
               Administration
             </Text>
-            {isSmallerThanMd && <MenuAdminMobile selected={'ROLES'} />}
+            {!isLargerThanLg && <MenuAdminMobile selected={'ROLES'} />}
           </Flex>
           <Container variant="primary" px={0} pb={0} maxW="full">
             <Flex

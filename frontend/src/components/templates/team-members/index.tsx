@@ -39,6 +39,8 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
   permissions,
 }) => {
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
+
   const { onOpen } = useDisclosure()
 
   return (
@@ -53,7 +55,7 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Administration
           </Text>
-          {isSmallerThanMd && <MenuAdminMobile selected={'TEAM_MEMBERS'} />}
+          {!isLargerThanLg && <MenuAdminMobile selected={'TEAM_MEMBERS'} />}
         </Flex>
 
         <Container variant="primary" px={0} pb={0} maxW="full">

@@ -35,7 +35,13 @@ export const AssetHome: React.FC = () => {
   const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
 
-  const { loadingAsset, getAssetById, updateImage } = useAssets()
+  const {
+    loadingAsset,
+    updatingAsset,
+    getAssetById,
+    updateImage,
+    updateAsset,
+  } = useAssets()
   const { loadingUserPermissions, userPermissions, getUserPermissions } =
     useAuth()
   const { getPaymentsByAssetId, loadingChart } = useDashboards()
@@ -71,6 +77,34 @@ export const AssetHome: React.FC = () => {
     try {
       const image = await toBase64(selectedFile)
       const isSuccess = await updateImage(asset?.id, image)
+
+      if (isSuccess) {
+        if (id) {
+          getAssetById(id).then(asset => setAsset(asset))
+        }
+        return true
+      }
+
+      toastError(MessagesError.errorOccurred)
+    } catch (error) {
+      let message
+      if (error instanceof Error) message = error.message
+      else message = String(error)
+      toastError(message)
+    }
+
+    return false
+  }
+
+  const handleUpdateAsset = async (
+    name: string,
+    code: string
+  ): Promise<boolean> => {
+    try {
+      if (!asset?.id) {
+        throw new Error('Invalid asset')
+      }
+      const isSuccess = await updateAsset(asset.id, { name: name, code: code })
 
       if (isSuccess) {
         if (id) {
@@ -135,6 +169,8 @@ export const AssetHome: React.FC = () => {
                 setSelectedFile={setSelectedFile}
                 setChartPeriod={setChartPeriod}
                 handleUploadImage={handleUploadImage}
+                updatingAsset={updatingAsset}
+                handleUpdateAsset={handleUpdateAsset}
               />
             )}
           </Flex>

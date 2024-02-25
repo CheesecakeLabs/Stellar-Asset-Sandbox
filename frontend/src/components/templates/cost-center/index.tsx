@@ -36,7 +36,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   getTransactionsByLink,
   getTransactionData,
 }) => {
-  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   return (
     <Flex flexDir="column" w="full">
@@ -50,7 +50,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Administration
           </Text>
-          {isSmallerThanMd && <MenuAdminMobile selected={'TEAM_MEMBERS'} />}
+          {!isLargerThanLg && <MenuAdminMobile selected={'COST_CENTER'} />}
         </Flex>
         <Flex flexDir="column" maxW="full">
           <OpexCard

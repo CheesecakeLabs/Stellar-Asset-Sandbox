@@ -65,7 +65,7 @@ export const Header: React.FC<IHeader> = ({ onOpen }) => {
       h="4.5rem"
       w="full"
       align="center"
-      ps={{ base: 2, md: 12 }}
+      ps={{ base: 2, lg: 12 }}
       pe={6}
       pos="fixed"
       zIndex={99}

@@ -142,10 +142,16 @@ declare namespace Hooks {
       freeze_enabled?: boolean
     }
 
+    interface IAssetUpdate {
+      name: string
+      code: string
+    }
+
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
       loadingAsset: boolean
+      updatingAsset: boolean
       assets: IAssetDto[] | undefined
       mint: (params: IMintRequest) => Promise<boolean>
       burn: (params: IBurnRequest) => Promise<boolean>
@@ -169,6 +175,7 @@ declare namespace Hooks {
         limit: number
         filters?: IFilter
       }) => Promise<IPagedAssets | undefined>
+      updateAsset: (id: number, params: IAssetUpdate) => Promise<boolean>
     }
   }
 }

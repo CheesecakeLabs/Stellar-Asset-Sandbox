@@ -12,7 +12,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { RolesManageTemplate } from 'components/templates/roles-manage-template'
 
 export const RolesManage: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const {
     getRoles,
@@ -112,7 +112,7 @@ export const RolesManage: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -128,7 +128,7 @@ export const RolesManage: React.FC = () => {
               handleRole={handleRole}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
             </VStack>

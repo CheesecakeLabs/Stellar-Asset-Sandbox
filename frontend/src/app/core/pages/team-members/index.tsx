@@ -11,7 +11,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { TeamMembersTemplate } from 'components/templates/team-members'
 
 export const TeamMembers: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const {
     getAllUsers,
@@ -52,7 +52,7 @@ export const TeamMembers: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -67,7 +67,7 @@ export const TeamMembers: React.FC = () => {
               permissions={userPermissions}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.TEAM_MEMBERS} />
             </VStack>

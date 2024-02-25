@@ -47,7 +47,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   onSubmit,
   setChanges,
 }) => {
-  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const havePermissionByRole = (
     permissionId: number,
@@ -95,7 +95,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Administration
           </Text>
-          {isSmallerThanMd && <MenuAdminMobile selected={'ROLE_PERMISSIONS'} />}
+          {!isLargerThanLg && <MenuAdminMobile selected={'ROLE_PERMISSIONS'} />}
         </Flex>
         <Container variant="primary" px={0} pb={0} maxW="full">
           <Flex
