@@ -11,14 +11,15 @@ import (
 )
 
 type rolePermissions struct {
-	rolePermissionUseCase usecase.RolePermissionUseCase
-	roleUseCase  usecase.RoleUseCase
-	messengerController   HTTPControllerMessenger
-	l                     *logger.Logger
+	rolePermissionUseCase 	usecase.RolePermissionUseCase
+	roleUseCase  			usecase.RoleUseCase
+	userUseCase				usecase.UserUseCase
+	messengerController   	HTTPControllerMessenger
+	l                     	*logger.Logger
 }
 
-func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase,  roleUseCase  usecase.RoleUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
-	r := &rolePermissions{rolePermissionUseCase, roleUseCase, messengerController, l}
+func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase, roleUseCase  usecase.RoleUseCase, userUseCase usecase.UserUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
+	r := &rolePermissions{rolePermissionUseCase, roleUseCase, userUseCase, messengerController, l}
 
 	h := handler.Group("/role-permissions")
 	{
@@ -58,7 +59,8 @@ func (r *rolePermissions) userPermissions(c *gin.Context) {
 	}
 
 	res.Permissions = rolePermissions
-	res.Admin, err = r.roleUseCase.IsUserSuperAdmin(token)
+
+	res.Admin, err = r.userUseCase.IsUserSuperAdmin(token)
 	if err != nil {
 		r.l.Error(err, "http - v1 - list user permissions - IsUserSuperAdmin")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)

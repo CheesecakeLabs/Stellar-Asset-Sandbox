@@ -44,6 +44,7 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.Au
 		{
 			allowedRoute.GET("/approve-new-accounts", r.detail)
 			allowedRoute.POST("/edit-users-role", r.editUsersRole)
+			allowedRoute.PUT("/:id/update-name", r.updateName)
 		}
 	}
 }
@@ -274,4 +275,38 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 // @Success 200  {object} entity.UserResponse
 // @Router /users [get]
 func (r *usersRoutes) forgetPassword(c *gin.Context) {
+}
+
+
+
+type updateNameRequest struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// @Summary     Update user name
+// @Description Update user name
+// @ID          updateName
+// @Tags  	    user
+// @Accept      json
+// @Produce     json
+// @Success     200 {object}
+// @Failure     500 {object} response
+// @Router      /users/{id}/update-name [put]
+func (r *usersRoutes) updateName(c *gin.Context) {
+	var req updateNameRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - ShouldBindJSON")
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+	userID := c.Param("id")
+	if err := r.t.UpdateName(userID, req.Name); err != nil {
+		r.l.Error(err, "http - v1 - updateName - UpdateName")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Name updated sucessfully",
+	})
 }

@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -170,4 +171,37 @@ func (r UserRepo) GetSuperAdminUsers() ([]entity.UserResponse, error) {
     }
 
     return entities, nil
+}
+
+func (r UserRepo) UpdateName(id string, name string) error {
+	// insert into if not exists if exist replace
+	stmt := `UPDATE UserAccount SET name=$2 WHERE id = $1`
+	_, err := r.Db.Exec(stmt, id, name)
+	if err != nil {
+		return fmt.Errorf("UserRepo - UpdateName - db.Exec: %w", err)
+	}
+	return nil
+}
+
+func (r UserRepo) IsUserSuperAdmin(token string) (bool, error) {
+	query := `SELECT EXISTS (
+		SELECT *
+		FROM UserAccount u
+		JOIN role r ON u.role_id = r.id
+		WHERE r.admin = $1 AND u.token = $2
+	) AS is_super_admin;`
+
+	row := r.Db.QueryRow(query, 1, token)
+
+	var isSuperAdmin bool
+
+	err := row.Scan(&isSuperAdmin)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, fmt.Errorf("UserRepo - IsUserSuperAdmin - not found")
+		}
+		return false, fmt.Errorf("UserRepo - IsUserSuperAdmin - row.Scan: %w", err)
+	}
+
+	return isSuperAdmin, nil
 }

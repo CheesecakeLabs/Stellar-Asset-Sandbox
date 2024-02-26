@@ -120,3 +120,19 @@ func (uc *UserUseCase) GetSuperAdminUsers() ([]entity.UserResponse, error) {
 	return users, nil
 }
 
+func (uc *UserUseCase) UpdateName(userID string, name string) error {
+	err := uc.repo.UpdateName(userID, name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (useCase *UserUseCase) IsUserSuperAdmin(token string) (bool, error) {
+	value, err := useCase.repo.IsUserSuperAdmin(token)
+	if err != nil {
+		return false, fmt.Errorf("UserUseCase - IsUserSuperAdmin - uc.repo.IsUserSuperAdmin: %w", err)
+	}
+
+	return value, nil
+}
