@@ -13,6 +13,7 @@ interface IItemRole {
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loading: boolean
   loadingRoles: boolean
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   handleRole(name: string, id?: number): Promise<boolean>
   handleDeleteRole(id: number, idNewUsersRole: number): Promise<boolean>
 }
@@ -22,6 +23,7 @@ export const ItemRole: React.FC<IItemRole> = ({
   roles,
   loading,
   loadingRoles,
+  userPermissions,
   handleRole,
   handleDeleteRole,
 }) => {
@@ -38,7 +40,10 @@ export const ItemRole: React.FC<IItemRole> = ({
   } = useDisclosure()
 
   const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
-    return role.admin === 1 || role.created_by != Authentication.getUser()?.id
+    if (userPermissions?.admin) {
+      return false
+    }
+    return role.created_by != Authentication.getUser()?.id
   }
 
   return (

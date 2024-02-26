@@ -6,12 +6,12 @@ export const isDark = (colorMode: 'dark' | 'light'): boolean => {
 
 export const havePermission = (
   permission: Permissions,
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermission: Hooks.UseAuthTypes.IUserPermission | undefined
 ): boolean => {
-  if (!permissions) return false
+  if (userPermission?.admin) return true
+  if (!userPermission) return false
   return (
-    permissions.filter(
-      (item: Hooks.UseAuthTypes.IUserPermission) => item.action === permission
-    ).length > 0
+    userPermission.permissions.filter(item => item.action === permission)
+      .length > 0
   )
 }

@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Authentication.getUser()
   )
   const [loading, setLoading] = useState(false)
+  const [updatingUsername, setUpdatingUsername] = useState(false)
   const [loadingUserPermissions, setLoadingUserPermissions] = useState(true)
   const [updatingRolesPermissions, setUpdatingRolesPermissions] =
     useState(false)
@@ -33,7 +34,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     Hooks.UseAuthTypes.IUserDto | undefined
   >()
   const [userPermissions, setUserPermissions] = useState<
-    Hooks.UseAuthTypes.IUserPermission[] | undefined
+    Hooks.UseAuthTypes.IUserPermission | undefined
   >()
   const [rolesPermissions, setRolesPermissions] = useState<
     Hooks.UseAuthTypes.IRolePermission[] | undefined
@@ -203,7 +204,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
   }, [getAccountData])
 
   const getUserPermissions = useCallback(async (): Promise<
-    Hooks.UseAuthTypes.IUserPermission[] | undefined
+    Hooks.UseAuthTypes.IUserPermission | undefined
   > => {
     setLoadingUserPermissions(true)
     try {
@@ -369,6 +370,25 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const updateUsername = async (id: number, name: string): Promise<boolean> => {
+    setUpdatingUsername(true)
+    try {
+      const response = await http.put(`users/${id}/update-name`, { name: name })
+      if (response.status !== 200) {
+        throw new Error()
+      }
+
+      return true
+    } catch (error) {
+      if (axios.isAxiosError(error) && error?.response?.status === 400) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setUpdatingUsername(false)
+    }
+  }
+
   const isAuthenticated = !!user
 
   return (
@@ -389,6 +409,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         createRole,
         updateRole,
         deleteRole,
+        updateUsername,
         isAuthenticated,
         loading,
         loadingRoles,
@@ -403,6 +424,7 @@ export const AuthProvider: React.FC<IProps> = ({ children }) => {
         updatingRole,
         deletingRole,
         loadingUserPermissions,
+        updatingUsername,
       }}
     >
       {children}

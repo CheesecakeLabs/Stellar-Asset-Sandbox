@@ -21,7 +21,7 @@ import {
 
 interface IMenuActionsAsset {
   action: AssetActions
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const MenuActionsAsset: React.FC<IMenuActionsAsset> = ({

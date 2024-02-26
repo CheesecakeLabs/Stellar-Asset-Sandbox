@@ -18,7 +18,7 @@ export interface IChange {
 }
 
 export const RolePermissions: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
   const [changes, setChanges] = useState<IChange[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -97,7 +97,7 @@ export const RolePermissions: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -116,7 +116,7 @@ export const RolePermissions: React.FC = () => {
               setChanges={setChanges}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.ROLE_PERMISSIONS} />
             </VStack>

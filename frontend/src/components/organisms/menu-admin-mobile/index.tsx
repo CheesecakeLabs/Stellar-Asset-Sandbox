@@ -65,7 +65,7 @@ export const MenuAdminMobile: React.FC<IMenuAdminMobile> = ({ selected }) => {
 
         <ItemActionAssetMobile
           isSelected={isSelected('COST_CENTER')}
-          title={'perating Expenses'}
+          title={'Operating Expenses'}
           icon={<CoinsIcon width="16px" height="16px" />}
           path={`${PathRoute.COST_CENTER}`}
         />

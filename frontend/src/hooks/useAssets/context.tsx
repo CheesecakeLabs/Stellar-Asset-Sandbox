@@ -18,6 +18,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
   const [loadingAssets, setLoadingAssets] = useState(true)
   const [loadingAsset, setLoadingAsset] = useState(true)
   const [loadingOperation, setLoadingOperation] = useState(false)
+  const [updatingAsset, setUpdatingAsset] = useState(false)
   const [assets, setAssets] = useState<
     Hooks.UseAssetsTypes.IAssetDto[] | undefined
   >()
@@ -369,6 +370,24 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const updateAsset = async (
+    id: number,
+    params: Hooks.UseAssetsTypes.IAssetUpdate
+  ): Promise<boolean> => {
+    setUpdatingAsset(true)
+    try {
+      const response = await http.put(`/assets/${id}/update-name-code`, params)
+      return response.status === 200
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.message)
+      }
+      throw new Error(MessagesError.errorOccurred)
+    } finally {
+      setUpdatingAsset(false)
+    }
+  }
+
   return (
     <AssetsContext.Provider
       value={{
@@ -376,6 +395,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         loadingAsset,
         loadingOperation,
         assets,
+        updatingAsset,
         mint,
         burn,
         distribute,
@@ -391,6 +411,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         updateImage,
         updateContractId,
         getPagedAssets,
+        updateAsset,
       }}
     >
       {children}

@@ -12,7 +12,7 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { RolesManageTemplate } from 'components/templates/roles-manage-template'
 
 export const RolesManage: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const {
     getRoles,
@@ -20,11 +20,13 @@ export const RolesManage: React.FC = () => {
     updateRole,
     deleteRole,
     getProfile,
+    getUserPermissions,
     creatingRole,
     updatingRole,
     roles,
     loadingRoles,
     deletingRole,
+    userPermissions
   } = useAuth()
 
   const toast = useToast()
@@ -32,6 +34,10 @@ export const RolesManage: React.FC = () => {
   useEffect(() => {
     getRoles()
   }, [getRoles])
+
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
 
   const handleRole = async (name: string, id?: number): Promise<boolean> => {
     try {
@@ -112,7 +118,7 @@ export const RolesManage: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -124,11 +130,12 @@ export const RolesManage: React.FC = () => {
               updatingRole={updatingRole}
               deletingRole={deletingRole}
               loadingRoles={loadingRoles}
+              userPermissions={userPermissions}
               handleDeleteRole={handleDeleteRole}
               handleRole={handleRole}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
             </VStack>

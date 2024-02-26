@@ -74,7 +74,7 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
         <SidebarContent
           items={linkItems}
           onClose={(): void => onClose()}
-          display={{ base: 'none', md: 'block' }}
+          display={{ base: 'none', lg: 'block' }}
           highlightMenu={highlightMenu}
         />
         <Drawer
@@ -94,7 +94,7 @@ export const Sidebar: React.FC<IProps> = ({ children, highlightMenu }) => {
             />
           </DrawerContent>
         </Drawer>
-        <Box ml={{ base: 0, md: '282px' }} p="4" w="full">
+        <Box ml={{ base: 0, lg: '282px' }} p="4" w="full">
           {children}
         </Box>
       </Flex>

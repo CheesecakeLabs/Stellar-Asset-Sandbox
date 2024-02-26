@@ -30,7 +30,7 @@ interface IContractsDetailTemplate {
   currentBalance: string
   history: Hooks.UseContractsTypes.IHistory[] | undefined
   deposited: number | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   currentInVault: string | undefined
   hasAssetInVault: boolean
   hasWallet: boolean
