@@ -249,7 +249,7 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 	profile, err := r.t.GetProfile(token)
 	if err != nil {
 		r.l.Error(err, "http - v1 - getProfile - GetProfile")
-		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+		errorResponse(c, http.StatusUnauthorized, "database problems", err)
 		return
 	}
 
