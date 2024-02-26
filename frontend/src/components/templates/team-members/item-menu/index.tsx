@@ -13,11 +13,16 @@ import { Permissions } from 'components/enums/permissions'
 import { MenuDotsIcon } from 'components/icons'
 
 interface IItemMenu {
-  onOpen(): void
+  onOpenChangeRole(): void
+  onOpenRename(): void
   permissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
-export const ItemMenu: React.FC<IItemMenu> = ({ onOpen, permissions }) => {
+export const ItemMenu: React.FC<IItemMenu> = ({
+  onOpenChangeRole,
+  onOpenRename,
+  permissions,
+}) => {
   return (
     <>
       {havePermission(Permissions.EDIT_USERS_ROLE, permissions) && (
@@ -36,7 +41,10 @@ export const ItemMenu: React.FC<IItemMenu> = ({ onOpen, permissions }) => {
                 icon={<MenuDotsIcon />}
               />
               <MenuList>
-                <MenuItem onClick={onOpen}>Change role</MenuItem>
+                <MenuItem onClick={onOpenChangeRole}>Change role</MenuItem>
+                {permissions?.admin && (
+                  <MenuItem onClick={onOpenRename}>Edit username</MenuItem>
+                )}
               </MenuList>
             </>
           )}

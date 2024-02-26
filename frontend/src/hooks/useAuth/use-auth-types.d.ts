@@ -84,6 +84,7 @@ declare namespace Hooks {
       ) => Promise<boolean>
       createRole: (userId: number, name: string) => Promise<boolean>
       updateRole: (id: number, name: string) => Promise<boolean>
+      updateUsername: (id: number, name: string) => Promise<boolean>
       deleteRole: (id: number, idNewUsersRole: number) => Promise<boolean>
       isAuthenticated: boolean
       loading: boolean
@@ -99,6 +100,7 @@ declare namespace Hooks {
       updatingRole: boolean
       deletingRole: boolean
       loadingUserPermissions: boolean
+      updatingUsername: boolean
     }
   }
 }

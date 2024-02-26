@@ -16,6 +16,7 @@ export const TeamMembers: React.FC = () => {
   const {
     getAllUsers,
     editUsersRole,
+    updateUsername,
     getRoles,
     getUserPermissions,
     users,
@@ -24,6 +25,7 @@ export const TeamMembers: React.FC = () => {
     loadingRoles,
     userPermissions,
     loadingUserPermissions,
+    updatingUsername,
   } = useAuth()
 
   useEffect(() => {
@@ -36,6 +38,19 @@ export const TeamMembers: React.FC = () => {
     const isEdited = await editUsersRole(params)
 
     if (isEdited) {
+      getAllUsers()
+      return true
+    }
+    return false
+  }
+
+  const handleUpdateUsername = async (
+    id: number,
+    name: string
+  ): Promise<boolean> => {
+    const isSuccess = await updateUsername(id, name)
+
+    if (isSuccess) {
       getAllUsers()
       return true
     }
@@ -61,10 +76,12 @@ export const TeamMembers: React.FC = () => {
             <TeamMembersTemplate
               users={users}
               loading={loading || loadingUserPermissions}
-              handleEditRole={handleEditRole}
               roles={roles}
               loadingRoles={loadingRoles}
               permissions={userPermissions}
+              updatingUsername={updatingUsername}
+              handleUpdateUsername={handleUpdateUsername}
+              handleEditRole={handleEditRole}
             />
           </Flex>
           {isLargerThanLg && (
