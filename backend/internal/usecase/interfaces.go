@@ -22,6 +22,7 @@ type (
 		GetProfile(token string) (entity.UserResponse, error)
 		GetSuperAdminUsers() ([]entity.UserResponse, error)
 		UpdateName(id string, name string) error 
+		IsUserSuperAdmin(id string) (bool, error)
 	}
 
 	// User -.
@@ -29,6 +30,7 @@ type (
 		Detail(email string) (entity.User, error)
 		CreateUser(user entity.User) error
 		Autentication(name string, password string) (User, error)
+		
 	}
 
 	// Wallet -.

@@ -127,3 +127,12 @@ func (uc *UserUseCase) UpdateName(userID string, name string) error {
 	}
 	return nil
 }
+
+func (useCase *UserUseCase) IsUserSuperAdmin(token string) (bool, error) {
+	value, err := useCase.repo.IsUserSuperAdmin(token)
+	if err != nil {
+		return false, fmt.Errorf("UserUseCase - IsUserSuperAdmin - uc.repo.IsUserSuperAdmin: %w", err)
+	}
+
+	return value, nil
+}

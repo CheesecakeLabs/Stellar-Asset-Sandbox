@@ -63,15 +63,3 @@ func (useCase *RoleUseCase) GetSuperAdminRole() (entity.Role, error) {
 	}
 	return role, nil
 }
-
-
-func (useCase *RoleUseCase) IsUserSuperAdmin(token string) (bool, error) {
-	role, err := useCase.repo.GetSuperAdminRole()
-	if err != nil {
-		return false, fmt.Errorf("RoleUseCase - GetSuperAdminRole - uc.repo.GetSuperAdminRole: %w", err)
-	}
-	if (role == entity.Role{}) {
-		return false, nil
-	}
-	return true, nil
-}
