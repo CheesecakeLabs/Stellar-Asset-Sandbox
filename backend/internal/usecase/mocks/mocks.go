@@ -520,6 +520,20 @@ func (mr *MockAssetRepoInterfaceMockRecorder) UpdateContractId(arg0, arg1 interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateContractId", reflect.TypeOf((*MockAssetRepoInterface)(nil).UpdateContractId), arg0, arg1)
 }
 
+// UpdateNameAndCode mocks base method.
+func (m *MockAssetRepoInterface) UpdateNameAndCode(arg0, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateNameAndCode", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateNameAndCode indicates an expected call of UpdateNameAndCode.
+func (mr *MockAssetRepoInterfaceMockRecorder) UpdateNameAndCode(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateNameAndCode", reflect.TypeOf((*MockAssetRepoInterface)(nil).UpdateNameAndCode), arg0, arg1, arg2)
+}
+
 // MockRoleRepoInterface is a mock of RoleRepoInterface interface.
 type MockRoleRepoInterface struct {
 	ctrl     *gomock.Controller

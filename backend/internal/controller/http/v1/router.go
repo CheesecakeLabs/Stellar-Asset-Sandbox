@@ -89,7 +89,7 @@ func NewRouter(
 	{
 		newUserRoutes(groupV1, userUseCase, authUseCase, rolePermissionUc, roleUseCase, logger, vaultUc, profanityF)
 		newWalletsRoutes(groupV1, walletUseCase, messengerController, authUseCase, logger)
-		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, logger, profanityF)
+		newAssetsRoutes(groupV1, walletUseCase, assetUseCase, messengerController, authUseCase, logUc, rolePermissionUc, logger, profanityF)
 		newRoleRoutes(groupV1, roleUseCase, messengerController, logger, profanityF)
 		newRolePermissionsRoutes(groupV1, rolePermissionUc, roleUseCase, messengerController, logger)
 		newVaultCategoryRoutes(groupV1, messengerController, authUseCase, vaultCategoryUc, logger, profanityF)
