@@ -28,6 +28,7 @@ interface IRolesManageTemplate {
   creatingRole: boolean
   updatingRole: boolean
   deletingRole: boolean
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   handleRole(name: string, id?: number): Promise<boolean>
   handleDeleteRole(id: number, idNewUsersRole: number): Promise<boolean>
 }
@@ -38,6 +39,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
   updatingRole,
   deletingRole,
   loadingRoles,
+  userPermissions,
   handleRole,
   handleDeleteRole,
 }) => {
@@ -114,6 +116,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
                       loading={creatingRole || updatingRole || deletingRole}
                       roles={roles}
                       loadingRoles={loadingRoles}
+                      userPermissions={userPermissions}
                       handleRole={handleRole}
                       handleDeleteRole={handleDeleteRole}
                     />

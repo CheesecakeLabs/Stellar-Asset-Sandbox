@@ -20,11 +20,13 @@ export const RolesManage: React.FC = () => {
     updateRole,
     deleteRole,
     getProfile,
+    getUserPermissions,
     creatingRole,
     updatingRole,
     roles,
     loadingRoles,
     deletingRole,
+    userPermissions
   } = useAuth()
 
   const toast = useToast()
@@ -32,6 +34,10 @@ export const RolesManage: React.FC = () => {
   useEffect(() => {
     getRoles()
   }, [getRoles])
+
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
 
   const handleRole = async (name: string, id?: number): Promise<boolean> => {
     try {
@@ -124,6 +130,7 @@ export const RolesManage: React.FC = () => {
               updatingRole={updatingRole}
               deletingRole={deletingRole}
               loadingRoles={loadingRoles}
+              userPermissions={userPermissions}
               handleDeleteRole={handleDeleteRole}
               handleRole={handleRole}
             />
