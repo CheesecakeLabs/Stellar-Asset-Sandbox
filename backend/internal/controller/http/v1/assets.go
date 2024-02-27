@@ -2,7 +2,9 @@ package v1
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -52,6 +54,7 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.GET("/toml-data", r.getTomlData)
 		h.PUT("/:id/update-contract-id", r.updateContractId)
 		h.GET("/:id/image.png", r.getAssetImage)
+		h.GET("/price-conversion", r.priceConversion)
 		
 
 		allowedRoute := h.Group("/").Use(Auth(a.ValidateToken())).Use(rolePermission.Validate(rP))
@@ -133,6 +136,12 @@ type UpdateContractIdRequest struct {
 type UpdateNameRequest struct {
 	Name      string   `json:"name" binding:"required" example:"USD Coin"`
 	Code      string   `json:"code" binding:"required" example:"USDC"`
+}
+
+type PriceConversionResponse struct {
+	Status string  `json:"status"`
+	XLM    float64 `json:"XLM"`
+	USD    float64 `json:"USD"`
 }
 
 // @Summary     Create a new asset
@@ -1235,4 +1244,37 @@ func (r *assetsRoutes) updateNameAndCode(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "asset information updated"})
+}
+
+// @Summary Get XLM price in USD
+// @Description Get XLM price in USD
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} PriceConversionResponse
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/price-conversion [get]
+func (r *assetsRoutes) priceConversion(c *gin.Context) {
+	const convertURL = "https://api.coinconvert.net/convert/xlm/usd?amount=1"
+	resp, err := http.Get(convertURL)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error making request to convert API:", err)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error reading response body:", err)
+		return
+	}
+
+	var conversionResponse PriceConversionResponse
+	err = json.Unmarshal(body, &conversionResponse)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error parsing JSON:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, conversionResponse)
 }
