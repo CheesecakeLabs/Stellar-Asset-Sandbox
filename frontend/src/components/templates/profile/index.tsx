@@ -102,12 +102,14 @@ export const ProfileTemplate: React.FC<IProfileTemplate> = ({
                     alignItems="center"
                   >
                     <Text fontWeight="400">{profile?.role}</Text>
-                    <IconButton
-                      variant="icon"
-                      icon={<EditIcon />}
-                      aria-label={'Edit'}
-                      onClick={onOpen}
-                    />
+                    {!userPermissions?.admin && (
+                      <IconButton
+                        variant="icon"
+                        icon={<EditIcon />}
+                        aria-label={'Edit'}
+                        onClick={onOpen}
+                      />
+                    )}
                   </Flex>
                 </Flex>
                 <Flex

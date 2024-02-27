@@ -44,6 +44,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   updatingRolesPermissions,
   changes,
   profile,
+  userPermissions,
   onSubmit,
   setChanges,
 }) => {
@@ -80,7 +81,10 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   }
 
   const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
-    return role.admin === 1 || role.created_by != profile?.id
+    if (userPermissions?.admin) {
+      return false
+    }
+    return role.created_by != profile?.id
   }
 
   return (
