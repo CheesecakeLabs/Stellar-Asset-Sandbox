@@ -117,6 +117,10 @@ const theme = extendTheme({
       600: '#2c4afd',
       800: '#3f307a',
     },
+    text: {
+      primary: '#222222',
+      secondary: '#666666',
+    },
   },
   borders: {
     '1px': '1px solid',

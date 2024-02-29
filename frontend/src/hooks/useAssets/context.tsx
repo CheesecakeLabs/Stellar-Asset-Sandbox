@@ -388,6 +388,23 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
+  const getUSDPrice =
+    useCallback(async (): Promise<Hooks.UseAssetsTypes.IPriceConversion> => {
+      setLoadingOperation(true)
+      try {
+        const response = await http.get(`assets/price-conversion`)
+        const data = response.data
+        return data
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingOperation(false)
+      }
+    }, [])
+
   return (
     <AssetsContext.Provider
       value={{
@@ -412,6 +429,7 @@ export const AssetsProvider: React.FC<IProps> = ({ children }) => {
         updateContractId,
         getPagedAssets,
         updateAsset,
+        getUSDPrice,
       }}
     >
       {children}

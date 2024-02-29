@@ -147,6 +147,12 @@ declare namespace Hooks {
       code: string
     }
 
+    interface IPriceConversion {
+      status: string
+      XLM: number
+      USD: number
+    }
+
     interface IAssetsContext {
       loadingOperation: boolean
       loadingAssets: boolean
@@ -176,6 +182,7 @@ declare namespace Hooks {
         filters?: IFilter
       }) => Promise<IPagedAssets | undefined>
       updateAsset: (id: number, params: IAssetUpdate) => Promise<boolean>
+      getUSDPrice: () => Promise<IPriceConversion>
     }
   }
 }

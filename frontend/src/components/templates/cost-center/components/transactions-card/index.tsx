@@ -3,6 +3,7 @@ import {
   Container,
   Flex,
   Table,
+  Tag,
   Tbody,
   Td,
   Text,
@@ -11,8 +12,8 @@ import {
   Tr,
   useMediaQuery,
 } from '@chakra-ui/react'
-import React, { ReactElement } from 'react'
-import { Flag } from 'react-feather'
+import React, { ReactElement, useState } from 'react'
+import { ChevronDown, ChevronUp, Flag } from 'react-feather'
 
 import { formatDateFullClean, toCrypto } from 'utils/formatter'
 
@@ -36,6 +37,7 @@ import { IHorizonData } from 'app/core/pages/cost-center'
 interface ITransactionsCard {
   transactions: Hooks.UseHorizonTypes.ITransactions | undefined
   isPrevDisabled: boolean
+  USDPrice: Hooks.UseAssetsTypes.IPriceConversion | undefined
   getTransactionsByLink(link: 'prev' | 'next'): void
   getTransactionData(
     transaction: Hooks.UseHorizonTypes.ITransactionItem
@@ -45,9 +47,11 @@ interface ITransactionsCard {
 export const TransactionsCard: React.FC<ITransactionsCard> = ({
   transactions,
   isPrevDisabled,
+  USDPrice,
   getTransactionsByLink,
   getTransactionData,
 }) => {
+  const [detailsController, setDetailsController] = useState<number[]>([])
   const [isLargerThanSm] = useMediaQuery('(min-width: 480px)')
 
   const operationIcon = (type: string): ReactElement => {
@@ -87,6 +91,14 @@ export const TransactionsCard: React.FC<ITransactionsCard> = ({
     return <Flag width="16px" height="16px" />
   }
 
+  const isExpanded = (index: number): boolean => {
+    return detailsController.includes(index)
+  }
+
+  const convertToUSD = (feeCharged: string): string => {
+    return toCrypto(Number(feeCharged) * (USDPrice?.USD || 1), undefined, true)
+  }
+
   return (
     <Container variant="primary" mb="1rem" p={4} w="full" maxW="full">
       <Text fontSize="md">Transaction's history</Text>
@@ -97,33 +109,64 @@ export const TransactionsCard: React.FC<ITransactionsCard> = ({
               <Th w="2rem" p={0} />
               <Th>Transaction</Th>
               <Th>Date</Th>
-              <Th>Asset</Th>
-              <Th>Accounts</Th>
-              <Th>Covered fee</Th>
+              <Th>Covered fee (XLM)</Th>
+              <Th>Covered fee (USD)</Th>
+              <Th p={1} />
             </Tr>
           </Thead>
           <Tbody>
-            {transactions?._embedded.records.map(transaction => {
+            {transactions?._embedded.records.map((transaction, index) => {
               const transactionData = getTransactionData(transaction)
               return (
-                <Tr>
-                  <Td px="1rem" py={0}>
-                    {operationIcon(transactionData.type)}
-                  </Td>
-                  <Td>{transactionData.type}</Td>
-                  <Td>
-                    <Text fontSize="sm">
-                      {formatDateFullClean(transaction.created_at)}
-                    </Text>
-                  </Td>
-                  <Td>{transactionData.asset}</Td>
-                  <Td>{transactionData.name}</Td>
-                  <Td>{`${toCrypto(
-                    Number(transaction.fee_charged),
-                    undefined,
-                    true
-                  )} XLM`}</Td>
-                </Tr>
+                <React.Fragment key={index}>
+                  <Tr
+                    cursor="pointer"
+                    onClick={(): void =>
+                      setDetailsController(prev =>
+                        isExpanded(index)
+                          ? prev.filter(item => item !== index)
+                          : [...prev, index]
+                      )
+                    }
+                  >
+                    <Td px="1rem" py={0}>
+                      {operationIcon(transactionData.type)}
+                    </Td>
+                    <Td>{transactionData.type}</Td>
+                    <Td>
+                      <Text>{formatDateFullClean(transaction.created_at)}</Text>
+                    </Td>
+                    <Td>{`${toCrypto(
+                      Number(transaction.fee_charged),
+                      undefined,
+                      true
+                    )} XLM`}</Td>
+                    <Td>{`$${convertToUSD(transaction.fee_charged)}`}</Td>
+                    <Td p={1}>
+                      {isExpanded(index) ? <ChevronUp /> : <ChevronDown />}
+                    </Td>
+                  </Tr>
+                  {isExpanded(index) && (
+                    <Tr>
+                      <Td colSpan={6}>
+                        <Flex gap={10}>
+                          <Flex flexDir="column" gap={2}>
+                            <Tag variant="label">Accounts</Tag>
+                            <Text fontWeight="700" fontSize="sm">
+                              {transactionData.name}
+                            </Text>
+                          </Flex>
+                          <Flex flexDir="column" gap={2} alignItems="center">
+                            <Tag variant="label">Asset</Tag>
+                            <Text fontWeight="700" fontSize="sm">
+                              {transactionData.asset}
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </Td>
+                    </Tr>
+                  )}
+                </React.Fragment>
               )
             })}
           </Tbody>
@@ -159,12 +202,16 @@ export const TransactionsCard: React.FC<ITransactionsCard> = ({
                   <Text>{`${transactionData.name}`}</Text>
                 </Flex>
                 <Flex gap="0.35rem">
-                  <Text fontWeight="bold">Fee charged</Text>
+                  <Text fontWeight="bold">Fee charged (XLM)</Text>
                   <Text>{`${toCrypto(
                     Number(transaction.fee_charged),
                     undefined,
                     true
                   )} XLM`}</Text>
+                </Flex>
+                <Flex gap="0.35rem">
+                  <Text fontWeight="bold">Fee charged (USD)</Text>
+                  <Text>{`$${convertToUSD(transaction.fee_charged)}`}</Text>
                 </Flex>
               </Flex>
             )

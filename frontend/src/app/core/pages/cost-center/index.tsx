@@ -41,12 +41,14 @@ export const CostCenter: React.FC = () => {
   const [historyTransactions, setHistoryTransactions] = useState<
     Hooks.UseHorizonTypes.ITransactions[]
   >([])
+  const [USDPrice, setUSDPrice] =
+    useState<Hooks.UseAssetsTypes.IPriceConversion>()
 
   const { userPermissions, getUserPermissions } = useAuth()
   const { getSponsorPK } = useTransactions()
   const { getTransactions, getAccount, loadingHorizon } = useHorizon()
   const { getVaults } = useVaults()
-  const { getAssets } = useAssets()
+  const { getAssets, getUSDPrice } = useAssets()
 
   useEffect(() => {
     GAService.GAPageView('Coast center')
@@ -63,22 +65,12 @@ export const CostCenter: React.FC = () => {
   }, [getVaults])
 
   useEffect(() => {
-    getAssets(true).then(assets => setAssets(assets))
-  }, [getAssets])
+    getUSDPrice().then(USDPrice => setUSDPrice(USDPrice))
+  }, [getUSDPrice])
 
   useEffect(() => {
-    if (sponsorAccount) {
-      getTransactions(sponsorAccount).then(transactions => {
-        setTransactions(transactions)
-        setLatestFeeCharged(
-          transactions?._embedded.records.reduce(
-            (total, transaction) => total + Number(transaction.fee_charged),
-            0
-          )
-        )
-      })
-    }
-  }, [sponsorAccount, getTransactions])
+    getAssets(true).then(assets => setAssets(assets))
+  }, [getAssets])
 
   useEffect(() => {
     if (sponsorAccount) {
@@ -255,26 +247,46 @@ export const CostCenter: React.FC = () => {
     [assets, walletToName]
   )
 
-  useEffect(() => {
-    const counter: Record<string, number> = {}
+  const getMostRepeatedType = useCallback(
+    (transactions: Hooks.UseHorizonTypes.ITransactions | undefined): void => {
+      const counter: Record<string, number> = {}
 
-    transactions?._embedded.records.forEach(transaction => {
-      const transactionData = getTransactionData(transaction)
-      counter[transactionData.type] = (counter[transactionData.type] || 0) + 1
-    })
+      transactions?._embedded.records.forEach(transaction => {
+        const transactionData = getTransactionData(transaction)
+        counter[transactionData.type] = (counter[transactionData.type] || 0) + 1
+      })
 
-    let mostRepeatedType: string | undefined
-    let maxOccurrences = 0
+      let mostRepeatedType: string | undefined
+      let maxOccurrences = 0
 
-    for (const type in counter) {
-      if (counter[type] > maxOccurrences) {
-        maxOccurrences = counter[type]
-        mostRepeatedType = type
+      for (const type in counter) {
+        if (counter[type] > maxOccurrences) {
+          maxOccurrences = counter[type]
+          mostRepeatedType = type
+        }
       }
-    }
 
-    setMostRepeatedType(mostRepeatedType)
-  }, [transactions, assets, vaults, getTransactionData])
+      setMostRepeatedType(mostRepeatedType)
+    },
+    [getTransactionData]
+  )
+
+  useEffect(() => {
+    if (sponsorAccount) {
+      getTransactions(sponsorAccount).then(
+        (transactions: Hooks.UseHorizonTypes.ITransactions | undefined) => {
+          setTransactions(transactions)
+          setLatestFeeCharged(
+            transactions?._embedded.records.reduce(
+              (total, transaction) => total + Number(transaction.fee_charged),
+              0
+            )
+          )
+          getMostRepeatedType(transactions)
+        }
+      )
+    }
+  }, [sponsorAccount, getTransactions, getMostRepeatedType])
 
   return (
     <Flex>
@@ -298,6 +310,7 @@ export const CostCenter: React.FC = () => {
               isPrevDisabled={historyTransactions.length === 0}
               mostRepeatedType={mostRepeatedType}
               loadingHorizon={loadingHorizon}
+              USDPrice={USDPrice}
               getTransactionsByLink={getTransactionsByLink}
               getTransactionData={getTransactionData}
             />

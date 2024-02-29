@@ -60,6 +60,7 @@ import { ReactComponent as TrustlineIcon } from './fonts/trustline.svg'
 import { ReactComponent as UsdcIcon } from './fonts/usdc.svg'
 import { ReactComponent as VaultIcon } from './fonts/vault.svg'
 import { ReactComponent as WalletIcon } from './fonts/wallet.svg'
+import { ReactComponent as XLMIcon } from './fonts/xlm.svg'
 
 export {
   MenuIcon,
@@ -124,4 +125,5 @@ export {
   TrustlineIcon,
   ContractInvokeIcon,
   ContractRestoreIcon,
+  XLMIcon,
 }

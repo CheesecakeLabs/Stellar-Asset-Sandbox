@@ -20,6 +20,7 @@ interface ICostCenterTemplate {
   isPrevDisabled: boolean
   mostRepeatedType: string | undefined
   loadingHorizon: boolean
+  USDPrice: Hooks.UseAssetsTypes.IPriceConversion | undefined
   getTransactionsByLink(link: 'prev' | 'next'): void
   getTransactionData(
     transaction: Hooks.UseHorizonTypes.ITransactionItem
@@ -33,6 +34,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   isPrevDisabled,
   mostRepeatedType,
   loadingHorizon,
+  USDPrice,
   getTransactionsByLink,
   getTransactionData,
 }) => {
@@ -57,6 +59,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
             accountData={accountData}
             latestFeeCharged={latestFeeCharged}
             mostRepeatedType={mostRepeatedType}
+            USDPrice={USDPrice}
           />
           {loadingHorizon ? (
             <Skeleton height="10rem" w="full" />
@@ -64,6 +67,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
             <TransactionsCard
               transactions={transactions}
               isPrevDisabled={isPrevDisabled}
+              USDPrice={USDPrice}
               getTransactionsByLink={getTransactionsByLink}
               getTransactionData={getTransactionData}
             />
