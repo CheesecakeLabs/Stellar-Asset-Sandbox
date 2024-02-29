@@ -29,6 +29,8 @@ export const CostCenter: React.FC = () => {
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const [sponsorAccount, setSponsorAccount] = useState<string | undefined>()
+  const [loadingTransactions, setLoadingTransactions] = useState<boolean>(true)
+  const [loadingOpex, setLoadingOpex] = useState<boolean>(true)
   const [transactions, setTransactions] =
     useState<Hooks.UseHorizonTypes.ITransactions>()
   const [accountData, setAccountData] =
@@ -46,7 +48,7 @@ export const CostCenter: React.FC = () => {
 
   const { userPermissions, getUserPermissions } = useAuth()
   const { getSponsorPK } = useTransactions()
-  const { getTransactions, getAccount, loadingHorizon } = useHorizon()
+  const { getTransactions, getAccount } = useHorizon()
   const { getVaults } = useVaults()
   const { getAssets, getUSDPrice } = useAssets()
 
@@ -56,7 +58,10 @@ export const CostCenter: React.FC = () => {
 
   useEffect(() => {
     getUserPermissions()
-    getSponsorPK().then(sponsor => setSponsorAccount(sponsor))
+    getSponsorPK().then(sponsor => {
+      setSponsorAccount(sponsor)
+      setLoadingOpex(false)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -89,9 +94,11 @@ export const CostCenter: React.FC = () => {
 
     const link = transactions?._links.next.href
     if (link) {
+      setLoadingTransactions(true)
       setHistoryTransactions(history => [...history, transactions])
       getTransactions(undefined, link).then(transactions => {
         setTransactions(transactions)
+        setLoadingTransactions(false)
       })
     }
   }
@@ -273,6 +280,7 @@ export const CostCenter: React.FC = () => {
 
   useEffect(() => {
     if (sponsorAccount) {
+      setLoadingTransactions(true)
       getTransactions(sponsorAccount).then(
         (transactions: Hooks.UseHorizonTypes.ITransactions | undefined) => {
           setTransactions(transactions)
@@ -283,6 +291,7 @@ export const CostCenter: React.FC = () => {
             )
           )
           getMostRepeatedType(transactions)
+          setLoadingTransactions(false)
         }
       )
     }
@@ -309,10 +318,11 @@ export const CostCenter: React.FC = () => {
               assets={assets}
               isPrevDisabled={historyTransactions.length === 0}
               mostRepeatedType={mostRepeatedType}
-              loadingHorizon={loadingHorizon}
+              loadingTransactions={loadingTransactions}
               USDPrice={USDPrice}
               getTransactionsByLink={getTransactionsByLink}
               getTransactionData={getTransactionData}
+              loadingOpex={loadingOpex}
             />
           </Flex>
           {isLargerThanLg && (

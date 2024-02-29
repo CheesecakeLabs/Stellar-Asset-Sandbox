@@ -19,7 +19,8 @@ interface ICostCenterTemplate {
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   isPrevDisabled: boolean
   mostRepeatedType: string | undefined
-  loadingHorizon: boolean
+  loadingTransactions: boolean
+  loadingOpex: boolean
   USDPrice: Hooks.UseAssetsTypes.IPriceConversion | undefined
   getTransactionsByLink(link: 'prev' | 'next'): void
   getTransactionData(
@@ -33,7 +34,8 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   latestFeeCharged,
   isPrevDisabled,
   mostRepeatedType,
-  loadingHorizon,
+  loadingTransactions,
+  loadingOpex,
   USDPrice,
   getTransactionsByLink,
   getTransactionData,
@@ -55,13 +57,17 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
           {!isLargerThanLg && <MenuAdminMobile selected={'COST_CENTER'} />}
         </Flex>
         <Flex flexDir="column" maxW="full">
-          <OpexCard
-            accountData={accountData}
-            latestFeeCharged={latestFeeCharged}
-            mostRepeatedType={mostRepeatedType}
-            USDPrice={USDPrice}
-          />
-          {loadingHorizon ? (
+          {loadingOpex ? (
+            <Skeleton height="6rem" w="full" />
+          ) : (
+            <OpexCard
+              accountData={accountData}
+              latestFeeCharged={latestFeeCharged}
+              mostRepeatedType={mostRepeatedType}
+              USDPrice={USDPrice}
+            />
+          )}
+          {loadingTransactions ? (
             <Skeleton height="10rem" w="full" />
           ) : (
             <TransactionsCard
