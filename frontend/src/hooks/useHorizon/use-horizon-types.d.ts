@@ -117,8 +117,8 @@ declare namespace Hooks {
       limit?: string
       trustee?: string
       trustor?: string
-      from?: string,
-      to?: string,
+      from?: string
+      to?: string
       amount?: string
       account?: string
       set_flags_s?: string[]
@@ -283,6 +283,10 @@ declare namespace Hooks {
         link?: string
       ): Promise<ITransactions | undefined>
       getAccount(wallet: string): Promise<IAccount | undefined>
+      getTransactionsByLimit(
+        wallet: string,
+        limit: number
+      ): Promise<ITransactions | undefined>
     }
   }
 }

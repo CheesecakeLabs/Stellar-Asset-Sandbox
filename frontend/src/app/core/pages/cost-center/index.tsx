@@ -33,9 +33,10 @@ export const CostCenter: React.FC = () => {
   const [loadingOpex, setLoadingOpex] = useState<boolean>(true)
   const [transactions, setTransactions] =
     useState<Hooks.UseHorizonTypes.ITransactions>()
+  const [transactionsByLimit, setTransactionsByLimit] =
+    useState<Hooks.UseHorizonTypes.ITransactions>()
   const [accountData, setAccountData] =
     useState<Hooks.UseHorizonTypes.IAccount>()
-  const [latestFeeCharged, setLatestFeeCharged] = useState<number>()
   const [mostRepeatedType, setMostRepeatedType] = useState<string>()
 
   const [vaults, setVaults] = useState<Hooks.UseVaultsTypes.IVault[]>()
@@ -45,10 +46,11 @@ export const CostCenter: React.FC = () => {
   >([])
   const [USDPrice, setUSDPrice] =
     useState<Hooks.UseAssetsTypes.IPriceConversion>()
+  const [includeSoroban, setIncludeSoroban] = useState(false)
 
   const { userPermissions, getUserPermissions } = useAuth()
   const { getSponsorPK } = useTransactions()
-  const { getTransactions, getAccount } = useHorizon()
+  const { getTransactions, getAccount, getTransactionsByLimit } = useHorizon()
   const { getVaults } = useVaults()
   const { getAssets, getUSDPrice } = useAssets()
 
@@ -60,7 +62,6 @@ export const CostCenter: React.FC = () => {
     getUserPermissions()
     getSponsorPK().then(sponsor => {
       setSponsorAccount(sponsor)
-      setLoadingOpex(false)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -284,18 +285,37 @@ export const CostCenter: React.FC = () => {
       getTransactions(sponsorAccount).then(
         (transactions: Hooks.UseHorizonTypes.ITransactions | undefined) => {
           setTransactions(transactions)
-          setLatestFeeCharged(
-            transactions?._embedded.records.reduce(
-              (total, transaction) => total + Number(transaction.fee_charged),
-              0
-            )
-          )
-          getMostRepeatedType(transactions)
           setLoadingTransactions(false)
+          setLoadingOpex(false)
         }
       )
     }
   }, [sponsorAccount, getTransactions, getMostRepeatedType])
+
+  useEffect(() => {
+    if (sponsorAccount) {
+      getTransactionsByLimit(sponsorAccount, 100).then(transactions => {
+        setTransactionsByLimit(transactions)
+        getMostRepeatedType(transactions)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sponsorAccount])
+
+  const getFilteredTransactions = (
+    includeSoroban: boolean
+  ): Hooks.UseHorizonTypes.ITransactionItem[] | undefined => {
+    return includeSoroban
+      ? transactionsByLimit?._embedded.records
+      : transactionsByLimit?._embedded.records.filter(
+          transaction =>
+            !transaction.operations?.find(
+              operation =>
+                operation.type === 'invoke_host_function' ||
+                operation.type === 'restore_footprint'
+            )
+        )
+  }
 
   return (
     <Flex>
@@ -310,19 +330,20 @@ export const CostCenter: React.FC = () => {
           <Flex maxW="966px" flexDir="column" w="full">
             <CostCenterTemplate
               transactions={transactions}
+              filteredTransactions={getFilteredTransactions(includeSoroban)}
               userPermissions={userPermissions}
               sponsorAccount={sponsorAccount}
               accountData={accountData}
-              latestFeeCharged={latestFeeCharged}
               vaults={vaults}
               assets={assets}
               isPrevDisabled={historyTransactions.length === 0}
               mostRepeatedType={mostRepeatedType}
               loadingTransactions={loadingTransactions}
               USDPrice={USDPrice}
+              loadingOpex={loadingOpex}
               getTransactionsByLink={getTransactionsByLink}
               getTransactionData={getTransactionData}
-              loadingOpex={loadingOpex}
+              setIncludeSoroban={setIncludeSoroban}
             />
           </Flex>
           {isLargerThanLg && (

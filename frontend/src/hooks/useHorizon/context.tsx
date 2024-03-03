@@ -298,6 +298,45 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
     [getOperationTransaction]
   )
 
+  const getTransactionsByLimit = useCallback(
+    async (
+      wallet: string,
+      limit: number
+    ): Promise<Hooks.UseHorizonTypes.ITransactions | undefined> => {
+      setLoadingHorizon(true)
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/accounts/${wallet}/transactions?limit=${limit}`
+        )
+
+        const data = response.data as Hooks.UseHorizonTypes.ITransactions
+        if (data) {
+          await Promise.all(
+            data._embedded.records.map(async record => {
+              record.operations = await getOperationTransaction(record.id)
+            })
+          )
+
+          const resultNext = await axios.get(data._links.next.href)
+
+          data._links.next.results =
+            resultNext.data?._embedded?.records.length || 0
+
+          return data
+        }
+        return undefined
+      } catch (error) {
+        if (axios.isAxiosError(error) && error?.response?.status === 400) {
+          throw new Error(error.message)
+        }
+        throw new Error(MessagesError.errorOccurred)
+      } finally {
+        setLoadingHorizon(false)
+      }
+    },
+    [getOperationTransaction]
+  )
+
   const getAccount = useCallback(
     async (
       wallet: string
@@ -336,6 +375,7 @@ export const HorizonProvider: React.FC<IProps> = ({ children }) => {
         getLatestSequenceLedger,
         getTransactions,
         getAccount,
+        getTransactionsByLimit,
       }}
     >
       {children}

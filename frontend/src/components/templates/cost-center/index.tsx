@@ -1,5 +1,5 @@
 import { Flex, Skeleton, Text, useMediaQuery } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
@@ -11,10 +11,10 @@ import { IHorizonData } from 'app/core/pages/cost-center'
 
 interface ICostCenterTemplate {
   transactions: Hooks.UseHorizonTypes.ITransactions | undefined
+  filteredTransactions: Hooks.UseHorizonTypes.ITransactionItem[] | undefined
   userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   accountData: Hooks.UseHorizonTypes.IAccount | undefined
   sponsorAccount: string | undefined
-  latestFeeCharged: number | undefined
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
   isPrevDisabled: boolean
@@ -26,12 +26,13 @@ interface ICostCenterTemplate {
   getTransactionData(
     transaction: Hooks.UseHorizonTypes.ITransactionItem
   ): IHorizonData
+  setIncludeSoroban: Dispatch<SetStateAction<boolean>>
 }
 
 export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   transactions,
   accountData,
-  latestFeeCharged,
+  filteredTransactions,
   isPrevDisabled,
   mostRepeatedType,
   loadingTransactions,
@@ -39,6 +40,7 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
   USDPrice,
   getTransactionsByLink,
   getTransactionData,
+  setIncludeSoroban,
 }) => {
   const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
@@ -62,9 +64,11 @@ export const CostCenterTemplate: React.FC<ICostCenterTemplate> = ({
           ) : (
             <OpexCard
               accountData={accountData}
-              latestFeeCharged={latestFeeCharged}
+              transactions={filteredTransactions}
               mostRepeatedType={mostRepeatedType}
               USDPrice={USDPrice}
+              transactionsQuantity={filteredTransactions?.length || 0}
+              setIncludeSoroban={setIncludeSoroban}
             />
           )}
           {loadingTransactions ? (

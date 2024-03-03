@@ -2,41 +2,54 @@ import {
   Container,
   Flex,
   FocusLock,
+  FormControl,
+  FormLabel,
   Img,
   Popover,
   PopoverArrow,
   PopoverContent,
   PopoverTrigger,
+  Switch,
   Tag,
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { ChevronDown, Copy, Repeat } from 'react-feather'
-import USA_FLAG from 'app/core/resources/usa-flag.png'
 
-import { SPONSORED_RESERVES_LINK } from 'utils/constants/constants'
 import { toCrypto } from 'utils/formatter'
 
-import { LinkIcon, XLMIcon } from 'components/icons'
+import { XLMIcon } from 'components/icons'
+
+import USA_FLAG from 'app/core/resources/usa-flag.png'
 
 interface IOpexCard {
   accountData: Hooks.UseHorizonTypes.IAccount | undefined
-  latestFeeCharged: number | undefined
+  transactions: Hooks.UseHorizonTypes.ITransactionItem[] | undefined
   mostRepeatedType: string | undefined
   USDPrice: Hooks.UseAssetsTypes.IPriceConversion | undefined
+  transactionsQuantity: number
+  setIncludeSoroban: Dispatch<SetStateAction<boolean>>
 }
 
 export const OpexCard: React.FC<IOpexCard> = ({
   accountData,
-  latestFeeCharged,
-  mostRepeatedType,
+  transactions,
   USDPrice,
+  transactionsQuantity,
+  setIncludeSoroban,
 }) => {
   const { onOpen, onClose, isOpen } = useDisclosure()
 
   const convertToUSD = (value: number): string => {
     return toCrypto(value * (USDPrice?.USD || 1), undefined, true)
+  }
+
+  const getFeeCharged = (): number | undefined => {
+    return transactions?.reduce(
+      (total, transaction) => total + Number(transaction.fee_charged),
+      0
+    )
   }
 
   return (
@@ -95,7 +108,7 @@ export const OpexCard: React.FC<IOpexCard> = ({
             </Popover>
           </Flex>
           <Text fontSize="sm" mt="2rem">
-            Cost of the last 10 transactions
+            {`Cost of the last ${transactionsQuantity} transactions`}
           </Text>
 
           <Flex
@@ -108,63 +121,33 @@ export const OpexCard: React.FC<IOpexCard> = ({
           >
             <Tag variant="value" gap={3}>
               <XLMIcon />
-              {`${toCrypto(latestFeeCharged || 0, undefined, true)} XLM`}
+              {`${toCrypto(getFeeCharged() || 0, undefined, true)} XLM`}
             </Tag>
             <Repeat color="gray" />
             <Tag variant="value" gap={3}>
-              <Img src={USA_FLAG} w="1.5rem"/>
-              {`$${convertToUSD(latestFeeCharged || 0)}`}
+              <Img src={USA_FLAG} w="1.5rem" />
+              {`$${convertToUSD(getFeeCharged() || 0)}`}
             </Tag>
           </Flex>
 
-          <Flex
-            alignItems="center"
-            w="full"
-            justifyContent="space-between"
-            mt="1rem"
-            flexDir={{ base: 'column', md: 'row' }}
-          >
-            <Flex flexDir="column" alignItems="center">
-              <Text
+          <Flex alignItems="center" w="full" mt="1rem">
+            <FormControl display="flex" justifyContent="center">
+              <Switch
+                id="sorobanTransactions"
+                onChange={(event): void => {
+                  setIncludeSoroban(event.target.checked)
+                }}
+              />
+              <FormLabel
+                htmlFor="sorobanTransactions"
                 fontSize="sm"
-                mt="1rem"
+                fontWeight="bold"
+                ms={2}
                 cursor="pointer"
-                onClick={(): Window | null =>
-                  window.open(`${SPONSORED_RESERVES_LINK}`, '_blank')
-                }
-                flexDir="row"
-                display="flex"
-                alignItems="center"
-                gap={1}
               >
-                Total sponsored reserves <LinkIcon />
-              </Text>
-              <Text fontSize="sm" mt="0.25rem" fontWeight="700">
-                {accountData.num_sponsoring}
-              </Text>
-            </Flex>
-            <Flex flexDir="column" alignItems="center">
-              <Text fontSize="sm" mt="1rem">
-                Average Fee Charged
-              </Text>
-              <Text fontSize="xs">(based on the last 10 transactions)</Text>
-              <Text fontSize="sm" mt="0.25rem" fontWeight="700">
-                {`${toCrypto(
-                  (latestFeeCharged || 0) / 10,
-                  undefined,
-                  true
-                )} XLM`}
-              </Text>
-            </Flex>
-            <Flex flexDir="column" alignItems="center">
-              <Text fontSize="sm" mt="1rem">
-                Main type of transaction
-              </Text>
-              <Text fontSize="xs">(based on the last 10 transactions)</Text>
-              <Text fontSize="sm" mt="0.25rem" fontWeight="700">
-                {mostRepeatedType || '-'}
-              </Text>
-            </Flex>
+                Incluse Soroban Transactions
+              </FormLabel>
+            </FormControl>
           </Flex>
         </Container>
       )}
