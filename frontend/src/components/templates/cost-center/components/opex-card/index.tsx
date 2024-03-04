@@ -145,7 +145,7 @@ export const OpexCard: React.FC<IOpexCard> = ({
                 ms={2}
                 cursor="pointer"
               >
-                Incluse Soroban Transactions
+                Include Soroban Transactions
               </FormLabel>
             </FormControl>
           </Flex>
