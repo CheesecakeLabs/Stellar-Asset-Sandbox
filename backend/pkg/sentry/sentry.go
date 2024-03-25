@@ -10,8 +10,8 @@ func New(cfg *config.Config, l *logger.Logger) {
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn:              cfg.Sentry.DSN,
 		EnableTracing:    true,
-		TracesSampleRate: 1.0,
-		SampleRate:       1.0,
+		TracesSampleRate: 0.75,
+		SampleRate:       0.75,
 		Environment:      cfg.Deploy.DeployStage,
 	}); err != nil {
 		l.Error(err, "app - Run - sentry.Init")
