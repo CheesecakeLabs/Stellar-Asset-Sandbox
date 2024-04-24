@@ -85,6 +85,7 @@ services:
       PG_DB_NAME: ${PG_DATABASE:-postgres}
       MASTER_KEY: ${MASTER_KEY:-da52f130e6fd477256b0c554aba89503}
       LOG_LEVEL: ${LOG_LEVEL:-debug}
+      STELLAR_NETWORK: ${STELLAR_NETWORK:-TESTNET}
     depends_on:
       postgres:
         condition: service_healthy
@@ -235,6 +236,7 @@ services:
       KAFKA_SUBMIT_CONSUMER_TOPICS: ${KAFKA_SUBMIT_CONSUMER_TOPICS:-signedEnvelopes}
       KAFKA_SUBMIT_PRODUCER_TOPIC: ${KAFKA_SUBMIT_PRODUCER_TOPIC:-submitResponse}
       LOG_LEVEL: ${LOG_LEVEL:-debug}
+      STELLAR_NETWORK: ${STELLAR_NETWORK:-TESTNET}
 
     depends_on:
       kafka1:

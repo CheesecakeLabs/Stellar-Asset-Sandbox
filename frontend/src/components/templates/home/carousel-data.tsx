@@ -1,5 +1,7 @@
 import { Text, Box } from '@chakra-ui/react'
 
+import { IS_PUBLIC_NETWORK } from 'utils/constants/stellar'
+
 import VIDEO_ASSET_MANAGEMENT from 'app/core/resources/home-videos/asset-management.mp4'
 import VIDEO_DASHBOARDS from 'app/core/resources/home-videos/dashboards.mp4'
 import VIDEO_ROLES from 'app/core/resources/home-videos/roles.mp4'
@@ -25,10 +27,10 @@ export const carouselData = [
         <br />
         <Text>
           Empower your business to explore and experiment with asset issuance
-          and management on the Stellar testnet. With our user-friendly
-          application, experience the Stellar network like never before.
-          Designed as an educational tool, our platform is open and accessible
-          to everyone.
+          and management on the Stellar {IS_PUBLIC_NETWORK ? '' : 'testnet'}.
+          With our user-friendly application, experience the Stellar network
+          like never before. Designed as an educational tool, our platform is
+          open and accessible to everyone.
         </Text>
       </Box>
     ),

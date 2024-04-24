@@ -10,6 +10,7 @@ import {
   operatingExpensesHelperP1,
   operatingExpensesHelperP2,
 } from 'utils/constants/helpers'
+import { IS_PUBLIC_NETWORK } from 'utils/constants/stellar'
 import { GAService } from 'utils/ga'
 
 import { PathRoute } from 'components/enums/path-route'
@@ -353,14 +354,16 @@ export const CostCenter: React.FC = () => {
                 <Text color="gray.900" lineHeight="22px" fontSize="sm">
                   {operatingExpensesHelperP1}
                 </Text>
-                <Text
-                  color="gray.900"
-                  lineHeight="22px"
-                  fontSize="sm"
-                  mt="1rem"
-                >
-                  {operatingExpensesHelperP2}
-                </Text>
+                {!IS_PUBLIC_NETWORK && (
+                  <Text
+                    color="gray.900"
+                    lineHeight="22px"
+                    fontSize="sm"
+                    mt="1rem"
+                  >
+                    {operatingExpensesHelperP2}
+                  </Text>
+                )}
               </ActionHelper>
             </VStack>
           )}

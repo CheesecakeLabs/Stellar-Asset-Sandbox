@@ -5,15 +5,22 @@ import arsPng from './../../components/icons/fonts/ars.png'
 import brazilPng from './../../components/icons/fonts/brazil_flag.png'
 import { CoinIcon, EurocIcon, UsdcIcon } from 'components/icons'
 
-export const STELLAR_EXPERT_TX_URL =
-  'https://stellar.expert/explorer/testnet/tx'
+import { IS_PUBLIC_NETWORK } from './stellar'
 
-export const STELLAR_EXPERT_ASSET =
-  'https://stellar.expert/explorer/testnet/asset'
+export const STELLAR_EXPERT_TX_URL = `https://stellar.expert/explorer/${
+  IS_PUBLIC_NETWORK ? 'public' : 'testnet'
+}/tx`
 
-export const STELLAR_EXPERT_URL = 'https://stellar.expert/explorer/testnet'
+export const STELLAR_EXPERT_ASSET = `https://stellar.expert/explorer/${
+  IS_PUBLIC_NETWORK ? 'public' : 'testnet'
+}/asset`
 
-export const SPONSORED_RESERVES_LINK = "https://developers.stellar.org/docs/encyclopedia/sponsored-reserves"
+export const STELLAR_EXPERT_URL = `https://stellar.expert/explorer/${
+  IS_PUBLIC_NETWORK ? 'public' : 'testnet'
+}`
+
+export const SPONSORED_RESERVES_LINK =
+  'https://developers.stellar.org/docs/encyclopedia/sponsored-reserves'
 
 export const getCurrencyIcon = (
   assetCode: string,

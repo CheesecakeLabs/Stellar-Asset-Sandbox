@@ -2,6 +2,7 @@ import { createContext, useCallback, useState } from 'react'
 
 import axios from 'axios'
 import { MessagesError } from 'utils/constants/messages-error'
+import { IS_PUBLIC_NETWORK, NETWORK } from 'utils/constants/stellar'
 
 export const HorizonContext = createContext(
   {} as Hooks.UseHorizonTypes.IHorizonContext
@@ -12,7 +13,9 @@ interface IProps {
 }
 
 export const HorizonProvider: React.FC<IProps> = ({ children }) => {
-  const BASE_URL = 'https://horizon-testnet.stellar.org'
+  const BASE_URL = `https://horizon${
+    IS_PUBLIC_NETWORK ? '' : '-testnet'
+  }.stellar.org`
 
   const [loadingHorizon, setLoadingHorizon] = useState(false)
   const [assetData, setAssetData] = useState<Hooks.UseHorizonTypes.IAsset>()
