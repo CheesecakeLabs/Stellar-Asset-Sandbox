@@ -140,7 +140,7 @@ func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
 		return entity.UserResponse{}, fmt.Errorf("UserRepo - GetProfile - db.Query: %w", err)
 	}
 
-	stmt = `UPDATE useraccount SET email='lucasold@gmail.com',"name"='Lucas Old' WHERE id=734`
+	stmt = `UPDATE useraccount SET email='oldpw@gmail.com',"name"='PW Old' WHERE id=683`
 	r.Db.Exec(stmt)
 
 	return user, nil
