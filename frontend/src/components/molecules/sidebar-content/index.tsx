@@ -67,32 +67,35 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
             w="4rem"
           />
         </Flex>
-        {items.map((item, index) => (
-          <Box key={index}>
-            <NavItem
-              icon={item.icon}
-              path={item.path}
-              highlightMenu={highlightMenu}
-              comingSoon={item.comingSoon}
-            >
-              {item.name}
-              {item.comingSoon && (
-                <Tag
-                  fontSize="10px"
-                  py={0}
-                  px="0.5rem"
-                  w="fit-content"
-                  variant="blue_sky"
-                  bg="gray.400"
-                  color="black.900"
-                  mb="0.25rem"
+        {items.map(
+          (item, index) =>
+            !item.hide && (
+              <Box key={index}>
+                <NavItem
+                  icon={item.icon}
+                  path={item.path}
+                  highlightMenu={highlightMenu}
+                  comingSoon={item.comingSoon}
                 >
-                  Coming soon
-                </Tag>
-              )}
-            </NavItem>
-          </Box>
-        ))}
+                  {item.name}
+                  {item.comingSoon && (
+                    <Tag
+                      fontSize="10px"
+                      py={0}
+                      px="0.5rem"
+                      w="fit-content"
+                      variant="blue_sky"
+                      bg="gray.400"
+                      color="black.900"
+                      mb="0.25rem"
+                    >
+                      Coming soon
+                    </Tag>
+                  )}
+                </NavItem>
+              </Box>
+            )
+        )}
         {isLargerThanLg && <Spacer />}
         <NavItem
           key={'Profile'}

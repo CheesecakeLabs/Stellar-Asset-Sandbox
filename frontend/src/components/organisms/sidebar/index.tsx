@@ -18,6 +18,7 @@ import {
 } from 'components/icons'
 import { SidebarContent } from 'components/molecules'
 import { Header } from 'components/molecules/header'
+import { HIDE_SOROBAN } from 'utils/constants/stellar'
 
 interface IProps {
   highlightMenu: PathRoute
@@ -30,6 +31,7 @@ export interface ILinkItemProps {
   path: string
   alerts?: number
   comingSoon?: boolean
+  hide?: boolean
 }
 const linkItems: ILinkItemProps[] = [
   {
@@ -46,6 +48,7 @@ const linkItems: ILinkItemProps[] = [
     name: 'Yield-bearing Asset',
     icon: <ContractIcon />,
     path: PathRoute.SOROBAN_SMART_CONTRACTS,
+    hide: HIDE_SOROBAN
   },
   {
     name: 'Treasury',
