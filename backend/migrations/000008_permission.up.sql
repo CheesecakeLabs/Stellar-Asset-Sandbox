@@ -10,3 +10,5 @@ insert into permission (id, name, description) values (3, 'Open Asset Management
 insert into permission (id, name, description) values (4, 'Distribute Internally', '');
 insert into permission (id, name, description) values (5, 'Distribute Externally', '');
 insert into permission (id, name, description) values (6, 'Approval Workflow', '');
+
+ALTER SEQUENCE permission_id_seq RESTART WITH 6;
