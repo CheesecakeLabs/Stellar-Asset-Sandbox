@@ -14,12 +14,13 @@ import {
   INNER_FEE,
   TOKEN_DECIMALS,
 } from 'soroban/contracts-service'
-import { StellarPlus } from 'stellar-plus'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
@@ -51,8 +52,6 @@ export const ContractsCreate: React.FC = () => {
       const sponsorPK = await getSponsorPK()
       if (!sponsorPK) throw new Error('Invalid sponsor')
 
-      await ContractsService.validateContract(sponsorPK)
-
       const opex = ContractsService.loadAccount(sponsorPK)
       const opexTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
 
@@ -78,14 +77,26 @@ export const ContractsCreate: React.FC = () => {
         }*/
       )
 
-      const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
-        network: STELLAR_NETWORK,
-        wasmHash: WASM_HASH,
+      const codClient = new CertificateOfDepositClient({
+        networkConfig: STELLAR_NETWORK,
+        contractParameters: {
+          wasmHash: WASM_HASH
+        },
+        options: {
+          sorobanTransactionPipeline: {
+            customRpcHandler: vcRpcHandler,
+            plugins: [
+              new AutoRestorePlugin(opexTxInvocation, STELLAR_NETWORK, vcRpcHandler)
+            ]
+          }
+        }
+        /* wasmHash: WASM_HASH,
         rpcHandler: vcRpcHandler,
         options: {
           restoreTxInvocation: opexTxInvocation,
-        },
+        },*/
       })
+
 
       const codParams = await ContractsService.validateParamsCOD(
         vault,

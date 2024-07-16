@@ -18,6 +18,9 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 import { http } from 'interfaces/http'
 
 import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from './constants'
+import { DefaultRpcHandler } from 'stellar-plus/lib/stellar-plus/rpc'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 export const TOKEN_DECIMALS = 10000000
 export const BUMP_FEE = '10000000'
@@ -73,15 +76,19 @@ const sign = async (
 const loadToken = (asset: Hooks.UseAssetsTypes.IAssetDto): SACHandler => {
   return new StellarPlus.Asset.SACHandler({
     code: asset.code,
-    issuerPublicKey: asset.issuer.key.publicKey,
-    network: STELLAR_NETWORK,
-    rpcHandler: vcRpcHandler,
+    issuerAccount: asset.issuer.key.publicKey,
+    networkConfig: STELLAR_NETWORK,
+    options: {
+      sorobanTransactionPipeline: {
+        customRpcHandler: vcRpcHandler
+      }
+    }
   })
 }
 
 const getExpirationLedger = async (): Promise<number> => {
-  const sorobanHandler = new StellarPlus.SorobanHandler(STELLAR_NETWORK)
-  const latestLedger = await sorobanHandler.server.getLatestLedger()
+  const sorobanHandler = new DefaultRpcHandler(STELLAR_NETWORK)
+  const latestLedger = await sorobanHandler.getLatestLedger()
   return latestLedger.sequence + 200000
 }
 
@@ -153,48 +160,11 @@ const validateParamsCOD = async (
   return codParams
 }
 
-const validateContract = async (
-  sponsorPK: string,
-  contractId?: string
-): Promise<void> => {
-  const opex = ContractsService.loadAccount(sponsorPK)
-  const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
-
-  const contract = new StellarPlus.Contracts.CertificateOfDeposit({
-    network: STELLAR_NETWORK,
-    contractId: contractId,
-    rpcHandler: vcRpcHandler,
-    wasmHash: WASM_HASH,
-    options: {
-      restoreTxInvocation: restoreTxInvocation,
-    },
-  })
-
-  const server = new StellarPlus.SorobanHandler(STELLAR_NETWORK).server
-  const latestLedger = await server.getLatestLedger()
-
-  const codeLiveUntilLedgerSeq =
-    await contract.getContractCodeLiveUntilLedgerSeq()
-
-  if (codeLiveUntilLedgerSeq < latestLedger.sequence) {
-    await contract.restoreContractCode(restoreTxInvocation)
-  }
-
-  if (contractId) {
-    const instanceLiveUntilLedgerSeq =
-      await contract.getContractInstanceLiveUntilLedgerSeq()
-
-    if (instanceLiveUntilLedgerSeq < latestLedger.sequence) {
-      await contract.restoreContractFootprint(restoreTxInvocation)
-    }
-  }
-}
 
 export const ContractsService = {
   customSign,
   loadToken,
   validateParamsCOD,
   loadAccount,
-  getTxInvocation,
-  validateContract,
+  getTxInvocation
 }
