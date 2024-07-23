@@ -110,8 +110,16 @@ export const ContractsCreate: React.FC = () => {
         compound
       )
 
-      await codClient.deploy(opexTxInvocation)
-      await codClient.initialize({ ...codParams, ...codTxInvocation })
+      await codClient.deploy(opexTxInvocation).catch(error => {
+        console.error('Error deploying contract', error)
+        throw new Error('Error deploying contract')
+      })
+      await codClient
+        .initialize({ ...codParams, ...codTxInvocation })
+        .catch(error => {
+          console.error('Error initializing contract', error)
+          throw new Error('Error initializing contract')
+        })
 
       const codContractId = codClient.getContractId()
       if (!codContractId) throw new Error('Invalid Contract ID')
