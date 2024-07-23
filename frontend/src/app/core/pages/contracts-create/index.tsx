@@ -14,13 +14,13 @@ import {
   INNER_FEE,
   TOKEN_DECIMALS,
 } from 'soroban/contracts-service'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
 import { ContractsCreateTemplate } from 'components/templates/contracts-create'
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
-import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
-import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 export const ContractsCreate: React.FC = () => {
   const [creatingContract, setCreatingContract] = useState(false)
@@ -66,7 +66,7 @@ export const ContractsCreate: React.FC = () => {
       const codVault = ContractsService.loadAccount(vault.wallet.key.publicKey)
       const codTxInvocation = ContractsService.getTxInvocation(
         codVault,
-        INNER_FEE,
+        INNER_FEE
         /*{
           signers: [opex],
           header: {
@@ -80,23 +80,26 @@ export const ContractsCreate: React.FC = () => {
       const codClient = new CertificateOfDepositClient({
         networkConfig: STELLAR_NETWORK,
         contractParameters: {
-          wasmHash: WASM_HASH
+          wasmHash: WASM_HASH,
         },
         options: {
           sorobanTransactionPipeline: {
             customRpcHandler: vcRpcHandler,
             plugins: [
-              new AutoRestorePlugin(opexTxInvocation, STELLAR_NETWORK, vcRpcHandler)
-            ]
-          }
-        }
+              new AutoRestorePlugin(
+                opexTxInvocation,
+                STELLAR_NETWORK,
+                vcRpcHandler
+              ),
+            ],
+          },
+        },
         /* wasmHash: WASM_HASH,
         rpcHandler: vcRpcHandler,
         options: {
           restoreTxInvocation: opexTxInvocation,
         },*/
       })
-
 
       const codParams = await ContractsService.validateParamsCOD(
         vault,
@@ -139,6 +142,7 @@ export const ContractsCreate: React.FC = () => {
         return
       }
     } catch (error) {
+      console.error(error)
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)
