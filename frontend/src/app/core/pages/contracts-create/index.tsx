@@ -124,11 +124,21 @@ export const ContractsCreate: React.FC = () => {
       const codContractId = codClient.getContractId()
       if (!codContractId) throw new Error('Invalid Contract ID')
 
+      console.log('Contract ID:', codContractId)
+      console.log('Asset ID:', asset.id)
+      console.log('Vault ID:', vault.id)
+      console.log('Yield Rate:', codParams.yieldRate)
+      console.log('Term:', codParams.term)
+      console.log('Min Deposit:', codParams.minDeposit)
+      console.log('Penalty Rate:', codParams.penaltyRate)
+      console.log('Compound:', codParams.compoundStep)
+      console.log('Token TOKEN_DECIMALS:', TOKEN_DECIMALS)
+
       const contract = {
         name: 'Yield-bearing Asset',
         asset_id: asset.id.toString(),
         vault_id: vault.id.toString(),
-        address: codClient.getContractId() || '',
+        address: codContractId || '',
         yield_rate: Number(codParams.yieldRate),
         term: Number(codParams.term),
         min_deposit: Number(codParams.minDeposit) / TOKEN_DECIMALS,
@@ -136,7 +146,10 @@ export const ContractsCreate: React.FC = () => {
         compound: Number(codParams.compoundStep),
       }
 
-      const contractCreated = await createContract(contract)
+      const contractCreated = await createContract(contract).catch(error => {
+        console.error('Error creating contract', error)
+        throw new Error('Error creating contract')
+      })
 
       if (contractCreated) {
         toast({
