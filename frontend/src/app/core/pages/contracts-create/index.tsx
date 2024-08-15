@@ -60,7 +60,15 @@ export const ContractsCreate: React.FC = () => {
       let contractId = asset.contract_id
 
       if (!contractId) {
-        await token.wrapAndDeploy(opexTxInvocation)
+        await token.wrapAndDeploy(opexTxInvocation).catch(error => {
+          console.error('Error wrapping and deploying token', error)
+          console.log('Details', (error as StellarPlusError).meta)
+          console.log(
+            'Details',
+            (error as StellarPlusError).meta?.sorobanSimulationData
+          )
+          throw new Error('Error wrapping and deploying token')
+        })
         contractId = token.sorobanTokenHandler.getContractId()
 
         if (!contractId) throw new Error('Error creating contract id')
