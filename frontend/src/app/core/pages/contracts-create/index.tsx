@@ -15,6 +15,7 @@ import {
   TOKEN_DECIMALS,
 } from 'soroban/contracts-service'
 import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
+import { ConveyorBeltErrorMeta } from 'stellar-plus/lib/stellar-plus/error/helpers/conveyor-belt'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
@@ -62,7 +63,13 @@ export const ContractsCreate: React.FC = () => {
       if (!contractId) {
         await token.wrapAndDeploy(opexTxInvocation).catch(error => {
           console.error('Error wrapping and deploying token', error)
-          console.log('Details', (error as StellarPlusError).meta)
+          console.log('Details', error as StellarPlusError)
+          console.log('Meta', (error as StellarPlusError).meta)
+          console.log(
+            'Conveyor',
+            ((error as StellarPlusError).meta?.conveyorBeltErrorMeta as any)
+              .meta
+          )
           console.log(
             'Details',
             (error as StellarPlusError).meta?.sorobanSimulationData
@@ -118,7 +125,13 @@ export const ContractsCreate: React.FC = () => {
 
       await codClient.deploy(opexTxInvocation).catch(error => {
         console.error('Error deploying contract', error)
-        console.error('Details', (error as StellarPlusError).meta)
+        console.log('Details', error as StellarPlusError)
+        console.log('Meta', (error as StellarPlusError).meta)
+        console.log(
+          'Conveyor',
+          ((error as StellarPlusError).meta?.conveyorBeltErrorMeta as any).meta
+        )
+
         throw new Error('Error deploying contract')
       })
       await codClient

@@ -24,7 +24,7 @@ import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from './constants'
 
 export const TOKEN_DECIMALS = 10000000
 export const BUMP_FEE = '100000000'
-export const INNER_FEE = '1000000'
+export const INNER_FEE = '10000000'
 const SECONDS_IN_DAY = 86400
 const VALUE_TO_PERCENTAGE = 100
 const TIMEOUT = 45
