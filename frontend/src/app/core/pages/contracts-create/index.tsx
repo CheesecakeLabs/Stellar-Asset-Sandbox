@@ -14,6 +14,7 @@ import {
   INNER_FEE,
   TOKEN_DECIMALS,
 } from 'soroban/contracts-service'
+import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
@@ -46,14 +47,17 @@ export const ContractsCreate: React.FC = () => {
     try {
       setCreatingContract(true)
 
-      const token = ContractsService.loadToken(asset)
-      let contractId = asset.contract_id
-
       const sponsorPK = await getSponsorPK()
       if (!sponsorPK) throw new Error('Invalid sponsor')
 
       const opex = ContractsService.loadAccount(sponsorPK)
       const opexTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
+
+      const token = ContractsService.loadToken(
+        asset,
+        ContractsService.getAutoRestorePlugin(opex)
+      )
+      let contractId = asset.contract_id
 
       if (!contractId) {
         await token.wrapAndDeploy(opexTxInvocation)
@@ -85,13 +89,7 @@ export const ContractsCreate: React.FC = () => {
         options: {
           sorobanTransactionPipeline: {
             customRpcHandler: vcRpcHandler,
-            plugins: [
-              new AutoRestorePlugin(
-                opexTxInvocation,
-                STELLAR_NETWORK,
-                vcRpcHandler
-              ),
-            ],
+            plugins: [ContractsService.getAutoRestorePlugin(opex)],
           },
         },
         /* wasmHash: WASM_HASH,
@@ -112,6 +110,7 @@ export const ContractsCreate: React.FC = () => {
 
       await codClient.deploy(opexTxInvocation).catch(error => {
         console.error('Error deploying contract', error)
+        console.error('Details', (error as StellarPlusError).meta)
         throw new Error('Error deploying contract')
       })
       await codClient

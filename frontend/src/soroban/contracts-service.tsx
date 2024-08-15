@@ -4,6 +4,8 @@ import axios from 'axios'
 import { CustomAccountHandler } from 'soroban'
 import { StellarPlus } from 'stellar-plus'
 import { SACHandler } from 'stellar-plus/lib/stellar-plus/asset'
+import { DefaultRpcHandler } from 'stellar-plus/lib/stellar-plus/rpc'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
 import {
   FeeBumpHeader,
   FeeBumpTransaction,
@@ -11,6 +13,7 @@ import {
   TransactionInvocation,
   TransactionXdr,
 } from 'stellar-plus/lib/stellar-plus/types'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { TSelectCompoundType } from 'components/templates/contracts-create/components/select-compound-type'
@@ -18,12 +21,9 @@ import { TSelectCompoundType } from 'components/templates/contracts-create/compo
 import { http } from 'interfaces/http'
 
 import { STELLAR_NETWORK, WASM_HASH, vcRpcHandler } from './constants'
-import { DefaultRpcHandler } from 'stellar-plus/lib/stellar-plus/rpc'
-import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
-import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 export const TOKEN_DECIMALS = 10000000
-export const BUMP_FEE = '10000000'
+export const BUMP_FEE = '100000000'
 export const INNER_FEE = '1000000'
 const SECONDS_IN_DAY = 86400
 const VALUE_TO_PERCENTAGE = 100
@@ -73,17 +73,31 @@ const sign = async (
   }
 }
 
-const loadToken = (asset: Hooks.UseAssetsTypes.IAssetDto): SACHandler => {
+const loadToken = (
+  asset: Hooks.UseAssetsTypes.IAssetDto,
+  autoRestorePlugin: AutoRestorePlugin
+): SACHandler => {
   return new StellarPlus.Asset.SACHandler({
     code: asset.code,
     issuerAccount: asset.issuer.key.publicKey,
     networkConfig: STELLAR_NETWORK,
     options: {
       sorobanTransactionPipeline: {
-        customRpcHandler: vcRpcHandler
-      }
-    }
+        customRpcHandler: vcRpcHandler,
+        plugins: [autoRestorePlugin],
+      },
+    },
   })
+}
+
+const getAutoRestorePlugin = (
+  opex: CustomAccountHandler
+): AutoRestorePlugin => {
+  return new AutoRestorePlugin(
+    getTxInvocation(opex, BUMP_FEE),
+    STELLAR_NETWORK,
+    vcRpcHandler
+  )
 }
 
 const getExpirationLedger = async (): Promise<number> => {
@@ -160,11 +174,11 @@ const validateParamsCOD = async (
   return codParams
 }
 
-
 export const ContractsService = {
   customSign,
   loadToken,
   validateParamsCOD,
   loadAccount,
-  getTxInvocation
+  getTxInvocation,
+  getAutoRestorePlugin,
 }
