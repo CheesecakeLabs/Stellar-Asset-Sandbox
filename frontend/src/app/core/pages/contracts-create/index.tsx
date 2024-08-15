@@ -67,8 +67,7 @@ export const ContractsCreate: React.FC = () => {
           console.log('Meta', (error as StellarPlusError).meta)
           console.log(
             'Conveyor',
-            ((error as StellarPlusError).meta?.conveyorBeltErrorMeta as any)
-              .meta
+            (error as StellarPlusError).meta?.conveyorBeltErrorMeta
           )
           console.log(
             'Details',
@@ -129,7 +128,7 @@ export const ContractsCreate: React.FC = () => {
         console.log('Meta', (error as StellarPlusError).meta)
         console.log(
           'Conveyor',
-          ((error as StellarPlusError).meta?.conveyorBeltErrorMeta as any).meta
+          (error as StellarPlusError).meta?.conveyorBeltErrorMeta
         )
 
         throw new Error('Error deploying contract')
