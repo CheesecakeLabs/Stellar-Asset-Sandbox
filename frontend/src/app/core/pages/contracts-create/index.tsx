@@ -62,6 +62,7 @@ export const ContractsCreate: React.FC = () => {
 
       if (!contractId) {
         await token.wrapAndDeploy(opexTxInvocation).catch(error => {
+          console.log('Opex invoc', opexTxInvocation)
           console.error('Error wrapping and deploying token', error)
           console.log('Details', error as StellarPlusError)
           console.log('Meta', (error as StellarPlusError).meta)
@@ -123,6 +124,7 @@ export const ContractsCreate: React.FC = () => {
       )
 
       await codClient.deploy(opexTxInvocation).catch(error => {
+        console.log('Opex invoc', opexTxInvocation)
         console.error('Error deploying contract', error)
         console.log('Details', error as StellarPlusError)
         console.log('Meta', (error as StellarPlusError).meta)
