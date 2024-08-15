@@ -68,7 +68,7 @@ export const ContractsCreate: React.FC = () => {
             ...opexTxInvocation,
             options: {
               executionPlugins: [
-                new DebugPlugin() as unknown as SupportedInnerPlugins,
+                new DebugPlugin('all') as unknown as SupportedInnerPlugins,
               ],
             },
           })
@@ -117,7 +117,7 @@ export const ContractsCreate: React.FC = () => {
             customRpcHandler: vcRpcHandler,
             plugins: [
               ContractsService.getAutoRestorePlugin(opex),
-              new DebugPlugin() as unknown as SupportedInnerPlugins,
+              new DebugPlugin('all') as unknown as SupportedInnerPlugins,
             ],
           },
         },
@@ -153,6 +153,18 @@ export const ContractsCreate: React.FC = () => {
         .initialize({ ...codParams, ...codTxInvocation })
         .catch(error => {
           console.error('Error initializing contract', error)
+          console.log('Opex invoc', opexTxInvocation)
+          console.error('Error wrapping and deploying token', error)
+          console.log('Details', error as StellarPlusError)
+          console.log('Meta', (error as StellarPlusError).meta)
+          console.log(
+            'Conveyor',
+            (error as StellarPlusError).meta?.conveyorBeltErrorMeta
+          )
+          console.log(
+            'Details',
+            (error as StellarPlusError).meta?.sorobanSimulationData
+          )
           throw new Error('Error initializing contract')
         })
 
