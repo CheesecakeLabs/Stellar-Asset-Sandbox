@@ -18,7 +18,6 @@ import { SupportedInnerPlugins } from 'stellar-plus/lib/stellar-plus/core/pipeli
 import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
 import { ConveyorBeltErrorMeta } from 'stellar-plus/lib/stellar-plus/error/helpers/conveyor-belt'
 import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
-import { DebugPlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/generic'
 import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 import { PathRoute } from '../../../../components/enums/path-route'
@@ -66,25 +65,10 @@ export const ContractsCreate: React.FC = () => {
         await token
           .wrapAndDeploy({
             ...opexTxInvocation,
-            options: {
-              executionPlugins: [
-                new DebugPlugin('all') as unknown as SupportedInnerPlugins,
-              ],
-            },
           })
           .catch(error => {
-            console.log('Opex invoc', opexTxInvocation)
             console.error('Error wrapping and deploying token', error)
-            console.log('Details', error as StellarPlusError)
-            console.log('Meta', (error as StellarPlusError).meta)
-            console.log(
-              'Conveyor',
-              (error as StellarPlusError).meta?.conveyorBeltErrorMeta
-            )
-            console.log(
-              'Details',
-              (error as StellarPlusError).meta?.sorobanSimulationData
-            )
+
             throw new Error('Error wrapping and deploying token')
           })
         contractId = token.sorobanTokenHandler.getContractId()
@@ -115,10 +99,7 @@ export const ContractsCreate: React.FC = () => {
         options: {
           sorobanTransactionPipeline: {
             customRpcHandler: vcRpcHandler,
-            plugins: [
-              ContractsService.getAutoRestorePlugin(opex),
-              new DebugPlugin('all') as unknown as SupportedInnerPlugins,
-            ],
+            plugins: [ContractsService.getAutoRestorePlugin(opex)],
           },
         },
         /* wasmHash: WASM_HASH,
@@ -138,14 +119,7 @@ export const ContractsCreate: React.FC = () => {
       )
 
       await codClient.deploy(opexTxInvocation).catch(error => {
-        console.log('Opex invoc', opexTxInvocation)
         console.error('Error deploying contract', error)
-        console.log('Details', error as StellarPlusError)
-        console.log('Meta', (error as StellarPlusError).meta)
-        console.log(
-          'Conveyor',
-          (error as StellarPlusError).meta?.conveyorBeltErrorMeta
-        )
 
         throw new Error('Error deploying contract')
       })
@@ -153,33 +127,12 @@ export const ContractsCreate: React.FC = () => {
         .initialize({ ...codParams, ...codTxInvocation })
         .catch(error => {
           console.error('Error initializing contract', error)
-          console.log('Opex invoc', opexTxInvocation)
-          console.error('Error wrapping and deploying token', error)
-          console.log('Details', error as StellarPlusError)
-          console.log('Meta', (error as StellarPlusError).meta)
-          console.log(
-            'Conveyor',
-            (error as StellarPlusError).meta?.conveyorBeltErrorMeta
-          )
-          console.log(
-            'Details',
-            (error as StellarPlusError).meta?.sorobanSimulationData
-          )
+
           throw new Error('Error initializing contract')
         })
 
       const codContractId = codClient.getContractId()
       if (!codContractId) throw new Error('Invalid Contract ID')
-
-      console.log('Contract ID:', codContractId)
-      console.log('Asset ID:', asset.id)
-      console.log('Vault ID:', vault.id)
-      console.log('Yield Rate:', codParams.yieldRate)
-      console.log('Term:', codParams.term)
-      console.log('Min Deposit:', codParams.minDeposit)
-      console.log('Penalty Rate:', codParams.penaltyRate)
-      console.log('Compound:', codParams.compoundStep)
-      console.log('Token TOKEN_DECIMALS:', TOKEN_DECIMALS)
 
       const contract = {
         name: 'Yield-bearing Asset',
