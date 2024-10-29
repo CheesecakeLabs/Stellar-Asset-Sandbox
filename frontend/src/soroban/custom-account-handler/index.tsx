@@ -1,9 +1,8 @@
+import { xdr } from '@stellar/stellar-base'
 import { AccountHandler } from 'stellar-plus/lib/stellar-plus/account'
-import { AccountBaseClient } from 'stellar-plus/lib/stellar-plus/account/base'
-import { AccountHelpersPayload } from 'stellar-plus/lib/stellar-plus/account/helpers/types'
+import { SignatureSchema } from 'stellar-plus/lib/stellar-plus/account/account-handler/types'
+import { AccountBase } from 'stellar-plus/lib/stellar-plus/account/base'
 import { FeeBumpTransaction, Transaction, TransactionXdr } from 'stellar-plus/lib/stellar-plus/types'
-
-export type AccountHandlerPayload = AccountHelpersPayload
 
 export type CustomAccountHandler = {
   sign(
@@ -15,7 +14,7 @@ export type CustomAccountHandler = {
   ): Promise<TransactionXdr>
 }
 
-export type CustomAccountHandlerPayload = AccountHandlerPayload & {
+export type CustomAccountHandlerPayload = {
   customSign: (
     tx: Transaction | FeeBumpTransaction,
     publicKey: string
@@ -24,7 +23,7 @@ export type CustomAccountHandlerPayload = AccountHandlerPayload & {
 }
 
 export class CustomAccountHandlerClient
-  extends AccountBaseClient
+  extends AccountBase
   implements AccountHandler
 {
   protected customSign: (
@@ -47,6 +46,10 @@ export class CustomAccountHandlerClient
       throw new Error('error load public key')
     }
   }
+  signSorobanAuthEntry(entry: xdr.SorobanAuthorizationEntry, validUntilLedgerSeq: number, networkPassphrase: string): Promise<xdr.SorobanAuthorizationEntry> {
+    throw new Error('Method not implemented.')
+  }
+  signatureSchema?: SignatureSchema | undefined
 
   public getPublicKey(): string {
     try {
