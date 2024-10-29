@@ -38,7 +38,7 @@ interface IDistributeVault {
   vaults: Hooks.UseVaultsTypes.IVault[] | undefined
   vault: Hooks.UseVaultsTypes.IVault | undefined
   selectedAsset: Hooks.UseAssetsTypes.IAssetDto | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const DistributeVault: React.FC<IDistributeVault> = ({

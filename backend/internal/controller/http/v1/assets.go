@@ -2,20 +2,18 @@ package v1
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 
+	rolePermission "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/role_permission"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/usecase"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/logger"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/pkg/profanity"
 	"github.com/gin-gonic/gin"
-)
-
-const (
-	_startingBalance = "4"
-	_sponsorId       = 1
 )
 
 type assetsRoutes struct {
@@ -25,7 +23,7 @@ type assetsRoutes struct {
 	a      usecase.AuthUseCase
 	l      usecase.LogTransactionUseCase
 	logger *logger.Logger
-	pf 	   profanity.ProfanityFilter
+	pf     profanity.ProfanityFilter
 }
 
 func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
@@ -36,7 +34,7 @@ func newAssetTomlRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as us
 	}
 }
 
-func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
+func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as usecase.AssetUseCase, m HTTPControllerMessenger, a usecase.AuthUseCase, l usecase.LogTransactionUseCase, rP usecase.RolePermissionUseCase, logger *logger.Logger, pf profanity.ProfanityFilter) {
 	r := &assetsRoutes{w, as, m, a, l, logger, pf}
 
 	h := handler.Group("/assets")
@@ -56,6 +54,13 @@ func newAssetsRoutes(handler *gin.RouterGroup, w usecase.WalletUseCase, as useca
 		h.GET("/toml-data", r.getTomlData)
 		h.PUT("/:id/update-contract-id", r.updateContractId)
 		h.GET("/:id/image.png", r.getAssetImage)
+		h.GET("/price-conversion", r.priceConversion)
+		
+
+		allowedRoute := h.Group("/").Use(Auth(a.ValidateToken())).Use(rolePermission.Validate(rP))
+		{
+			allowedRoute.PUT("/:id/update-name-code", r.updateNameAndCode)
+		}
 	}
 }
 
@@ -126,6 +131,17 @@ type PaginatedAssetsResponse struct {
 
 type UpdateContractIdRequest struct {
 	ContractId string `json:"contract_id" example:"iVBORw0KGgoAAAANSUhEUgAACqoAAAMMCAMAAAAWqpRaAAADAFBMVEX///..."`
+}
+
+type UpdateNameRequest struct {
+	Name      string   `json:"name" binding:"required" example:"USD Coin"`
+	Code      string   `json:"code" binding:"required" example:"USDC"`
+}
+
+type PriceConversionResponse struct {
+	Status string  `json:"status"`
+	XLM    float64 `json:"XLM"`
+	USD    float64 `json:"USD"`
 }
 
 // @Summary     Create a new asset
@@ -259,11 +275,12 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 	}
 
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, distPk, issuerPk},
 		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - create asset - send message %d", Id))
@@ -319,6 +336,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		return
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -329,6 +347,7 @@ func (r *assetsRoutes) createAsset(c *gin.Context) {
 		TransactionTypeID: entity.CreateAsset,
 		UserID:            userID,
 		Description:       createLogDescription(entity.CreateAsset, asset.Code, nil, nil),
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - create asset - create log transaction")
@@ -400,10 +419,11 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 	}
 
 	sponsorID := request.SponsorId
+	sponsor := entity.Wallet{}
 	if sponsorID == 0 {
-		_, err = r.w.Get(_sponsorId)
+		sponsor, err = r.w.Get(_sponsorId)
 	} else {
-		_, err = r.w.Get(request.SponsorId)
+		sponsor, err = r.w.Get(request.SponsorId)
 	}
 	if err != nil {
 		r.logger.Error(err, "http - v1 - mint asset - get sponsor")
@@ -430,10 +450,11 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		},
 	}
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: asset.Issuer.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {
@@ -442,6 +463,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		return
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -455,6 +477,7 @@ func (r *assetsRoutes) mintAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.MintAsset, asset.Code, nil, nil),
 		CurrentSupply:     &request.CurrentSupply,
 		CurrentMainVault:  &request.CurrentMainVault,
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - mint asset - create log transaction")
@@ -507,10 +530,11 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 
 	sponsorID := request.SponsorId
+	sponsor := entity.Wallet{}
 	if sponsorID == 0 {
-		_, err = r.w.Get(_sponsorId)
+		sponsor, err = r.w.Get(_sponsorId)
 	} else {
-		_, err = r.w.Get(request.SponsorId)
+		sponsor, err = r.w.Get(request.SponsorId)
 	}
 	if err != nil {
 		r.logger.Error(err, "http - v1 - burn asset - get sponsor")
@@ -531,11 +555,12 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 	}
 
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: asset.Distributor.Key.PublicKey,
 		PublicKeys: []string{asset.Distributor.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - burn asset - send message %d", Id))
@@ -543,6 +568,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		return
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -555,6 +581,7 @@ func (r *assetsRoutes) burnAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.BurnAsset, asset.Code, nil, nil),
 		CurrentSupply:     &request.CurrentSupply,
 		CurrentMainVault:  &request.CurrentMainVault,
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - burn asset - create log transaction")
@@ -609,10 +636,11 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	}
 
 	sponsorID := request.SponsorId
+	sponsor := entity.Wallet{}
 	if sponsorID == 0 {
-		_, err = r.w.Get(_sponsorId)
+		sponsor, err = r.w.Get(_sponsorId)
 	} else {
-		_, err = r.w.Get(request.SponsorId)
+		sponsor, err = r.w.Get(request.SponsorId)
 	}
 	if err != nil {
 		r.logger.Error(err, "http - v1 - transfer asset - get sponsor")
@@ -640,11 +668,12 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 	}
 
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: sourceWallet.Key.PublicKey,
 		PublicKeys: []string{sourceWallet.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - transfer asset - send message %d", Id))
@@ -652,6 +681,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		return
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -666,6 +696,7 @@ func (r *assetsRoutes) transferAsset(c *gin.Context) {
 		DestinationPK:     &request.DestinationWalletPK,
 		CurrentSupply:     &request.CurrentSupply,
 		CurrentMainVault:  &request.CurrentMainVault,
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - transfer asset - create log transaction")
@@ -712,7 +743,6 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 
 	sponsorID := request.SponsorId
 	var sponsor entity.Wallet
-
 	if sponsorID == 0 {
 		sponsor, err = r.w.Get(_sponsorId)
 	} else {
@@ -747,11 +777,12 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 	}
 
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - clawback asset - send message %d", Id))
@@ -759,6 +790,7 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		return
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	amount, err := strconv.ParseFloat(request.Amount, 64)
 	if err != nil {
 		amount = 0
@@ -771,6 +803,8 @@ func (r *assetsRoutes) clawbackAsset(c *gin.Context) {
 		Description:       createLogDescription(entity.ClawbackAsset, asset.Code, nil, nil),
 		CurrentSupply:     &request.CurrentSupply,
 		CurrentMainVault:  &request.CurrentMainVault,
+		DestinationPK:     &request.From,
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - clawback asset - create log transaction")
@@ -847,6 +881,7 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	}
 
 	sponsor, err := r.w.Get(_sponsorId)
+
 	if err != nil {
 		r.logger.Error(err, "http - v1 - update auth flags - get sponsor")
 		errorResponse(c, http.StatusNotFound, "sponsor wallet not found", err)
@@ -854,11 +889,12 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 	}
 
 	Id := generateID()
-	_, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+	response, err := r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
 		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{asset.Issuer.Key.PublicKey, sponsor.Key.PublicKey},
 		Operations: []entity.Operation{op},
+		FeeBump:    sponsor.Key.PublicKey,
 	})
 	if err != nil {
 		r.logger.Error(err, fmt.Sprintf("http - v1 - update auth flags- send message %d", Id))
@@ -867,11 +903,14 @@ func (r *assetsRoutes) updateAuthFlags(c *gin.Context) {
 
 	}
 
+	feeCharged := response.Message.(entity.EnvelopeResponse).FeeCharged
 	err = r.l.CreateLogTransaction(entity.LogTransaction{
 		Asset:             asset,
 		TransactionTypeID: entity.UpdateAuthFlags,
 		UserID:            userID,
 		Description:       createLogDescription(entity.UpdateAuthFlags, asset.Code, request.SetFlags, request.ClearFlags),
+		DestinationPK:     &request.TrustorPK,
+		FeeCharged:        &feeCharged,
 	})
 	if err != nil {
 		r.logger.Error(err, "http - v1 - update auth flags - create log transaction")
@@ -1177,4 +1216,65 @@ func (r *assetsRoutes) updateContractId(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"contract_id": request.ContractId})
+}
+
+
+// @Summary Update asset name and code
+// @Description Update asset name and code
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Param       request body UpdateNameRequest true "Contract ID"
+// @Success     200 {object} UpdateContractIdRequest
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/{id}/update-name-code [put]
+func (r *assetsRoutes) updateNameAndCode(c *gin.Context) {
+	var request UpdateNameRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+
+	assetId := c.Param("id")
+	err := r.as.UpdateNameAndCode(assetId, request.Name, request.Code)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error updating asset name and code", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "asset information updated"})
+}
+
+// @Summary Get XLM price in USD
+// @Description Get XLM price in USD
+// @Tags  	    Assets
+// @Accept      json
+// @Produce     json
+// @Success     200 {object} PriceConversionResponse
+// @Failure     400 {object} response
+// @Failure     500 {object} response
+// @Router      /assets/price-conversion [get]
+func (r *assetsRoutes) priceConversion(c *gin.Context) {
+	const convertURL = "https://api.coinconvert.net/convert/xlm/usd?amount=1"
+	resp, err := http.Get(convertURL)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error making request to convert API:", err)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error reading response body:", err)
+		return
+	}
+
+	var conversionResponse PriceConversionResponse
+	err = json.Unmarshal(body, &conversionResponse)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "error parsing JSON:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, conversionResponse)
 }

@@ -11,13 +11,15 @@ import (
 )
 
 type rolePermissions struct {
-	rolePermissionUseCase usecase.RolePermissionUseCase
-	messengerController   HTTPControllerMessenger
-	l                     *logger.Logger
+	rolePermissionUseCase 	usecase.RolePermissionUseCase
+	roleUseCase  			usecase.RoleUseCase
+	userUseCase				usecase.UserUseCase
+	messengerController   	HTTPControllerMessenger
+	l                     	*logger.Logger
 }
 
-func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
-	r := &rolePermissions{rolePermissionUseCase, messengerController, l}
+func newRolePermissionsRoutes(handler *gin.RouterGroup, rolePermissionUseCase usecase.RolePermissionUseCase, roleUseCase  usecase.RoleUseCase, userUseCase usecase.UserUseCase, messengerController HTTPControllerMessenger, l *logger.Logger) {
+	r := &rolePermissions{rolePermissionUseCase, roleUseCase, userUseCase, messengerController, l}
 
 	h := handler.Group("/role-permissions")
 	{
@@ -34,22 +36,37 @@ type RolePermissionRequest struct {
 	IsAdd        bool `json:"is_add" example:"false"`
 }
 
+type UserPermissionsResponse struct {
+	Permissions       []entity.UserPermissionResponse  `json:"permissions"`
+	Admin bool  `json:"admin" example:"true"`
+}
+
 // @Summary User permissions
 // @Description User permissions
 // @Schemes
 // @Tags RolePermissions
 // @Accept json
 // @Produce json
-// @Success 200  {object} []entity.UserPermissionResponse
+// @Success 200  {object} UserPermissionsResponse
 // @Router /role-permission/user-permissions [get]
 func (r *rolePermissions) userPermissions(c *gin.Context) {
+	res := UserPermissionsResponse{}
 	token := c.GetHeader("Authorization")
 	rolePermissions, err := r.rolePermissionUseCase.GetUserPermissions(token)
 	if err != nil {
 		r.l.Error(err, "http - v1 - list user permissions - GetUserPermissions")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
 	}
-	c.JSON(http.StatusOK, rolePermissions)
+
+	res.Permissions = rolePermissions
+
+	res.Admin, err = r.userUseCase.IsUserSuperAdmin(token)
+	if err != nil {
+		r.l.Error(err, "http - v1 - list user permissions - IsUserSuperAdmin")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+	}
+	
+	c.JSON(http.StatusOK, res)
 }
 
 // @Summary Roles permissions

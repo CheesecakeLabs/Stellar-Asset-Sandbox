@@ -16,6 +16,7 @@ type (
 		AWS     AWS
 		Deploy  Deploy
 		Sentry  Sentry
+		DefaultData DefaultData
 	}
 
 	Log struct {
@@ -115,6 +116,11 @@ type (
 
 	Sentry struct {
 		DSN string `env:"SENTRY_DSN"`
+	}
+
+	DefaultData struct {
+		SuperAdminEmail string `env:"SUPER_ADMIN_EMAIL"`
+		SuperAdminPassword string `env:"SUPER_ADMIN_PASSWORD"`
 	}
 )
 

@@ -29,4 +29,5 @@ export enum PathRoute {
   TOKEN_MANAGEMENT = '/token-management',
   DASHBOARDS = '/dashboards',
   TOML_FILE = '/.well-known/stellar.toml',
+  COST_CENTER = '/cost-center',
 }

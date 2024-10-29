@@ -18,6 +18,7 @@ import React, { Dispatch, SetStateAction } from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
+import { InfoTag } from 'components/atoms/info-tag'
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { IChange } from 'app/core/pages/role-permissions'
@@ -25,7 +26,7 @@ import { IChange } from 'app/core/pages/role-permissions'
 interface IRolePermissionsTemplate {
   loading: boolean
   roles: Hooks.UseAuthTypes.IRole[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   permissions: Hooks.UseAuthTypes.IPermission[] | undefined
   rolesPermissions: Hooks.UseAuthTypes.IRolePermission[] | undefined
   updatingRolesPermissions: boolean
@@ -43,10 +44,11 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   updatingRolesPermissions,
   changes,
   profile,
+  userPermissions,
   onSubmit,
   setChanges,
 }) => {
-  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const havePermissionByRole = (
     permissionId: number,
@@ -79,7 +81,10 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
   }
 
   const isDisabled = (role: Hooks.UseAuthTypes.IRole): boolean => {
-    return role.admin === 1 || role.created_by != profile?.id
+    if (userPermissions?.admin) {
+      return false
+    }
+    return role.created_by != profile?.id
   }
 
   return (
@@ -94,7 +99,7 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Administration
           </Text>
-          {isSmallerThanMd && <MenuAdminMobile selected={'ROLE_PERMISSIONS'} />}
+          {!isLargerThanLg && <MenuAdminMobile selected={'ROLE_PERMISSIONS'} />}
         </Flex>
         <Container variant="primary" px={0} pb={0} maxW="full">
           <Flex
@@ -108,11 +113,12 @@ export const RolePermissionsTemplate: React.FC<IRolePermissionsTemplate> = ({
           >
             <Flex
               gap={1}
-              alignItems="center"
               fill="gray"
+              flexDir="column"
               _dark={{ fill: 'white' }}
             >
               <Text>Permissions</Text>
+              <InfoTag text="You are only able to modify roles that you have created." />
             </Flex>
             <Button
               variant="primary"

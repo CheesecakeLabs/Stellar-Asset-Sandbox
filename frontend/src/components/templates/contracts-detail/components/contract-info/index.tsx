@@ -29,7 +29,7 @@ export const ContractInfo: React.FC<IContractInfo> = ({ contract }) => {
         boxShadow="lower"
         _dark={{ bg: 'black.800' }}
       >
-        <Text fontSize="xl">Yield-bearing asset</Text>
+        <Text fontSize="xl">Yield-bearing Asset</Text>
         <Flex
           display="flex"
           bg="gray.200"

@@ -12,18 +12,21 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { RolesManageTemplate } from 'components/templates/roles-manage-template'
 
 export const RolesManage: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const {
     getRoles,
     createRole,
     updateRole,
     deleteRole,
+    getProfile,
+    getUserPermissions,
     creatingRole,
     updatingRole,
     roles,
     loadingRoles,
     deletingRole,
+    userPermissions
   } = useAuth()
 
   const toast = useToast()
@@ -32,9 +35,18 @@ export const RolesManage: React.FC = () => {
     getRoles()
   }, [getRoles])
 
+  useEffect(() => {
+    getUserPermissions()
+  }, [getUserPermissions])
+
   const handleRole = async (name: string, id?: number): Promise<boolean> => {
     try {
-      const isSuccess = id ? await updateRole(id, name) : await createRole(name)
+      const profile = await getProfile()
+      if (!profile?.id) throw new Error('Unauthorized user')
+
+      const isSuccess = id
+        ? await updateRole(id, name)
+        : await createRole(profile.id, name)
 
       if (isSuccess) {
         toast({
@@ -106,7 +118,7 @@ export const RolesManage: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -118,11 +130,12 @@ export const RolesManage: React.FC = () => {
               updatingRole={updatingRole}
               deletingRole={deletingRole}
               loadingRoles={loadingRoles}
+              userPermissions={userPermissions}
               handleDeleteRole={handleDeleteRole}
               handleRole={handleRole}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.ROLES_MANAGE} />
             </VStack>

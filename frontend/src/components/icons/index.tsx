@@ -14,7 +14,10 @@ import { ReactComponent as ChevronDownIcon } from './fonts/chevron_down.svg'
 import { ReactComponent as ChevronRight } from './fonts/chevron_right.svg'
 import { ReactComponent as CircleCheckIcon } from './fonts/circle-check.svg'
 import { ReactComponent as CoinIcon } from './fonts/coin.svg'
+import { ReactComponent as CoinsIcon } from './fonts/coins.svg'
 import { ReactComponent as ContractIcon } from './fonts/contract.svg'
+import { ReactComponent as ContractInvokeIcon } from './fonts/contract_invoke.svg'
+import { ReactComponent as ContractRestoreIcon } from './fonts/contract_restore.svg'
 import { ReactComponent as DashboardIcon } from './fonts/dashboard.svg'
 import { ReactComponent as DeleteIcon } from './fonts/delete.svg'
 import { ReactComponent as EditIcon } from './fonts/edit.svg'
@@ -53,9 +56,11 @@ import { ReactComponent as SortIcon } from './fonts/sort.svg'
 import { ReactComponent as SunIcon } from './fonts/sun.svg'
 import { ReactComponent as TimeIcon } from './fonts/time.svg'
 import { ReactComponent as TransferIcon } from './fonts/transfer.svg'
+import { ReactComponent as TrustlineIcon } from './fonts/trustline.svg'
 import { ReactComponent as UsdcIcon } from './fonts/usdc.svg'
 import { ReactComponent as VaultIcon } from './fonts/vault.svg'
 import { ReactComponent as WalletIcon } from './fonts/wallet.svg'
+import { ReactComponent as XLMIcon } from './fonts/xlm.svg'
 
 export {
   MenuIcon,
@@ -116,4 +121,9 @@ export {
   ArrowForwardIcon,
   CircleCheckIcon,
   FileIcon,
+  CoinsIcon,
+  TrustlineIcon,
+  ContractInvokeIcon,
+  ContractRestoreIcon,
+  XLMIcon,
 }

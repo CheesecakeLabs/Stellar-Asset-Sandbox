@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -89,9 +90,10 @@ func (r UserRepo) GetUserByToken(token string) (entity.User, error) {
 
 func (r UserRepo) GetAllUsers() ([]entity.UserResponse, error) {
 	stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
-			 FROM UserAccount u 
-			 LEFT JOIN Role r ON u.role_id = r.id 
-			 ORDER BY u.name ASC`
+		FROM UserAccount u 
+		LEFT JOIN Role r ON u.role_id = r.id 
+		WHERE r.admin = 0
+		ORDER BY u.name ASC`
 
 	rows, err := r.Db.Query(stmt)
 	if err != nil {
@@ -139,4 +141,67 @@ func (r UserRepo) GetProfile(token string) (entity.UserResponse, error) {
 	}
 
 	return user, nil
+}
+
+func (r UserRepo) GetSuperAdminUsers() ([]entity.UserResponse, error) {
+    stmt := `SELECT u.id, u.name, u.updated_at, u.role_id, r.name as role, u.email 
+	FROM UserAccount u 
+	LEFT JOIN Role r ON u.role_id = r.id 
+	WHERE r.admin = 1
+	ORDER BY u.name ASC`
+
+    rows, err := r.Db.Query(stmt)
+    if err != nil {
+        return nil, fmt.Errorf("UserRepo - GetSuperAdminUsers - db.Query: %w", err)
+    }
+
+    defer rows.Close()
+
+    entities := make([]entity.UserResponse, 0, _defaultEntityCap)
+
+    for rows.Next() {
+        var user entity.UserResponse
+
+        err = rows.Scan(&user.ID, &user.Name, &user.UpdatedAt, &user.RoleId, &user.Role, &user.Email)
+        if err != nil {
+            return nil, fmt.Errorf("UserRepo - GetSuperAdminUsers - rows.Scan: %w", err)
+        }
+
+        entities = append(entities, user)
+    }
+
+    return entities, nil
+}
+
+func (r UserRepo) UpdateName(id string, name string) error {
+	// insert into if not exists if exist replace
+	stmt := `UPDATE UserAccount SET name=$2 WHERE id = $1`
+	_, err := r.Db.Exec(stmt, id, name)
+	if err != nil {
+		return fmt.Errorf("UserRepo - UpdateName - db.Exec: %w", err)
+	}
+	return nil
+}
+
+func (r UserRepo) IsUserSuperAdmin(token string) (bool, error) {
+	query := `SELECT EXISTS (
+		SELECT *
+		FROM UserAccount u
+		JOIN role r ON u.role_id = r.id
+		WHERE r.admin = $1 AND u.token = $2
+	) AS is_super_admin;`
+
+	row := r.Db.QueryRow(query, 1, token)
+
+	var isSuperAdmin bool
+
+	err := row.Scan(&isSuperAdmin)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, fmt.Errorf("UserRepo - IsUserSuperAdmin - not found")
+		}
+		return false, fmt.Errorf("UserRepo - IsUserSuperAdmin - row.Scan: %w", err)
+	}
+
+	return isSuperAdmin, nil
 }

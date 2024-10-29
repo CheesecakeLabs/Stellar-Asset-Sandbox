@@ -6,36 +6,57 @@ import { formatName } from 'utils/formatter'
 import { ModalEditRole } from 'components/molecules'
 
 import { ItemMenu } from '../item-menu'
+import { ModalUpdateUsername } from '../modal-update-username'
 
 interface IItemUser {
   user: Hooks.UseAuthTypes.IUserDto
   loading: boolean
-  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
+  updatingUsername: boolean
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
+  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
+  handleUpdateUsername(id: number, name: string): Promise<boolean>
 }
 
 export const ItemUser: React.FC<IItemUser> = ({
   user,
   loading,
-  handleEditRole,
   roles,
   loadingRoles,
   permissions,
+  updatingUsername,
+  handleEditRole,
+  handleUpdateUsername,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isOpenChangeRole,
+    onOpen: onOpenChangeRole,
+    onClose: onCloseChangeRole,
+  } = useDisclosure()
+  const {
+    isOpen: isOpenUpdateUsername,
+    onOpen: onOpenUpdateUsername,
+    onClose: onCloseUpdateUsername,
+  } = useDisclosure()
 
   return (
     <>
       <ModalEditRole
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isOpenChangeRole}
         loading={loading}
         loadingRoles={loadingRoles}
         user={user}
-        handleEditRole={handleEditRole}
         roles={roles}
+        onClose={onCloseChangeRole}
+        handleEditRole={handleEditRole}
+      />
+      <ModalUpdateUsername
+        isOpen={isOpenUpdateUsername}
+        user={user}
+        updatingUsername={updatingUsername}
+        onClose={onCloseUpdateUsername}
+        handleUpdateUsername={handleUpdateUsername}
       />
       <Tr>
         <Td>{user.id}</Td>
@@ -43,7 +64,11 @@ export const ItemUser: React.FC<IItemUser> = ({
         <Td>{user.role}</Td>
         {
           <Td w="1rem" p={0}>
-            <ItemMenu onOpen={onOpen} permissions={permissions} />
+            <ItemMenu
+              onOpenChangeRole={onOpenChangeRole}
+              permissions={permissions}
+              onOpenRename={onOpenUpdateUsername}
+            />
           </Td>
         }
       </Tr>

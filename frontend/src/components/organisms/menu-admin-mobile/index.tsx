@@ -5,18 +5,19 @@ import { ItemActionAssetMobile } from 'components/atoms/item-action-asset-mobile
 import { PathRoute } from 'components/enums/path-route'
 import {
   ChevronDownIcon,
+  CoinsIcon,
   MembersIcon,
   PermissionsIcon,
   RoleIcon,
 } from 'components/icons'
 
 interface IMenuAdminMobile {
-  selected: 'TEAM_MEMBERS' | 'ROLE_PERMISSIONS' | 'ROLES'
+  selected: 'TEAM_MEMBERS' | 'ROLE_PERMISSIONS' | 'ROLES' | 'COST_CENTER'
 }
 
 export const MenuAdminMobile: React.FC<IMenuAdminMobile> = ({ selected }) => {
   const isSelected = (
-    page: 'TEAM_MEMBERS' | 'ROLE_PERMISSIONS' | 'ROLES'
+    page: 'TEAM_MEMBERS' | 'ROLE_PERMISSIONS' | 'ROLES' | 'COST_CENTER'
   ): boolean => {
     return selected === page
   }
@@ -60,6 +61,13 @@ export const MenuAdminMobile: React.FC<IMenuAdminMobile> = ({ selected }) => {
           title={'Roles'}
           icon={<RoleIcon width="16px" height="16px" />}
           path={`${PathRoute.ROLES_MANAGE}`}
+        />
+
+        <ItemActionAssetMobile
+          isSelected={isSelected('COST_CENTER')}
+          title={'Operating Expenses'}
+          icon={<CoinsIcon width="16px" height="16px" />}
+          path={`${PathRoute.COST_CENTER}`}
         />
       </MenuList>
     </Menu>

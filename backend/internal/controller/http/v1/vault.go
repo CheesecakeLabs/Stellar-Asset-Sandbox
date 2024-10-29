@@ -132,25 +132,16 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		},
 	})
 
-	fundRes, err := r.m.SendMessage(entity.HorizonChannel, entity.HorizonRequest{
-		Id:      wallet.Id,
-		Type:    "fundWithFriendbot",
-		Account: walletPk,
-	})
-	if err != nil {
-		r.l.Error(err, "http - v1 - fund wallet - SendMessage")
-		errorResponse(c, http.StatusInternalServerError, "messaging problems", err)
+	ops := []entity.Operation{
+		{
+			Type:   entity.CreateAccountOp,
+			Target: walletPk,
+			//Amount:  _startingBalance,
+			Amount:  "10",
+			Sponsor: sponsor.Key.PublicKey,
+			Origin:  sponsor.Key.PublicKey,
+		},
 	}
-
-	fundResult := fundRes.Message.(entity.HorizonResponse)
-
-	if fundResult.StatusCode != 200 {
-		r.l.Error(err, "http - v1 - fund wallet - fundRes.StatusCode != 200")
-		errorResponse(c, http.StatusInternalServerError, "friendbot error", err)
-		return
-	}
-
-	ops := []entity.Operation{}
 
 	for _, assetId := range request.AssetsId {
 		asset, err := r.as.GetById(strconv.Itoa(assetId))
@@ -171,27 +162,26 @@ func (r *vaultRoutes) createVault(c *gin.Context) {
 		})
 	}
 
-	if len(ops) > 0 {
-		Id := generateID()
-		res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
-			Id:         Id,
-			MainSource: sponsor.Key.PublicKey,
-			PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
-			Operations: ops,
-		})
+	Id := generateID()
+	res, err = r.m.SendMessage(entity.EnvelopeChannel, entity.EnvelopeRequest{
+		Id:         Id,
+		MainSource: sponsor.Key.PublicKey,
+		PublicKeys: []string{sponsor.Key.PublicKey, walletPk},
+		Operations: ops,
+		FeeBump:    sponsor.Key.PublicKey,
+	})
 
-		if err != nil {
-			r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
-			errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
-			return
-		}
+	if err != nil {
+		r.l.Error(err, fmt.Sprintf("http - v1 - create vault - send message %d", Id))
+		errorResponse(c, http.StatusInternalServerError, "starlabs messaging problems", err)
+		return
+	}
 
-		_, ok = res.Message.(entity.EnvelopeResponse)
-		if !ok {
-			r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
-			errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
-			return
-		}
+	_, ok = res.Message.(entity.EnvelopeResponse)
+	if !ok {
+		r.l.Error(err, "http - v1 - create vault - Parse Envelope Response")
+		errorResponse(c, http.StatusInternalServerError, "unexpected starlabs response", err)
+		return
 	}
 
 	vault := entity.Vault{
@@ -427,6 +417,7 @@ func (r *vaultRoutes) updateVaultAsset(c *gin.Context) {
 		Id:         Id,
 		MainSource: sponsor.Key.PublicKey,
 		PublicKeys: []string{sponsor.Key.PublicKey, vault.Wallet.Key.PublicKey},
+		FeeBump:    sponsor.Key.PublicKey,
 		Operations: ops,
 	})
 	if err != nil {

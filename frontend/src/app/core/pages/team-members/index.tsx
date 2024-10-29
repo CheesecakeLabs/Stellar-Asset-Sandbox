@@ -11,11 +11,12 @@ import { Sidebar } from 'components/organisms/sidebar'
 import { TeamMembersTemplate } from 'components/templates/team-members'
 
 export const TeamMembers: React.FC = () => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   const {
     getAllUsers,
     editUsersRole,
+    updateUsername,
     getRoles,
     getUserPermissions,
     users,
@@ -24,6 +25,7 @@ export const TeamMembers: React.FC = () => {
     loadingRoles,
     userPermissions,
     loadingUserPermissions,
+    updatingUsername,
   } = useAuth()
 
   useEffect(() => {
@@ -42,6 +44,19 @@ export const TeamMembers: React.FC = () => {
     return false
   }
 
+  const handleUpdateUsername = async (
+    id: number,
+    name: string
+  ): Promise<boolean> => {
+    const isSuccess = await updateUsername(id, name)
+
+    if (isSuccess) {
+      getAllUsers()
+      return true
+    }
+    return false
+  }
+
   useEffect(() => {
     getAllUsers()
     getRoles()
@@ -52,7 +67,7 @@ export const TeamMembers: React.FC = () => {
     <Flex>
       <Sidebar highlightMenu={PathRoute.SETTINGS}>
         <Flex
-          flexDir={isLargerThanMd ? 'row' : 'column'}
+          flexDir={isLargerThanLg ? 'row' : 'column'}
           w="full"
           justifyContent="center"
           gap="1.5rem"
@@ -61,13 +76,15 @@ export const TeamMembers: React.FC = () => {
             <TeamMembersTemplate
               users={users}
               loading={loading || loadingUserPermissions}
-              handleEditRole={handleEditRole}
               roles={roles}
               loadingRoles={loadingRoles}
               permissions={userPermissions}
+              updatingUsername={updatingUsername}
+              handleUpdateUsername={handleUpdateUsername}
+              handleEditRole={handleEditRole}
             />
           </Flex>
-          {isLargerThanMd && (
+          {isLargerThanLg && (
             <VStack>
               <MenuSettings option={SettingsOptions.TEAM_MEMBERS} />
             </VStack>

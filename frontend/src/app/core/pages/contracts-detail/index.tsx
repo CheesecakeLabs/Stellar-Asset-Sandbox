@@ -113,8 +113,6 @@ export const ContractsDetail: React.FC = () => {
 
         let timeLeft = contractData?.timeLeft
 
-        await ContractsService.validateContract(sponsor, contract.address)
-
         const position =
           Number(
             (await getPosition(wallet, contract.address, wallet, sponsor)) || 0

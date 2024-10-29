@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	rolePermission "github.com/CheesecakeLabs/token-factory-v2/backend/internal/controller/http/role_permission"
 	"github.com/CheesecakeLabs/token-factory-v2/backend/internal/entity"
@@ -16,13 +17,14 @@ type usersRoutes struct {
 	t  usecase.UserUseCase
 	a  usecase.AuthUseCase
 	rP usecase.RolePermissionUseCase
+	rl usecase.RoleUseCase
 	v  usecase.VaultUseCase
 	l logger.Interface
 	pf profanity.ProfanityFilter
 }
 
-func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, l logger.Interface, v usecase.VaultUseCase, pf profanity.ProfanityFilter) {
-	r := &usersRoutes{t, a, rP, v, l, pf}
+func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.AuthUseCase, rP usecase.RolePermissionUseCase, rl usecase.RoleUseCase, l logger.Interface, v usecase.VaultUseCase, pf profanity.ProfanityFilter) {
+	r := &usersRoutes{t, a, rP, rl, v, l, pf}
 
 	h := handler.Group("/users")
 	{
@@ -42,6 +44,7 @@ func newUserRoutes(handler *gin.RouterGroup, t usecase.UserUseCase, a usecase.Au
 		{
 			allowedRoute.GET("/approve-new-accounts", r.detail)
 			allowedRoute.POST("/edit-users-role", r.editUsersRole)
+			allowedRoute.PUT("/:id/update-name", r.updateName)
 		}
 	}
 }
@@ -204,6 +207,26 @@ func (r *usersRoutes) editUsersRole(c *gin.Context) {
 		return
 	}
 
+	roleId, err := strconv.Atoi(userRole.ID_role)
+	if err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - strconv.Atoi")
+		errorResponse(c, http.StatusBadRequest, "invalid role id value", err)
+		return
+	}
+
+	role, err := r.rl.GetRoleById(roleId)
+	if err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - GetRoleById")
+		errorResponse(c, http.StatusBadRequest, "role not found", err)
+		return
+	}
+
+	if role.Admin == 1 {
+		r.l.Error(err, "http - v1 - editUserRole - role.Admin")
+		errorResponse(c, http.StatusBadRequest, "not authorized", nil)
+		return
+	}
+
 	if err := r.t.EditUsersRole(userRole); err != nil {
 		r.l.Error(err, "http - v1 - editUsersRole - EditUsersRole")
 		errorResponse(c, http.StatusInternalServerError, "database problems", err)
@@ -226,7 +249,7 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 	profile, err := r.t.GetProfile(token)
 	if err != nil {
 		r.l.Error(err, "http - v1 - getProfile - GetProfile")
-		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+		errorResponse(c, http.StatusUnauthorized, "database problems", err)
 		return
 	}
 
@@ -252,4 +275,38 @@ func (r *usersRoutes) getProfile(c *gin.Context) {
 // @Success 200  {object} entity.UserResponse
 // @Router /users [get]
 func (r *usersRoutes) forgetPassword(c *gin.Context) {
+}
+
+
+
+type updateNameRequest struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// @Summary     Update user name
+// @Description Update user name
+// @ID          updateName
+// @Tags  	    user
+// @Accept      json
+// @Produce     json
+// @Success     200 {object}
+// @Failure     500 {object} response
+// @Router      /users/{id}/update-name [put]
+func (r *usersRoutes) updateName(c *gin.Context) {
+	var req updateNameRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		r.l.Error(err, "http - v1 - editUserRole - ShouldBindJSON")
+		errorResponse(c, http.StatusBadRequest, "invalid request body", err)
+		return
+	}
+	userID := c.Param("id")
+	if err := r.t.UpdateName(userID, req.Name); err != nil {
+		r.l.Error(err, "http - v1 - updateName - UpdateName")
+		errorResponse(c, http.StatusInternalServerError, "database problems", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Name updated sucessfully",
+	})
 }

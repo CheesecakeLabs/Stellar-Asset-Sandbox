@@ -13,6 +13,8 @@ export const STELLAR_EXPERT_ASSET =
 
 export const STELLAR_EXPERT_URL = 'https://stellar.expert/explorer/testnet'
 
+export const SPONSORED_RESERVES_LINK = "https://developers.stellar.org/docs/encyclopedia/sponsored-reserves"
+
 export const getCurrencyIcon = (
   assetCode: string,
   width = '1.5rem'

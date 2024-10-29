@@ -46,8 +46,8 @@ declare namespace Hooks {
     }
 
     interface IUserPermission {
-      name: string
-      action: string
+      admin: boolean
+      permissions: { name: string; action: string }[]
     }
 
     interface IRolePermission {
@@ -70,7 +70,7 @@ declare namespace Hooks {
       getProfile: () => Promise<IUserDto | undefined>
       editUsersRole: (params: IUserRole) => Promise<boolean>
       getUserPermissions: () => Promise<
-        Hooks.UseAuthTypes.IUserPermission[] | undefined
+        Hooks.UseAuthTypes.IUserPermission | undefined
       >
       getRolesPermissions: () => Promise<
         Hooks.UseAuthTypes.IRolePermission[] | undefined
@@ -82,8 +82,9 @@ declare namespace Hooks {
       updateRolesPermissions: (
         params: Hooks.UseAuthTypes.IRolePermission[]
       ) => Promise<boolean>
-      createRole: (name: string) => Promise<boolean>
+      createRole: (userId: number, name: string) => Promise<boolean>
       updateRole: (id: number, name: string) => Promise<boolean>
+      updateUsername: (id: number, name: string) => Promise<boolean>
       deleteRole: (id: number, idNewUsersRole: number) => Promise<boolean>
       isAuthenticated: boolean
       loading: boolean
@@ -91,7 +92,7 @@ declare namespace Hooks {
       roles: IRole[] | undefined
       users: IUserDto[] | undefined
       profile: IUserDto | undefined
-      userPermissions: IUserPermission[] | undefined
+      userPermissions: IUserPermission | undefined
       rolesPermissions: IRolePermission[] | undefined
       permissions: IPermission[] | undefined
       updatingRolesPermissions: boolean
@@ -99,6 +100,7 @@ declare namespace Hooks {
       updatingRole: boolean
       deletingRole: boolean
       loadingUserPermissions: boolean
+      updatingUsername: boolean
     }
   }
 }

@@ -16,6 +16,7 @@ import React from 'react'
 
 import { MAX_PAGE_WIDTH } from 'utils/constants/sizes'
 
+import { InfoTag } from 'components/atoms/info-tag'
 import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 
 import { ItemRole } from './item-role'
@@ -27,6 +28,7 @@ interface IRolesManageTemplate {
   creatingRole: boolean
   updatingRole: boolean
   deletingRole: boolean
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   handleRole(name: string, id?: number): Promise<boolean>
   handleDeleteRole(id: number, idNewUsersRole: number): Promise<boolean>
 }
@@ -37,11 +39,12 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
   updatingRole,
   deletingRole,
   loadingRoles,
+  userPermissions,
   handleRole,
   handleDeleteRole,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   return (
     <>
@@ -68,7 +71,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             <Text fontSize="2xl" fontWeight="400">
               Administration
             </Text>
-            {isSmallerThanMd && <MenuAdminMobile selected={'ROLES'} />}
+            {!isLargerThanLg && <MenuAdminMobile selected={'ROLES'} />}
           </Flex>
           <Container variant="primary" px={0} pb={0} maxW="full">
             <Flex
@@ -82,11 +85,12 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
             >
               <Flex
                 gap={1}
-                alignItems="center"
                 fill="gray"
+                flexDir="column"
                 _dark={{ fill: 'white' }}
               >
                 <Text>Roles</Text>
+                <InfoTag text="You are only able to modify roles that you have created." />
               </Flex>
               <Button variant="primary" onClick={onOpen}>
                 Create role
@@ -112,6 +116,7 @@ export const RolesManageTemplate: React.FC<IRolesManageTemplate> = ({
                       loading={creatingRole || updatingRole || deletingRole}
                       roles={roles}
                       loadingRoles={loadingRoles}
+                      userPermissions={userPermissions}
                       handleRole={handleRole}
                       handleDeleteRole={handleDeleteRole}
                     />

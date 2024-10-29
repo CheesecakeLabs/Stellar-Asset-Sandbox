@@ -31,7 +31,7 @@ import { Paginator } from 'components/molecules/paginator'
 interface IContractsTemplate {
   loading: boolean
   contracts: Hooks.UseContractsTypes.IContract[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   currentPage: number
   totalPages: number
   changePage(page: number): void
@@ -55,7 +55,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
       <Flex maxW={MAX_PAGE_WIDTH} alignSelf="center" flexDir="column" w="full">
         <Flex mb="1.5rem" justifyContent="space-between">
           <Text fontSize="2xl" fontWeight="400">
-            Yield-bearing asset
+            Yield-bearing Asset
           </Text>
           {havePermission(Permissions.CREATE_CERTIFICATES, userPermissions) && (
             <Button
@@ -65,7 +65,7 @@ export const ContractsTemplate: React.FC<IContractsTemplate> = ({
                 navigate({ pathname: PathRoute.CONTRACT_CREATE })
               }
             >
-              {isLargerThanSm ? 'New Yield-bearing asset' : 'New'}
+              {isLargerThanSm ? 'New Yield-bearing Asset' : 'New'}
             </Button>
           )}
         </Flex>

@@ -43,7 +43,7 @@ import { Filter } from './filter'
 interface ITokenManagementTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   currentPage: number
   totalPages: number
   changePage(page: number): void

@@ -24,7 +24,7 @@ import { carouselData } from './carousel-data'
 interface IHomeTemplate {
   loading: boolean
   assets: Hooks.UseAssetsTypes.IAssetDto[] | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
 }
 
 export const HomeTemplate: React.FC<IHomeTemplate> = () => {

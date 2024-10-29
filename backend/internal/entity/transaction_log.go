@@ -12,6 +12,7 @@ type LogTransaction struct {
 	DestinationPK     *string  `json:"destination_pk" example:"GSDC..."`
 	CurrentSupply     *float64 `json:"current_supply" example:"1000"`
 	CurrentMainVault  *float64 `json:"current_main_vault" example:"1000"`
+	FeeCharged        *int64   `json:"fee_charged" example:"1000"`
 }
 
 type SumLogTransaction struct {

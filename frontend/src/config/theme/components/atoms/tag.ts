@@ -80,5 +80,29 @@ export const Tag = {
         color: 'white',
       },
     },
+    label: {
+      label: {
+        padding: '6px 12px',
+      },
+      container: {
+        w: 'fit-content',
+        bg: 'gray.100',
+        _dark: { bg: 'black.800', color: 'white' },
+        color: 'gray.900',
+      },
+    },
+    value: {
+      label: {
+        padding: '8px 16px',
+      },
+      container: {
+        w: 'fit-content',
+        bg: 'gray.100',
+        color: 'text.secondary',
+        fontSize: { base: 'md', md: '2xl' },
+        borderRadius: '0.5rem',
+        _dark: { bg: 'black.800', color: 'white' },
+      },
+    },
   },
 }

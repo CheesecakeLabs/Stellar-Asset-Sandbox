@@ -19,6 +19,7 @@ import {
 import { MessagesError } from 'utils/constants/messages-error'
 
 import { http } from 'interfaces/http'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 export const ContractsContext = createContext(
   {} as Hooks.UseContractsTypes.IContractsContext
@@ -155,14 +156,20 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     const opex = ContractsService.loadAccount(sponsorPK)
     const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
 
-    const contract = new StellarPlus.Contracts.CertificateOfDeposit({
-      network: STELLAR_NETWORK,
-      contractId: contractId,
-      rpcHandler: vcRpcHandler,
-      wasmHash: WASM_HASH,
-      options: {
-        restoreTxInvocation: restoreTxInvocation,
-      },
+    const contract = new CertificateOfDepositClient({
+      networkConfig: STELLAR_NETWORK,
+        contractParameters: {
+          wasmHash: WASM_HASH,
+          contractId: contractId,
+        },
+        options: {
+          sorobanTransactionPipeline: {
+            customRpcHandler: vcRpcHandler,
+            plugins: [
+              new AutoRestorePlugin(restoreTxInvocation, STELLAR_NETWORK, vcRpcHandler)
+            ]
+          }
+        }
     })
 
     return contract
@@ -217,22 +224,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
     }
   }
 
-  const restoreData = async (
-    sponsorPk: string,
-    stellarPlusError: StellarPlusError,
-    contract: CertificateOfDepositClient
-  ): Promise<void> => {
-    const opex = ContractsService.loadAccount(sponsorPk)
-    const restoreTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
-    const restoreData = stellarPlusError.meta
-      ?.sorobanSimulationData as restoreData
-
-    await contract.restoreFootprint({
-      ...restoreTxInvocation,
-      restorePreamble: restoreData.restorePreamble,
-    })
-  }
-
   const getPosition = async (
     address: string,
     contractId: string,
@@ -247,11 +238,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       return result
     } catch (e) {
-      const stellarPlusError = e as StellarPlusError
-      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
-        restoreData(sponsorPk, stellarPlusError, contract)
-      }
-
       const result = await contract.getPosition({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -274,11 +260,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       return result
     } catch (e) {
-      const stellarPlusError = e as StellarPlusError
-      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
-        restoreData(sponsorPk, stellarPlusError, contract)
-      }
-
       const result = await contract.getEstimatedYield({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -301,11 +282,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       return result
     } catch (e) {
-      const stellarPlusError = e as StellarPlusError
-      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
-        restoreData(sponsorPk, stellarPlusError, contract)
-      }
-
       const result = await contract.getEstimatedPrematureWithdraw({
         address: address,
         ...userTxInvocation(sourcePk),
@@ -328,11 +304,6 @@ export const ContractsProvider: React.FC<IProps> = ({ children }) => {
       })
       return result
     } catch (e) {
-      const stellarPlusError = e as StellarPlusError
-      if (stellarPlusError.code === ContractEngineErrorCodes.CE102) {
-        restoreData(sponsorPk, stellarPlusError, contract)
-      }
-
       const result = await contract.getTimeLeft({
         address: address,
         ...userTxInvocation(sourcePk),

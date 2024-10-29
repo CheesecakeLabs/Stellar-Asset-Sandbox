@@ -30,7 +30,7 @@ interface IContractsDetailTemplate {
   currentBalance: string
   history: Hooks.UseContractsTypes.IHistory[] | undefined
   deposited: number | undefined
-  userPermissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  userPermissions: Hooks.UseAuthTypes.IUserPermission | undefined
   currentInVault: string | undefined
   hasAssetInVault: boolean
   hasWallet: boolean
@@ -57,7 +57,7 @@ export const ContractsDetailTemplate: React.FC<IContractsDetailTemplate> = ({
   timerCounter,
 }) => {
   return (
-    <Flex flexDir="column" w="full">
+    <Flex flexDir="column" w="full" pb="3.5rem">
       <Flex
         maxW={MAX_PAGE_WIDTH_FULL}
         alignSelf="center"

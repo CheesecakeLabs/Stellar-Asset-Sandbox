@@ -31,18 +31,18 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
   onClose,
   ...rest
 }: ISidebarProps) => {
-  const [isLargerThanMd] = useMediaQuery('(min-width: 768px)')
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
 
   return (
     <Box
-      w={{ base: 'full', md: 60 }}
+      w={{ base: 'full', lg: 60 }}
       minW="282px"
       pos="fixed"
-      h={{ base: '100vh', md: 'calc(100vh - 5rem)' }}
+      h={{ base: '100vh', lg: 'calc(100vh - 5rem)' }}
       borderRight="1px solid"
       borderColor={'gray.600'}
       pb="2rem"
-      bg={{ sm: 'white', md: 'none' }}
+      bg={{ sm: 'white', lg: 'none' }}
       _dark={{ bg: { base: 'black.600' }, borderColor: 'black.800' }}
       {...rest}
       overflowY="auto"
@@ -52,7 +52,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
           h={14}
           justifyContent="space-between"
           alignItems="center"
-          display={{ base: 'flex', md: 'none' }}
+          display={{ base: 'flex', lg: 'none' }}
           w="full"
           pl="2rem"
           mb="1rem"
@@ -93,7 +93,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
             </NavItem>
           </Box>
         ))}
-        {isLargerThanMd && <Spacer />}
+        {isLargerThanLg && <Spacer />}
         <NavItem
           key={'Profile'}
           icon={<ProfileIcon />}
@@ -110,7 +110,7 @@ export const SidebarContent: React.FC<ISidebarProps> = ({
         >
           Administration
         </NavItem>
-        {!isLargerThanMd && <Spacer />}
+        {!isLargerThanLg && <Spacer />}
         <Flex mt="1rem" alignItems="center">
           <Flex
             fill="black"

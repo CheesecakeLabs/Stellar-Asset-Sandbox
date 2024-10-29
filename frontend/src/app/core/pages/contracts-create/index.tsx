@@ -14,7 +14,11 @@ import {
   INNER_FEE,
   TOKEN_DECIMALS,
 } from 'soroban/contracts-service'
-import { StellarPlus } from 'stellar-plus'
+import { SupportedInnerPlugins } from 'stellar-plus/lib/stellar-plus/core/pipelines/soroban-transaction/types'
+import { StellarPlusError } from 'stellar-plus/lib/stellar-plus/error'
+import { ConveyorBeltErrorMeta } from 'stellar-plus/lib/stellar-plus/error/helpers/conveyor-belt'
+import { CertificateOfDepositClient } from 'stellar-plus/lib/stellar-plus/soroban/contracts/certificate-of-deposit'
+import { AutoRestorePlugin } from 'stellar-plus/lib/stellar-plus/utils/pipeline/plugins/simulate-transaction'
 
 import { PathRoute } from '../../../../components/enums/path-route'
 import { Sidebar } from 'components/organisms/sidebar'
@@ -45,19 +49,28 @@ export const ContractsCreate: React.FC = () => {
     try {
       setCreatingContract(true)
 
-      const token = ContractsService.loadToken(asset)
-      let contractId = asset.contract_id
-
       const sponsorPK = await getSponsorPK()
       if (!sponsorPK) throw new Error('Invalid sponsor')
-
-      await ContractsService.validateContract(sponsorPK)
 
       const opex = ContractsService.loadAccount(sponsorPK)
       const opexTxInvocation = ContractsService.getTxInvocation(opex, BUMP_FEE)
 
+      const token = ContractsService.loadToken(
+        asset,
+        ContractsService.getAutoRestorePlugin(opex)
+      )
+      let contractId = asset.contract_id
+
       if (!contractId) {
-        await token.wrapAndDeploy(opexTxInvocation)
+        await token
+          .wrapAndDeploy({
+            ...opexTxInvocation,
+          })
+          .catch(error => {
+            console.error('Error wrapping and deploying token', error)
+
+            throw new Error('Error wrapping and deploying token')
+          })
         contractId = token.sorobanTokenHandler.getContractId()
 
         if (!contractId) throw new Error('Error creating contract id')
@@ -68,15 +81,32 @@ export const ContractsCreate: React.FC = () => {
       const codTxInvocation = ContractsService.getTxInvocation(
         codVault,
         INNER_FEE
+        /*{
+          signers: [opex],
+          header: {
+            fee: BUMP_FEE,
+            source: opex.getPublicKey(),
+            timeout: 60,
+          },
+        }*/
       )
 
-      const codClient = new StellarPlus.Contracts.CertificateOfDeposit({
-        network: STELLAR_NETWORK,
-        wasmHash: WASM_HASH,
+      const codClient = new CertificateOfDepositClient({
+        networkConfig: STELLAR_NETWORK,
+        contractParameters: {
+          wasmHash: WASM_HASH,
+        },
+        options: {
+          sorobanTransactionPipeline: {
+            customRpcHandler: vcRpcHandler,
+            plugins: [ContractsService.getAutoRestorePlugin(opex)],
+          },
+        },
+        /* wasmHash: WASM_HASH,
         rpcHandler: vcRpcHandler,
         options: {
           restoreTxInvocation: opexTxInvocation,
-        },
+        },*/
       })
 
       const codParams = await ContractsService.validateParamsCOD(
@@ -88,17 +118,27 @@ export const ContractsCreate: React.FC = () => {
         compound
       )
 
-      await codClient.deploy(opexTxInvocation)
-      await codClient.initialize({ ...codParams, ...codTxInvocation })
+      await codClient.deploy(opexTxInvocation).catch(error => {
+        console.error('Error deploying contract', error)
+
+        throw new Error('Error deploying contract')
+      })
+      await codClient
+        .initialize({ ...codParams, ...codTxInvocation })
+        .catch(error => {
+          console.error('Error initializing contract', error)
+
+          throw new Error('Error initializing contract')
+        })
 
       const codContractId = codClient.getContractId()
       if (!codContractId) throw new Error('Invalid Contract ID')
 
       const contract = {
-        name: 'Yield-bearing asset',
+        name: 'Yield-bearing Asset',
         asset_id: asset.id.toString(),
         vault_id: vault.id.toString(),
-        address: codClient.getContractId() || '',
+        address: codContractId || '',
         yield_rate: Number(codParams.yieldRate),
         term: Number(codParams.term),
         min_deposit: Number(codParams.minDeposit) / TOKEN_DECIMALS,
@@ -106,7 +146,10 @@ export const ContractsCreate: React.FC = () => {
         compound: Number(codParams.compoundStep),
       }
 
-      const contractCreated = await createContract(contract)
+      const contractCreated = await createContract(contract).catch(error => {
+        console.error('Error creating contract', error)
+        throw new Error('Error creating contract')
+      })
 
       if (contractCreated) {
         toast({
@@ -120,6 +163,7 @@ export const ContractsCreate: React.FC = () => {
         return
       }
     } catch (error) {
+      console.error(error)
       let message
       if (error instanceof Error) message = error.message
       else message = String(error)

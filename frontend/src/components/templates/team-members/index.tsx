@@ -21,25 +21,31 @@ import { MenuAdminMobile } from 'components/organisms/menu-admin-mobile'
 import { ItemMenu } from './item-menu'
 import { ItemUser } from './item-user'
 
-interface ISettingsTemplate {
+interface ITeamMembersTemplateTemplate {
   users: Hooks.UseAuthTypes.IUserDto[] | undefined
   loading: boolean
-  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
   roles: Hooks.UseAuthTypes.IRole[] | undefined
   loadingRoles: boolean
-  permissions: Hooks.UseAuthTypes.IUserPermission[] | undefined
+  permissions: Hooks.UseAuthTypes.IUserPermission | undefined
+  updatingUsername: boolean
+  handleEditRole(params: Hooks.UseAuthTypes.IUserRole): Promise<boolean>
+  handleUpdateUsername(id: number, name: string): Promise<boolean>
 }
 
-export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
+export const TeamMembersTemplate: React.FC<ITeamMembersTemplateTemplate> = ({
   users,
   loading,
-  handleEditRole,
   roles,
   loadingRoles,
   permissions,
+  updatingUsername,
+  handleEditRole,
+  handleUpdateUsername,
 }) => {
   const [isSmallerThanMd] = useMediaQuery('(max-width: 768px)')
-  const { onOpen } = useDisclosure()
+  const [isLargerThanLg] = useMediaQuery('(min-width: 992px)')
+
+  const { onOpen: onOpenChangeRole, onOpen: onOpenRename } = useDisclosure()
 
   return (
     <Flex flexDir="column" w="full">
@@ -53,7 +59,7 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
           <Text fontSize="2xl" fontWeight="400">
             Administration
           </Text>
-          {isSmallerThanMd && <MenuAdminMobile selected={'TEAM_MEMBERS'} />}
+          {!isLargerThanLg && <MenuAdminMobile selected={'TEAM_MEMBERS'} />}
         </Flex>
 
         <Container variant="primary" px={0} pb={0} maxW="full">
@@ -105,7 +111,11 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                       <Text>{`${user.role}`}</Text>
                     </Flex>
                   </Flex>
-                  <ItemMenu onOpen={onOpen} permissions={permissions} />
+                  <ItemMenu
+                    onOpenChangeRole={onOpenChangeRole}
+                    permissions={permissions}
+                    onOpenRename={onOpenRename}
+                  />
                 </Flex>
               ))}
             </Flex>
@@ -116,6 +126,7 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                   <Th>ID</Th>
                   <Th>Member</Th>
                   <Th>Role</Th>
+                  <Th />
                 </Tr>
               </Thead>
               <Tbody>
@@ -124,10 +135,12 @@ export const TeamMembersTemplate: React.FC<ISettingsTemplate> = ({
                     key={index}
                     user={user}
                     loading={loading}
-                    handleEditRole={handleEditRole}
                     roles={roles}
                     loadingRoles={loadingRoles}
                     permissions={permissions}
+                    updatingUsername={updatingUsername}
+                    handleEditRole={handleEditRole}
+                    handleUpdateUsername={handleUpdateUsername}
                   />
                 ))}
               </Tbody>

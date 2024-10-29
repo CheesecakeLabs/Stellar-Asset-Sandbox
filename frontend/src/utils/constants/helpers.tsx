@@ -21,3 +21,9 @@ export const newContractHelper =
 
 export const assetHomeHelper =
   'Each asset represents a unique tokenized asset on the Stellar Network. It provides a digital representation of value, whether it be fiat, cryptocurrency, or other tangible or intangible assets. Within the Stellar ecosystem, assets can be traded, transferred, and used in various financial operations, providing liquidity and interoperability between different asset classes.'
+
+export const operatingExpensesHelperP1 =
+  'This is the central administration area to monitor the network expenses required for the Sandbox to run. All transactions handled by the Sandbox are set to have their network fees covered by this Operating Expenses account as well as the underlying reserved balances required for certain features to be operational.'
+
+export const operatingExpensesHelperP2 =
+  "It's important to note that the Sandbox operates within the testnet environment, which is free of charge. The figures displayed represent a simulation of the expenses that would be incurred if operating within the mainnet."
