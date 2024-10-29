@@ -1,10 +1,10 @@
-import { TestNet } from "stellar-plus/lib/stellar-plus/network";
-import { ValidationCloudRpcHandler } from "stellar-plus/lib/stellar-plus/rpc";
+import { TestNet } from 'stellar-plus/lib/stellar-plus/network'
+import { ValidationCloudRpcHandler } from 'stellar-plus/lib/stellar-plus/rpc'
 
 export const STELLAR_NETWORK = TestNet()
 
 export const WASM_HASH =
-  'd4fedb949678a4f34963a6cb56b2081a5e9eb537007cb0ea0ff12fc3c7f09de5'
+  '22f2bb6b005d5af00dc24c5434673c4363503f6feab27d35932dc04dd108baa9'
 
 export const vcRpcHandler = new ValidationCloudRpcHandler(
   STELLAR_NETWORK,
