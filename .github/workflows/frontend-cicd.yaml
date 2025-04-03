@@ -4,26 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       run-type:
-        description: 'Run type'
+        description: "Run type"
         required: true
-        default: 'Deploy'
+        default: "Deploy"
         type: choice
         options:
-        - Code-Quality
-        - Deploy
+          - Code-Quality
+          - Deploy
   pull_request:
-    types: 
+    types:
       - opened
       - reopened
       - synchronize
     paths:
-      - 'frontend/**.js'
-      - 'frontend/**.ts'
-      - 'frontend/**.tsx'
-      - 'frontend/**.json'
-      - 'frontend/**.lock'
-      - 'frontend/src/**'
-      - 'frontend/Dockerfile'
+      - "frontend/**.js"
+      - "frontend/**.ts"
+      - "frontend/**.tsx"
+      - "frontend/**.json"
+      - "frontend/**.lock"
+      - "frontend/src/**"
+      - "frontend/Dockerfile"
 
 defaults:
   run:
@@ -57,7 +57,7 @@ jobs:
       #     level: "info"
       #     workdir: "./frontend/"
       #     fail_on_error: "true"
-        
+
       # TODO: fix lint errors
       # - name: Run linter
       #   if: github.event_name != 'pull_request'
@@ -96,7 +96,7 @@ jobs:
           outputs: type=docker,dest=/tmp/docker_image.tar
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: inputs.run-type == 'Deploy'
         with:
           retention-days: 1
@@ -106,7 +106,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: ['code-quality', 'build']
+    needs: ["code-quality", "build"]
     if: needs.code-quality.result == 'success' && needs.build.result == 'success' && inputs.run-type == 'Deploy'
     environment: Production
     env:
@@ -117,7 +117,7 @@ jobs:
       ECS_TASK_NAME: ${{ vars.resource_base_name }}-tfv2-frontend
       IMAGE_TAG: ${{ github.sha }}
     permissions:
-      contents: 'read'
+      contents: "read"
 
     steps:
       - name: Checkout
@@ -133,7 +133,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-        
+
       - name: Set image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -151,7 +151,7 @@ jobs:
           docker tag build:1.0.0 ${{ env.IMAGE }}
           docker image ls -a
           docker push ${{ env.IMAGE }}
-          
+
       - name: Download ECS task definition
         run: |
           aws ecs describe-task-definition --task-definition $ECS_TASK_NAME --query taskDefinition > task-definition.json
