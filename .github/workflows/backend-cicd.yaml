@@ -125,7 +125,7 @@ jobs:
         run: echo "IMAGE=$(echo $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG )" >> $GITHUB_ENV
 
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker_image
           path: /tmp
