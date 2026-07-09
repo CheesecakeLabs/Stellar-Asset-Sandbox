@@ -50,11 +50,13 @@ type (
 	}
 
 	PGConfig struct {
-		Host     string `env-required:"true" env:"PG_HOST"`
-		Port     int    `env-required:"true" env:"PG_PORT"`
-		User     string `env-required:"true" env:"PG_USER"`
-		Password string `env-required:"true" env:"PG_PASSWORD"`
-		DBName   string `env-required:"true" env:"PG_DB_NAME"`
+		Host        string `env-required:"true" env:"PG_HOST"`
+		Port        int    `env-required:"true" env:"PG_PORT"`
+		User        string `env-required:"true" env:"PG_USER"`
+		Password    string `env-required:"true" env:"PG_PASSWORD"`
+		DBName      string `env-required:"true" env:"PG_DB_NAME"`
+		SSLMode     string `env:"PG_SSL_MODE" env-default:"disable"`
+		SSLRootCert string `env:"PG_SSL_ROOT_CERT"`
 	}
 
 	HTTP struct {

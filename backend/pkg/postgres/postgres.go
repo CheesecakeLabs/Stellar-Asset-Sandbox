@@ -31,9 +31,12 @@ func New(c config.PGConfig, opts ...Option) (*Postgres, error) {
 	}
 
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		c.Host, c.Port, c.User, c.Password, c.DBName,
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode,
 	)
+	if c.SSLRootCert != "" {
+		psqlInfo += fmt.Sprintf(" sslrootcert=%s", c.SSLRootCert)
+	}
 	var err error
 	for pg.connAttempts > 0 {
 		pg.Db, err = sql.Open("postgres", psqlInfo)

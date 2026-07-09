@@ -24,7 +24,10 @@ func init() {
 		log.Fatalf("Config error: %s", e)
 	}
 
-	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", cfg.PG.User, cfg.PG.Password, cfg.PG.Host, cfg.PG.Port, cfg.PG.DBName)
+	databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", cfg.PG.User, cfg.PG.Password, cfg.PG.Host, cfg.PG.Port, cfg.PG.DBName, cfg.PG.SSLMode)
+	if cfg.PG.SSLRootCert != "" {
+		databaseURL += fmt.Sprintf("&sslrootcert=%s", cfg.PG.SSLRootCert)
+	}
 
 	var (
 		attempts = _defaultAttempts
